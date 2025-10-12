@@ -1,0 +1,330 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+
+import { headerData } from '~/navigation';
+
+const metadata = {
+  title: 'Suero Multivitamínico a Domicilio | SMD Vital',
+  description:
+    'Servicio de suero multivitamínico a domicilio en Bogotá, Colombia. Refortalece tu salud con nuestros tratamientos cómodos y profesionales directamente en tu hogar.',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Emergencia',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <Hero2
+    tagline="Nutrición y Vitalidad Directamente en tu Hogar"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda tu tratamiento', href: '#features' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/3845115/pexels-photo-3845115.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Suero Multivitamínico a Domicilio en Bogotá',
+      loading: 'lazy',
+    }}
+  >
+    <Fragment slot="title">
+      Suero <br /><span class="text-accent dark:text-white highlight">Multivitamínico</span><br />
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        Refortalece tu sistema inmunológico y mejora tu bienestar con nuestros tratamientos profesionales a domicilio.</span
+      >
+      Disfruta de una nutrición óptima sin salir de casa. ¡Confía en nuestros servicios seguros y efectivos en Bogotá, Colombia!
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="features"
+    title="¿Por qué elegir nuestro servicio de suero multivitamínico a domicilio?"
+    subtitle="Comprometidos con tu salud y comodidad en Bogotá"
+    columns={2}
+    items={[
+      {
+        title: 'Profesionales Certificados',
+        description:
+          'Nuestro equipo está compuesto por especialistas en nutrición y salud altamente capacitados para brindarte el mejor cuidado.',
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comodidad y Seguridad',
+        description: `Recibe tus tratamientos en la comodidad de tu hogar, siguiendo estrictos protocolos de higiene y seguridad en Bogotá.`,
+        icon: 'tabler:home',
+      },
+      {
+        title: 'Fórmulas Personalizadas',
+        description:
+          'Ofrecemos sueros multivitamínicos adaptados a tus necesidades específicas para maximizar los beneficios para tu salud.',
+        icon: 'tabler:clipboard-list',
+      },
+      {
+        title: 'Resultados Rápidos',
+        description: `Experimenta mejoras en tu bienestar general en poco tiempo gracias a nuestras formulaciones avanzadas.`,
+        icon: 'tabler:clock',
+      },
+    ]}
+  />
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    title="Nuestros Servicios"
+    subtitle="Descubre cómo SMD Vital Bogotá puede ayudarte a mejorar tu salud con suero multivitamínico a domicilio."
+    isReversed
+    items={[
+      {
+        title: 'Evaluación Inicial',
+        description:
+          'Realizamos una consulta detallada para entender tus necesidades y diseñar un plan de tratamiento personalizado.',
+      },
+      {
+        title: 'Administración Segura del Suero',
+        description: `Nuestros profesionales administran el suero multivitamínico de manera segura y efectiva en tu hogar, garantizando tu comodidad.`,
+      },
+      {
+        title: 'Seguimiento Continuo',
+        description: `Monitoreamos tu progreso y ajustamos el tratamiento según sea necesario para asegurar resultados óptimos.`,
+      },
+      {
+        title: 'Asesoramiento Nutricional',
+        description: `Te proporcionamos recomendaciones personalizadas para complementar tu tratamiento y mantener una salud óptima.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/11081177/pexels-photo-11081177.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Servicios de Suero Multivitamínico a Domicilio',
+      loading: 'lazy',
+    }}
+  />
+
+  <Content
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Mejora tu Bienestar',
+        description: `Nuestros tratamientos están diseñados para aumentar tu energía, fortalecer tu sistema inmunológico y mejorar tu salud general.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Mayor energía y vitalidad. <br /> Fortalecimiento del sistema inmunológico. <br /> Mejora de la salud mental y física.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6129233/pexels-photo-6129233.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Alivio y Beneficios del Suero Multivitamínico',
+      loading: 'lazy',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Nutrición y Vitalidad <br /><span class="text-2xl">Garantizadas</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isReversed
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Tecnología Avanzada',
+        description: `Utilizamos equipos de última generación para asegurar la precisión y eficacia de cada tratamiento.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Resultados más rápidos. <br /> Procedimientos cómodos y sin dolor. <br /> Mayor confianza en el tratamiento.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6753445/pexels-photo-6753445.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Tecnología Avanzada en Tratamientos de Suero',
+      loading: 'lazy',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Precisión y Confianza <br /><span class="text-2xl">Garantizadas</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isReversed
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Soporte Continuo',
+        description: `Nuestro equipo está disponible para responder tus dudas y proporcionarte el soporte necesario durante todo el proceso.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Asesoramiento personalizado. <br /> Atención inmediata a tus consultas. <br /> Tranquilidad y confianza en nuestro servicio.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6011662/pexels-photo-6011662.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Soporte Continuo en Suero Multivitamínico',
+      loading: 'lazy',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Soporte y Atención <br /><span class="text-2xl">Personalizada</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    items={[
+      {
+        title: 'Atención en Emergencias',
+        description: `Proporcionamos servicios rápidos y eficientes para tus necesidades de suero multivitamínico en situaciones de emergencia.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Respuesta inmediata. <br /> Minimización de riesgos. <br /> Tranquilidad en momentos críticos.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6010784/pexels-photo-6010784.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Atención en Emergencias de Suero Multivitamínico',
+      loading: 'lazy',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Atención Rápida <br /><span class="text-2xl">y Segura</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes"
+    items={[
+      {
+        title: '¿Qué es un suero multivitamínico?',
+        description:
+          'Un suero multivitamínico es una solución intravenosa que contiene una combinación de vitaminas esenciales diseñadas para mejorar la salud y el bienestar general.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo funciona el suero multivitamínico?',
+        description: `El suero multivitamínico se administra directamente en el torrente sanguíneo, lo que permite una absorción rápida y eficiente de las vitaminas y minerales necesarios para el cuerpo.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Es seguro recibir un suero multivitamínico a domicilio?',
+        description:
+          'Sí, nuestros profesionales están altamente capacitados y siguen estrictos protocolos de higiene y seguridad para garantizar un procedimiento seguro en tu hogar.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuáles son los beneficios de un suero multivitamínico?',
+        description:
+          'Los beneficios incluyen aumento de energía, fortalecimiento del sistema inmunológico, mejora de la salud mental y física, y una recuperación más rápida de enfermedades.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo agendar una cita para recibir el suero multivitamínico?',
+        description:
+          'Puedes agendar una cita fácilmente a través de nuestro WhatsApp, llamando a nuestro call center o completando el formulario en nuestro sitio web.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas sobre nuestro servicio de suero multivitamínico a domicilio? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPost Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Conoce más sobre el suero multivitamínico y sus beneficios"
+    information={`Visita nuestro blog para aprender más sobre los sueros multivitamínicos, sus beneficios, cómo funcionan y cómo pueden mejorar tu salud y bienestar. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

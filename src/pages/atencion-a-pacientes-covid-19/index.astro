@@ -1,0 +1,281 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+
+import { headerData } from '~/navigation';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+
+const metadata = {
+  title: 'Atención a Pacientes COVID-19 | SMD Vital',
+  description:
+    'Servicios especializados para la atención y cuidado de pacientes con COVID-19 en Bogotá. Atención profesional y protocolos de bioseguridad garantizados.',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Emergencia',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <Hero2
+    tagline="Cuidado Integral para Pacientes COVID-19"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Llamada de emergencia', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4167544/pexels-photo-4167544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Atención a Pacientes COVID-19',
+    }}
+  >
+    <Fragment slot="title">
+      Atención Médica para <br /><span class="text-accent dark:text-white highlight">Pacientes COVID-19</span><br />
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        Servicios profesionales con protocolos de bioseguridad para garantizar tu salud y la de los tuyos.</span
+      >
+      Contamos con un equipo especializado listo para atenderte en cualquier situación.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="features"
+    title="¿Por qué elegir nuestro servicio de atención a pacientes COVID-19?"
+    subtitle="Comprometidos con tu salud y bienestar"
+    columns={2}
+    items={[
+      {
+        title: 'Atención Especializada',
+        description:
+          'Personal médico altamente capacitado para tratar pacientes con COVID-19, siguiendo los más altos estándares.',
+        icon: 'tabler:layers-union',
+      },
+      {
+        title: 'Protocolos de Bioseguridad',
+        description: `Garantizamos la seguridad de nuestros pacientes y profesionales en cada consulta y tratamiento.`,
+        icon: 'tabler:artboard',
+      },
+      {
+        title: 'Monitoreo Continuo',
+        description: 'Seguimiento diario de signos vitales y síntomas para una recuperación óptima y segura.',
+        icon: 'tabler:writing',
+      },
+      {
+        title: 'Atención en Casa',
+        description: `Brindamos servicios a domicilio para evitar desplazamientos innecesarios y minimizar riesgos de contagio.`,
+        icon: 'tabler:podium',
+      },
+    ]}
+  />
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    title="Casos de Uso"
+    subtitle="Descubre cómo SMD Vital Bogotá apoya a pacientes con COVID-19."
+    isReversed
+    items={[
+      {
+        title: 'Atención Preventiva',
+        description:
+          'Realizamos chequeos regulares para identificar y prevenir complicaciones relacionadas con el COVID-19.',
+      },
+      {
+        title: 'Cuidado de Pacientes en Aislamiento',
+        description: `Apoyo integral para pacientes que requieren aislamiento en casa, garantizando su bienestar físico y emocional.`,
+      },
+      {
+        title: 'Tratamientos en Etapas Avanzadas',
+        description: `Asistencia médica especializada para casos graves o complicados de COVID-19.`,
+      },
+      {
+        title: 'Recuperación Post-COVID',
+        description: `Servicios diseñados para apoyar la rehabilitación y fortalecer la salud después de superar el COVID-19.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4167560/pexels-photo-4167560.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Casos de Uso para Pacientes COVID-19',
+    }}
+  />
+
+  <Content
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Seguimiento Médico',
+        description: `Controlamos la evolución del paciente con visitas regulares y reportes médicos detallados.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Detección temprana de complicaciones. <br /> Reducción del riesgo de hospitalización. <br /> Tranquilidad para pacientes y familiares.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4167562/pexels-photo-4167562.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Seguimiento Médico para COVID-19',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Monitoreo Continuo <br /><span class="text-2xl">y Atención Integral</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isReversed
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Rehabilitación Post-COVID',
+        description: `Apoyamos la recuperación física y respiratoria de pacientes que han superado el COVID-19.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Programas personalizados de recuperación. <br /> Mejora de la capacidad pulmonar. <br /> Acompañamiento médico constante.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/5938374/pexels-photo-5938374.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Rehabilitación Post-COVID',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Recuperación Física <br /><span class="text-2xl">y Bienestar</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    items={[
+      {
+        title: 'Atención en Urgencias Domiciliarias',
+        description: `Servicios inmediatos para atender emergencias relacionadas con el COVID-19 sin salir de casa.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Respuesta rápida y eficiente. <br /> Minimización de riesgos de exposición. <br /> Tranquilidad en momentos críticos.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4687173/pexels-photo-4687173.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Urgencias Domiciliarias por COVID-19',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Atención Rápida <br /><span class="text-2xl">y Segura</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes"
+    items={[
+      {
+        title: '¿Qué incluye el servicio de atención a pacientes COVID-19?',
+        description: 'Incluye monitoreo de signos vitales, administración de medicamentos y seguimiento médico.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Puedo recibir atención a domicilio?',
+        description: `Sí, contamos con un servicio especializado para atenderte en tu hogar, minimizando riesgos de contagio.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué medidas de bioseguridad se aplican?',
+        description:
+          'Todo nuestro personal sigue estrictos protocolos de bioseguridad para garantizar la seguridad de pacientes y médicos.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas sobre nuestro servicio para pacientes COVID-19? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPost Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Conoce más sobre el cuidado para pacientes COVID-19"
+    information={`Visita nuestro blog para aprender más sobre el manejo y cuidado de pacientes con COVID-19. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

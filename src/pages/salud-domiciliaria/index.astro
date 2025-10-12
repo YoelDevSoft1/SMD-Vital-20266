@@ -1,0 +1,303 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la salud domiciliaria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La salud domiciliaria es un modelo de atención médica que lleva los servicios de salud directamente al hogar del paciente, proporcionando cuidado médico profesional en un ambiente cómodo y familiar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué servicios incluye la salud domiciliaria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Incluye valoraciones médicas, enfermería especializada, toma de signos vitales, inyectología, electrocardiografía, laboratorio clínico, teleconsultas y procedimientos médicos especializados a domicilio.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Salud Domiciliaria Bogotá',
+  description: 'Servicios de salud domiciliaria integral en Bogotá. Atención médica profesional a domicilio con médicos certificados y enfermeras especializadas.',
+  url: SITE.site + '/salud-domiciliaria/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  medicalSpecialty: ['PrimaryCare', 'Nursing', 'HomeHealthCare'],
+  keywords: 'salud domiciliaria, atención médica domiciliaria, servicios de salud a domicilio, médico a domicilio, enfermera a domicilio',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+const metadata = {
+  title: 'Salud Domiciliaria en Bogotá | Servicios Médicos a Domicilio | SMD Vital',
+  description: 'Servicios de salud domiciliaria integral en Bogotá. Atención médica profesional a domicilio con médicos certificados y enfermeras especializadas. Cobertura 24/7.',
+  keywords: 'salud domiciliaria, atención médica domiciliaria, servicios de salud a domicilio, médico a domicilio, enfermera a domicilio, salud domiciliaria bogotá',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
+};
+
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+  <section class="relative -mt-[76px]">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Salud Domiciliaria' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Cuidado Médico en tu Hogar"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Agendar Servicio', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Llamar Ahora', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Servicios de salud domiciliaria integral en Bogotá - SMD Vital',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Salud Domiciliaria en Bogotá
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Atención Médica Profesional a Domicilio
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Cuidado Integral en tu Hogar
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Servicios de salud domiciliaria integral</span> con médicos certificados y enfermeras especializadas para brindar el mejor cuidado médico en la comodidad de tu hogar.
+      <br /><br />
+      Nuestro equipo profesional te ofrece atención médica completa en las 20 localidades de Bogotá. Servicios 24/7 con la más alta calidad.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+  <Features
+    id="beneficios"
+    tagline="Servicio Integral"
+    title="¿Por qué elegir nuestra salud domiciliaria?"
+    subtitle="Ofrecemos servicios de salud domiciliaria integral con médicos certificados y enfermeras especializadas para brindar el mejor cuidado médico en tu hogar."
+    columns={3}
+    items={[
+      {
+        title: 'Atención Personalizada',
+        description: 'Cuidado médico adaptado a las necesidades específicas de cada paciente en su entorno familiar.',
+        icon: 'tabler:user-heart',
+      },
+      {
+        title: 'Profesionales Certificados',
+        description: 'Médicos y enfermeras con certificación profesional y amplia experiencia en atención domiciliaria.',
+        icon: 'tabler:certificate',
+      },
+      {
+        title: 'Servicios Integrales',
+        description: 'Desde valoraciones médicas hasta procedimientos especializados, todo en un solo lugar.',
+        icon: 'tabler:stethoscope',
+      },
+      {
+        title: 'Disponibilidad 24/7',
+        description: 'Atención médica disponible las 24 horas del día, los 7 días de la semana.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Equipos Médicos',
+        description: 'Instrumental médico profesional y equipos especializados para cada procedimiento.',
+        icon: 'tabler:device-heart-monitor',
+      },
+      {
+        title: 'Cobertura Total',
+        description: 'Servicio disponible en las 20 localidades de Bogotá y municipios cercanos.',
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Servicios **************** -->
+  <Content
+    id="servicios"
+    title="Servicios de Salud Domiciliaria"
+    subtitle="Atención médica integral y especializada en la comodidad de tu hogar"
+    isReversed
+    items={[
+      {
+        title: 'Valoración Médica Integral',
+        description: 'Evaluación médica completa con historia clínica, examen físico y diagnóstico profesional.',
+        icon: 'tabler:clipboard-check',
+      },
+      {
+        title: 'Enfermería Especializada',
+        description: 'Cuidados de enfermería especializados con técnicas profesionales y equipos médicos.',
+        icon: 'tabler:user-heart',
+      },
+      {
+        title: 'Laboratorio Clínico',
+        description: 'Toma de muestras y análisis clínicos en la comodidad de tu hogar.',
+        icon: 'tabler:microscope',
+      },
+      {
+        title: 'Teleconsultas Médicas',
+        description: 'Consultas médicas virtuales con especialistas certificados.',
+        icon: 'tabler:video',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Servicios de salud domiciliaria integral en Bogotá',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  />
+
+  <!-- FAQs Widget ******************* -->
+  <FAQs
+    title="Preguntas frecuentes sobre salud domiciliaria"
+    subtitle="Respuestas a las dudas más comunes sobre nuestros servicios de salud domiciliaria"
+    items={[
+      {
+        title: '¿Qué es la salud domiciliaria?',
+        description: 'La salud domiciliaria es un modelo de atención médica que lleva los servicios de salud directamente al hogar del paciente, proporcionando cuidado médico profesional en un ambiente cómodo y familiar.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué servicios incluye la salud domiciliaria?',
+        description: 'Incluye valoraciones médicas, enfermería especializada, toma de signos vitales, inyectología, electrocardiografía, laboratorio clínico, teleconsultas y procedimientos médicos especializados a domicilio.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+  <Steps2
+    title="Agenda tu Servicio de Salud Domiciliaria"
+    subtitle="Atención médica integral a domicilio. Personal certificado con amplia experiencia. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Agendar Servicio por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20necesito%20agendar%20un%20servicio%20de%20salud%20domiciliaria',
+      icon: 'tabler:brand-whatsapp',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: 'Contacto directo y respuesta inmediata',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamada Telefónica',
+        description: 'Atención personalizada por teléfono',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda Bogotá',
+        icon: 'tabler:clock',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPosts Widget **************** -->
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre salud domiciliaria"
+    information={`Visita nuestro blog para conocer más sobre salud domiciliaria, cuidados médicos a domicilio y beneficios de la atención médica en el hogar. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+
+</Layout>

@@ -1,0 +1,179 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import HeroText from '~/components/widgets/HeroText.astro';
+import Prices from '~/components/widgets/Pricing.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import Steps from '~/components/widgets/Steps.astro';
+import Features3 from '~/components/widgets/Features3.astro';
+import CallToAction from '~/components/widgets/CallToAction.astro';
+
+const metadata = {
+  title: 'Servicios Médicos Domiciliarios en Bogotá | SMD Vital',
+  description:
+    'Nuestros médicos a domicilio en Bogotá ofrecen atención médica de calidad en la comodidad de tu hogar. Evita el tráfico y las largas esperas, ¡contáctanos hoy mismo!',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- HeroText Widget ******************* -->
+  <HeroText
+    tagline="Precios"
+    title="Servicios Médicos Domiciliarios a tu Alcance"
+    subtitle="Conoce las opciones que ofrecemos para cuidar de tu salud en la comodidad de tu hogar."
+  />
+
+  <!-- Pricing Widget ******************* -->
+  <Prices
+    title="Nuestros Servicios"
+    subtitle="Cada servicio tiene un precio determinado que puede variar según tus necesidades. Nuestros asesores están disponibles para brindarte la información exacta."
+    prices={[
+      {
+        title: 'Consulta Médica Domiciliaria',
+        subtitle: 'Atención médica integral en tu hogar',
+        price: 'Consultar con un asesor',
+        period: '',
+        items: [
+          { description: 'Evaluación médica completa' },
+          { description: 'Recomendaciones de tratamiento' },
+          { description: 'Seguimiento según el caso' },
+        ],
+        callToAction: {
+          target: '_blank',
+          text: 'Consultar precio con un asesor',
+          href: 'https://wa.me/573042912564',
+        },
+      },
+      {
+        title: 'Toma de Muestras a Domicilio',
+        subtitle: 'Exámenes clínicos sin salir de casa',
+        price: 'Consultar con un asesor',
+        period: '',
+        items: [
+          { description: 'Extracción de sangre y otras muestras' },
+          { description: 'Procesamiento en laboratorios certificados' },
+          { description: 'Envío de resultados en línea' },
+        ],
+        callToAction: {
+          target: '_blank',
+          text: 'Consultar precio con un asesor',
+          href: 'https://wa.me/573042912564',
+        },
+        hasRibbon: true,
+        ribbonTitle: 'Recomendado',
+      },
+      {
+        title: 'Cuidado Postoperatorio en Casa',
+        subtitle: 'Atención especializada después de cirugías',
+        price: 'Consultar con un asesor',
+        period: '',
+        items: [
+          { description: 'Curaciones y seguimiento de heridas' },
+          { description: 'Control de signos vitales' },
+          { description: 'Orientación en cuidados adicionales' },
+        ],
+        callToAction: {
+          target: '_blank',
+          text: 'Consultar precio con un asesor',
+          href: 'https://wa.me/573042912564',
+        },
+      },
+    ]}
+  />
+
+  <!-- Features3 Widget ************** -->
+  <Features3
+    title="Beneficios de Nuestros Servicios"
+    subtitle="Al elegir SMD Vital, obtienes múltiples ventajas que mejoran tu experiencia de cuidado médico a domicilio."
+    columns={2}
+    items={[
+      {
+        title: 'Atención Personalizada',
+        description: 'Cada paciente es único. Adaptamos nuestro servicio a tus necesidades específicas.',
+        icon: 'tabler:user',
+      },
+      {
+        title: 'Transparencia en Precios',
+        description:
+          'Nuestros asesores te informarán el costo exacto antes de agendar el servicio, sin gastos ocultos.',
+        icon: 'tabler:cash',
+      },
+      {
+        title: 'Profesionales Calificados',
+        description: 'Contamos con un equipo médico certificado y con experiencia en atención domiciliaria.',
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Ahorro de Tiempo',
+        description: 'Evita desplazamientos y esperas prolongadas, recibiendo la atención directamente en tu hogar.',
+        icon: 'tabler:clock',
+      },
+    ]}
+    classes={{ container: 'max-w-5xl' }}
+  />
+
+  <!-- Steps Widget ****************** -->
+  <Steps
+    title="¿Cómo funciona el proceso?"
+    tagline="Fácil y Rápido"
+    isReversed={true}
+    items={[
+      { title: 'Contáctanos', icon: 'tabler:number-1' },
+      { title: 'Consulta con un asesor', icon: 'tabler:number-2' },
+      { title: 'Recibe información sobre precios y disponibilidad', icon: 'tabler:number-3' },
+      { title: 'Agenda tu servicio', icon: 'tabler:number-4' },
+      { title: 'Disfruta de la atención en tu hogar', icon: 'tabler:number-5' },
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1536816579748-4ecb3f03d72a?ixlib=rb-4.0.3&auto=format&fit=crop&w=987&q=80',
+      alt: 'Proceso de atención domiciliaria',
+    }}
+  />
+
+  <!-- FAQs Widget ******************* -->
+  <FAQs
+    title="Preguntas Frecuentes sobre Precios"
+    subtitle="Entendemos que la claridad es importante. Estas respuestas pueden ayudarte a resolver tus dudas sobre nuestros costos y servicios."
+    columns={1}
+    items={[
+      {
+        title: '¿Cómo obtengo el precio exacto del servicio?',
+        description:
+          'Nuestros asesores te brindarán el costo específico una vez conozcan tus necesidades y el tipo de servicio que requieras.',
+      },
+      {
+        title: '¿Existen costos ocultos?',
+        description:
+          'No. Te informaremos todos los detalles del precio antes de que agendes el servicio. Queremos que tengas una experiencia transparente.',
+      },
+      {
+        title: '¿Qué métodos de pago aceptan?',
+        description:
+          'Aceptamos tarjetas de crédito, débito y transferencias electrónicas. Nuestros asesores te indicarán las opciones disponibles.',
+      },
+      {
+        title: '¿Puedo cambiar el servicio contratado?',
+        description:
+          'Si necesitas modificar tu solicitud, contáctanos. Haremos lo posible por adaptarnos a tus nuevas necesidades.',
+      },
+      {
+        title: '¿Ofrecen reembolsos?',
+        description:
+          'Si por alguna razón no podemos prestar el servicio acordado, nuestros asesores te informarán las opciones disponibles, incluyendo posibles devoluciones.',
+      },
+    ]}
+  />
+
+  <!-- CallToAction Widget *********** -->
+  <CallToAction
+    title="¿Listo para recibir atención en tu hogar?"
+    subtitle="Contáctanos y descubre cómo SMD Vital puede mejorar tu calidad de vida con atención médica domiciliaria."
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Consultar con un asesor',
+        href: 'https://wa.me/573042912564',
+      },
+    ]}
+  />
+</Layout>

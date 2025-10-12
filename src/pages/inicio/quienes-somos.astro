@@ -1,0 +1,41 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Hero2 from '~/components/widgets/Hero2.astro';
+import CallToAction from '~/components/widgets/CallToAction.astro';
+
+const metadata = {
+  title: 'Sales Landing Page Demo',
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+
+  <Hero2
+    tagline="SMD Vital Total"
+    title="SMD Vital: Médicos a Domicilio de Confianza"
+    subtitle="En <strong>SMD Vital</strong>, somos un equipo de profesionales dedicados a brindar atención médica a domicilio en Bogotá. Nuestro compromiso es ofrecer un servicio competente y personalizado que se adapta a las necesidades de cada paciente, garantizando cuidado de calidad en la comodidad de tu hogar."
+    actions={[
+      { variant: 'primary', text: 'WhatsApp', href: '#', icon: 'tabler:square-rounded-arrow-right' },
+      { text: 'Llamada de emergencia', href: '#' },
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1638202993928-7267aad84c31?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      alt: 'Children telling a story. Long-form Sales Landing Page demo',
+    }}
+  />
+
+  <CallToAction
+    title="Confía en los Expertos en Atención Médica a Domicilio"
+    subtitle="Con un enfoque en la salud integral, nuestros médicos a domicilio están preparados para atenderte con rapidez y profesionalismo."
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Download Template',
+        href: 'https://wa.link/7cprhk',
+        icon: 'tabler:download',
+      },
+    ]}
+  />
+</Layout>

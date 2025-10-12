@@ -1,0 +1,895 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el lavado de oídos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un procedimiento para remcer y otros residuos del canal auditivo, mejorando la audición y previniendo molestias.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es doloroso el procedimiento?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No, el lavado de oídos, si se realiza correctamente, es indoloro y seguro. Nuestro personal se asegura de minimizar cualquier molestia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta el lavado de oídos a domicilio en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio del lavado de oídos a domicilio en Bogotá es de $140,000 COP. Este valor incluye evaluación inicial, procedimiento completo, materiales estériles y cuidados posteriores. Sin costos ocultos, precios transparentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre lavado de oídos e irrigación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La irrigación es una técnica dentro del lavado de oídos que utiliza agua tibia a presión controlada. Nuestros profesionales evalúan cada caso y determinan si es necesaria irrigación, aspiración o una combinación de técnicas para remover el cerumen de forma segura.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo hacerme el lavado de oídos yo mismo en casa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No se recomienda hacerlo sin supervisión profesional. El uso incorrecto de hisopos, pinzas u otros objetos puede empujar el cerumen más profundo o dañar el tímpano. Nuestro servicio profesional garantiza seguridad y efectividad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Con qué frecuencia debo realizar un lavado de oídos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende de cada persona. Si presentas acumulación frecuente de cerumen, nuestro equipo puede aconsejarte sobre la periodicidad adecuada, generalmente entre 3 a 6 meses.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué contraindicaciones tiene el lavado de oídos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No se recomienda en casos de perforación timpánica, infección activa del oído, cirugía reciente del oído o sangrado. Nuestro personal realiza una evaluación previa para determinar si el procedimiento es seguro para ti.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden atender a niños y adultos mayores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, adaptamos el procedimiento según la edad y condición del paciente, brindando una experiencia segura para todos. Tenemos experiencia trabajando con pacientes pediátricos y geriátricos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cada cuánto tiempo debo hacerme limpieza de oídos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La frecuencia varía según la producción individual de cerumen. Algunos pacientes necesitan limpieza cada 3-4 meses, mientras que otros pueden esperar 6-12 meses. Después de la primera evaluación, te daremos una recomendación personalizada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo el lavado de oídos a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes hacerlo fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Lavado de Oídos a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Limpieza de Oídos Barato',
+  description: 'Lavado de oídos a domicilio barato en Bogotá. Limpieza de oídos profesional, cerumen, otoscopia a domicilio. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  url: SITE.site + '/lavado-de-oidos-a-domicilio/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    },
+    {
+      '@type': 'City',
+      name: 'Funza'
+    },
+    {
+      '@type': 'City',
+      name: 'Mosquera'
+    },
+    {
+      '@type': 'City',
+      name: 'Cota'
+    }
+  ],
+  medicalSpecialty: [
+    'Audiology',
+    'EarNoseThroat',
+    'PrimaryCare',
+    'Nursing'
+  ],
+  keywords: 'lavado de oídos bogotá, limpieza de oídos barato, cerumen a domicilio, otoscopia bogotá, lavado de oídos económico, limpieza de oídos profesional, cerumen domicilio, otoscopia a domicilio, lavado de oídos 24 horas, limpieza de oídos urgente',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Lavado de Oídos',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Lavado de Oídos Profesional',
+          description: 'Limpieza de cerumen y residuos del canal auditivo con técnicas seguras y profesionales'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Evaluación Auditiva Inicial',
+          description: 'Inspección para determinar la presencia de cerumen y técnica más adecuada'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Post-Tratamiento y Consejos',
+          description: 'Indicaciones para cuidado posterior y prevención de acumulación de cerumen'
+        }
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    reviewCount: '150',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+// Schema Reviews para testimonios
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  itemReviewed: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital - Lavado de Oídos a Domicilio Bogotá'
+  },
+  author: {
+    '@type': 'Person',
+    name: 'María González'
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '5',
+    bestRating: '5'
+  },
+  reviewBody: 'Excelente servicio de limpieza de oídos a domicilio. El personal es muy profesional y el procedimiento fue completamente indoloro. Recomendado 100%.'
+};
+
+const metadata = {
+  title: 'Lavado de Oídos a Domicilio en Bogotá | Profesional y Económico | SMD Vital',
+  description:
+    'Lavado de oídos en Bogotá a domicilio. Servicio médico profesional con precios desde $140.000 COP. Médicos a domicilio especializados en limpieza de oídos. Atención 24/7 en toda la capital.',
+  keywords: 'lavado de oídos, lavados de oídos, lavado de oidos en bogota, lavado de oido bogota, lavado de oídos precio, médico a domicilio, médicos a domicilio, medico a domicilio bogota, servicio médico a domicilio, atención médica a domicilio, limpieza de oidos bogota, lavado de oídos bogotá',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/5206945/pexels-photo-5206945.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
+};
+
+// Schema HowTo para el procedimiento de limpieza auditiva
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo realizar limpieza auditiva profesional a domicilio',
+  description: 'Procedimiento paso a paso para realizar limpieza auditiva profesional de forma segura en el hogar',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/8313438/pexels-photo-8313438.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Procedimiento profesional de limpieza auditiva a domicilio con equipos médicos especializados'
+  },
+  totalTime: 'PT45M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '140000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Otoscopio profesional',
+      description: 'Instrumento médico para inspección del canal auditivo'
+    },
+    {
+      '@type': 'HowToSupply', 
+      name: 'Solución estéril de irrigación',
+      description: 'Líquido estéril a temperatura corporal para irrigación'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Equipo de aspiración',
+      description: 'Instrumento médico para aspiración de residuos'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Materiales estériles',
+      description: 'Guantes, gasas y otros materiales de un solo uso'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Otoscopio con luz LED',
+      description: 'Instrumento de diagnóstico para visualización del canal auditivo'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Sistema de irrigación',
+      description: 'Equipo especializado para irrigación con presión controlada'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Aspirador médico',
+      description: 'Equipo de aspiración para remoción de residuos'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Evaluación Auditiva Inicial',
+      text: 'Realizar inspección profesional con otoscopio para determinar el tipo y cantidad de cerumen. Identificar la técnica más segura según la condición del paciente.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/5206945/pexels-photo-5206945.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Evaluación auditiva inicial con otoscopio profesional para diagnóstico preciso'
+      },
+      url: SITE.site + '/lavado-de-oidos-a-domicilio/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Preparación del Paciente',
+      text: 'Explicar el procedimiento al paciente y posicionarlo cómodamente. Aplicar gotas ablandadoras si es necesario para facilitar la extracción.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/8313438/pexels-photo-8313438.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Preparación del paciente para procedimiento de limpieza auditiva profesional'
+      },
+      url: SITE.site + '/lavado-de-oidos-a-domicilio/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Lavado Profesional',
+      text: 'Realizar irrigación con solución estéril tibia o aspiración con equipos especializados. Procedimiento completamente indoloro de 10-15 minutos.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/8313438/pexels-photo-8313438.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Lavado profesional con irrigación estéril y equipos médicos especializados'
+      },
+      url: SITE.site + '/lavado-de-oidos-a-domicilio/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Verificación y Cuidados Posteriores',
+      text: 'Verificar la limpieza completa con otoscopio. Proporcionar recomendaciones para el cuidado posterior y prevención de futuras acumulaciones.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/8313438/pexels-photo-8313438.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Verificación final y cuidados posteriores para limpieza auditiva completa'
+      },
+      url: SITE.site + '/lavado-de-oidos-a-domicilio/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
+
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Lavado de Oídos a Domicilio' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Cuidado Experto para tus Oídos"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Lavado de Oídos Barato WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda Limpieza de Oídos', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/5206945/pexels-photo-5206945.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Profesional médico realizando limpieza auditiva a domicilio con equipos especializados - SMD Vital Bogotá',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Lavado de Oídos en Bogotá a Domicilio
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Servicio Profesional y Económico
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Limpieza Auditiva Segura
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Lavado de oídos profesional a domicilio</span> con técnicas seguras y médicos especializados para aliviar molestias y mejorar tu audición sin salir de casa.
+      <br /><br />
+      Nuestro equipo certificado te ofrece un servicio confiable y económico en las 20 localidades de la capital. Precios transparentes sin costos ocultos.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestro lavado de oídos a domicilio?"
+    subtitle="Ofrecemos atención médica profesional en tu hogar con técnicas seguras y especializadas para aliviar molestias y mejorar tu audición. Nuestro equipo certificado te brinda un servicio confiable y económico en las 20 localidades de la capital."
+    columns={3}
+    items={[
+      {
+        title: 'Sin Dolor ni Molestias',
+        description:
+          'Procedimiento completamente indoloro con técnicas profesionales certificadas. Alivio inmediato de la presión y mejora en la audición.',
+        icon: 'tabler:heart-handshake',
+      },
+      {
+        title: 'Equipos Especializados',
+        description: `Utilizamos instrumental médico profesional certificado para la irrigación y aspiración de cerumen de forma segura.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda la ciudad. Agenda tu cita y recibe atención profesional el mismo día sin largas esperas.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Personal Certificado',
+        description: `Enfermeros especializados con certificación en procedimientos otorrinolaringológicos y amplia experiencia.`,
+        icon: 'tabler:certificate',
+      },
+      {
+        title: 'Resultados Inmediatos',
+        description: 'Mejora instantánea de la audición y eliminación completa del cerumen en una sola sesión.',
+        icon: 'tabler:check',
+      },
+      {
+        title: 'Cobertura Total',
+        description: `Servicio disponible en las 20 localidades de la capital y municipios cercanos. Atención 24/7 todos los días.`,
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Procedimiento **************** -->
+
+  <Content
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestro Procedimiento?"
+    subtitle="Proceso profesional paso a paso realizado por especialistas certificados"
+    isReversed
+    items={[
+      {
+        title: '1. Evaluación Auditiva Inicial',
+        description:
+          'Inspección profesional con otoscopio para determinar el tipo y cantidad de cerumen. Identificamos la técnica más segura según tu condición.',
+        icon: 'tabler:ear',
+      },
+      {
+        title: '2. Preparación del Procedimiento',
+        description: `Aplicamos gotas reblandecedoras si es necesario. Preparamos el equipo estéril y verificamos que no existan contraindicaciones.`,
+        icon: 'tabler:droplet',
+      },
+      {
+        title: '3. Lavado Profesional',
+        description: `Irrigación con solución estéril tibia o aspiración con equipos especializados. Procedimiento completamente indoloro de 10-15 minutos.`,
+        icon: 'tabler:device-heart-monitor',
+      },
+      {
+        title: '4. Verificación y Cuidados',
+        description: `Inspección final para confirmar eliminación completa. Instrucciones de cuidado posterior y prevención de acumulación futura.`,
+        icon: 'tabler:circle-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8313438/pexels-photo-8313438.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Procedimiento paso a paso de limpieza auditiva profesional con otoscopio y equipos médicos especializados',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h2>
+      <p class="text-muted mt-4">
+        Utilizamos técnicas aprobadas por la Organización Mundial de la Salud (OMS) y el Ministerio de Salud de Colombia para garantizar tu seguridad y bienestar.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo necesitas **************** -->
+
+  <Content
+    id="cuando-necesitas"
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Síntomas de Tapón de Cerumen',
+        description: `✓ Disminución de la audición o sensación de oído tapado<br>
+                      ✓ Zumbidos o ruidos en el oído (tinnitus)<br>
+                      ✓ Dolor o molestia en el canal auditivo<br>
+                      ✓ Sensación de presión o plenitud en el oído<br>
+                      ✓ Mareos o vértigo ocasional`,
+        icon: 'tabler:alert-circle',
+      },
+      {
+        title: '¿Quiénes lo Necesitan?',
+        description: `✓ Personas con producción excesiva de cerumen<br>
+                      ✓ Usuarios de audífonos o tapones<br>
+                      ✓ Adultos mayores con cerumen endurecido<br>
+                      ✓ Pacientes post-operatorios del oído<br>
+                      ✓ Trabajadores expuestos a polvo o suciedad`,
+        icon: 'tabler:users',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/5998452/pexels-photo-5998452.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Paciente con síntomas de acumulación de cerumen consultando sobre limpieza auditiva profesional a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Atención Médica?
+      </h2>
+      <p class="text-muted mt-4">
+        Si experimentas alguno de estos síntomas, es momento de agendar una evaluación profesional. La acumulación de residuos puede afectar tu calidad de vida y audición. 
+        <strong>No uses hisopos</strong> ni objetos para limpiar tus oídos, ya que pueden empujar el cerumen más profundo y causar lesiones.
+      </p>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Precios **************** -->
+
+  <Content
+    id="precios"
+    title="Precios de Lavado de Oídos a Domicilio"
+    subtitle="Servicio médico especializado a domicilio con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
+    isReversed
+    items={[
+      {
+        title: 'Precio Fijo Garantizado',
+        description: `$140.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: 'Todo Incluido',
+        description: `Evaluación inicial, procedimiento completo, materiales estériles, equipos especializados y cuidados posteriores.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el resultado, realizamos una segunda limpieza sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $200.000+ | Otros domicilios: $180.000+ | SMD Vital: $140.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios transparentes y competitivos para limpieza auditiva profesional a domicilio en Bogotá - $140.000 COP',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+  </Content>
+
+  <!-- Content Widget - Por qué NO usar hisopos **************** -->
+
+  <Content
+    id="no-hisopos"
+    title="¿Por qué NO usar hisopos para limpiar los oídos?"
+    subtitle="Información importante sobre los riesgos de usar hisopos y la importancia de la limpieza profesional"
+    isReversed={false}
+    items={[
+      {
+        title: 'Empujan el cerumen hacia adentro',
+        description: `Los hisopos no extraen el cerumen, sino que lo empujan más profundo en el canal auditivo, creando tapones más compactos y difíciles de remover.`,
+        icon: 'tabler:arrow-down',
+      },
+      {
+        title: 'Riesgo de perforación timpánica',
+        description: `Un movimiento brusco puede causar lesiones graves en el tímpano, incluyendo perforaciones que requieren cirugía y pueden afectar la audición permanentemente.`,
+        icon: 'tabler:alert-triangle',
+      },
+      {
+        title: 'Infecciones y lesiones',
+        description: `Pueden causar microlesiones en el canal auditivo, facilitando la entrada de bacterias y el desarrollo de infecciones dolorosas como otitis externa.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Pérdida de la función natural',
+        description: `El oído tiene un sistema de autolimpieza natural. Los hisopos interfieren con este proceso y pueden causar dependencia de limpieza manual.`,
+        icon: 'tabler:shield-x',
+      },
+      {
+        title: 'Sensación de oído tapado',
+        description: `Al empujar el cerumen, los hisopos crean la sensación de oído tapado, llevando a un ciclo vicioso de más limpieza manual.`,
+        icon: 'tabler:ear-off',
+      },
+      {
+        title: 'Solución profesional segura',
+        description: `Nuestro servicio utiliza técnicas médicas especializadas que extraen el cerumen de forma segura sin empujarlo hacia adentro.`,
+        icon: 'tabler:circle-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Riesgos médicos de usar hisopos para limpieza de oídos - Por qué es importante la limpieza profesional a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-red-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Sección de Servicios Relacionados con Enlaces Internos -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Servicios Complementarios</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        Además de la limpieza auditiva, ofrecemos <a href="/servicios" class="text-primary hover:underline font-semibold">atención médica integral a domicilio</a> en la capital
+      </p>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        La <strong>limpieza auditiva profesional</strong> es parte de nuestro amplio catálogo de <a href="/servicios" class="text-primary hover:underline">servicios médicos domiciliarios</a>.
+        Si necesitas una <a href="/valoracion-medica-domiciliaria" class="text-primary hover:underline">valoración médica completa</a>,
+        nuestro equipo puede evaluar múltiples aspectos de tu salud durante la visita.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Para quienes requieren monitoreo constante, ofrecemos
+        <a href="/toma-de-signos-vitales" class="text-primary hover:underline">toma de signos vitales</a> y
+        <a href="/enfemeria-a-nivel-domiciliario-y-hospitalario" class="text-primary hover:underline">servicios de enfermería especializada</a>.
+        También realizamos <a href="/sutura-y-retiro-de-puntos" class="text-primary hover:underline">curaciones y retiro de puntos</a>
+        con técnicas asépticas certificadas. <a href="/contacto" class="text-primary hover:underline font-semibold">Contáctanos</a> para más información.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Si prefieres una consulta inicial sin desplazamiento, conoce nuestra
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">teleconsulta médica</a> disponible las 24 horas.
+        Para diagnósticos más complejos, contamos con <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">laboratorio clínico a domicilio</a>
+        con toma de muestras profesional y resultados digitales.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Explora todos nuestros <a href="/servicios" class="text-primary hover:underline font-semibold">servicios médicos a domicilio</a>
+        o visita nuestro <a href="/blog" class="text-primary hover:underline">blog de salud</a> para consejos de cuidado en casa.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes sobre lavado de oídos"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio médico especializado"
+    items={[
+      {
+        title: '¿Qué es el lavado de oídos?',
+        description:
+          'Es un procedimiento médico para remover cerumen y residuos del canal auditivo, mejorando la audición y previniendo molestias.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Es doloroso el procedimiento?',
+        description: `No, el lavado de oídos, si se realiza correctamente, es indoloro y seguro. Nuestro personal se asegura de minimizar cualquier molestia.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuánto cuesta el lavado de oídos a domicilio?',
+        description:
+          'El precio del lavado de oídos a domicilio es de $140.000 COP para todas las localidades. Este valor incluye evaluación inicial, procedimiento completo, materiales estériles y cuidados posteriores. Sin costos ocultos, precios transparentes.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué diferencia hay entre lavado de oídos e irrigación?',
+        description:
+          'La irrigación es una técnica dentro del lavado de oídos que utiliza agua tibia a presión controlada. Nuestros profesionales evalúan cada caso y determinan si es necesaria irrigación, aspiración o una combinación de técnicas.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Puedo hacerme el lavado de oídos yo mismo en casa?',
+        description:
+          'No se recomienda hacerlo sin supervisión profesional. El uso incorrecto de hisopos u otros objetos puede empujar el cerumen más profundo o dañar el tímpano. Nuestro servicio profesional garantiza seguridad.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Con qué frecuencia debo realizar un lavado de oídos?',
+        description:
+          'Depende de cada persona. Si presentas acumulación frecuente de cerumen, nuestro equipo puede aconsejarte sobre la periodicidad adecuada, generalmente entre 3 a 6 meses.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué contraindicaciones tiene el lavado de oídos?',
+        description:
+          'No se recomienda en casos de perforación timpánica, infección activa del oído, cirugía reciente o sangrado. Nuestro personal realiza una evaluación previa para determinar si el procedimiento es seguro.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Pueden atender a niños y adultos mayores?',
+        description:
+          'Sí, adaptamos el procedimiento según la edad y condición del paciente, brindando una experiencia segura para todos. Tenemos experiencia con pacientes pediátricos y geriátricos.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cada cuánto tiempo debo hacerme un lavado de oídos?',
+        description:
+          'La frecuencia varía según la producción individual de cerumen. Algunos pacientes necesitan lavado cada 3-4 meses, mientras que otros pueden esperar 6-12 meses. Después de la primera evaluación, te daremos una recomendación personalizada.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo agendo el lavado de oídos a domicilio?',
+        description:
+          'Puedes hacerlo fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Sección de Trust Signals y Estadísticas -->
+  <section class="py-8 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-4 text-center">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">500+</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Lavados Realizados</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">4.8/5</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Calificación Promedio</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">45 min</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Tiempo de Llegada</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">24/7</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Disponibilidad</span>
+        </div>
+      </div>
+      <p class="mt-6 text-lg font-semibold text-accent">
+        ✓ Disponible hoy en tu localidad
+      </p>
+    </div>
+  </section>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Agenda tu Cita Ahora - Atención en 45 Minutos"
+    subtitle="Servicio médico especializado a domicilio. Personal certificado con más de 500 procedimientos exitosos. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Agendar Lavado de Oídos por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20necesito%20agendar%20un%20lavado%20de%20oídos%20a%20domicilio',
+      icon: 'tabler:brand-whatsapp',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamar Ahora',
+        description: 'Atención Inmediata',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo Electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent dark:from-slate-800"></div>
+    </Fragment>
+  </Steps2>
+
+  <!-- BlogLatestPosts Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre el lavado de oídos"
+    information={`Visita nuestro blog para conocer más sobre la higiene auditiva, la prevención de problemas y la importancia de un cuidado adecuado. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

@@ -1,0 +1,148 @@
+---
+import Icon from '~/components/ui/Icon.astro';
+---
+
+<section class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 dark:from-blue-900 dark:via-slate-900 dark:to-slate-950 not-prose">
+  <!-- Patrón de fondo geométrico animado -->
+  <div class="absolute inset-0 opacity-20">
+    <div class="absolute top-10 left-10 w-64 h-64 bg-cyan-400 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
+    <div class="absolute top-20 right-20 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl animate-float animation-delay-2"></div>
+    <div class="absolute bottom-10 left-1/2 w-56 h-56 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl animate-float animation-delay-4"></div>
+  </div>
+
+  <!-- Patrón de puntos decorativos -->
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+    <!-- Badges superiores con animación fade-in -->
+    <div class="flex flex-wrap items-center justify-center gap-3 mb-6 animate-fade-in">
+      <div class="flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/40 px-5 py-2.5 rounded-full shadow-lg hover:bg-white/25 transition-all duration-300">
+        <Icon name="tabler:clock-bolt" class="w-5 h-5 text-yellow-300" />
+        <span class="text-white text-sm font-bold">Atención disponible 24/7</span>
+      </div>
+      <div class="flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/40 px-5 py-2.5 rounded-full shadow-lg hover:bg-white/25 transition-all duration-300">
+        <Icon name="tabler:certificate" class="w-5 h-5 text-cyan-300" />
+        <span class="text-white text-sm font-bold">Profesionales certificados</span>
+      </div>
+      <div class="flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/40 px-5 py-2.5 rounded-full shadow-lg hover:bg-white/25 transition-all duration-300">
+        <Icon name="tabler:users" class="w-5 h-5 text-green-300" />
+        <span class="text-white text-sm font-bold">12,500+ pacientes</span>
+      </div>
+      <div class="flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/40 px-5 py-2.5 rounded-full shadow-lg hover:bg-white/25 transition-all duration-300">
+        <Icon name="tabler:star-filled" class="w-5 h-5 text-yellow-300" />
+        <span class="text-white text-sm font-bold">97% satisfacción</span>
+      </div>
+    </div>
+
+    <!-- Título principal y CTAs -->
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+      <!-- Sección izquierda: Título principal -->
+      <div class="flex items-center gap-3 text-white">
+        <div class="flex-shrink-0 w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center animate-pulse-slow">
+          <Icon name="tabler:ambulance" class="w-7 h-7 text-white" />
+        </div>
+        <div class="text-left">
+          <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">
+            URGENCIAS <span class="text-yellow-300">24/7</span>
+          </h2>
+          <p class="text-sm md:text-base text-blue-100 font-medium">Médicos certificados en menos de 45 minutos</p>
+        </div>
+      </div>
+
+      <!-- Sección central: Badges informativos -->
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full">
+          <Icon name="tabler:clock-hour-3" class="w-5 h-5 text-yellow-300" />
+          <span class="text-white text-sm font-semibold whitespace-nowrap">45 min respuesta</span>
+        </div>
+        <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full">
+          <Icon name="tabler:map-pin" class="w-5 h-5 text-green-300" />
+          <span class="text-white text-sm font-semibold whitespace-nowrap">Toda Bogotá</span>
+        </div>
+        <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full">
+          <Icon name="tabler:shield-check" class="w-5 h-5 text-cyan-300" />
+          <span class="text-white text-sm font-semibold whitespace-nowrap">Certificados</span>
+        </div>
+      </div>
+
+      <!-- Sección derecha: CTAs -->
+      <div class="flex flex-col sm:flex-row items-center gap-3">
+        <a
+          href="https://wa.link/7cprhk"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group relative inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-full hover:bg-yellow-300 hover:text-blue-900 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-yellow-300/50"
+        >
+          <Icon name="tabler:brand-whatsapp" class="w-5 h-5 transition-transform group-hover:rotate-12" />
+          <span class="text-sm">WhatsApp</span>
+          <span class="absolute top-0 right-0 flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+          </span>
+        </a>
+        <a
+          href="tel:3208862408"
+          class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+        >
+          <span class="text-sm">Llamar</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+    }
+    33% {
+      transform: translateY(-20px) translateX(20px);
+    }
+    66% {
+      transform: translateY(20px) translateX(-20px);
+    }
+  }
+
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float {
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .animation-delay-2 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4 {
+    animation-delay: 4s;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 3s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.8s ease-out;
+  }
+</style>

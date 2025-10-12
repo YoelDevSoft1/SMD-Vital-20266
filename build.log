@@ -1,0 +1,158 @@
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm.
+
+> @Yoel Dev Soft/astrowind@1.0.0-beta.48 build
+> astro build
+
+22:52:51 [astrowind] Astrowind `./src/config.yaml` has been loaded.
+22:52:51 [WARN] Unsupported file type c:\Users\Administrator\Desktop\SMD-Vital-2024-main\src\pages\carbon-icons-demo.astro.BROKEN found. Prefix filename with an underscore (`_`) to ignore.
+22:52:51 [WARN] Unsupported file type c:\Users\Administrator\Desktop\SMD-Vital-2024-main\src\pages\toma-de-muestra-pcr-covid-19\index.astro.BROKEN found. Prefix filename with an underscore (`_`) to ignore.
+22:52:52 [content] Syncing content
+22:52:52 [content] Synced content
+22:52:52 [types] Generated 412ms
+22:52:52 [build] output: "static"
+22:52:52 [build] mode: "static"
+22:52:52 [build] directory: c:\Users\Administrator\Desktop\SMD-Vital-2024-main\dist\
+22:52:52 [build] Collecting build info...
+22:52:52 [build] ✓ Completed in 555ms.
+22:52:52 [build] Building static entrypoints...
+
+
+Source path: C:/Users/Administrator/Desktop/SMD-Vital-2024-main/src/components/widgets/Note.astro?astro&type=style&index=0&lang.css
+Setting up new context...
+JIT TOTAL: 321.533ms
+
+
+
+
+Source path: C:/Users/Administrator/Desktop/SMD-Vital-2024-main/src/components/widgets/FloatingWhatsApp.astro?astro&type=style&index=0&lang.css
+JIT TOTAL: 2.133ms
+
+
+
+
+Source path: C:/Users/Administrator/Desktop/SMD-Vital-2024-main/src/components/widgets/Note.astro?astro&type=style&index=0&lang.css
+JIT TOTAL: 0.675ms
+
+
+
+
+Source path: C:/Users/Administrator/Desktop/SMD-Vital-2024-main/src/components/widgets/FloatingWhatsApp.astro?astro&type=style&index=0&lang.css
+JIT TOTAL: 1.221ms
+
+
+
+
+Source path: C:/Users/Administrator/Desktop/SMD-Vital-2024-main/src/assets/styles/tailwind.css
+Setting up new context...
+Finding changed files: 15.344ms
+
+
+Source path: C:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/components/ClientRouter.astro?astro&type=style&index=0&lang.css
+JIT TOTAL: 258.07ms
+
+
+(node:11136) Warning: Label 'JIT TOTAL' already exists for console.time()
+(Use `node --trace-warnings ...` to show where the warning was created)
+Reading changed files: 394.075ms
+Sorting candidates: 12.454ms
+Generate rules: 306.543ms
+Build stylesheet: 4.307ms
+Potential classes:  13847
+Active contexts:  2
+
+
+(node:11136) Warning: No such label 'JIT TOTAL' for console.timeEnd()
+
+
+Source path: C:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/components/ClientRouter.astro?astro&type=style&index=0&lang.css
+JIT TOTAL: 0.561ms
+
+
+
+
+Source path: C:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/@fontsource-variable/inter/index.css
+JIT TOTAL: 0.605ms
+
+
+22:52:57 [WARN] [vite] [33m"matchHostname", "matchPathname", "matchPort" and "matchProtocol" are imported from external module "@astrojs/internal-helpers/remote" but never used in "../../../../../C:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/assets/utils/remotePattern.js" and "../../../../../C:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/assets/services/service.js".[39m
+22:52:57 [vite] [32m✓ built in 5.15s[39m
+22:52:57 [build] ✓ Completed in 5.19s.
+
+ building client (vite) 
+22:52:57 [vite] transforming...
+22:52:57 [vite] [32m✓[39m 14 modules transformed.
+22:52:57 [vite] rendering chunks...
+22:52:57 [vite] computing gzip size...
+22:52:57 [vite] [2mdist/[22m[36m_astro/ClientRouter.astro_astro_type_script_index_0_lang.DlbB_We1.js  [39m[1m[2m15.12 kB[22m[1m[22m[2m │ gzip: 5.18 kB[22m
+22:52:57 [vite] [32m✓ built in 76ms[39m
+
+ generating static routes 
+22:52:57 ▶ src/pages/404.astro
+22:52:57   └─ /404.html (+20ms) 
+22:52:57 ▶ src/pages/acerca.astro
+22:52:57   └─ /acerca/index.html (+31ms) 
+22:52:58 ▶ src/pages/acompañamiento-a-citas-medicas/index.astro
+22:52:58   └─ /acompañamiento-a-citas-medicas/index.html (+422ms) 
+22:52:58 ▶ src/pages/atencion-a-pacientes-covid-19/index.astro
+22:52:58   └─ /atencion-a-pacientes-covid-19/index.html (+387ms) 
+22:52:58 ▶ src/pages/contacto.astro
+22:52:58   └─ /contacto/index.html (+7ms) 
+22:52:58 ▶ src/pages/cura-de-heridas-simples-y-complejas/index.astro
+22:52:58   └─ /cura-de-heridas-simples-y-complejas/index.html (+446ms) 
+22:52:59 ▶ src/pages/electrocardiografia-basica/index.astro
+22:52:59   └─ /electrocardiografia-basica/index.html (+425ms) 
+22:52:59 ▶ src/pages/enfemeria-a-nivel-domiciliario-y-hospitalario/index.astro
+22:52:59   └─ /enfemeria-a-nivel-domiciliario-y-hospitalario/index.html (+428ms) 
+22:53:00 ▶ src/pages/extraccion-y-cuidado-de-uñas-encarnadas/index.astro
+22:53:00   └─ /extraccion-y-cuidado-de-uñas-encarnadas/index.html (+553ms) 
+22:53:00 ▶ src/pages/inicio/filosofia.astro
+22:53:00   └─ /inicio/filosofia/index.html (+361ms) 
+22:53:01 ▶ src/pages/inicio/mision.astro
+22:53:01   └─ /inicio/mision/index.html (+354ms) 
+22:53:01 ▶ src/pages/inicio/quienes-somos.astro
+22:53:01   └─ /inicio/quienes-somos/index.html (+5ms) 
+22:53:01 ▶ src/pages/inicio/vision.astro
+22:53:01   └─ /inicio/vision/index.html (+289ms) 
+22:53:01 ▶ src/pages/inyectologia-a-domicilio/index.astro
+22:53:01   └─ /inyectologia-a-domicilio/index.html (+413ms) 
+22:53:02 ▶ src/pages/laboratorio-a-domicilio/index.astro
+22:53:02   └─ /laboratorio-a-domicilio/index.html (+687ms) 
+22:53:02 ▶ src/pages/lavado-de-oidos-a-domicilio/index.astro
+22:53:02   └─ /lavado-de-oidos-a-domicilio/index.html (+414ms) 
+22:53:03 ▶ src/pages/precios.astro
+22:53:03   └─ /precios/index.html (+9ms) 
+22:53:03 ▶ src/pages/privacy.md
+22:53:03   └─ /privacy/index.html (+4ms) 
+22:53:03 ▶ src/pages/prueba-de-antigeno-a-domicilio/index.astro
+22:53:03   └─ /prueba-de-antigeno-a-domicilio/index.html (+443ms) 
+22:53:03 ▶ src/pages/retiro-y-colocacion-de-sonda-vesical/index.astro
+22:53:03   └─ /retiro-y-colocacion-de-sonda-vesical/index.html (+433ms) 
+22:53:04 λ src/pages/rss.xml.ts
+22:53:04   └─ /rss.xmlError generating RSS feed: Error: [RSS] Invalid or missing options:
+Invalid input (items)
+The `items` property requires at least the `title` or `description` key. They must be properly typed, as well as `pubDate` and `link` keys if provided.
+Check your collection's schema, and visit https://docs.astro.build/en/guides/rss/#generating-items for more info.
+    at validateRssOptions (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/@astrojs/rss/dist/index.js:44:26)
+    at async getRssString (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/@astrojs/rss/dist/index.js:36:31)
+    at async Module.GET (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/dist/pages/rss.xml.astro.mjs?time=1760147584164:34:17)
+    at async renderEndpoint (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/runtime/server/endpoint.js:37:18)
+    at async lastNext (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/core/render-context.js:188:23)
+    at async NOOP_MIDDLEWARE_FN (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/core/middleware/noop-middleware.js:3:20)
+    at async callMiddleware (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/core/middleware/callMiddleware.js:11:10)
+    at async RenderContext.render (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/core/render-context.js:235:22)
+    at async generatePath (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/core/build/generate.js:380:16)
+    at async generatePathWithLogs (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/core/build/generate.js:158:21)
+ (+7ms) 
+22:53:04 ▶ src/pages/servicios.astro
+22:53:04   └─ /servicios/index.html (+10ms) 
+22:53:04 λ src/pages/sitemap-index.xml.ts
+22:53:04   └─ /sitemap-index.xml[RSS] Invalid or missing options:
+Invalid input (items)
+The `items` property requires at least the `title` or `description` key. They must be properly typed, as well as `pubDate` and `link` keys if provided.
+Check your collection's schema, and visit https://docs.astro.build/en/guides/rss/#generating-items for more info.
+  Stack trace:
+    at validateRssOptions (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/@astrojs/rss/dist/index.js:44:26)
+    at async Module.GET (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/dist/pages/sitemap-index.xml.astro.mjs?time=1760147584200:8:15)
+    at async lastNext (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/core/render-context.js:188:23)
+    at async callMiddleware (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/core/middleware/callMiddleware.js:11:10)
+    at async generatePath (file:///c:/Users/Administrator/Desktop/SMD-Vital-2024-main/node_modules/astro/dist/core/build/generate.js:380:16)

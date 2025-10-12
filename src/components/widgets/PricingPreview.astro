@@ -1,0 +1,130 @@
+﻿---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import Icon from '~/components/ui/Icon.astro';
+import type { Widget } from '~/types';
+
+export interface Props extends Widget {
+  title?: string;
+  subtitle?: string;
+  tagline?: string;
+  items?: Array<{
+    title: string;
+    price: string;
+    description: string;
+    features: string[];
+    isPopular?: boolean;
+    color: string;
+  }>;
+  paymentMethods?: string[];
+  ctaText?: string;
+  ctaHref?: string;
+}
+
+const {
+  title = 'Precios Transparentes',
+  subtitle = 'Sin costos ocultos. Precios claros desde el primer contacto.',
+  tagline,
+  items = [
+    {
+      title: 'Valoración Médica',
+      price: '$120.000',
+      description: 'Consulta completa a domicilio',
+      features: ['Diagnóstico completo', 'Receta médica digital', 'Seguimiento por WhatsApp', 'Kit médico completo'],
+      color: 'blue'
+    },
+    {
+      title: 'Enfermería 24/7',
+      price: '$100.000',
+      description: 'Cuidado especializado',
+      features: ['Curaciones avanzadas', 'Control de signos vitales', 'Administración de medicamentos', 'Disponible 24/7'],
+      isPopular: true,
+      color: 'green'
+    },
+    {
+      title: 'Laboratorio',
+      price: '$80.000',
+      description: 'Pruebas diagnósticas',
+      features: ['Toma de muestras', 'Resultados digitales', 'PCR COVID-19', 'Electrocardiograma'],
+      color: 'purple'
+    }
+  ],
+  paymentMethods = ['Efectivo', 'Tarjetas', 'Nequi', 'Daviplata'],
+  ctaText = 'Consultar Precios Específicos',
+  ctaHref = 'https://wa.link/7cprhk',
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+
+const getColorClasses = (color: string) => {
+  const colors = {
+    blue: 'border-blue-200 dark:border-blue-700 text-blue-600',
+    green: 'border-green-200 dark:border-green-700 text-green-600',
+    purple: 'border-purple-200 dark:border-purple-700 text-purple-600'
+  };
+  return colors[color] || colors.blue;
+};
+---
+
+<WidgetWrapper 
+  id={id} 
+  isDark={isDark} 
+  containerClass={`max-w-7xl mx-auto ${classes?.container ?? ''}`} 
+  bg={bg}
+>
+  <Headline 
+    title={title} 
+    subtitle={subtitle} 
+    tagline={tagline} 
+    classes={{
+      container: 'text-center mb-12',
+      title: 'text-4xl font-bold text-gray-900 dark:text-white mb-4',
+      subtitle: 'text-xl text-gray-600 dark:text-gray-300',
+      ...((classes?.headline as Record<string, string>) ?? {})
+    }}
+  />
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    {
+      items.map((item) => (
+        <div class={`bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border-2 ${getColorClasses(item.color)} relative`}>
+          {item.isPopular && (
+            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <span class="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                Más Popular
+              </span>
+            </div>
+          )}
+          <div class="text-center">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{item.title}</h3>
+            <div class={`text-4xl font-bold mb-2 ${getColorClasses(item.color).split(' ')[2]}`}>
+              {item.price}
+            </div>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">{item.description}</p>
+            <ul class="text-left space-y-2 text-gray-600 dark:text-gray-300">
+              {item.features.map((feature) => (
+                <li>• {feature}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+  
+  <div class="text-center mt-8">
+    <p class="text-gray-600 dark:text-gray-300 mb-4">
+      ✔️ Aceptamos: {paymentMethods.join(', ')}
+    </p>
+    <a 
+      href={ctaHref} 
+      target="_blank" 
+      class="inline-flex items-center px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transición-colors"
+    >
+      <Icon name="brand-whatsapp" set="tabler" class="w-6 h-6 mr-2" />
+      {ctaText}
+    </a>
+  </div>
+</WidgetWrapper>

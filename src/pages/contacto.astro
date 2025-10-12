@@ -1,0 +1,81 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import HeroText from '~/components/widgets/HeroText.astro';
+import ContactUs from '~/components/widgets/Contact.astro';
+import Features2 from '~/components/widgets/Features2.astro';
+
+const metadata = {
+  title: 'Servicios Médicos Domiciliarios en Bogotá | SMD Vital',
+  description:
+    'Nuestros médicos a domicilio en Bogotá ofrecen atención médica de calidad en la comodidad de tu hogar. Evita el tráfico y las largas esperas, ¡contáctanos hoy mismo!',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- HeroText Widget ******************* -->
+  <HeroText tagline="Contacto" title="¡Conectemos!" />
+
+  <ContactUs
+    id="form"
+    title="Envíanos tu mensaje"
+    subtitle="¿Tienes preguntas, necesitas agendar una visita médica a domicilio o requieres más información sobre nuestros servicios? Completa el formulario y nuestro equipo de soporte te responderá a la brevedad."
+    inputs={[
+      {
+        type: 'text',
+        name: 'name',
+        label: 'Nombre',
+      },
+      {
+        type: 'email',
+        name: 'email',
+        label: 'Correo electrónico',
+      },
+    ]}
+    textarea={{
+      label: 'Mensaje',
+    }}
+    disclaimer={{
+      label:
+        'Al enviar este formulario, aceptas que recopilemos tus datos personales con el único fin de responder a tu consulta.',
+    }}
+    description="Nuestro equipo de soporte suele responder en menos de 24 horas laborales."
+  />
+
+  <!-- Features2 Widget ************** -->
+  <Features2
+    title="Estamos aquí para ayudarte"
+    items={[
+      {
+        title: 'Atención General',
+        description:
+          '¿Tienes preguntas sobre nuestros servicios médicos domiciliarios, horarios, costos o disponibilidad? Nuestro equipo está listo para orientarte.',
+      },
+      {
+        title: 'Agendar Citas',
+        description:
+          '¿Necesitas programar una visita médica a domicilio? Contáctanos y te ayudaremos a encontrar el horario más adecuado.',
+      },
+      {
+        title: 'Soporte Técnico',
+        description:
+          '¿Tienes dificultades con nuestra plataforma en línea o problemas para acceder a tu información? Nuestro soporte técnico está para asistirte.',
+      },
+      {
+        title: 'Teléfono',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Email',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Ubicación',
+        description: 'Bogotá, Colombia',
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+</Layout>

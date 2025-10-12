@@ -1,0 +1,772 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la valoración médica domiciliaria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un servicio médico integral que incluye examen físico completo, revisión de antecedentes, diagnóstico profesional y recomendaciones de tratamiento en la comodidad de tu hogar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la valoración médica a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio de la valoración médica a domicilio en Bogotá es de $120,000 COP. Este valor incluye evaluación completa, diagnóstico, recomendaciones y prescripciones médicas si es necesario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué incluye la valoración médica domiciliaria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Incluye examen físico completo, revisión de antecedentes médicos, diagnóstico profesional, recomendaciones de tratamiento, prescripciones médicas si es necesario y seguimiento posterior.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo dura la valoración médica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La valoración médica domiciliaria dura entre 45-60 minutos, dependiendo de la complejidad del caso. Incluye tiempo para examen físico, diagnóstico y explicación detallada del tratamiento.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden atender cualquier tipo de enfermedad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Atendemos la mayoría de condiciones médicas generales. Para casos complejos o especializados, realizamos la valoración inicial y referimos al especialista correspondiente si es necesario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo solicitar valoración médica sin tener síntomas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, la valoración médica también es útil para chequeos preventivos, control periódico de salud y seguimiento de condiciones crónicas. Es una excelente forma de mantener tu salud bajo control.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué equipos médicos utilizan?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Utilizamos equipos médicos portátiles profesionales incluyendo estetoscopio, tensiómetro, termómetro, otoscopio, oftalmoscopio y equipos básicos de diagnóstico para brindar una evaluación completa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden atender a niños y adultos mayores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, atendemos pacientes de todas las edades. Adaptamos la valoración según las necesidades específicas de cada grupo etario, brindando atención especializada para niños y adultos mayores.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre valoración médica y consulta médica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La valoración médica es más integral e incluye examen físico completo, revisión de antecedentes y diagnóstico detallado. Una consulta médica puede ser más específica para un síntoma particular.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo una valoración médica domiciliaria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes agendar fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Valoración Médica Domiciliaria Bogotá',
+  alternateName: 'SMD Vital Bogotá - Médico a Domicilio Valoración',
+  description: 'Valoración médica a domicilio en Bogotá. Médico a domicilio para evaluación médica, diagnóstico y tratamiento. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  url: SITE.site + '/valoracion-medica-domiciliaria/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    }
+  ],
+  medicalSpecialty: [
+    'PrimaryCare',
+    'InternalMedicine',
+    'FamilyMedicine',
+    'Nursing'
+  ],
+  keywords: 'médico a domicilio, valoración médica domiciliaria, atención médica a domicilio, médico a domicilio bogotá, valoración médica bogotá, consulta médica domiciliaria',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Valoración Médica',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Valoración Médica Integral',
+          description: 'Evaluación médica completa con examen físico, diagnóstico y recomendaciones de tratamiento'
+        },
+        price: '120000',
+        priceCurrency: 'COP',
+        availability: 'https://schema.org/InStock',
+        validFrom: '2024-01-01',
+        priceValidUntil: '2024-12-31',
+        includesObject: [
+          'Examen físico completo',
+          'Revisión de antecedentes médicos',
+          'Diagnóstico profesional',
+          'Recomendaciones de tratamiento',
+          'Prescripciones médicas si es necesario'
+        ]
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    reviewCount: '150',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+// Schema Reviews para testimonios
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  itemReviewed: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital - Valoración Médica Domiciliaria Bogotá'
+  },
+  author: {
+    '@type': 'Person',
+    name: 'Carlos Rodríguez'
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '5',
+    bestRating: '5'
+  },
+  reviewBody: 'Excelente servicio de valoración médica a domicilio. El médico fue muy profesional, realizó un examen completo y me explicó todo detalladamente. Muy recomendado.'
+};
+
+// Schema HowTo para el procedimiento de valoración médica
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo realizar valoración médica domiciliaria profesional',
+  description: 'Procedimiento paso a paso para realizar valoración médica integral de forma profesional en el hogar',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Procedimiento profesional de valoración médica domiciliaria con equipos médicos especializados'
+  },
+  totalTime: 'PT60M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '120000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Equipos médicos portátiles',
+      description: 'Estetoscopio, tensiómetro, termómetro y equipos de diagnóstico básico'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Materiales de examen',
+      description: 'Guantes, gasas, alcohol y materiales estériles para examen físico'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Formularios médicos',
+      description: 'Historia clínica, consentimiento informado y formatos de registro'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Estetoscopio profesional',
+      description: 'Instrumento médico para auscultación cardíaca y pulmonar'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Tensiómetro digital',
+      description: 'Equipo para medición de presión arterial'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Otoscopio',
+      description: 'Instrumento para examen de oídos'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Revisión de Antecedentes',
+      text: 'Realizar entrevista médica detallada para conocer síntomas, antecedentes médicos y medicamentos actuales del paciente.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Revisión de antecedentes médicos y entrevista clínica detallada'
+      },
+      url: SITE.site + '/valoracion-medica-domiciliaria/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Examen Físico Completo',
+      text: 'Realizar examen físico sistemático incluyendo signos vitales, auscultación, palpación y evaluación de sistemas corporales.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Examen físico completo con equipos médicos especializados'
+      },
+      url: SITE.site + '/valoracion-medica-domiciliaria/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Diagnóstico y Evaluación',
+      text: 'Analizar hallazgos del examen y antecedentes para establecer diagnóstico clínico y determinar necesidades de tratamiento.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Proceso de diagnóstico médico profesional basado en hallazgos clínicos'
+      },
+      url: SITE.site + '/valoracion-medica-domiciliaria/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Recomendaciones y Seguimiento',
+      text: 'Proporcionar recomendaciones de tratamiento, prescripciones médicas si es necesario y plan de seguimiento personalizado.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Entrega de recomendaciones médicas y plan de seguimiento personalizado'
+      },
+      url: SITE.site + '/valoracion-medica-domiciliaria/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
+
+const metadata = {
+  title: 'Valoración Médica Domiciliaria en Bogotá | Médico a Domicilio Barato | SMD Vital',
+  description: 'Valoración médica a domicilio barato en Bogotá. Médicos certificados para evaluación médica completa, diagnóstico y tratamiento. Servicio 24/7 en las 20 localidades. Precio $120.000 COP.',
+  keywords: 'valoración médica domiciliaria bogotá, médico a domicilio barato, evaluación médica domiciliaria, médico a domicilio bogotá, valoración médica barato, consulta médica domiciliaria, diagnóstico a domicilio',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    title: 'Valoración Médica Domiciliaria | Médico a Domicilio Barato | SMD Vital Bogotá',
+    description: 'Valoración médica a domicilio barato en Bogotá. Médicos certificados para evaluación médica completa, diagnóstico y tratamiento. Servicio 24/7 en toda Bogotá. Precio $120.000 COP.',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+        alt: 'Servicio profesional de valoración médica domiciliaria en Bogotá - SMD Vital',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@SMDVitalBogota',
+    creator: '@SMDVitalBogota',
+    title: 'Valoración Médica Domiciliaria | Médico a Domicilio Barato | SMD Vital',
+    description: 'Médicos certificados para evaluación médica completa en tu hogar. Diagnóstico y tratamiento profesional. Servicio 24/7 en toda Bogotá.',
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Valoración Médica Domiciliaria' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Evaluación Médica Profesional"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Valoración Médica WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agendar Evaluación Médica', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Médico profesional realizando valoración médica a domicilio con equipos especializados - SMD Vital Bogotá',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      Valoración Médica Domiciliaria<br />
+      <span class="text-accent dark:text-white highlight">Bogotá Barato</span><br />
+      Médico a Domicilio Profesional
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Valoración médica a domicilio barato en Bogotá</span> con médicos certificados para evaluación médica completa, diagnóstico y tratamiento en la comodidad de tu hogar.
+      <br /><br />
+      Nuestro equipo especializado te ofrece un servicio confiable y económico en las 20 localidades de Bogotá, Colombia. Precios transparentes sin costos ocultos.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestra valoración médica a domicilio barato en Bogotá?"
+    subtitle="Valoración médica a domicilio barato en Bogotá con médicos certificados para evaluación médica completa, diagnóstico y tratamiento en la comodidad de tu hogar. Nuestro equipo especializado te ofrece un servicio confiable y económico en las 20 localidades de Bogotá, Colombia."
+    columns={3}
+    items={[
+      {
+        title: 'Médicos Certificados',
+        description: 'Profesionales médicos certificados con amplia experiencia en evaluación médica integral y diagnóstico clínico.',
+        icon: 'tabler:stethoscope',
+      },
+      {
+        title: 'Equipos Especializados',
+        description: 'Utilizamos equipos médicos portátiles profesionales para examen físico completo y diagnóstico preciso.',
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda la ciudad. Agenda tu valoración y recibe atención profesional el mismo día.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Evaluación Integral',
+        description: 'Examen físico completo, revisión de antecedentes, diagnóstico profesional y recomendaciones de tratamiento.',
+        icon: 'tabler:clipboard-check',
+      },
+      {
+        title: 'Diagnóstico Preciso',
+        description: 'Evaluación médica detallada con análisis clínico profesional para un diagnóstico preciso y confiable.',
+        icon: 'tabler:microscope',
+      },
+      {
+        title: 'Cobertura Total',
+        description: 'Servicio disponible en las 20 localidades de Bogotá y municipios cercanos. Atención 24/7 todos los días.',
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Procedimiento **************** -->
+
+  <Content
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestra Valoración Médica?"
+    subtitle="Proceso profesional paso a paso realizado por médicos certificados con equipos especializados"
+    isReversed
+    items={[
+      {
+        title: '1. Revisión de Antecedentes',
+        description:
+          'Entrevista médica detallada para conocer síntomas, antecedentes médicos y medicamentos actuales del paciente.',
+        icon: 'tabler:clipboard',
+      },
+      {
+        title: '2. Examen Físico Completo',
+        description: `Evaluación sistemática incluyendo signos vitales, auscultación, palpación y evaluación de sistemas corporales.`,
+        icon: 'tabler:stethoscope',
+      },
+      {
+        title: '3. Diagnóstico y Evaluación',
+        description: `Análisis de hallazgos para establecer diagnóstico clínico y determinar necesidades de tratamiento específico.`,
+        icon: 'tabler:microscope',
+      },
+      {
+        title: '4. Recomendaciones y Seguimiento',
+        description: `Entrega de recomendaciones de tratamiento, prescripciones médicas y plan de seguimiento personalizado.`,
+        icon: 'tabler:checklist',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Procedimiento paso a paso de valoración médica profesional con equipos especializados',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h2>
+      <p class="text-muted mt-4">
+        Utilizamos protocolos médicos aprobados por el Ministerio de Salud de Colombia para garantizar diagnósticos precisos y tratamientos efectivos.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo Necesitas **************** -->
+
+  <Content
+    id="cuando-necesitas"
+    tagline="Indicaciones Médicas"
+    title="¿Cuándo Necesitas Valoración Médica?"
+    subtitle="Identifica cuándo es importante realizar una evaluación médica profesional para mantener tu salud."
+    items={[
+      {
+        title: 'Síntomas que Requieren Evaluación',
+        description: `✓ Dolor persistente o agudo<br>
+                      ✓ Fiebre alta o prolongada<br>
+                      ✓ Dificultad respiratoria<br>
+                      ✓ Cambios en el estado de conciencia<br>
+                      ✓ Sangrado o secreciones anormales`,
+        icon: 'tabler:alert-triangle',
+      },
+      {
+        title: 'Controles Preventivos',
+        description: `✓ Chequeos médicos regulares<br>
+                      ✓ Control de enfermedades crónicas<br>
+                      ✓ Seguimiento post-operatorio<br>
+                      ✓ Evaluación pre-deportiva<br>
+                      ✓ Certificados médicos`,
+        icon: 'tabler:shield-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/14558557/pexels-photo-14558557.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Paciente con síntomas médicos consultando sobre valoración médica profesional a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Valoración Médica?
+      </h2>
+      <p class="text-muted mt-4">
+        Si experimentas síntomas persistentes o necesitas un control médico regular, es importante realizar una valoración profesional. 
+        La detección temprana puede prevenir complicaciones y mejorar tu calidad de vida.
+      </p>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Precios **************** -->
+
+  <Content
+    id="precios"
+    title="Precios de Valoración Médica a Domicilio"
+    subtitle="Servicio médico especializado a domicilio con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
+    isReversed
+    items={[
+      {
+        title: 'Precio Fijo Garantizado',
+        description: `$120.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: 'Todo Incluido',
+        description: `Evaluación completa, examen físico, diagnóstico profesional, recomendaciones de tratamiento y prescripciones médicas.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el servicio, realizamos una segunda valoración sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $150.000+ | Otros domicilios: $180.000+ | SMD Vital: $120.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8376277/pexels-photo-8376277.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios transparentes y competitivos para valoración médica profesional a domicilio en Bogotá - $120.000 COP',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+  </Content>
+
+  <!-- Sección de Servicios Relacionados con Enlaces Internos -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Servicios Complementarios</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        Además de la valoración médica, ofrecemos <a href="/servicios" class="text-primary hover:underline font-semibold">atención médica integral a domicilio</a> en la capital
+      </p>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        La <strong>valoración médica profesional</strong> es parte de nuestro amplio catálogo de <a href="/servicios" class="text-primary hover:underline">servicios médicos domiciliarios</a>.
+        Si necesitas una <a href="/toma-de-signos-vitales" class="text-primary hover:underline">toma de signos vitales</a>,
+        nuestro equipo puede realizar monitoreo constante durante la visita.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Para quienes requieren atención especializada, ofrecemos
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">teleconsultas médicas</a> y
+        <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">servicios de laboratorio clínico</a>.
+        También realizamos <a href="/electrocardiografia-basica" class="text-primary hover:underline">electrocardiografías</a>
+        con equipos portátiles especializados. <a href="/contacto" class="text-primary hover:underline font-semibold">Contáctanos</a> para más información.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Si prefieres una consulta inicial sin desplazamiento, conoce nuestra
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">teleconsulta médica</a> disponible las 24 horas.
+        Para diagnósticos más complejos, contamos con <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">laboratorio clínico a domicilio</a>
+        que incluye <a href="/toma-de-muestras-a-domicilio" class="text-primary hover:underline">toma de muestras</a> y análisis especializados.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes sobre valoración médica"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio médico especializado"
+    items={[
+      {
+        title: '¿Qué es la valoración médica domiciliaria?',
+        description: 'Es un servicio médico integral que incluye examen físico completo, revisión de antecedentes, diagnóstico profesional y recomendaciones de tratamiento en la comodidad de tu hogar.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuánto cuesta la valoración médica a domicilio?',
+        description: 'El precio de la valoración médica a domicilio en Bogotá es de $120,000 COP. Este valor incluye evaluación completa, diagnóstico, recomendaciones y prescripciones médicas si es necesario.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué incluye la valoración médica domiciliaria?',
+        description: 'Incluye examen físico completo, revisión de antecedentes médicos, diagnóstico profesional, recomendaciones de tratamiento, prescripciones médicas si es necesario y seguimiento posterior.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuánto tiempo dura la valoración médica?',
+        description: 'La valoración médica domiciliaria dura entre 45-60 minutos, dependiendo de la complejidad del caso. Incluye tiempo para examen físico, diagnóstico y explicación detallada del tratamiento.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Pueden atender cualquier tipo de enfermedad?',
+        description: 'Atendemos la mayoría de condiciones médicas generales. Para casos complejos o especializados, realizamos la valoración inicial y referimos al especialista correspondiente si es necesario.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Puedo solicitar valoración médica sin tener síntomas?',
+        description: 'Sí, la valoración médica también es útil para chequeos preventivos, control periódico de salud y seguimiento de condiciones crónicas. Es una excelente forma de mantener tu salud bajo control.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué equipos médicos utilizan?',
+        description: 'Utilizamos equipos médicos portátiles profesionales incluyendo estetoscopio, tensiómetro, termómetro, otoscopio, oftalmoscopio y equipos básicos de diagnóstico para brindar una evaluación completa.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Pueden atender a niños y adultos mayores?',
+        description: 'Sí, atendemos pacientes de todas las edades. Adaptamos la valoración según las necesidades específicas de cada grupo etario, brindando atención especializada para niños y adultos mayores.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué diferencia hay entre valoración médica y consulta médica?',
+        description: 'La valoración médica es más integral e incluye examen físico completo, revisión de antecedentes y diagnóstico detallado. Una consulta médica puede ser más específica para un síntoma particular.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo agendo una valoración médica domiciliaria?',
+        description: 'Puedes agendar fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Agenda tu Valoración Médica Ahora - Atención en 45 Minutos"
+    subtitle="Servicio médico especializado a domicilio. Personal certificado con más de 500 valoraciones exitosas. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Agendar Valoración Médica por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20necesito%20agendar%20una%20valoración%20médica%20a%20domicilio',
+      icon: 'tabler:brand-whatsapp',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: 'Envíanos un mensaje en cualquier momento y te responderemos de inmediato para coordinar tu valoración.',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamada Directa',
+        description: 'Si prefieres hablar con un asesor, llámanos a nuestro call center. Atención 24/7.',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Nuestro equipo médico se desplaza a tu domicilio en menos de 45 minutos en toda la capital.',
+        icon: 'tabler:clock',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPosts Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre valoración médica"
+    information={`Visita nuestro blog para conocer más sobre la importancia de la valoración médica, prevención de enfermedades y cuidado de la salud. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

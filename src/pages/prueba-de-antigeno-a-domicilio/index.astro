@@ -1,0 +1,325 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+
+import { headerData } from '~/navigation';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+
+const metadata = {
+  title: 'Prueba de Antígeno a Domicilio | SMD Vital',
+  description:
+    'Realiza tu prueba de antígeno a domicilio en Bogotá, Colombia. Servicios rápidos, seguros y confiables directamente en la comodidad de tu hogar.',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Emergencia',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <Hero2
+    tagline="Pruebas Rápidas y Confiables en tu Hogar"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda tu prueba', href: '#features' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/9629693/pexels-photo-9629693.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Prueba de Antígeno a Domicilio en Bogotá',
+    }}
+  >
+    <Fragment slot="title">
+      Pruebas de <br /><span class="text-accent dark:text-white highlight">Antígeno a Domicilio</span><br />
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        Diagnósticos rápidos y precisos realizados por profesionales certificados en la comodidad de tu hogar.</span
+      >
+      Mantén tu salud bajo control sin necesidad de desplazarte. ¡Confía en nuestros servicios seguros y confiables en Bogotá,
+      Colombia!
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="features"
+    title="¿Por qué elegir nuestro servicio de prueba de antígeno a domicilio?"
+    subtitle="Comprometidos con tu salud y comodidad en Bogotá"
+    columns={2}
+    items={[
+      {
+        title: 'Profesionales Certificados',
+        description:
+          'Contamos con técnicos altamente capacitados para realizar pruebas de antígeno con precisión y seguridad.',
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comodidad y Seguridad',
+        description: `Realiza tu prueba en la comodidad de tu hogar, siguiendo estrictos protocolos de higiene y seguridad en Bogotá.`,
+        icon: 'tabler:home',
+      },
+      {
+        title: 'Resultados Rápidos',
+        description:
+          'Obtén tus resultados en menos de 30 minutos gracias a nuestra tecnología avanzada y procesos eficientes.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Privacidad Garantizada',
+        description: `Mantenemos la confidencialidad de tus resultados y datos personales, asegurando una experiencia privada y segura.`,
+        icon: 'tabler:lock',
+      },
+    ]}
+  />
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    title="Nuestros Servicios"
+    subtitle="Descubre cómo SMD Vital Bogotá puede ayudarte con tus pruebas de antígeno a domicilio."
+    isReversed
+    items={[
+      {
+        title: 'Evaluación Inicial',
+        description:
+          'Realizamos una consulta detallada para entender tus necesidades y determinar el momento adecuado para realizar la prueba.',
+      },
+      {
+        title: 'Administración de la Prueba',
+        description: `Nuestros profesionales realizan la toma de muestras de manera rápida y cómoda en tu hogar, garantizando la precisión del diagnóstico.`,
+      },
+      {
+        title: 'Procesamiento de Muestras',
+        description: `Las muestras son enviadas a laboratorios certificados para su análisis, asegurando resultados confiables y precisos.`,
+      },
+      {
+        title: 'Entrega de Resultados',
+        description: `Recibe tus resultados directamente en tu dispositivo móvil o a través de una llamada telefónica, de manera rápida y segura.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/24293768/pexels-photo-24293768/free-photo-of-microscopio.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Servicios de Prueba de Antígeno a Domicilio',
+    }}
+  />
+
+  <Content
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Facilidad de Agendamiento',
+        description: `Agenda tu prueba de antígeno fácilmente a través de WhatsApp, llamada telefónica o nuestro sitio web.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Ahorro de tiempo. <br /> Mayor comodidad. <br /> Diagnósticos precisos y rápidos.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4047146/pexels-photo-4047146.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Facilidad y Beneficios de las Pruebas de Antígeno',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Comodidad y Confianza <br /><span class="text-2xl">en Cada Prueba</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isReversed
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Tecnología de Última Generación',
+        description: `Utilizamos equipos avanzados para asegurar la precisión y rapidez en cada prueba de antígeno.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Resultados precisos. <br /> Procedimientos sin dolor. <br /> Mayor confianza en el diagnóstico.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4040563/pexels-photo-4040563.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Tecnología Avanzada en Pruebas de Antígeno',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Precisión y Eficiencia <br /><span class="text-2xl">Garantizadas</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isReversed
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Soporte Continuo',
+        description: `Nuestro equipo está disponible para responder tus dudas y proporcionarte el soporte necesario durante todo el proceso.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Asesoramiento personalizado. <br /> Atención inmediata a tus consultas. <br /> Tranquilidad y confianza en nuestro servicio.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8442440/pexels-photo-8442440.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Soporte Continuo en Pruebas de Antígeno',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Soporte y Atención <br /><span class="text-2xl">Personalizada</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    items={[
+      {
+        title: 'Atención en Emergencias',
+        description: `Proporcionamos servicios rápidos y eficientes para tus necesidades de prueba de antígeno en situaciones de emergencia.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Respuesta inmediata. <br /> Minimización de riesgos. <br /> Tranquilidad en momentos críticos.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8442021/pexels-photo-8442021.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Atención en Emergencias de Prueba de Antígeno',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Atención Rápida <br /><span class="text-2xl">y Segura</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes"
+    items={[
+      {
+        title: '¿Qué es una prueba de antígeno?',
+        description:
+          'Una prueba de antígeno es un diagnóstico rápido que detecta proteínas específicas del virus responsable del COVID-19 en muestras respiratorias.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo se realiza la prueba a domicilio?',
+        description: `Nuestros profesionales visitan tu hogar, realizan la toma de muestras de manera rápida y segura, y te proporcionan los resultados en menos de 30 minutos.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Es dolorosa la prueba de antígeno?',
+        description:
+          'La prueba de antígeno es mínimamente invasiva y rápida, causando molestias leves durante la toma de muestras.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuánto tiempo tardaré en recibir los resultados?',
+        description:
+          'Recibirás tus resultados en menos de 30 minutos, directamente en tu dispositivo móvil o a través de una llamada telefónica.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué debo hacer si mi prueba es positiva?',
+        description:
+          'En caso de un resultado positivo, te proporcionaremos orientación sobre los pasos a seguir, incluyendo aislamiento y contacto con profesionales de salud para recibir el tratamiento adecuado.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas sobre nuestro servicio de prueba de antígeno a domicilio? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPost Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Conoce más sobre las pruebas de antígeno y su importancia"
+    information={`Visita nuestro blog para aprender más sobre las pruebas de antígeno, su funcionamiento, beneficios y cómo pueden ayudarte a mantener tu salud bajo control. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

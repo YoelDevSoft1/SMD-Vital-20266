@@ -1,0 +1,811 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la sutura y retiro de puntos a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un servicio médico especializado que consiste en la aplicación de suturas para cerrar heridas y el retiro posterior de puntos quirúrgicos en la comodidad de tu hogar, realizado por profesionales certificados.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la sutura y retiro de puntos a domicilio en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio de la sutura y retiro de puntos a domicilio en Bogotá es de $120.000 COP. Este valor incluye evaluación inicial, procedimiento completo, materiales estériles y cuidados posteriores. Sin costos ocultos, precios transparentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué tipos de suturas pueden realizar a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Realizamos suturas simples, suturas continuas, suturas de grapas quirúrgicas y retiro de puntos de cirugía. Nuestros profesionales evalúan cada caso y determinan la técnica más adecuada según el tipo de herida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es seguro realizar suturas a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, contamos con profesionales certificados en técnicas quirúrgicas y seguimos estrictos protocolos de higiene y seguridad. Utilizamos materiales estériles de un solo uso y técnicas asépticas certificadas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo debo retirar los puntos de sutura?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El tiempo de retiro varía según la ubicación y tipo de herida. Generalmente entre 7-14 días para heridas faciales y 10-21 días para heridas corporales. Nuestros profesionales evalúan cada caso individualmente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre sutura simple y continua?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La sutura simple utiliza puntos individuales, ideal para heridas pequeñas. La sutura continua utiliza un hilo continuo, ideal para heridas largas. Nuestros profesionales determinan la técnica más adecuada según el caso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden realizar suturas a niños y adultos mayores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, tenemos experiencia realizando suturas a pacientes de todas las edades. Adaptamos las técnicas según la edad y condición del paciente para minimizar molestias y garantizar la mejor cicatrización.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué debo tener listo para la sutura a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Solo necesitas tener el área limpia y estar cómodo. Nosotros llevamos todo el equipo necesario: hilos de sutura, agujas, instrumental quirúrgico, materiales estériles y anestesia local si es necesaria.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Los servicios están cubiertos por EPS o medicina prepagada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Algunos servicios pueden tener cobertura parcial. Te ayudamos con la gestión de autorizaciones y emitimos facturas para reembolsos ante pólizas de salud.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo la sutura y retiro de puntos a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en toda Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Sutura y Retiro de Puntos a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Sutura Profesional Barato',
+  description: 'Sutura y retiro de puntos a domicilio barato en Bogotá. Suturas quirúrgicas, retiro de puntos de cirugía, grapas quirúrgicas a domicilio. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  url: SITE.site + '/sutura-y-retiro-de-puntos/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    },
+    {
+      '@type': 'City',
+      name: 'Funza'
+    },
+    {
+      '@type': 'City',
+      name: 'Mosquera'
+    },
+    {
+      '@type': 'City',
+      name: 'Cota'
+    }
+  ],
+  medicalSpecialty: [
+    'Nursing',
+    'PrimaryCare',
+    'EmergencyMedicine',
+    'Surgery'
+  ],
+  keywords: 'sutura y retiro de puntos, sutura a domicilio, retiro de puntos domicilio, sutura domicilio bogotá, retiro puntos bogotá, quitar puntos de sutura, retiro de puntos de sutura, quitar puntos de cirugia, retiro de puntos de cirugia, quitar grapas de sutura',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Sutura y Retiro de Puntos',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Sutura Quirúrgica Profesional',
+          description: 'Aplicación de suturas simples y continuas para cerrar heridas con técnicas asépticas'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Retiro de Puntos de Cirugía',
+          description: 'Retiro seguro de puntos quirúrgicos y grapas con instrumental especializado'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Cuidados Post-Quirúrgicos',
+          description: 'Seguimiento y cuidados posteriores para garantizar cicatrización adecuada'
+        }
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '120',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+// Schema Reviews para testimonios
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  itemReviewed: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital - Sutura y Retiro de Puntos a Domicilio Bogotá'
+  },
+  author: {
+    '@type': 'Person',
+    name: 'Carlos Mendoza'
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '5',
+    bestRating: '5'
+  },
+  reviewBody: 'Excelente servicio de sutura a domicilio. El profesional fue muy cuidadoso y el resultado fue perfecto. Muy recomendado para retiro de puntos.'
+};
+
+// Schema HowTo para el procedimiento de sutura
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo realizar sutura y retiro de puntos profesionales a domicilio',
+  description: 'Procedimiento paso a paso para aplicación de suturas quirúrgicas y retiro de puntos de forma segura en el hogar',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/28727569/pexels-photo-28727569/free-photo-of-instrumentos-quirurgicos-sobre-una-manta-azul-en-el-quirofano.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Instrumentos quirúrgicos profesionales para sutura y retiro de puntos a domicilio'
+  },
+  totalTime: 'PT60M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '120000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Hilos de sutura estériles',
+      description: 'Hilos quirúrgicos de diferentes calibres según el tipo de herida'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Instrumental quirúrgico',
+      description: 'Agujas, porta-agujas, tijeras quirúrgicas y otros instrumentos estériles'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Materiales de asepsia',
+      description: 'Alcohol, gasas estériles, guantes y otros materiales de seguridad'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Instrumental quirúrgico',
+      description: 'Conjunto de instrumentos médicos para aplicación de suturas'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Tijeras quirúrgicas',
+      description: 'Tijeras especializadas para retiro de puntos y grapas'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Material de asepsia',
+      description: 'Alcohol, gasas y otros materiales para mantener la esterilidad'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Evaluación y Preparación',
+      text: 'Evaluar el estado de la herida, determinar el tipo de sutura necesaria y preparar el área de trabajo con técnicas asépticas.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/24193882/pexels-photo-24193882/free-photo-of-mesa-hospital-herramientas-cuidado-de-la-salud.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Evaluación inicial y preparación del área de trabajo para sutura quirúrgica'
+      },
+      url: SITE.site + '/sutura-y-retiro-de-puntos/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Aplicación de Sutura',
+      text: 'Aplicar la sutura simple o continua según el tipo de herida, utilizando técnicas asépticas y materiales estériles.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/28727569/pexels-photo-28727569/free-photo-of-instrumentos-quirurgicos-sobre-una-manta-azul-en-el-quirofano.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Aplicación profesional de sutura quirúrgica con técnicas asépticas'
+      },
+      url: SITE.site + '/sutura-y-retiro-de-puntos/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Retiro de Puntos',
+      text: 'Retirar puntos quirúrgicos o grapas cuando la herida haya cicatrizado adecuadamente, utilizando instrumental especializado.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/28727569/pexels-photo-28727569/free-photo-of-instrumentos-quirurgicos-sobre-una-manta-azul-en-el-quirofano.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Retiro profesional de puntos quirúrgicos con instrumental especializado'
+      },
+      url: SITE.site + '/sutura-y-retiro-de-puntos/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Cuidados Posteriores',
+      text: 'Aplicar cuidados posteriores, proporcionar recomendaciones para cicatrización y programar seguimiento si es necesario.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/28727569/pexels-photo-28727569/free-photo-of-instrumentos-quirurgicos-sobre-una-manta-azul-en-el-quirofano.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Cuidados posteriores y recomendaciones para cicatrización adecuada'
+      },
+      url: SITE.site + '/sutura-y-retiro-de-puntos/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
+
+const metadata = {
+  title: 'Sutura y Retiro de Puntos a Domicilio en Bogotá | Profesional y Económico | SMD Vital',
+  description:
+    'Sutura y retiro de puntos a domicilio barato en Bogotá. Suturas quirúrgicas, retiro de puntos de cirugía, grapas quirúrgicas a domicilio. Servicio 24/7 en las 20 localidades. Precio $120.000 COP.',
+  keywords: 'sutura y retiro de puntos, sutura a domicilio, retiro de puntos domicilio, sutura domicilio bogotá, retiro puntos bogotá, quitar puntos de sutura, retiro de puntos de sutura, quitar puntos de cirugia, retiro de puntos de cirugia, quitar grapas de sutura',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    title: 'Sutura y Retiro de Puntos a Domicilio | Profesional y Económico | SMD Vital Bogotá',
+    description: 'Sutura y retiro de puntos a domicilio barato en Bogotá. Suturas quirúrgicas profesionales, retiro de puntos de cirugía. Servicio 24/7 en toda Bogotá. Precio $120.000 COP.',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/28727569/pexels-photo-28727569/free-photo-of-instrumentos-quirurgicos-sobre-una-manta-azul-en-el-quirofano.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+        alt: 'Instrumentos quirúrgicos profesionales para sutura y retiro de puntos a domicilio en Bogotá - SMD Vital',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@SMDVitalBogota',
+    creator: '@SMDVitalBogota',
+    title: 'Sutura y Retiro de Puntos a Domicilio | Profesional y Económico | SMD Vital',
+    description: 'Suturas quirúrgicas y retiro de puntos en tu hogar. Servicio profesional 24/7 en toda Bogotá.',
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Breadcrumbs con Schema.org -->
+  <div class="container mx-auto px-4 pt-20 md:pt-24">
+    <Breadcrumbs
+      items={[
+        { label: 'Servicios', href: '/servicios' },
+        { label: 'Sutura y Retiro de Puntos' },
+      ]}
+    />
+  </div>
+
+  <!-- Hero2 Widget ******************* -->
+  <Hero2
+    tagline="Suturas Quirúrgicas Profesionales"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Sutura Barato WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda Sutura', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/28727569/pexels-photo-28727569/free-photo-of-instrumentos-quirurgicos-sobre-una-manta-azul-en-el-quirofano.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Instrumentos quirúrgicos para sutura y retiro de puntos a domicilio - Servicio médico especializado SMD Vital',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      Sutura y Retiro de Puntos<br />
+      <span class="text-accent dark:text-white highlight">Bogotá Barato</span><br />
+      Servicio Profesional
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Sutura y retiro de puntos a domicilio barato en Bogotá</span> con técnicas quirúrgicas profesionales y retiro seguro de puntos de cirugía en la comodidad de tu hogar.
+      <br /><br />
+      Nuestro equipo especializado te ofrece un servicio confiable y económico en las 20 localidades de Bogotá, Colombia. Precios transparentes sin costos ocultos.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+  <Features
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestro servicio de sutura y retiro de puntos a domicilio barato en Bogotá?"
+    subtitle="Sutura y retiro de puntos a domicilio barato en Bogotá con técnicas quirúrgicas profesionales y retiro seguro de puntos de cirugía en la comodidad de tu hogar. Nuestro equipo especializado te ofrece un servicio confiable y económico en las 20 localidades de Bogotá, Colombia."
+    columns={3}
+    items={[
+      {
+        title: 'Suturas Quirúrgicas Profesionales',
+        description: 'Técnicas asépticas certificadas con materiales estériles de un solo uso. Suturas simples, continuas y retiro seguro de puntos de cirugía.',
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Personal Certificado en Cirugía',
+        description: 'Enfermeros especializados con certificación en técnicas quirúrgicas y amplia experiencia en suturas y cuidado de heridas.',
+        icon: 'tabler:certificate',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda la ciudad. Agenda tu cita y recibe atención profesional el mismo día sin largas esperas.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Materiales Quirúrgicos Incluidos',
+        description: 'Hilos de sutura estériles, instrumental quirúrgico, tijeras especializadas y todos los materiales necesarios incluidos en el servicio.',
+        icon: 'tabler:package',
+      },
+      {
+        title: 'Cicatrización Óptima',
+        description: 'Técnicas profesionales que garantizan cicatrización adecuada y minimizan el riesgo de infecciones o complicaciones.',
+        icon: 'tabler:check',
+      },
+      {
+        title: 'Cobertura Total Bogotá',
+        description: 'Servicio disponible en las 20 localidades de Bogotá y municipios cercanos. Atención 24/7 todos los días del año.',
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Procedimiento **************** -->
+  <Content
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestro Procedimiento de Sutura y Retiro de Puntos?"
+    subtitle="Proceso profesional paso a paso realizado por especialistas certificados"
+    isReversed
+    items={[
+      {
+        title: '1. Evaluación y Preparación',
+        description: 'Evaluamos el estado de la herida, determinamos el tipo de sutura necesaria y preparamos el área de trabajo con técnicas asépticas.',
+        icon: 'tabler:clipboard-check',
+      },
+      {
+        title: '2. Aplicación de Sutura',
+        description: 'Aplicamos sutura simple o continua según el tipo de herida, utilizando técnicas asépticas y materiales estériles.',
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: '3. Retiro de Puntos',
+        description: 'Retiramos puntos quirúrgicos o grapas cuando la herida haya cicatrizado adecuadamente, utilizando instrumental especializado.',
+        icon: 'tabler:scissors',
+      },
+      {
+        title: '4. Cuidados Posteriores',
+        description: 'Aplicamos cuidados posteriores, proporcionamos recomendaciones para cicatrización y programamos seguimiento si es necesario.',
+        icon: 'tabler:circle-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/24193882/pexels-photo-24193882/free-photo-of-mesa-hospital-herramientas-cuidado-de-la-salud.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Procedimiento paso a paso de sutura y retiro de puntos profesionales a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h3>
+      <p class="text-muted mt-4">
+        Utilizamos técnicas aprobadas por la Organización Mundial de la Salud (OMS) y el Ministerio de Salud de Colombia para garantizar tu seguridad y bienestar.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo necesitas **************** -->
+  <Content
+    id="cuando-necesitas"
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Indicaciones para Sutura',
+        description: `✓ Heridas abiertas que requieren cierre<br>
+                      ✓ Cortes profundos que necesitan sutura<br>
+                      ✓ Heridas post-quirúrgicas<br>
+                      ✓ Laceraciones que no cicatrizan solas<br>
+                      ✓ Heridas en áreas de alta tensión`,
+        icon: 'tabler:stethoscope',
+      },
+      {
+        title: '¿Quiénes lo Necesitan?',
+        description: `✓ Pacientes con heridas que requieren sutura<br>
+                      ✓ Personas post-operadas que necesitan retiro de puntos<br>
+                      ✓ Pacientes con heridas que no cicatrizan<br>
+                      ✓ Personas que prefieren comodidad en casa<br>
+                      ✓ Adultos mayores con dificultades de movilidad`,
+        icon: 'tabler:users',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/7583382/pexels-photo-7583382.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Indicaciones para sutura y retiro de puntos a domicilio profesional',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Sutura y Retiro de Puntos a Domicilio?
+      </h3>
+      <p class="text-muted mt-4">
+        Si tienes heridas que requieren sutura o necesitas retiro de puntos de cirugía, nuestro servicio está diseñado para ti.
+      </p>
+    </Fragment>
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Precios **************** -->
+  <Content
+    id="precios"
+    title="Precios de Sutura y Retiro de Puntos a Domicilio"
+    subtitle="Servicio médico especializado a domicilio con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
+    isReversed
+    items={[
+      {
+        title: 'Precio Fijo Garantizado',
+        description: `$120.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: 'Todo Incluido',
+        description: `Evaluación inicial, procedimiento completo, materiales estériles, instrumental quirúrgico y cuidados posteriores.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el resultado, realizamos una segunda evaluación sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $200.000+ | Otros domicilios: $150.000+ | SMD Vital: $120.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6291179/pexels-photo-6291179.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios transparentes y competitivos para sutura y retiro de puntos profesional a domicilio en Bogotá - $120.000 COP',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+  </Content>
+
+  <!-- Sección de Servicios Relacionados con Enlaces Internos -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Servicios Complementarios</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        Además de la sutura y retiro de puntos, ofrecemos <a href="/servicios" class="text-primary hover:underline font-semibold">atención médica integral a domicilio</a> en la capital
+      </p>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        La <strong>sutura y retiro de puntos profesional</strong> es parte de nuestro amplio catálogo de <a href="/servicios" class="text-primary hover:underline">servicios médicos domiciliarios</a>.
+        Si necesitas una <a href="/valoracion-medica-domiciliaria" class="text-primary hover:underline">valoración médica completa</a>,
+        nuestro equipo puede evaluar múltiples aspectos de tu salud durante la visita.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Para quienes requieren monitoreo constante, ofrecemos
+        <a href="/toma-de-signos-vitales" class="text-primary hover:underline">toma de signos vitales</a> y
+        <a href="/enfemeria-a-nivel-domiciliario-y-hospitalario" class="text-primary hover:underline">servicios de enfermería especializada</a>.
+        También realizamos <a href="/inyectologia-a-domicilio" class="text-primary hover:underline">inyectología profesional</a>
+        con técnicas asépticas certificadas. <a href="/contacto" class="text-primary hover:underline font-semibold">Contáctanos</a> para más información.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Si prefieres una consulta inicial sin desplazamiento, conoce nuestra
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">teleconsulta médica</a> disponible las 24 horas.
+        Para diagnósticos más complejos, contamos con <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">laboratorio clínico a domicilio</a>
+        con toma de muestras profesional y resultados digitales.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Explora todos nuestros <a href="/servicios" class="text-primary hover:underline font-semibold">servicios médicos a domicilio</a>
+        o visita nuestro <a href="/blog" class="text-primary hover:underline">blog de salud</a> para consejos de cuidado en casa.
+      </p>
+    </div>
+  </section>
+
+  <!-- Sección de Estadísticas -->
+  <section class="py-8 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-4 text-center">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">300+</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Suturas Realizadas</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">4.9/5</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Calificación Promedio</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">45 min</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Tiempo de Llegada</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">24/7</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Disponibilidad</span>
+        </div>
+      </div>
+      <p class="mt-6 text-lg font-semibold text-accent">
+        ✓ Disponible hoy en tu localidad
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQs Widget ******************* -->
+  <FAQs
+    title="Preguntas frecuentes sobre sutura y retiro de puntos a domicilio"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio médico especializado"
+    items={[
+      {
+        title: '¿Qué es la sutura y retiro de puntos a domicilio?',
+        description:
+          'Es un servicio médico especializado que consiste en la aplicación de suturas para cerrar heridas y el retiro posterior de puntos quirúrgicos en la comodidad de tu hogar, realizado por profesionales certificados.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuánto cuesta la sutura y retiro de puntos a domicilio en Bogotá?',
+        description: `El precio de la sutura y retiro de puntos a domicilio en Bogotá es de $120.000 COP. Este valor incluye evaluación inicial, procedimiento completo, materiales estériles y cuidados posteriores. Sin costos ocultos, precios transparentes.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué tipos de suturas pueden realizar a domicilio?',
+        description:
+          'Realizamos suturas simples, suturas continuas, suturas de grapas quirúrgicas y retiro de puntos de cirugía. Nuestros profesionales evalúan cada caso y determinan la técnica más adecuada según el tipo de herida.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Es seguro realizar suturas a domicilio?',
+        description: `Sí, contamos con profesionales certificados en técnicas quirúrgicas y seguimos estrictos protocolos de higiene y seguridad. Utilizamos materiales estériles de un solo uso y técnicas asépticas certificadas.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuándo debo retirar los puntos de sutura?',
+        description: `El tiempo de retiro varía según la ubicación y tipo de herida. Generalmente entre 7-14 días para heridas faciales y 10-21 días para heridas corporales. Nuestros profesionales evalúan cada caso individualmente.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué diferencia hay entre sutura simple y continua?',
+        description: `La sutura simple utiliza puntos individuales, ideal para heridas pequeñas. La sutura continua utiliza un hilo continuo, ideal para heridas largas. Nuestros profesionales determinan la técnica más adecuada según el caso.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Pueden realizar suturas a niños y adultos mayores?',
+        description: `Sí, tenemos experiencia realizando suturas a pacientes de todas las edades. Adaptamos las técnicas según la edad y condición del paciente para minimizar molestias y garantizar la mejor cicatrización.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué debo tener listo para la sutura a domicilio?',
+        description: `Solo necesitas tener el área limpia y estar cómodo. Nosotros llevamos todo el equipo necesario: hilos de sutura, agujas, instrumental quirúrgico, materiales estériles y anestesia local si es necesaria.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Los servicios están cubiertos por EPS o medicina prepagada?',
+        description: `Algunos servicios pueden tener cobertura parcial. Te ayudamos con la gestión de autorizaciones y emitimos facturas para reembolsos ante pólizas de salud.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo agendo la sutura y retiro de puntos a domicilio?',
+        description: `Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en toda Bogotá.`,
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+  <Steps2
+    title="Agenda tu Sutura y Retiro de Puntos Ahora - Atención en 45 Minutos"
+    subtitle="Servicio médico especializado a domicilio. Personal certificado con más de 300 suturas exitosas. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Agendar Sutura por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20necesito%20agendar%20sutura%20y%20retiro%20de%20puntos%20a%20domicilio',
+      icon: 'tabler:brand-whatsapp',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamar Ahora',
+        description: 'Atención Inmediata',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo Electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent dark:from-slate-800"></div>
+    </Fragment>
+  </Steps2>
+
+  <!-- BlogLatestPosts Widget **************** -->
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre sutura y retiro de puntos a domicilio"
+    information={`Visita nuestro blog para conocer más sobre el cuidado de heridas, técnicas de sutura y la importancia de un seguimiento adecuado. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

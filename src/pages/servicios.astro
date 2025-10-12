@@ -1,0 +1,240 @@
+---
+import CallToAction from '~/components/widgets/CallToAction.astro';
+import Content from '~/components/widgets/Content.astro';
+import Features2 from '~/components/widgets/Features2.astro';
+import Hero from '~/components/widgets/Hero.astro';
+import Testimonials from '~/components/widgets/Testimonials.astro';
+import Layout from '~/layouts/PageLayout.astro';
+
+const metadata = {
+  title: 'Servicios Médicos a Domicilio Bogotá 24/7 | Enfermería, Laboratorio y Más | SMD Vital',
+  description:
+    'Servicios médicos domiciliarios en Bogotá: Valoración médica, enfermería 24/7, laboratorio clínico, curaciones, terapias IV y más. Profesionales certificados en tu hogar. ¡Agenda ahora!',
+  keywords: 'servicios médicos domiciliarios bogotá, enfermería a domicilio, laboratorio a domicilio, médico a domicilio, curaciones domiciliarias, terapia intravenosa, atención médica 24/7',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    title: 'Servicios Médicos Domiciliarios en Bogotá 24/7 | SMD Vital',
+    description: 'Atención médica profesional en tu hogar: consultas, enfermería, laboratorio, curaciones y más. Profesionales certificados disponibles 24/7 en toda Bogotá.',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+        width: 1740,
+        height: 900,
+        alt: 'Servicios médicos domiciliarios profesionales en Bogotá - SMD Vital',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Servicios Médicos a Domicilio Bogotá | SMD Vital',
+    description: 'Atención médica profesional 24/7 en tu hogar. Valoración, enfermería, laboratorio y más. ¡Agenda ya!',
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+  <Hero
+    tagline="Servicios"
+    title="Servicios Médicos Domiciliarios en Bogotá"
+    subtitle="En SMD Vital te brindamos una amplia variedad de servicios médicos básicos en la comodidad de tu hogar. Olvídate de desplazamientos y largas esperas, recibe atención profesional a tu puerta."
+    actions={[{ variant: 'primary', target: '_blank', text: 'Contáctanos', href: 'https://wa.me/573042912564' }]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+      alt: 'Atención médica a domicilio en Bogotá',
+    }}
+  />
+
+  <!-- Features2 Widget ************** -->
+  <Features2
+    title="Explora Nuestros Servicios"
+    subtitle="Conoce la variedad de atenciones que ofrecemos para cubrir tus necesidades de salud en casa."
+    columns={3}
+    items={[
+      {
+        title: 'Consulta Médica Domiciliaria',
+        description: 'Evaluación integral, diagnóstico y recomendaciones de tratamiento sin salir de tu hogar.',
+        icon: 'tabler:stethoscope',
+      },
+      {
+        title: 'Toma de Muestras',
+        description:
+          'Realizamos exámenes clínicos (sangre, orina, etc.) en tu domicilio, evitando desplazamientos y garantizando resultados confiables.',
+        icon: 'tabler:needle',
+      },
+      {
+        title: 'Cuidado Postoperatorio',
+        description:
+          'Atención especializada después de cirugías, incluyendo curaciones, control de signos vitales y apoyo en tu recuperación.',
+        icon: 'tabler:heart-rate-monitor',
+      },
+      {
+        title: 'Lavado de Oídos',
+        description: 'Eliminación de cerumen y alivio de molestias auditivas con técnicas seguras y profesionales.',
+        icon: 'tabler:ear',
+      },
+      {
+        title: 'Inyectología a Domicilio',
+        description:
+          'Aplicación segura de inyecciones, vitaminas y otros tratamientos, siguiendo las indicaciones médicas.',
+        icon: 'tabler:vaccine',
+      },
+      {
+        title: 'Atención COVID-19',
+        description:
+          'Monitoreo, cuidado y orientación para pacientes con COVID-19, asegurando un ambiente seguro en tu hogar.',
+        icon: 'tabler:virus',
+      },
+      {
+        title: 'Valoración Médica',
+        description:
+          'Examen médico completo para detectar posibles problemas de salud y orientar un tratamiento oportuno.',
+        icon: 'tabler:clipboard-heart',
+      },
+      {
+        title: 'Suero Multivitamínico',
+        description:
+          'Fortalece tu organismo con sueros y tratamientos intravenosos que mejoran tu nutrición y estado general.',
+        icon: 'tabler:bottle',
+      },
+      {
+        title: 'Monitoreo de Signos Vitales',
+        description:
+          'Control regular de tu presión arterial, frecuencia cardíaca y otros parámetros para un seguimiento continuo de tu salud.',
+        icon: 'tabler:activity-heartbeat',
+      },
+    ]}
+  />
+
+  <!-- Content Widget (Primera sección) **************** -->
+  <Content
+    isReversed
+    items={[
+      {
+        title: 'Profesionales Calificados',
+        description:
+          'Nuestro equipo médico está conformado por profesionales con experiencia en atención domiciliaria, garantizando una atención segura y de calidad.',
+        icon: 'tabler:user-check',
+      },
+      {
+        title: 'Atención Personalizada',
+        description:
+          'Adaptamos nuestros servicios a tus necesidades, brindando una experiencia única y cercana para tu bienestar.',
+        icon: 'tabler:heart-handshake',
+      },
+      {
+        title: 'Tecnología Moderna',
+        description:
+          'Contamos con equipos y herramientas actualizadas que nos permiten ofrecer diagnósticos y tratamientos eficaces.',
+        icon: 'tabler:device-heart-monitor',
+      },
+      {
+        title: 'Respuesta Rápida',
+        description:
+          'Agilizamos el proceso de agendamiento y atención para que recibas el servicio en el menor tiempo posible.',
+        icon: 'tabler:clock',
+      },
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1525909002-1b05e0c869d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=870&q=80',
+      alt: 'Profesionales en acción',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">Características Principales</h3>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget (Segunda sección) **************** -->
+  <Content
+    isAfterContent
+    items={[
+      {
+        title: 'Ahorro de Tiempo',
+        description:
+          'Evita el tráfico y las filas en salas de espera. Nuestro equipo va hasta tu domicilio, optimizando tu tiempo y esfuerzo.',
+        icon: 'tabler:road',
+      },
+      {
+        title: 'Comodidad y Privacidad',
+        description:
+          'Recibe atención médica en tu espacio personal, garantizando tu confort y un entorno más relajado.',
+        icon: 'tabler:home-heart',
+      },
+      {
+        title: 'Cuidado Integral',
+        description:
+          'Ofrecemos una amplia gama de servicios que abarcan desde una simple consulta hasta cuidados postoperatorios.',
+        icon: 'tabler:heart-plus',
+      },
+      {
+        title: 'Atención Inmediata',
+        description:
+          'Agendamos tu atención de forma rápida para que recibas el cuidado que necesitas justo cuando lo requieras.',
+        icon: 'tabler:alarm',
+      },
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1552664688-cf412ec27db2?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80',
+      alt: 'Beneficios del servicio',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">Beneficios</h3>
+    </Fragment>
+  </Content>
+
+  <!-- Testimonials Widget *********** -->
+  <Testimonials
+    title="Lo que dicen nuestros pacientes"
+    testimonials={[
+      {
+        testimonial: `SMD Vital me permitió recibir una consulta médica completa sin salir de casa. El médico fue muy profesional y atento a mis inquietudes. Ahorré tiempo y me sentí muy cómoda.`,
+        name: 'Laura Gómez',
+        job: 'Paciente',
+        image: {
+          src: 'https://images.unsplash.com/photo-1618835962148-cf177563c6c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=930&q=80',
+          alt: 'Laura Gómez Image',
+        },
+      },
+      {
+        testimonial: `Necesitaba atención postoperatoria y el equipo de SMD Vital fue puntual y muy cuidadoso. Se notaba su experiencia. Definitivamente marcó la diferencia en mi recuperación.`,
+        name: 'Carlos Ramírez',
+        job: 'Paciente',
+        image: {
+          src: 'https://images.unsplash.com/photo-1561406636-b80293969660?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80',
+          alt: 'Carlos Ramírez Image',
+        },
+      },
+      {
+        testimonial: `El lavado de oídos en casa fue sencillo y sin dolor. SMD Vital me brindó tranquilidad y evitó que tuviera que salir y esperar en un consultorio.`,
+        name: 'María López',
+        job: 'Paciente',
+        image: {
+          src: 'https://images.unsplash.com/photo-1545167622-3a6ac756afa4?ixlib=rb-4.0.3&auto=format&fit=crop&w=824&q=80',
+          alt: 'María López Image',
+        },
+      },
+    ]}
+    callToAction={{
+      target: '_blank',
+      text: 'Más testimonios...',
+      href: 'https://wa.me/573042912564',
+      icon: 'tabler:chevron-right',
+    }}
+  />
+
+  <!-- CallToAction Widget *********** -->
+  <CallToAction
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Agendar ahora',
+        href: 'https://wa.me/573042912564',
+      },
+    ]}
+    title="¿Listo para recibir atención médica en tu hogar?"
+    subtitle="Contáctanos ahora y descubre cómo SMD Vital puede cuidar de ti y de tu familia con servicios médicos domiciliarios en Bogotá."
+  />
+</Layout>

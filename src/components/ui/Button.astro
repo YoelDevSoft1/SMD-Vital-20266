@@ -1,0 +1,98 @@
+---
+import { twMerge } from 'tailwind-merge';
+import Icon from './Icon.astro';
+import type { CallToAction as Props } from '~/types';
+
+const {
+  variant = 'secondary',
+  target,
+  text = Astro.slots.render('default'),
+  icon = '',
+  class: className = '',
+  type,
+  ...rest
+} = Astro.props;
+
+const variants = {
+  primary: 'btn-primary',
+  secondary: 'btn-secondary',
+  tertiary: 'btn btn-tertiary',
+  link: 'cursor-pointer hover:text-primary',
+};
+
+// Mapeo de iconos de Tabler a nombres de Heroicons con prefijo correcto
+const getIconName = (iconName: string) => {
+  const iconMap: Record<string, string> = {
+    // Iconos de Tabler que se mantienen en Tabler
+    'tabler:brand-whatsapp': 'tabler:brand-whatsapp',
+    'tabler:brand-tailwind': 'tabler:brand-tailwind',
+    'tabler:components': 'tabler:components',
+    'tabler:list-check': 'tabler:list-check',
+    'tabler:rocket': 'tabler:rocket',
+    'tabler:arrows-right-left': 'tabler:arrows-right-left',
+    'tabler:bulb': 'tabler:bulb',
+    'tabler:package': 'tabler:package',
+    'tabler:letter-case': 'tabler:letter-case',
+    'tabler:paint': 'tabler:paint',
+    'tabler:check': 'tabler:check',
+    
+    // Iconos de Tabler mapeados a Heroicons
+    'tabler:phone-call': 'heroicons:phone',
+    'tabler:square-rounded-arrow-right': 'heroicons:arrow-right',
+    'tabler:download': 'heroicons:arrow-down-tray',
+    'tabler:chevron-right': 'heroicons:chevron-right',
+    'tabler:stethoscope': 'heroicons:heart-pulse',
+    'tabler:bandage': 'heroicons:heart-pulse', // Usando heart-pulse como alternativa
+    'tabler:medical-cross': 'heroicons:plus-circle',
+    'tabler:microscope': 'heroicons:magnifying-glass',
+    'tabler:device-desktop': 'heroicons:computer-desktop',
+    'tabler:heart': 'heroicons:heart',
+    'tabler:wheelchair': 'heroicons:wheelchair',
+    'tabler:heartbeat': 'heroicons:heart-pulse',
+    'tabler:baby-carriage': 'heroicons:baby',
+    'tabler:users-group': 'heroicons:users',
+    'tabler:test-pipe': 'heroicons:beaker',
+    'tabler:building': 'heroicons:building-office',
+    'tabler:heart-handshake': 'heroicons:handshake',
+    'tabler:plane': 'heroicons:airplane',
+    'tabler:message-circle-2': 'heroicons:chat-bubble-left-right',
+    'tabler:clipboard-check': 'heroicons:clipboard-document-check',
+    'tabler:ambulance': 'heroicons:truck',
+    'tabler:clock-bolt': 'heroicons:clock',
+    'tabler:stars': 'heroicons:star',
+    'tabler:users': 'heroicons:users',
+    'tabler:sun': 'heroicons:sun',
+    'tabler:moon': 'heroicons:moon',
+  };
+  
+  return iconMap[iconName] || iconName;
+};
+---
+
+{
+  type === 'button' || type === 'submit' || type === 'reset' ? (
+    <button type={type} class={twMerge(variants[variant] || '', className)} {...rest}>
+      <Fragment set:html={text} />
+      {icon && (
+        <Icon 
+          name={getIconName(icon)} 
+          class="w-5 h-5 ml-1 -mr-1.5 rtl:mr-1 rtl:-ml-1.5 inline-block" 
+        />
+      )}
+    </button>
+  ) : (
+    <a
+      class={twMerge(variants[variant] || '', className)}
+      {...(target ? { target: target, rel: 'noopener noreferrer' } : {})}
+      {...rest}
+    >
+      <Fragment set:html={text} />
+      {icon && (
+        <Icon 
+          name={getIconName(icon)} 
+          class="w-5 h-5 ml-1 -mr-1.5 rtl:mr-1 rtl:-ml-1.5 inline-block" 
+        />
+      )}
+    </a>
+  )
+}

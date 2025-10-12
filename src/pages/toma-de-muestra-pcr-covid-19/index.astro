@@ -1,0 +1,303 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la prueba PCR COVID-19?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La prueba PCR COVID-19 es un test molecular que detecta el material genético del virus SARS-CoV-2. Es la prueba más confiable para diagnosticar la infección activa por COVID-19.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se toma la muestra para PCR COVID-19?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La muestra se toma mediante un hisopo nasofaríngeo, que se introduce por la nariz hasta la parte posterior de la garganta. El procedimiento es rápido y seguro.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Toma de Muestra PCR COVID-19 Bogotá',
+  description: 'Toma de muestra PCR COVID-19 a domicilio en Bogotá. Prueba molecular confiable para detectar infección activa por SARS-CoV-2. Servicio profesional y seguro.',
+  url: SITE.site + '/toma-de-muestra-pcr-covid-19/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  medicalSpecialty: ['LaboratoryMedicine', 'InfectiousDisease', 'Nursing'],
+  keywords: 'prueba pcr covid 19, toma de muestra pcr, pcr covid bogotá, prueba molecular covid, test pcr domicilio',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+const metadata = {
+  title: 'Toma de Muestra PCR COVID-19 a Domicilio en Bogotá | SMD Vital',
+  description: 'Toma de muestra PCR COVID-19 a domicilio en Bogotá. Prueba molecular confiable para detectar infección activa por SARS-CoV-2. Servicio profesional y seguro.',
+  keywords: 'prueba pcr covid 19, toma de muestra pcr, pcr covid bogotá, prueba molecular covid, test pcr domicilio, pcr covid domicilio',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
+};
+
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+  <section class="relative -mt-[76px]">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Toma de Muestra PCR COVID-19' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Prueba Molecular Confiable"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Agendar Prueba PCR', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Llamar Ahora', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Toma de muestra PCR COVID-19 a domicilio en Bogotá - SMD Vital',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Toma de Muestra PCR COVID-19 a Domicilio
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Prueba Molecular Confiable y Segura
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Detección Precisa del Virus
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Toma de muestra PCR COVID-19 a domicilio</span> con personal especializado y protocolos de bioseguridad certificados para detectar infección activa por SARS-CoV-2.
+      <br /><br />
+      Nuestro equipo profesional te ofrece la prueba molecular más confiable en la comodidad de tu hogar. Servicio seguro y certificado en las 20 localidades de Bogotá.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+  <Features
+    id="beneficios"
+    tagline="Servicio Especializado"
+    title="¿Por qué elegir nuestra toma de muestra PCR COVID-19?"
+    subtitle="Ofrecemos toma de muestra PCR COVID-19 a domicilio con personal especializado, protocolos de bioseguridad certificados y resultados confiables para tu tranquilidad."
+    columns={3}
+    items={[
+      {
+        title: 'Personal Especializado',
+        description: 'Profesionales capacitados en toma de muestras nasofaríngeas con protocolos de bioseguridad certificados.',
+        icon: 'tabler:user-shield',
+      },
+      {
+        title: 'Protocolos de Bioseguridad',
+        description: 'Cumplimiento estricto de protocolos de bioseguridad para proteger al paciente y al personal médico.',
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Resultados Confiables',
+        description: 'Prueba molecular PCR con alta sensibilidad y especificidad para detectar infección activa por SARS-CoV-2.',
+        icon: 'tabler:microscope',
+      },
+      {
+        title: 'Servicio a Domicilio',
+        description: 'Toma de muestra en la comodidad de tu hogar, sin desplazamientos ni exposición innecesaria.',
+        icon: 'tabler:home',
+      },
+      {
+        title: 'Resultados Rápidos',
+        description: 'Entrega de resultados en 24-48 horas con informe detallado y certificado médico.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Cobertura Total',
+        description: 'Servicio disponible en las 20 localidades de Bogotá y municipios cercanos.',
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Procedimiento **************** -->
+  <Content
+    id="procedimiento"
+    title="¿Cómo Funciona la Toma de Muestra PCR?"
+    subtitle="Proceso seguro y profesional para la toma de muestra nasofaríngea con protocolos de bioseguridad certificados"
+    isReversed
+    items={[
+      {
+        title: '1. Evaluación Inicial',
+        description: 'Verificación de síntomas y evaluación médica previa para determinar la necesidad de la prueba.',
+        icon: 'tabler:clipboard-check',
+      },
+      {
+        title: '2. Preparación del Paciente',
+        description: 'Explicación del procedimiento y preparación del paciente para la toma de muestra.',
+        icon: 'tabler:user',
+      },
+      {
+        title: '3. Toma de Muestra',
+        description: 'Toma de muestra nasofaríngea con hisopo estéril siguiendo protocolos de bioseguridad.',
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: '4. Envío al Laboratorio',
+        description: 'Transporte seguro de la muestra al laboratorio certificado para análisis molecular.',
+        icon: 'tabler:truck',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Procedimiento de toma de muestra PCR COVID-19 a domicilio con protocolos de bioseguridad',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  />
+
+  <!-- FAQs Widget ******************* -->
+  <FAQs
+    title="Preguntas frecuentes sobre PCR COVID-19"
+    subtitle="Respuestas a las dudas más comunes sobre la toma de muestra PCR COVID-19 a domicilio"
+    items={[
+      {
+        title: '¿Qué es la prueba PCR COVID-19?',
+        description: 'La prueba PCR COVID-19 es un test molecular que detecta el material genético del virus SARS-CoV-2. Es la prueba más confiable para diagnosticar la infección activa por COVID-19.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo se toma la muestra para PCR COVID-19?',
+        description: 'La muestra se toma mediante un hisopo nasofaríngeo, que se introduce por la nariz hasta la parte posterior de la garganta. El procedimiento es rápido y seguro.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+  <Steps2
+    title="Agenda tu Prueba PCR COVID-19"
+    subtitle="Toma de muestra PCR COVID-19 a domicilio. Personal especializado con protocolos de bioseguridad certificados. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Agendar Prueba PCR por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20necesito%20agendar%20una%20prueba%20PCR%20COVID-19%20a%20domicilio',
+      icon: 'tabler:brand-whatsapp',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: 'Contacto directo y respuesta inmediata',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamada Telefónica',
+        description: 'Atención personalizada por teléfono',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda Bogotá',
+        icon: 'tabler:clock',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPosts Widget **************** -->
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre PCR COVID-19"
+    information={`Visita nuestro blog para conocer más sobre la prueba PCR COVID-19, protocolos de bioseguridad y cuidado médico durante la pandemia. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+
+</Layout>

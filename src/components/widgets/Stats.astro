@@ -1,0 +1,75 @@
+---
+import type { Stats as Props } from '~/types';
+import WidgetWrapper from '../ui/WidgetWrapper.astro';
+import Headline from '../ui/Headline.astro';
+import Icon from '~/components/ui/Icon.astro';
+
+const {
+  title = await Astro.slots.render('title'),
+  subtitle = await Astro.slots.render('subtitle'),
+  tagline,
+  stats = [],
+
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+---
+
+<WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-7xl mx-auto ${classes?.container ?? ''}`} bg={bg}>
+  <Headline title={title} subtitle={subtitle} tagline={tagline} />
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+    {
+      stats &&
+        stats.map(({ amount, title, icon }, index) => (
+          <div class="intersect-once motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade intersect-quarter" style={`animation-delay: ${index * 100}ms`}>
+            <div class="relative group h-full">
+              {/* Fondo con gradiente y efecto hover */}
+              <div class="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-800 rounded-2xl transform group-hover:scale-105 transition-transform duration-300 shadow-lg group-hover:shadow-2xl"></div>
+
+              {/* Contenido - altura fija */}
+              <div class="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-2xl p-8 h-full min-h-[280px] flex flex-col items-center justify-center border-2 border-transparent group-hover:border-blue-400 transition-all duration-300">
+                {/* Icono decorativo de fondo */}
+                {icon && (
+                  <div class="absolute top-4 right-4 opacity-10 dark:opacity-5">
+                    <Icon name={icon} class="w-20 h-20 text-blue-600" />
+                  </div>
+                )}
+
+                {/* Icono principal */}
+                {icon && (
+                  <div class="flex items-center justify-center w-16 h-16 mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg group-hover:shadow-xl transition-shadow duration-300 flex-shrink-0">
+                    <Icon name={icon} class="w-8 h-8 text-white" />
+                  </div>
+                )}
+
+                {/* Número/Cantidad */}
+                {amount && (
+                  <div class="relative mb-3 flex-shrink-0">
+                    <div class="font-heading text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-300 text-5xl md:text-6xl font-extrabold group-hover:scale-110 transition-transform duration-300 whitespace-nowrap">
+                      {amount}
+                    </div>
+                    {/* Línea decorativa */}
+                    <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-transparent mx-auto mt-2 rounded-full"></div>
+                  </div>
+                )}
+
+                {/* Título - centrado y con altura fija */}
+                {title && (
+                  <div class="text-sm md:text-base font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300 text-center px-2 min-h-[48px] flex items-center justify-center">
+                    {title}
+                  </div>
+                )}
+
+                {/* Efecto de brillo en hover */}
+                <div class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/10 to-transparent"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+    }
+  </div>
+</WidgetWrapper>

@@ -1,0 +1,882 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la toma de signos vitales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un procedimiento médico que consiste en medir y registrar las funciones básicas del organismo como presión arterial, frecuencia cardíaca, temperatura, frecuencia respiratoria y saturación de oxígeno.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es doloroso el procedimiento?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No, la toma de signos vitales es completamente indolora y no invasiva. Se realiza con equipos especializados que miden las constantes vitales de forma cómoda y segura.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la toma de signos vitales a domicilio en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio de la toma de signos vitales a domicilio en Bogotá es de $60.000 COP. Este valor incluye evaluación inicial, medición completa, registro de datos y seguimiento posterior. Sin costos ocultos, precios transparentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre toma de signos vitales a domicilio y en clínica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La toma de signos vitales a domicilio se realiza en tu hogar, ofreciendo mayor comodidad y privacidad. La clínica requiere desplazamiento pero tiene equipos especializados. Nuestro servicio combina ambas ventajas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo recibir toma de signos vitales sin prescripción médica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, la toma de signos vitales es un procedimiento de rutina que no requiere prescripción médica. Es útil para monitoreo preventivo y seguimiento de la salud general.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Con qué frecuencia puedo recibir toma de signos vitales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende de las necesidades específicas del paciente. Algunos requieren monitoreo diario, otros semanal o mensual. Después de la evaluación inicial, te daremos una recomendación personalizada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué contraindicaciones tiene la toma de signos vitales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No tiene contraindicaciones, es un procedimiento completamente seguro. Solo se requiere que el paciente esté en reposo y relajado para obtener mediciones precisas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden atender a niños y adultos mayores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, adaptamos el procedimiento según la edad y condición del paciente, brindando una experiencia segura para todos. Tenemos experiencia trabajando con pacientes pediátricos y geriátricos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cada cuánto tiempo necesito toma de signos vitales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La frecuencia varía según las necesidades específicas del paciente. Algunos requieren monitoreo diario, otros semanal. Después de la primera evaluación, te daremos una recomendación personalizada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo la toma de signos vitales a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes hacerlo fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Toma de Signos Vitales a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Monitoreo Vital Profesional Barato',
+  description: 'Toma de signos vitales a domicilio barato en Bogotá. Monitoreo de presión arterial, frecuencia cardíaca, temperatura, respiración a domicilio. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  url: SITE.site + '/toma-de-signos-vitales/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    },
+    {
+      '@type': 'City',
+      name: 'Funza'
+    },
+    {
+      '@type': 'City',
+      name: 'Mosquera'
+    },
+    {
+      '@type': 'City',
+      name: 'Cota'
+    }
+  ],
+  medicalSpecialty: [
+    'Nursing',
+    'PrimaryCare',
+    'InternalMedicine',
+    'FamilyMedicine'
+  ],
+  keywords: 'toma de signos vitales, con que se toma la frecuencia respiratoria, con que se toman los signos vitales, frecuencia respiratoria como se toma, para que se toman los signos vitales, para que sirve la toma de signos vitales, procedimiento de toma de signos vitales, tecnica de toma de signos vitales, toma de constantes vitales, toma de frecuencia respiratoria',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Toma de Signos Vitales a Domicilio',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Medición de Presión Arterial',
+          description: 'Control de presión arterial sistólica y diastólica con equipos digitales'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Monitoreo de Frecuencia Cardíaca',
+          description: 'Medición de pulso y ritmo cardíaco con oxímetro de pulso'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Control de Temperatura Corporal',
+          description: 'Medición de temperatura corporal con termómetros digitales'
+        }
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    reviewCount: '400',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+const metadata = {
+  title: 'Toma de Signos Vitales a Domicilio en Bogotá | Profesional y Económico | SMD Vital',
+  description:
+    'Toma de signos vitales a domicilio en Bogotá. Servicio médico profesional con precios desde $60.000 COP. Monitoreo de presión arterial, frecuencia cardíaca, temperatura a domicilio. Atención 24/7 en toda la capital.',
+  keywords: 'toma de signos vitales, con que se toma la frecuencia respiratoria, con que se toman los signos vitales, frecuencia respiratoria como se toma, para que se toman los signos vitales, para que sirve la toma de signos vitales, procedimiento de toma de signos vitales, tecnica de toma de signos vitales, toma de constantes vitales, toma de frecuencia respiratoria',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
+};
+
+// Schema HowTo para el procedimiento de toma de signos vitales
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo realizar toma de signos vitales profesional a domicilio',
+  description: 'Procedimiento paso a paso para realizar toma de signos vitales profesional de forma segura en el hogar',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Procedimiento profesional de toma de signos vitales a domicilio con equipos médicos especializados'
+  },
+  totalTime: 'PT30M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '60000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Tensiómetro digital',
+      description: 'Equipo para medición de presión arterial sistólica y diastólica'
+    },
+    {
+      '@type': 'HowToSupply', 
+      name: 'Oxímetro de pulso',
+      description: 'Instrumento para medir frecuencia cardíaca y saturación de oxígeno'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Termómetro digital',
+      description: 'Equipo para medición de temperatura corporal'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Estetoscopio',
+      description: 'Instrumento para auscultación y medición de frecuencia respiratoria'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Tensiómetro digital',
+      description: 'Equipo especializado para medición precisa de presión arterial'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Oxímetro de pulso',
+      description: 'Instrumento para monitoreo de frecuencia cardíaca y oxigenación'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Termómetro digital',
+      description: 'Equipo para medición precisa de temperatura corporal'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Preparación del Paciente',
+      text: 'Posicionar al paciente en reposo, explicar el procedimiento y verificar que esté cómodo y relajado.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Preparación del paciente para toma de signos vitales profesional'
+      },
+      url: SITE.site + '/toma-de-signos-vitales/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Medición de Presión Arterial',
+      text: 'Aplicar el brazalete del tensiómetro y realizar la medición de presión sistólica y diastólica.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Medición de presión arterial con tensiómetro digital profesional'
+      },
+      url: SITE.site + '/toma-de-signos-vitales/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Monitoreo de Frecuencia Cardíaca',
+      text: 'Colocar el oxímetro de pulso para medir frecuencia cardíaca y saturación de oxígeno.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Monitoreo de frecuencia cardíaca con oxímetro de pulso'
+      },
+      url: SITE.site + '/toma-de-signos-vitales/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Registro y Evaluación',
+      text: 'Registrar todos los valores obtenidos, evaluar los resultados y proporcionar recomendaciones al paciente.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Registro y evaluación de signos vitales para monitoreo completo'
+      },
+      url: SITE.site + '/toma-de-signos-vitales/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
+
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Toma de Signos Vitales a Domicilio' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Cuidado Experto para tu Salud"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Signos Vitales Barato WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda Monitoreo', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Profesional médico realizando toma de signos vitales a domicilio con equipos especializados - SMD Vital Bogotá',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Toma de Signos Vitales a Domicilio en Bogotá
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Servicio Profesional y Económico
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Monitoreo de Salud
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Toma de signos vitales profesional en Bogotá</span> con monitoreo de presión arterial, frecuencia cardíaca, temperatura y respiración para controlar tu salud sin salir de casa.
+      <br /><br />
+      Nuestro equipo certificado te ofrece un servicio confiable y económico en las 20 localidades de la capital. Precios transparentes sin costos ocultos.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestra toma de signos vitales a domicilio en Bogotá?"
+    subtitle="Ofrecemos monitoreo de salud profesional en tu hogar con equipos especializados y técnicas precisas para controlar tu bienestar. Nuestro equipo certificado te brinda un servicio confiable y económico en las 20 localidades de la capital."
+    columns={3}
+    items={[
+      {
+        title: 'Sin Dolor ni Molestias',
+        description:
+          'Procedimiento completamente indolora y no invasiva. Se realiza con equipos especializados que miden las constantes vitales de forma cómoda y segura.',
+        icon: 'tabler:heart-handshake',
+      },
+      {
+        title: 'Equipos Especializados',
+        description: `Utilizamos tensiómetros digitales, oxímetros de pulso, termómetros digitales y estetoscopios profesionales para mediciones precisas.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda la ciudad. Agenda tu cita y recibe atención profesional el mismo día sin largas esperas.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Personal Certificado',
+        description: `Profesionales especializados con certificación en toma de signos vitales y amplia experiencia en monitoreo de salud.`,
+        icon: 'tabler:certificate',
+      },
+      {
+        title: 'Resultados Inmediatos',
+        description: 'Medición precisa y registro inmediato de todos los valores para un monitoreo completo de tu salud.',
+        icon: 'tabler:check',
+      },
+      {
+        title: 'Cobertura Total',
+        description: `Servicio disponible en las 20 localidades de la capital y municipios cercanos. Atención 24/7 todos los días.`,
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Procedimiento **************** -->
+
+  <Content
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestro Procedimiento?"
+    subtitle="Proceso profesional paso a paso realizado por especialistas certificados"
+    isReversed
+    items={[
+      {
+        title: '1. Preparación del Paciente',
+        description:
+          'Posicionar al paciente en reposo, explicar el procedimiento y verificar que esté cómodo y relajado para obtener mediciones precisas.',
+        icon: 'tabler:user-check',
+      },
+      {
+        title: '2. Medición de Presión Arterial',
+        description: `Aplicar el brazalete del tensiómetro digital y realizar la medición de presión sistólica y diastólica con precisión.`,
+        icon: 'tabler:heart-rate-monitor',
+      },
+      {
+        title: '3. Monitoreo de Frecuencia Cardíaca',
+        description: `Colocar el oxímetro de pulso para medir frecuencia cardíaca y saturación de oxígeno de forma no invasiva.`,
+        icon: 'tabler:heart',
+      },
+      {
+        title: '4. Registro y Evaluación',
+        description: `Registrar todos los valores obtenidos, evaluar los resultados y proporcionar recomendaciones al paciente.`,
+        icon: 'tabler:clipboard-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Procedimiento paso a paso de toma de signos vitales a domicilio con equipos médicos especializados',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h2>
+      <p class="text-muted mt-4">
+        Utilizamos técnicas aprobadas por la Organización Mundial de la Salud (OMS) y el Ministerio de Salud de Colombia para garantizar mediciones precisas y confiables.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo necesitas **************** -->
+
+  <Content
+    id="cuando-necesitas"
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Indicaciones para Toma de Signos Vitales',
+        description: `✓ Monitoreo de presión arterial<br>
+                      ✓ Control de frecuencia cardíaca<br>
+                      ✓ Seguimiento de temperatura corporal<br>
+                      ✓ Evaluación de frecuencia respiratoria<br>
+                      ✓ Monitoreo de saturación de oxígeno`,
+        icon: 'tabler:heart-rate-monitor',
+      },
+      {
+        title: '¿Quiénes lo Necesitan?',
+        description: `✓ Pacientes con hipertensión<br>
+                      ✓ Personas con problemas cardíacos<br>
+                      ✓ Adultos mayores<br>
+                      ✓ Pacientes con diabetes<br>
+                      ✓ Monitoreo preventivo de salud`,
+        icon: 'tabler:users',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/5998452/pexels-photo-5998452.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Paciente con necesidades de monitoreo de signos vitales consultando sobre toma de constantes vitales',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Toma de Signos Vitales?
+      </h2>
+      <p class="text-muted mt-4">
+        Si necesitas monitoreo de salud, control de presión arterial o seguimiento de constantes vitales, nuestro servicio está diseñado para ti. 
+        <strong>No uses equipos caseros</strong> ni intentes interpretar los valores sin supervisión profesional, ya que pueden dar lecturas incorrectas.
+      </p>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Precios **************** -->
+
+  <Content
+    id="precios"
+    title="Precios de Toma de Signos Vitales a Domicilio"
+    subtitle="Servicio médico especializado a domicilio con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
+    isReversed
+    items={[
+      {
+        title: 'Precio Fijo Garantizado',
+        description: `$60.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: 'Todo Incluido',
+        description: `Evaluación inicial, medición completa, registro de datos, equipos especializados y seguimiento posterior.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el resultado, realizamos una segunda medición sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $80.000+ | Otros domicilios: $70.000+ | SMD Vital: $60.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios transparentes y competitivos para toma de signos vitales a domicilio en Bogotá - $60.000 COP',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+  </Content>
+
+  <!-- Content Widget - Por qué NO usar equipos caseros **************** -->
+
+  <Content
+    id="no-equipos-caseros"
+    title="¿Por qué NO usar equipos caseros para signos vitales?"
+    subtitle="Información importante sobre los riesgos de usar equipos no profesionales y la importancia de la toma profesional"
+    isReversed={false}
+    items={[
+      {
+        title: 'Lecturas incorrectas',
+        description: `Los equipos caseros pueden dar lecturas incorrectas de presión arterial, frecuencia cardíaca y temperatura, llevando a diagnósticos erróneos.`,
+        icon: 'tabler:alert-triangle',
+      },
+      {
+        title: 'Falta de calibración',
+        description: `Los equipos caseros no están calibrados profesionalmente, lo que puede resultar en mediciones imprecisas y peligrosas.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Técnica incorrecta',
+        description: `Sin conocimiento médico, es fácil realizar las mediciones de forma incorrecta, obteniendo valores que no reflejan la realidad.`,
+        icon: 'tabler:alert-octagon',
+      },
+      {
+        title: 'Interpretación errónea',
+        description: `Los valores obtenidos requieren interpretación médica profesional. Sin esto, pueden pasar desapercibidas condiciones graves.`,
+        icon: 'tabler:shield-x',
+      },
+      {
+        title: 'Falta de seguimiento',
+        description: `Sin supervisión médica, no hay seguimiento adecuado de los valores ni recomendaciones profesionales para el cuidado.`,
+        icon: 'tabler:circle-x',
+      },
+      {
+        title: 'Solución profesional segura',
+        description: `Nuestro servicio utiliza equipos médicos especializados y técnicas profesionales que garantizan mediciones precisas y confiables.`,
+        icon: 'tabler:circle-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Riesgos de usar equipos caseros para toma de signos vitales - Por qué es importante la medición profesional',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-red-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Sección de Servicios Relacionados con Enlaces Internos -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Servicios Complementarios</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        Además de la toma de signos vitales, ofrecemos atención médica integral en Bogotá
+      </p>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        La <strong>toma de signos vitales profesional</strong> es parte de nuestro amplio catálogo de servicios médicos domiciliarios.
+        Si necesitas una <a href="/valoracion-medica-domiciliaria" class="text-primary hover:underline">valoración médica completa</a>,
+        nuestro equipo puede evaluar múltiples aspectos de tu salud durante la visita.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Para quienes requieren monitoreo constante, ofrecemos
+        <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">laboratorio clínico a domicilio</a> y
+        <a href="/inyectologia-a-domicilio" class="text-primary hover:underline">inyectología a domicilio</a>.
+        También realizamos <a href="/sutura-y-retiro-de-puntos" class="text-primary hover:underline">curaciones y retiro de puntos</a>
+        con técnicas asépticas certificadas.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Si prefieres una consulta inicial sin desplazamiento, conoce nuestra
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">teleconsulta médica</a> disponible las 24 horas.
+        Para diagnósticos más complejos, contamos con <a href="/lavado-de-oidos-a-domicilio" class="text-primary hover:underline">lavado de oídos profesional</a>
+        y otros procedimientos especializados a domicilio.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Explora todos nuestros <a href="/servicios" class="text-primary hover:underline font-semibold">servicios médicos a domicilio</a>
+        o visita nuestro <a href="/blog" class="text-primary hover:underline">blog de salud</a> para consejos de cuidado en casa.
+      </p>
+    </div>
+  </section>
+
+  <!-- Sección de Estadísticas -->
+  <section class="py-8 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-4 text-center">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">400+</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Pacientes Atendidos</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">4.8/5</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Calificación Promedio</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">45min</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Tiempo de Respuesta</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">24/7</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Disponibilidad</span>
+        </div>
+      </div>
+      <p class="mt-6 text-lg font-semibold text-accent">
+        ✓ Disponible hoy en tu localidad
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA Final -->
+  <Steps2
+    title="Agenda tu Toma de Signos Vitales Ahora - Respuesta en 45 Minutos"
+    subtitle="Toma de signos vitales barato en Bogotá. Monitoreo de presión arterial, frecuencia cardíaca, temperatura a domicilio. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Signos Vitales Barato WhatsApp',
+      href: 'https://wa.me/573042912564',
+      target: '_blank',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamar Ahora',
+        description: 'Respuesta inmediata',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent dark:from-slate-800"></div>
+    </Fragment>
+  </Steps2>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes sobre toma de signos vitales"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio profesional de monitoreo de salud"
+    items={[
+      {
+        title: '¿Qué es la toma de signos vitales?',
+        description: 'Es un procedimiento médico que consiste en medir y registrar las funciones básicas del organismo como presión arterial, frecuencia cardíaca, temperatura, frecuencia respiratoria y saturación de oxígeno.',
+      },
+      {
+        title: '¿Qué signos vitales se miden?',
+        description: 'Medimos presión arterial (sistólica y diastólica), frecuencia cardíaca, temperatura corporal, frecuencia respiratoria y saturación de oxígeno con equipos especializados.',
+      },
+      {
+        title: '¿Cuánto cuesta la toma de signos vitales a domicilio en Bogotá?',
+        description: 'El precio de la toma de signos vitales a domicilio en Bogotá es de $60.000 COP. Este valor incluye evaluación inicial, medición completa, registro de datos y seguimiento posterior. Sin costos ocultos, precios transparentes.',
+      },
+      {
+        title: '¿Es seguro recibir toma de signos vitales a domicilio?',
+        description: 'Sí, contamos con profesionales certificados y seguimos estrictos protocolos de higiene y seguridad. Utilizamos equipos médicos especializados y técnicas precisas certificadas.',
+      },
+      {
+        title: '¿Qué diferencia hay entre toma de signos vitales a domicilio y en clínica?',
+        description: 'La toma de signos vitales a domicilio se realiza en tu hogar, ofreciendo mayor comodidad y privacidad. La clínica requiere desplazamiento pero tiene equipos especializados. Nuestro servicio combina ambas ventajas.',
+      },
+      {
+        title: '¿Puedo recibir toma de signos vitales sin prescripción médica?',
+        description: 'Sí, la toma de signos vitales es un procedimiento de rutina que no requiere prescripción médica. Es útil para monitoreo preventivo y seguimiento de la salud general.',
+      },
+      {
+        title: '¿Con qué frecuencia puedo recibir toma de signos vitales?',
+        description: 'Depende de las necesidades específicas del paciente. Algunos requieren monitoreo diario, otros semanal o mensual. Después de la evaluación inicial, te daremos una recomendación personalizada.',
+      },
+      {
+        title: '¿Qué contraindicaciones tiene la toma de signos vitales?',
+        description: 'No tiene contraindicaciones, es un procedimiento completamente seguro. Solo se requiere que el paciente esté en reposo y relajado para obtener mediciones precisas.',
+      },
+      {
+        title: '¿Pueden atender a niños y adultos mayores?',
+        description: 'Sí, adaptamos el procedimiento según la edad y condición del paciente, brindando una experiencia segura para todos. Tenemos experiencia trabajando con pacientes pediátricos y geriátricos.',
+      },
+      {
+        title: '¿Cómo agendo la toma de signos vitales a domicilio?',
+        description: 'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en toda Bogotá.',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas sobre nuestro servicio de toma de signos vitales? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPost Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre monitoreo de salud"
+    information={`Nuestro blog está diseñado para ofrecerte información útil y consejos sobre el cuidado de la salud. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

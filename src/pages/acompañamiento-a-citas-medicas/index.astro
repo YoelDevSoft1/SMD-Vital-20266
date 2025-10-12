@@ -1,0 +1,291 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+
+import { headerData } from '~/navigation';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+
+const metadata = {
+  title: 'Acompañamiento a Citas Médicas en Bogotá | SMD Vital',
+  description:
+    'Recibe acompañamiento profesional a citas médicas en Bogotá con SMD Vital. Garantiza asistencia, apoyo y orientación en tus consultas médicas de manera segura y confiable.',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Emergencia',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <Hero2
+    tagline="Tu Aliado en el Acompañamiento Médico"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Llamada de emergencia', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8460157/pexels-photo-8460157.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Acompañamiento a Citas Médicas',
+    }}
+  >
+    <Fragment slot="title">
+      Facilita tu Experiencia Médica con <br /><span class="text-accent dark:text-white highlight">SMD Vital</span><br
+      />
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        Con <span class="font-semibold">SMD Vital Bogotá</span>, te acompañamos en cada paso de tu consulta médica.</span
+      >
+      Nuestro servicio garantiza apoyo logístico, emocional y de comunicación con el personal médico para una experiencia
+      segura y tranquila.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="features"
+    title="¿Por qué elegir nuestro Acompañamiento a Citas Médicas?"
+    subtitle="Beneficios únicos de nuestro servicio en Bogotá"
+    columns={2}
+    items={[
+      {
+        title: 'Asistencia personalizada',
+        description:
+          'Nuestro equipo garantiza un acompañamiento ajustado a tus necesidades, brindando apoyo logístico y emocional en cada etapa de tu cita médica.',
+        icon: 'tabler:layers-union',
+      },
+      {
+        title: 'Comunicación eficaz con los profesionales médicos',
+        description: `Facilitamos la interacción con el personal médico, asegurando que comprendas claramente los procedimientos y recomendaciones durante tu cita.`,
+        icon: 'tabler:artboard',
+      },
+      {
+        title: 'Apoyo para personas mayores o con movilidad reducida',
+        description:
+          'Especialmente diseñado para quienes necesitan asistencia adicional, asegurando su comodidad y tranquilidad en todo momento.',
+        icon: 'tabler:writing',
+      },
+      {
+        title: 'Puntualidad y organización',
+        description: `Te ayudamos a coordinar tus citas médicas, evitando retrasos y garantizando que todo fluya sin inconvenientes.`,
+        icon: 'tabler:podium',
+      },
+    ]}
+  />
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    title="Casos de Uso"
+    subtitle="Descubre cómo SMD Vital Bogotá ofrece soluciones personalizadas para todas tus necesidades médicas."
+    isReversed
+    items={[
+      {
+        title: 'Atención a Pacientes Crónicos',
+        description:
+          'Ideal para pacientes que requieren consultas regulares y seguimiento especializado. Nos aseguramos de que cada cita sea eficiente y ajustada a sus necesidades.',
+      },
+      {
+        title: 'Acompañamiento a Personas Mayores',
+        description: `Brindamos apoyo a personas mayores, garantizando que se sientan seguras y cómodas en cada cita médica. Nuestro equipo está capacitado para atender sus necesidades específicas.`,
+      },
+      {
+        title: 'Asistencia para Consultas Especializadas',
+        description: `Facilitamos tu experiencia en citas médicas con especialistas, asegurándonos de que entiendas los diagnósticos y tratamientos sugeridos.`,
+      },
+      {
+        title: 'Apoyo en Exámenes Médicos',
+        description: `Te asistimos durante la realización de exámenes médicos, garantizando que sigas los procedimientos correctamente y sin estrés.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8460376/pexels-photo-8460376.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Acompañamiento a Pacientes',
+    }}
+  />
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Apoyo en Tratamientos Especializados',
+        description: `Nuestro equipo te acompaña en tratamientos especializados, asegurando una experiencia médica sin estrés y con total tranquilidad.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Coordinación eficaz con especialistas médicos. <br /> Asistencia personalizada y empatía durante el proceso. <br /> Aseguramos comodidad y cumplimiento de cada etapa médica.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8413323/pexels-photo-8413323.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'SaaS Businesses Image',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Acompañamiento en Tratamientos <br /><span class="text-2xl">para tu Tranquilidad</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    isReversed
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Asistencia en Procedimientos Ambulatorios',
+        description: `Brindamos apoyo para garantizar que tu experiencia en procedimientos sea fluida, cómoda y segura.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Tranquilidad durante exámenes y procedimientos médicos. <br /> Apoyo profesional en cada paso del proceso. <br /> Aseguramos que te sientas acompañado y comprendido.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6303775/pexels-photo-6303775.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Portfolio Image',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimientos Ambulatorios <br /><span class="text-2xl">Con Apoyo Profesional</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    items={[
+      {
+        title: 'Acompañamiento Pediátrico',
+        description: `Especialmente diseñado para cuidar de los más pequeños durante consultas o procedimientos médicos. Garantizamos su comodidad y bienestar.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Atención personalizada y cariñosa para niños. <br /> Reducción de la ansiedad en procesos médicos. <br /> Tranquilidad para los padres en todo momento.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6235010/pexels-photo-6235010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Small Business Image',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Atención Pediátrica <br /><span class="text-2xl">Para su Bienestar</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes"
+    items={[
+      {
+        title: '¿Qué incluye el servicio de acompañamiento a citas médicas?',
+        description:
+          'Incluye asistencia personalizada desde el inicio hasta el final de tu cita, apoyo logístico, comunicación con el personal médico y orientación en procedimientos necesarios.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Está disponible el servicio para cualquier tipo de cita médica?',
+        description: `Sí, ofrecemos acompañamiento para consultas generales, citas de especialidad, exámenes médicos y procedimientos ambulatorios.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿El servicio es adecuado para personas mayores?',
+        description:
+          'Absolutamente. Nuestro equipo está capacitado para brindar el apoyo necesario a personas mayores o con necesidades específicas, asegurando su bienestar durante el proceso.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas sobre nuestro servicio de acompañamiento? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPost Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Conoce más sobre nuestros servicios"
+    information={`Nuestro blog está diseñado para ofrecerte información útil y consejos sobre cómo aprovechar al máximo nuestros servicios médicos. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

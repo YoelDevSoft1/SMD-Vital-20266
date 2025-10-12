@@ -1,0 +1,323 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+
+import { headerData } from '~/navigation';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+
+const metadata = {
+  title: 'Retiro y Colocación de Sonda Vesical | SMD Vital',
+  description:
+    'Servicios profesionales de retiro y colocación de sonda vesical a domicilio en Bogotá, Colombia. Atención segura y cómoda directamente en tu hogar.',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Emergencia',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <Hero2
+    tagline="Cuidado Integral para tu Bienestar"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda tu cita', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Retiro y Colocación de Sonda Vesical a Domicilio en Bogotá',
+    }}
+  >
+    <Fragment slot="title">
+      Retiro y <br /><span class="text-accent dark:text-white highlight">Colocación de Sonda Vesical</span><br />
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        Procedimientos seguros y profesionales realizados por especialistas en la comodidad de tu hogar.</span
+      >
+      Garantizamos tu comodidad y bienestar con servicios de alta calidad en Bogotá, Colombia.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="features"
+    title="¿Por qué elegir nuestro servicio de retiro y colocación de sonda vesical?"
+    subtitle="Comprometidos con tu salud y comodidad en Bogotá"
+    columns={2}
+    items={[
+      {
+        title: 'Profesionales Certificados',
+        description:
+          'Nuestro equipo está compuesto por especialistas en urología altamente capacitados para realizar procedimientos seguros y efectivos.',
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comodidad y Seguridad',
+        description: `Realiza tus procedimientos en la comodidad de tu hogar, siguiendo estrictos protocolos de higiene y seguridad en Bogotá.`,
+        icon: 'tabler:home',
+      },
+      {
+        title: 'Atención Personalizada',
+        description:
+          'Ofrecemos un enfoque individualizado para cada paciente, asegurando que cada procedimiento se adapte a tus necesidades específicas.',
+        icon: 'tabler:user',
+      },
+      {
+        title: 'Tecnología Avanzada',
+        description: `Utilizamos equipos de última generación para garantizar la precisión y comodidad durante cada procedimiento.`,
+        icon: 'tabler:device-laptop',
+      },
+    ]}
+  />
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    title="Nuestros Servicios"
+    subtitle="Descubre cómo SMD Vital Bogotá puede ayudarte con el retiro y colocación de sonda vesical a domicilio."
+    isReversed
+    items={[
+      {
+        title: 'Evaluación Inicial',
+        description:
+          'Realizamos una consulta detallada para entender tus necesidades y determinar el mejor enfoque para el procedimiento.',
+      },
+      {
+        title: 'Preparación del Procedimiento',
+        description: `Preparamos todo lo necesario en tu hogar, asegurando un ambiente cómodo y seguro para el procedimiento.`,
+      },
+      {
+        title: 'Retiro de Sonda Vesical',
+        description: `Nuestros especialistas realizan el retiro de la sonda vesical de manera cuidadosa y sin causar molestias.`,
+      },
+      {
+        title: 'Colocación de Nueva Sonda',
+        description: `Instalamos una nueva sonda vesical utilizando técnicas avanzadas para asegurar su correcta colocación y funcionamiento.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/7904481/pexels-photo-7904481.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Servicios de Retiro y Colocación de Sonda Vesical a Domicilio',
+    }}
+  />
+
+  <Content
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Alivio y Bienestar',
+        description: `Nuestros servicios están diseñados para proporcionarte alivio y mejorar tu calidad de vida mediante procedimientos seguros y efectivos.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Reducción del malestar. <br /> Mejora de la movilidad. <br /> Bienestar general optimizado.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4989130/pexels-photo-4989130.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Alivio y Beneficios de Nuestros Servicios',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Alivio y Bienestar <br /><span class="text-2xl">Garantizados</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isReversed
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Tecnología de Punta',
+        description: `Utilizamos equipos avanzados para asegurar la precisión y comodidad en cada procedimiento de retiro y colocación de sonda vesical.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Resultados más precisos. <br /> Procedimientos sin dolor. <br /> Mayor confianza en el tratamiento.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8413387/pexels-photo-8413387.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Tecnología Avanzada en Procedimientos de Sonda Vesical',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Precisión y Confianza <br /><span class="text-2xl">Garantizadas</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isReversed
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Soporte Continuo',
+        description: `Nuestro equipo está disponible para responder tus dudas y proporcionarte el soporte necesario durante todo el proceso de retiro y colocación de sonda vesical.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Asesoramiento personalizado. <br /> Atención inmediata a tus consultas. <br /> Tranquilidad y confianza en nuestro servicio.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4270091/pexels-photo-4270091.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Soporte Continuo en Procedimientos de Sonda Vesical',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Soporte y Atención <br /><span class="text-2xl">Personalizada</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    items={[
+      {
+        title: 'Atención en Emergencias',
+        description: `Proporcionamos servicios rápidos y eficientes para tus necesidades de retiro y colocación de sonda vesical en situaciones de emergencia.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Respuesta inmediata. <br /> Minimización de riesgos. <br /> Tranquilidad en momentos críticos.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Atención en Emergencias de Sonda Vesical',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Atención Rápida <br /><span class="text-2xl">y Segura</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes"
+    items={[
+      {
+        title: '¿Qué es una sonda vesical?',
+        description:
+          'Una sonda vesical es un dispositivo médico que se inserta en la vejiga a través de la uretra para drenar la orina.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Por qué necesito una sonda vesical?',
+        description: `Es necesaria en casos de retención urinaria, cirugías u otros procedimientos médicos que requieren el drenaje de orina.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Es doloroso el procedimiento?',
+        description:
+          'El procedimiento de retiro y colocación de sonda vesical puede causar molestias leves, pero nuestros profesionales están capacitados para minimizar cualquier incomodidad.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuánto tiempo dura el procedimiento?',
+        description: 'El procedimiento generalmente dura entre 15 y 30 minutos, dependiendo de cada caso específico.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué debo hacer después del procedimiento?',
+        description:
+          'Se recomienda seguir las indicaciones de tu especialista, mantener una buena higiene y estar atento a cualquier señal de infección o complicación.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas sobre nuestro servicio de retiro y colocación de sonda vesical a domicilio? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPost Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Conoce más sobre el cuidado de tu salud vesical"
+    information={`Visita nuestro blog para aprender más sobre el retiro y colocación de sonda vesical, cuidados post-procedimiento y otros consejos para mantener una buena salud vesical. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

@@ -1,0 +1,20 @@
+# SEO: robots.txt optimizado - simplicidad y acceso completo a sitemaps
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://smdvitalbogota.com/sitemap-index.xml
+Sitemap: https://smdvitalbogota.com/rss.xml
+
+# Crawl-delay para evitar sobrecarga
+Crawl-delay: 1
+
+# Bloquear directorios innecesarios
+Disallow: /admin/
+Disallow: /private/
+Disallow: /temp/
+Disallow: /api/
+Disallow: /_astro/*.map
+
+# Recursos permitidos (por defecto con Allow: /)
+# /images/, /css/, /js/, /fonts/, /*.xml, /*.json (manifest) están permitidos

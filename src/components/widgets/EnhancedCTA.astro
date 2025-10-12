@@ -1,0 +1,196 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import Icon from '~/components/ui/Icon.astro';
+
+export interface CTAProps {
+  title?: string;
+  description?: string;
+  primaryButton?: {
+    text: string;
+    href: string;
+    icon?: string;
+    variant?: 'primary' | 'secondary' | 'outline';
+  };
+  secondaryButton?: {
+    text: string;
+    href: string;
+    icon?: string;
+    variant?: 'primary' | 'secondary' | 'outline';
+  };
+  socialProof?: {
+    text: string;
+    count?: number;
+    icon?: string;
+  };
+  urgency?: {
+    text: string;
+    timer?: boolean;
+  };
+  className?: string;
+}
+
+const {
+  title = '¿Necesitas atención médica urgente?',
+  description = 'Nuestros médicos certificados están disponibles 24/7 para atenderte en tu hogar.',
+  primaryButton = {
+    text: 'Agendar consulta ahora',
+    href: 'https://wa.me/573042912564',
+    icon: 'tabler:brand-whatsapp',
+    variant: 'primary',
+  },
+  secondaryButton = {
+    text: 'Ver servicios',
+    href: '/servicios',
+    icon: 'tabler:medical-cross',
+    variant: 'secondary',
+  },
+  socialProof = {
+    text: 'pacientes atendidos hoy',
+    count: 47,
+    icon: 'tabler:users',
+  },
+  urgency = {
+    text: 'Última consulta agendada hace 3 minutos',
+    timer: true,
+  },
+  className = '',
+} = Astro.props;
+
+const getButtonClasses = (variant: string) => {
+  const baseClasses =
+    'inline-flex items-center justify-center px-6 py-3 text-base font-semibold rounded-lg transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900';
+
+  switch (variant) {
+    case 'primary':
+      return `${baseClasses} bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-500 shadow-lg hover:shadow-xl`;
+    case 'secondary':
+      return `${baseClasses} bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 focus:ring-emerald-400 shadow-lg hover:shadow-xl`;
+    case 'outline':
+      return `${baseClasses} border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-blue-500`;
+    default:
+      return baseClasses;
+  }
+};
+---
+
+<WidgetWrapper id="enhanced-cta" containerClass={`enhanced-cta ${className}`}>
+  <div class="relative mx-auto max-w-5xl overflow-hidden rounded-[32px] border border-white/40 bg-white/90 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-slate-900/80">
+    <div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-100/40 via-transparent to-sky-100/40 dark:from-emerald-500/20 dark:via-transparent dark:to-sky-500/10"></div>
+    <div class="relative px-6 py-12 sm:px-10 lg:px-14">
+      {urgency && (
+        <div class="mb-6 flex items-center justify-center">
+          <div class="flex items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-red-700 shadow-sm dark:bg-red-900/70 dark:text-red-200">
+            <Icon name="tabler:clock-bolt" class="h-4 w-4 animate-pulse" />
+            <span class="text-sm font-semibold tracking-wide">{urgency.text}</span>
+          </div>
+        </div>
+      )}
+
+      <Headline
+        title={title}
+        subtitle={description}
+        classes={{
+          container: 'text-center mb-8',
+          title: 'text-3xl md:text-4xl font-bold text-gray-900 dark:text-white',
+          subtitle: 'text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto',
+        }}
+      />
+
+      {socialProof && (
+        <div class="mb-10 flex justify-center">
+          <div
+            data-social-proof
+            class="flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-medium text-gray-600 shadow-md ring-1 ring-gray-200 dark:bg-slate-900 dark:text-gray-200 dark:ring-white/10"
+          >
+            <Icon name={socialProof.icon} class="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
+            <span>
+              <span class="font-bold text-emerald-600 dark:text-emerald-300">{socialProof.count}+</span> {socialProof.text}
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div class="mb-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <a href={primaryButton.href} class={getButtonClasses(primaryButton.variant)} data-cta="primary" target="_blank">
+          {primaryButton.icon && <Icon name={primaryButton.icon} class="mr-2 h-5 w-5" />} {primaryButton.text}
+        </a>
+        {secondaryButton && (
+          <a href={secondaryButton.href} class={getButtonClasses(secondaryButton.variant)} data-cta="secondary">
+            {secondaryButton.icon && <Icon name={secondaryButton.icon} class="mr-2 h-5 w-5" />} {secondaryButton.text}
+          </a>
+        )}
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+        <div class="flex flex-col items-center space-y-2 rounded-2xl bg-white/80 p-4 text-center shadow-sm ring-1 ring-gray-100 dark:bg-slate-900/60 dark:ring-white/10">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow dark:bg-emerald-900/60 dark:text-emerald-300">
+            <Icon name="tabler:shield-check" class="h-6 w-6" />
+          </div>
+          <h3 class="font-semibold text-gray-900 dark:text-white">Certificados</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">Profesionales verificados ante Supersalud</p>
+        </div>
+        <div class="flex flex-col items-center space-y-2 rounded-2xl bg-white/80 p-4 text-center shadow-sm ring-1 ring-gray-100 dark:bg-slate-900/60 dark:ring-white/10">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 shadow dark:bg-blue-900/60 dark:text-blue-300">
+            <Icon name="tabler:clock-bolt" class="h-6 w-6" />
+          </div>
+          <h3 class="font-semibold text-gray-900 dark:text-white">Respuesta rápida</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">Llegamos en promedio en 45 minutos</p>
+        </div>
+        <div class="flex flex-col items-center space-y-2 rounded-2xl bg-white/80 p-4 text-center shadow-sm ring-1 ring-gray-100 dark:bg-slate-900/60 dark:ring-white/10">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 text-violet-600 shadow dark:bg-violet-900/60 dark:text-violet-300">
+            <Icon name="tabler:star" class="h-6 w-6" />
+          </div>
+          <h3 class="font-semibold text-gray-900 dark:text-white">Calidad certificada</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">97 % de satisfacción reportada</p>
+        </div>
+      </div>
+
+      <div class="mt-10 border-t border-gray-200 pt-6 text-sm text-gray-600 dark:border-white/10 dark:text-gray-300">
+        <div class="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
+          <span class="flex items-center gap-2">
+            <Icon name="tabler:phone" class="h-4 w-4" /> +57 304 291 2564
+          </span>
+          <span class="flex items-center gap-2">
+            <Icon name="tabler:mail" class="h-4 w-4" /> salud@smdvitalbogota.com
+          </span>
+          <span class="flex items-center gap-2">
+            <Icon name="tabler:map-pin" class="h-4 w-4" /> Toda Bogotá
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</WidgetWrapper>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const socialProofElement = document.querySelector('[data-social-proof]');
+
+    if (socialProofElement) {
+      setInterval(() => {
+        const countElement = socialProofElement.querySelector('.font-bold');
+        if (countElement) {
+          const currentCount = parseInt(countElement.textContent);
+          const newCount = currentCount + Math.floor(Math.random() * 3) + 1;
+          countElement.textContent = `${newCount}+`;
+        }
+      }, 30000);
+    }
+
+    const ctaButtons = document.querySelectorAll('[data-cta]');
+    ctaButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const ctaType = target.getAttribute('data-cta');
+
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'cta_click', {
+            cta_type: ctaType,
+            cta_text: target.textContent?.trim(),
+          });
+        }
+      });
+    });
+  });
+</script>

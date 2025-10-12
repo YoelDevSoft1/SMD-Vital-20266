@@ -1,0 +1,392 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Hero from '~/components/widgets/Hero.astro';
+import Note from '~/components/widgets/Note.astro';
+import Features from '~/components/widgets/Features.astro';
+import Features2 from '~/components/widgets/Features2.astro';
+import Steps from '~/components/widgets/Steps.astro';
+import Content from '~/components/widgets/Content.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import Stats from '~/components/widgets/Stats.astro';
+import CallToAction from '~/components/widgets/CallToAction.astro';
+import EnhancedCTA from '~/components/widgets/EnhancedCTA.astro';
+
+import { SITE } from 'astrowind:config';
+
+// SEO: Metadatos optimizados YMYL - reducción keyword stuffing, mejor legibilidad
+const metadata = {
+  title: 'Médico a Domicilio Bogotá 24/7 | Doctor a Casa | SMD Vital',
+  description:
+    'Atención médica profesional a domicilio en Bogotá. Llegamos en 45 minutos con médicos certificados. Valoraciones, enfermería, laboratorio y teleconsultas 24/7 en las 20 localidades. Precios transparentes.',
+  keywords: 'médico a domicilio bogotá, doctor a casa bogotá, médico a domicilio barato, doctor a casa económico, enfermera a domicilio bogotá, laboratorio a domicilio bogotá, médico a domicilio 24 horas, doctor a casa bogotá precio, atención médica domiciliaria bogotá, médico a domicilio urgente, doctor a domicilio bogotá, enfermera profesional a domicilio, laboratorio clínico a domicilio, médico a domicilio chía, doctor a casa cajicá, médico a domicilio soacha, teleconsulta médica bogotá, valoración médica domiciliaria',
+  canonical: SITE.site,
+  ignoreTitleTemplate: true,
+  openGraph: {
+    title: 'Médico a Domicilio Bogotá 24/7 | Doctor a Casa Económico | SMD Vital',
+    description: 'Médico a domicilio barato en Bogotá con doctor a casa económico. Enfermera profesional a domicilio, laboratorio clínico a domicilio, curaciones y teleconsultas. Atención médica 24/7 en las 20 localidades de Bogotá. Precios transparentes sin costos ocultos.',
+    type: 'website',
+    url: SITE.site,
+    siteName: 'SMD Vital Bogotá',
+    locale: 'es_CO',
+    images: [
+      {
+        url: '~/assets/images/hero-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Médico a domicilio Bogotá 24/7 - Doctor a casa económico - SMD Vital atención médica domiciliaria',
+        type: 'image/png',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@smdvitalbogota',
+    creator: '@smdvitalbogota',
+    title: 'Médico a Domicilio Bogotá 24/7 | Doctor a Casa Económico | SMD Vital',
+    description: 'Médico a domicilio barato en Bogotá con doctor a casa económico. Enfermera profesional a domicilio, laboratorio clínico a domicilio, curaciones y teleconsultas. Atención médica 24/7 en las 20 localidades de Bogotá. Precios transparentes sin costos ocultos.',
+    image: '~/assets/images/hero-image.png',
+    imageAlt: 'Médico a domicilio Bogotá 24/7 - Doctor a casa económico - SMD Vital atención médica domiciliaria profesional',
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+
+  <!-- SEO: Hero con CTAs optimizados (aria-label + UTM tracking) -->
+  <Hero
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Médico a Domicilio Barato - 45 min',
+        href: 'https://wa.link/7cprhk?utm_source=seo&utm_medium=organic&utm_campaign=home_hero',
+        target: '_blank',
+        class: 'min-w-[240px] whitespace-nowrap bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-600 hover:from-emerald-500 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/40 hover:shadow-emerald-500/60 transition-all duration-300 scale-100 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300',
+        icon: '',
+      },
+      { text: 'Doctor a Casa Económico', href: 'tel:3208862408', icon: '' },
+    ]}
+    image={{ src: '~/assets/images/hero-image.png', alt: 'Médico a domicilio Bogotá 24/7 - Doctor a casa económico - SMD Vital atención médica domiciliaria profesional' }}
+  >
+    <Fragment slot="title">
+      Médico a Domicilio Bogotá 24/7
+      <span class="xl:inline hidden"></span>
+      <span class="text-accent dark:text-white highlight">Doctor a Casa</span>
+      Económico y Profesional
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        <span class="font-semibold">¿Necesitas un médico a domicilio barato en Bogotá?</span>
+        En SMD Vital Bogotá ofrecemos valoración, procedimientos y control continuo con especialistas certificados que se desplazan hasta tu domicilio en cuestión de minutos. Somos tu doctor a casa económico de confianza.
+      </span>
+      <span class="block mb-1 font-bold text-blue-600 sm:hidden">Cobertura en las 20 localidades y municipios cercanos</span>
+      <br /><br />
+      <span class="block text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4">
+        Sin costos ocultos · Resultados digitales · Historia clínica digital disponible
+      </span>
+    </Fragment>
+  </Hero>
+
+  <!-- Note Widget ******************* -->
+
+  <Note />
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="features"
+    tagline="Servicios"
+    title="¿Qué es un médico a domicilio barato en Bogotá? Doctor a casa económico"
+    subtitle="Un médico a domicilio barato en Bogotá es un doctor a casa económico que se desplaza hasta tu residencia para ofrecer atención médica profesional. En SMD Vital ofrecemos los mejores precios sin costos ocultos."
+    items={[
+      {
+        title: 'Servicios de Enfermería a Domicilio',
+        description:
+          ' Cuidados Postoperatorios: Asistencia especializada para la recuperación después de cirugías.<br>  Monitorización de Signos Vitales: Control regular de la presión arterial, temperatura y otros signos vitales.',
+        icon: 'tabler:brand-tailwind',
+      },
+      {
+        title: 'Valoraciones Médicas Complejas',
+        description:
+          'Evaluaciones Médicas Integrales: Diagnósticos y seguimiento de condiciones de salud.<br> Consultas Especializadas: Valoraciones por especialistas según la necesidad del paciente.',
+        icon: 'tabler:components',
+      },
+      {
+        title: 'Terapias Intravenosas a Domicilio',
+        description:
+          'Administración de Medicamentos: Tratamientos intravenosos administrados en el hogar.<br> Hidratación Intravenosa: Terapia de fluidos para pacientes deshidratados o con condiciones crónicas.',
+        icon: 'tabler:list-check',
+      },
+      {
+        title: 'Lavado de Oídos en Casa',
+        description:
+          'Eliminación de Cera: Procedimientos seguros para la limpieza y desobstrucción del oído.<br> Tratamiento de Infecciones: Diagnóstico y tratamiento de infecciones del oído.',
+        icon: 'tabler:rocket',
+      },
+      {
+        title: 'Cambio de Sondas Vesicales',
+        description:
+          'Reemplazo de Sondas: Cambios regulares de sondas vesicales para asegurar la comodidad del paciente. <br> Educación al Paciente: Instrucción sobre el cuidado adecuado de las sondas vesicales.',
+        icon: 'tabler:arrows-right-left',
+      },
+      {
+        title: 'Vacunación a Domicilio',
+        description:
+          'Inmunización: Aplicación de vacunas según el calendario de vacunación.<br> Vacunas para Viajeros: Vacunas específicas para personas que planean viajar.',
+        icon: 'tabler:bulb',
+      },
+    ]}
+  />
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    isReversed
+    tagline="Inside template"
+    title="Ventajas de recibir atención médica en casa"
+    items={[
+      {
+        title: 'Comodidad en el hogar',
+        description:
+          'El paciente se recupera en un entorno conocido y seguro, lo que reduce el estrés y acelera la mejoría.',
+      },
+      {
+        title: 'Atención personalizada',
+        description:
+          'Los profesionales pueden evaluar mejor el entorno del paciente y adaptar los tratamientos a sus necesidades reales.',
+      },
+      {
+        title: 'Acompañamiento continuo',
+        description:
+          'Desde la primera visita se establece un plan de seguimiento que garantiza la continuidad del tratamiento.',
+      },
+    ]}
+    callToAction={{
+      variant: 'primary',
+      text: 'Contactar por WhatsApp',
+      href: 'https://wa.link/7cprhk',
+      target: '_blank',
+    }}
+    image={{
+      src: 'https://images.pexels.com/photos/5452292/pexels-photo-5452292.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Profesional médico atendiendo en casa',
+    }}
+  >
+    <Fragment slot="content">Designamos nuestro mayor esfuerzo y compromiso para tu tranquilidad.</Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Steps Widget ****************** -->
+
+  <Steps
+    title="Cómo obtener la mejor atención médica: pasos clave para tu bienestar"
+    items={[
+      {
+        title: 'Paso 1: <span class="font-medium">Ubica los botones de contacto</span>',
+        description:
+          'En nuestra página encontrarás accesos directos a WhatsApp para una conversación inmediata.',
+        icon: 'tabler:package',
+      },
+      {
+        title: 'Paso 2: <span class="font-medium">Habla con un asesor</span>',
+        description:
+          'Al escribirnos, uno de nuestros profesionales responderá casi al instante para orientarte.',
+        icon: 'tabler:letter-case',
+      },
+      {
+        title: 'Paso 3: <span class="font-medium">Explica tu necesidad</span>',
+        description:
+          'Cuéntanos qué servicio necesitas y agendaremos la visita domiciliaria en el horario que prefieras.',
+        icon: 'tabler:paint',
+      },
+      {
+        title: '¡Listo!',
+        icon: 'tabler:check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8376231/pexels-photo-8376231.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Profesional de salud planificando visitas',
+    }}
+  />
+
+  <!-- Features2 Widget ************** -->
+
+  <Features2
+    title="¿Cuándo solicitar médico a domicilio barato en Bogotá? Doctor a casa económico"
+    subtitle="La consulta médica a domicilio en Bogotá es ideal en diferentes situaciones. Nuestro doctor a casa económico está disponible 24/7 en las 20 localidades:"
+    tagline="Components"
+    items={[
+      {
+        title: 'Pacientes con movilidad reducida',
+        description:
+          'Ideal para quienes tienen lesiones, discapacidad o enfermedades crónicas que dificultan el desplazamiento.',
+        icon: 'flat-color-icons:approval',
+      },
+      {
+        title: 'Recuperación postquirúrgica',
+        description:
+          'Permite un monitoreo constante y reduce el riesgo de infecciones durante la convalecencia.',
+        icon: 'flat-color-icons:approval',
+      },
+      {
+        title: 'Cuidados paliativos',
+        description:
+          'Garantiza acompañamiento profesional y digno a pacientes con enfermedades avanzadas.',
+        icon: 'flat-color-icons:approval',
+      },
+      {
+        title: 'Tratamientos prolongados',
+        description:
+          'Facilita terapias respiratorias, fisioterapia o aplicaciones intravenosas sin desplazamientos.',
+        icon: 'flat-color-icons:approval',
+      },
+      {
+        title: 'Personas mayores',
+        description:
+          'Ofrece chequeos, control de medicamentos y supervisión regular sin salir de casa.',
+        icon: 'flat-color-icons:approval',
+      },
+      {
+        title: 'Control de enfermedades crónicas',
+        description:
+          'Seguimiento especializado para hipertensión, diabetes, EPOC y otras condiciones que requieren vigilancia.',
+        icon: 'flat-color-icons:approval',
+      },
+      {
+        title: 'Niños con necesidades especiales',
+        description:
+          'Reduce el estrés de traslados y permite tratamientos en un entorno familiar y seguro.',
+        icon: 'flat-color-icons:approval',
+      },
+      {
+        title: 'Curaciones y retiro de suturas',
+        description:
+          'Evita desplazamientos innecesarios y garantiza un control adecuado del proceso de cicatrización.',
+        icon: 'flat-color-icons:approval',
+      },
+      {
+        title: 'Exámenes y pruebas diagnósticas',
+        description:
+          'Laboratorio a domicilio, pruebas de COVID-19 y chequeos preventivos con protocolos certificados.',
+        icon: 'flat-color-icons:approval',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Features2>
+
+  <!-- HighlightedPosts Widget ******* -->
+
+  <BlogLatestPosts
+    title="Aprende a cuidar tu salud sin salir de casa"
+    information={`Descubre guías prácticas sobre prevención, manejo de enfermedades crónicas y consejos para cuidadores. Actualizamos el blog cada semana con recomendaciones de nuestro equipo médico.`}
+  />
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes sobre médico a domicilio barato en Bogotá"
+    subtitle="Todo lo que necesitas saber sobre nuestro doctor a casa económico en Bogotá - SMD Vital"
+    tagline="FAQs"
+    classes={{ container: 'max-w-6xl' }}
+    items={[
+      {
+        title: '¿Cuál es el tiempo promedio de llegada?',
+        description:
+          'En Bogotá contamos con cobertura 24/7 y coordinamos la visita en menos de 45 minutos, dependiendo del tráfico y la complejidad del caso.',
+      },
+      {
+        title: '¿Qué zonas cubren? Médico a domicilio en Chía, Cajicá, Soacha',
+        description:
+          'Llegamos a las 20 localidades de Bogotá: Usaquén, Chapinero, Santa Fe, San Cristóbal, Usme, Tunjuelito, Bosa, Kennedy, Fontibón, Engativá, Suba, Barrios Unidos, Teusaquillo, Los Mártires, Antonio Nariño, Puente Aranda, La Candelaria, Rafael Uribe Uribe, Ciudad Bolívar y Sumapaz. También cubrimos municipios como Chía, Cajicá, Soacha, Funza, Mosquera y Cota. Pregunta por disponibilidad en tu sector.',
+      },
+      {
+        title: '¿Aceptan aseguradoras o convenios empresariales?',
+        description:
+          'Sí. Gestionamos convenios corporativos y emitimos informes clínicos para reembolsos ante pólizas o medicina prepagada.',
+      },
+      {
+        title: '¿Qué debo tener listo para la visita?',
+        description:
+          'Ten a la mano documentos de identificación, historia clínica si la tienes y lista de medicamentos actuales. Nuestro profesional llevará el kit necesario.',
+      },
+      {
+        title: '¿Cómo manejan la bioseguridad?',
+        description:
+          'Todo el personal usa elementos de protección certificados, desinfecta el área de trabajo y sigue protocolos aprobados por el Ministerio de Salud.',
+      },
+      {
+        title: '¿Qué pasa después de la consulta?',
+        description:
+          'Recibirás un plan de tratamiento digital, seguiremos tu evolución por WhatsApp y coordinaremos controles o teleconsultas adicionales si es necesario.',
+      },
+    ]}
+  />
+
+  <!-- Stats Widget ****************** -->
+
+  <Stats
+    stats={[
+      { title: 'Servicios', amount: '19.1K' },
+      { title: 'Estrellas', amount: '3.2K' },
+      { title: 'Clientes Sastifechos', amount: '97%' },
+      { title: 'Clientes', amount: '2.4K' },
+    ]}
+  />
+
+  <!-- CallToAction Widget *********** -->
+
+  <CallToAction
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Médico a Domicilio Barato WhatsApp',
+        href: 'https://wa.link/7cprhk',
+        target: '_blank',
+        icon: 'tabler:brand-whatsapp',
+      },
+    ]}
+  >
+    <Fragment slot="title">
+      SMD&nbsp;+&nbsp;<br class="block sm:hidden" /><span class="sm:whitespace-nowrap">Vital Bogota</span>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      SMD Vital te brinda atención médica de calidad en casa, con un equipo profesional y cercano.
+      <br class="hidden md:inline" />
+      ¡Tu salud es nuestra prioridad!
+    </Fragment>
+  </CallToAction>
+
+  <!-- SEO YMYL: Bloque E-E-A-T + Disclaimer médico (requerido para contenido de salud) -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl bg-blue-50 dark:bg-slate-800 rounded-lg" aria-labelledby="medical-disclaimer">
+    <div class="text-center mb-6">
+      <h2 id="medical-disclaimer" class="text-2xl font-bold text-gray-900 dark:text-white">Información médica verificada</h2>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto text-gray-700 dark:text-gray-300">
+      <p class="text-sm leading-relaxed">
+        <strong>Revisión clínica:</strong> El contenido de esta página ha sido revisado por profesionales médicos certificados de SMD Vital Bogotá, con registro profesional vigente ante el Ministerio de Salud y Protección Social de Colombia.
+        Última actualización: <time datetime="2025-10-10">Octubre 2025</time>.
+      </p>
+      <p class="text-sm leading-relaxed mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded">
+        <strong>⚠️ Aviso importante:</strong> Esta información tiene fines educativos y no sustituye una consulta médica presencial.
+        <strong>En caso de emergencia médica, diríjase inmediatamente al servicio de urgencias más cercano o llame al 123.</strong>
+        La información aquí presentada no constituye diagnóstico ni tratamiento médico.
+      </p>
+      <p class="text-xs mt-4 text-gray-600 dark:text-gray-400">
+        SMD Vital Bogotá cumple con los estándares de calidad establecidos por la Ley 1581 de 2012 (Habeas Data) y la Resolución 2003 de 2014 del Ministerio de Salud. Todos nuestros profesionales cuentan con pólizas de responsabilidad civil profesional vigentes.
+      </p>
+    </div>
+  </section>
+
+  <EnhancedCTA />
+</Layout>

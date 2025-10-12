@@ -1,0 +1,680 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el laboratorio a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un servicio médico que permite realizar análisis clínicos y pruebas diagnósticas en la comodidad de tu hogar, con personal especializado que se desplaza hasta tu domicilio.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué tipos de exámenes pueden realizar a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Realizamos hemogramas, química sanguínea, perfil lipídico, glicemia, pruebas de función renal, hepática, tiroidea, marcadores tumorales, pruebas de coagulación y más. Consulta disponibilidad específica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta el laboratorio a domicilio en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los precios varían según el tipo de examen y la localidad. Ofrecemos paquetes económicos y precios competitivos. Contáctanos para una cotización personalizada sin compromiso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo tardan en llegar los resultados?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los resultados están disponibles entre 24-48 horas para exámenes básicos y hasta 72 horas para pruebas especializadas. Los enviamos por email y WhatsApp de forma segura.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Necesito ayuno para los exámenes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende del tipo de examen. Algunos requieren ayuno de 8-12 horas, otros no. Te daremos las indicaciones específicas al agendar tu cita.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Los resultados son válidos para mi médico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, todos nuestros exámenes son realizados en laboratorios certificados y los resultados son válidos para cualquier médico o institución de salud.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden realizar exámenes a niños?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, tenemos personal especializado en pediatría que maneja técnicas especiales para minimizar el estrés en los niños durante la toma de muestras.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué debo tener listo para la toma de muestras?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Solo necesitas tener ayuno si es requerido, estar en un lugar cómodo y tener documentos de identificación. Nosotros llevamos todo el equipo necesario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Los exámenes están cubiertos por EPS o medicina prepagada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Algunos exámenes pueden tener cobertura parcial. Te ayudamos con la gestión de autorizaciones y emitimos facturas para reembolsos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo el laboratorio a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en toda Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Laboratorio a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Laboratorio Clínico Barato',
+  description: 'Laboratorio a domicilio barato en Bogotá. Análisis clínicos, exámenes de laboratorio, toma de muestras a domicilio. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  url: SITE.site + '/laboratorio-a-domicilio/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    },
+    {
+      '@type': 'City',
+      name: 'Funza'
+    },
+    {
+      '@type': 'City',
+      name: 'Mosquera'
+    },
+    {
+      '@type': 'City',
+      name: 'Cota'
+    }
+  ],
+  medicalSpecialty: [
+    'ClinicalPathology',
+    'LaboratoryMedicine',
+    'PrimaryCare',
+    'Nursing'
+  ],
+  keywords: 'laboratorio a domicilio bogotá, análisis clínicos barato, exámenes de laboratorio domicilio, toma de muestras bogotá, laboratorio clínico económico, análisis sanguíneo domicilio, laboratorio 24 horas, exámenes médicos barato, laboratorio urgente bogotá, análisis clínicos profesional',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Laboratorio Clínico',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Análisis Clínicos Básicos',
+          description: 'Hemograma completo, química sanguínea básica y perfil lipídico'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Exámenes Especializados',
+          description: 'Marcadores tumorales, pruebas de función tiroidea y hepática'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Toma de Muestras Profesional',
+          description: 'Recolección segura de muestras sanguíneas y de otros fluidos'
+        }
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '180',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+const metadata = {
+  title: 'Laboratorio a Domicilio en Bogotá | Análisis Clínicos Barato | SMD Vital',
+  description:
+    'Laboratorio a domicilio barato en Bogotá. Análisis clínicos, exámenes de laboratorio, toma de muestras profesional. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  keywords: 'laboratorio a domicilio bogotá, análisis clínicos barato, exámenes de laboratorio domicilio, toma de muestras bogotá, laboratorio clínico económico, análisis sanguíneo domicilio',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    title: 'Laboratorio a Domicilio | Análisis Clínicos Barato | SMD Vital Bogotá',
+    description: 'Laboratorio a domicilio barato en Bogotá. Análisis clínicos profesionales, exámenes de laboratorio en tu hogar. Servicio 24/7 en toda Bogotá. Precios transparentes.',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.unsplash.com/photo-1579154392429-0e6b4e850ad2?w=1260&h=750&fit=crop',
+        width: 1260,
+        height: 750,
+        alt: 'Servicio profesional de laboratorio a domicilio en Bogotá - SMD Vital',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@SMDVitalBogota',
+    creator: '@SMDVitalBogota',
+    title: 'Laboratorio a Domicilio | Análisis Clínicos Barato | SMD Vital',
+    description: 'Análisis clínicos profesionales en tu hogar. Toma de muestras especializada. Servicio 24/7 en toda Bogotá.',
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+  </Fragment>
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+  <div class="container mx-auto px-4 pt-20 md:pt-24">
+    <Breadcrumbs
+      items={[
+        { label: 'Servicios', href: '/servicios' },
+        { label: 'Laboratorio a Domicilio' },
+      ]}
+    />
+  </div>
+
+  <Hero2
+    tagline="Análisis Clínicos en tu Hogar"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Laboratorio Barato WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda Análisis', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/954585/pexels-photo-954585.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Laboratorio a Domicilio en Bogotá',
+    }}
+  >
+    <Fragment slot="title">
+      Laboratorio a Domicilio<br />
+      <span class="text-accent dark:text-white highlight">Bogotá Barato</span><br />
+      Análisis Clínicos Profesionales
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Laboratorio a domicilio barato en Bogotá</span> con análisis clínicos profesionales y toma de muestras especializada en la comodidad de tu hogar.
+      <br /><br />
+      Nuestro equipo especializado te ofrece un servicio confiable y económico en las 20 localidades de Bogotá, Colombia. Precios transparentes sin costos ocultos.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestro laboratorio a domicilio barato en Bogotá?"
+    subtitle="Laboratorio a domicilio barato en Bogotá con análisis clínicos profesionales y toma de muestras especializada en la comodidad de tu hogar. Nuestro equipo especializado te ofrece un servicio confiable y económico en las 20 localidades de Bogotá, Colombia."
+    columns={3}
+    items={[
+      {
+        title: 'Análisis Clínicos Profesionales',
+        description: 'Tecnólogos médicos certificados realizan hemogramas, química sanguínea, perfil lipídico y más exámenes especializados con equipos de última generación.',
+        icon: 'tabler:microscope',
+      },
+      {
+        title: 'Toma de Muestras Especializada',
+        description: 'Personal especializado en pediatría y geriatría maneja técnicas especiales para minimizar el estrés durante la recolección de muestras.',
+        icon: 'tabler:droplet',
+      },
+      {
+        title: 'Resultados en 24-48 Horas',
+        description: 'Recibe tus resultados por email y WhatsApp de forma segura. Exámenes básicos en 24 horas, especializados en 48-72 horas.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Cobertura Total Bogotá',
+        description: 'Servicio disponible en las 20 localidades de Bogotá y municipios cercanos. Atención 24/7 todos los días del año.',
+        icon: 'tabler:map-pin',
+      },
+      {
+        title: 'Precios Transparentes',
+        description: 'Tarifas competitivas sin costos ocultos. Paquetes económicos y descuentos por múltiples exámenes. Facturación para reembolsos.',
+        icon: 'tabler:currency-dollar',
+      },
+      {
+        title: 'Resultados Válidos Médicamente',
+        description: 'Todos nuestros exámenes son realizados en laboratorios certificados y los resultados son válidos para cualquier médico o institución de salud.',
+        icon: 'tabler:certificate',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Procedimiento **************** -->
+
+  <Content
+    id="procedimiento"
+    title="¿Cómo Funciona el Laboratorio a Domicilio?"
+    subtitle="Proceso profesional paso a paso realizado por especialistas certificados"
+    isReversed
+    items={[
+      {
+        title: '1. Evaluación y Preparación',
+        description: 'Consulta detallada para entender tus necesidades médicas. Verificamos requisitos de ayuno y preparamos el equipo especializado.',
+        icon: 'tabler:clipboard-check',
+      },
+      {
+        title: '2. Toma de Muestras Profesional',
+        description: 'Técnicos especializados realizan la recolección de muestras sanguíneas y otros fluidos con técnicas estériles certificadas.',
+        icon: 'tabler:droplet',
+      },
+      {
+        title: '3. Procesamiento en Laboratorio',
+        description: 'Las muestras se procesan en laboratorios certificados con equipos de última generación para garantizar resultados precisos.',
+        icon: 'tabler:microscope',
+      },
+      {
+        title: '4. Entrega de Resultados',
+        description: 'Recibes tus resultados por email y WhatsApp de forma segura en 24-48 horas, con interpretación profesional incluida.',
+        icon: 'tabler:file-text',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/7772011/pexels-photo-7772011.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Procedimiento profesional de laboratorio a domicilio en Bogotá',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h3>
+      <p class="text-muted mt-4">
+        Utilizamos técnicas aprobadas por la Organización Mundial de la Salud (OMS) y el Ministerio de Salud de Colombia para garantizar tu seguridad y bienestar.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo necesitas **************** -->
+
+  <Content
+    id="cuando-necesitas"
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Indicaciones para Análisis Clínicos',
+        description: `✓ Control médico rutinario y chequeos preventivos<br>
+                      ✓ Seguimiento de enfermedades crónicas (diabetes, hipertensión)<br>
+                      ✓ Monitoreo de medicamentos y tratamientos<br>
+                      ✓ Evaluación pre-operatoria y post-operatoria<br>
+                      ✓ Diagnóstico de síntomas específicos`,
+        icon: 'tabler:stethoscope',
+      },
+      {
+        title: '¿Quiénes lo Necesitan?',
+        description: `✓ Pacientes con movilidad reducida o discapacidad<br>
+                      ✓ Adultos mayores que requieren comodidad<br>
+                      ✓ Personas con horarios laborales extensos<br>
+                      ✓ Pacientes pediátricos (técnicas especiales)<br>
+                      ✓ Personas que prefieren privacidad en casa`,
+        icon: 'tabler:users',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8544959/pexels-photo-8544959.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Indicaciones para análisis clínicos a domicilio profesional',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Análisis Clínicos a Domicilio?
+      </h3>
+      <p class="text-muted mt-4">
+        Si necesitas análisis clínicos regulares, seguimiento médico o simplemente prefieres la comodidad de tu hogar, nuestro servicio está diseñado para ti.
+      </p>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Sección de Servicios Relacionados con Enlaces Internos -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Servicios Complementarios</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        Además del laboratorio a domicilio, ofrecemos atención médica integral en Bogotá
+      </p>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        El <strong>laboratorio a domicilio profesional</strong> es parte de nuestro amplio catálogo de servicios médicos domiciliarios.
+        Si necesitas una <a href="/valoracion-medica-domiciliaria" class="text-primary hover:underline">valoración médica completa</a>,
+        nuestro equipo puede evaluar múltiples aspectos de tu salud durante la visita.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Para quienes requieren monitoreo constante, ofrecemos
+        <a href="/toma-de-signos-vitales" class="text-primary hover:underline">toma de signos vitales</a> y
+        <a href="/enfemeria-a-nivel-domiciliario-y-hospitalario" class="text-primary hover:underline">servicios de enfermería especializada</a>.
+        También realizamos <a href="/sutura-y-retiro-de-puntos" class="text-primary hover:underline">curaciones y retiro de puntos</a>
+        con técnicas asépticas certificadas.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Si prefieres una consulta inicial sin desplazamiento, conoce nuestra
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">teleconsulta médica</a> disponible las 24 horas.
+        Para diagnósticos más complejos, contamos con <a href="/lavado-de-oidos-a-domicilio" class="text-primary hover:underline">lavado de oídos profesional</a>
+        y otros procedimientos especializados a domicilio.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Explora todos nuestros <a href="/servicios" class="text-primary hover:underline font-semibold">servicios médicos a domicilio</a>
+        o visita nuestro <a href="/blog" class="text-primary hover:underline">blog de salud</a> para consejos de cuidado en casa.
+      </p>
+    </div>
+  </section>
+
+  <!-- Sección de Estadísticas -->
+  <section class="py-8 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-4 text-center">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">1000+</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Análisis Realizados</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">4.9/5</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Calificación Promedio</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">24-48h</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Tiempo de Resultados</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">24/7</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Disponibilidad</span>
+        </div>
+      </div>
+      <p class="mt-6 text-lg font-semibold text-accent">
+        ✓ Disponible hoy en tu localidad
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA Final -->
+  <Steps2
+    title="Agenda tu Laboratorio a Domicilio Ahora - Resultados en 24-48 Horas"
+    subtitle="Laboratorio a domicilio barato en Bogotá. Análisis clínicos profesionales con toma de muestras especializada. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Laboratorio Barato WhatsApp',
+      href: 'https://wa.me/573042912564',
+      target: '_blank',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamar Ahora',
+        description: 'Respuesta inmediata',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent dark:from-slate-800"></div>
+    </Fragment>
+  </Steps2>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes"
+    items={[
+      {
+        title: '¿Qué servicios de laboratorio a domicilio ofrecen?',
+        description:
+          'Ofrecemos una variedad de análisis clínicos, incluyendo hemogramas, pruebas de glucosa, perfiles lipídicos, pruebas hormonales, entre otros.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo agendar una cita para un análisis a domicilio?',
+        description: `Puedes agendar una cita fácilmente a través de nuestro WhatsApp, llamando a nuestro call center o completando el formulario en nuestro sitio web.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Es seguro realizar análisis de laboratorio en casa?',
+        description:
+          'Sí, seguimos estrictos protocolos de higiene y seguridad para garantizar la seguridad tanto de nuestros pacientes como de nuestros profesionales.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuánto tiempo tardaré en recibir los resultados?',
+        description:
+          'La mayoría de los análisis son procesados en 24 a 48 horas, y puedes recibir tus resultados a través de nuestra plataforma en línea o directamente en tu hogar.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué áreas de Bogotá cubren sus servicios a domicilio?',
+        description:
+          'Nuestros servicios cubren toda la ciudad de Bogotá, incluyendo sus principales localidades y barrios. Consulta con nosotros para confirmar tu ubicación específica.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas sobre nuestro servicio de laboratorio a domicilio? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+
+  <!-- FAQs Widget **************** -->
+
+  <FAQs
+    title="Preguntas frecuentes sobre laboratorio a domicilio"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio profesional de análisis clínicos"
+    items={[
+      {
+        title: '¿Qué es el laboratorio a domicilio?',
+        description: 'Es un servicio médico que permite realizar análisis clínicos y pruebas diagnósticas en la comodidad de tu hogar, con personal especializado que se desplaza hasta tu domicilio.',
+      },
+      {
+        title: '¿Qué tipos de exámenes pueden realizar a domicilio?',
+        description: 'Realizamos hemogramas, química sanguínea, perfil lipídico, glicemia, pruebas de función renal, hepática, tiroidea, marcadores tumorales, pruebas de coagulación y más. Consulta disponibilidad específica.',
+      },
+      {
+        title: '¿Cuánto cuesta el laboratorio a domicilio en Bogotá?',
+        description: 'Los precios varían según el tipo de examen y la localidad. Ofrecemos paquetes económicos y precios competitivos. Contáctanos para una cotización personalizada sin compromiso.',
+      },
+      {
+        title: '¿Cuánto tiempo tardan en llegar los resultados?',
+        description: 'Los resultados están disponibles entre 24-48 horas para exámenes básicos y hasta 72 horas para pruebas especializadas. Los enviamos por email y WhatsApp de forma segura.',
+      },
+      {
+        title: '¿Necesito ayuno para los exámenes?',
+        description: 'Depende del tipo de examen. Algunos requieren ayuno de 8-12 horas, otros no. Te daremos las indicaciones específicas al agendar tu cita.',
+      },
+      {
+        title: '¿Los resultados son válidos para mi médico?',
+        description: 'Sí, todos nuestros exámenes son realizados en laboratorios certificados y los resultados son válidos para cualquier médico o institución de salud.',
+      },
+      {
+        title: '¿Pueden realizar exámenes a niños?',
+        description: 'Sí, tenemos personal especializado en pediatría que maneja técnicas especiales para minimizar el estrés en los niños durante la toma de muestras.',
+      },
+      {
+        title: '¿Qué debo tener listo para la toma de muestras?',
+        description: 'Solo necesitas tener ayuno si es requerido, estar en un lugar cómodo y tener documentos de identificación. Nosotros llevamos todo el equipo necesario.',
+      },
+      {
+        title: '¿Los exámenes están cubiertos por EPS o medicina prepagada?',
+        description: 'Algunos exámenes pueden tener cobertura parcial. Te ayudamos con la gestión de autorizaciones y emitimos facturas para reembolsos.',
+      },
+      {
+        title: '¿Cómo agendo el laboratorio a domicilio?',
+        description: 'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en toda Bogotá.',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- BlogLatestPost Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre análisis clínicos y salud"
+    information={`Visita nuestro blog para conocer más sobre los diferentes análisis clínicos, su importancia y cómo pueden ayudarte a mantener una buena salud. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

@@ -1,0 +1,44 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Hero from '~/components/widgets/Hero.astro';
+import CallToAction from '~/components/widgets/CallToAction.astro';
+
+const metadata = {
+  title: 'Servicios Médicos Domiciliarios en Bogotá | SMD Vital',
+  description:
+    'Nuestros médicos a domicilio en Bogotá ofrecen atención médica de calidad en la comodidad de tu hogar. Olvídate del tráfico y las largas esperas en salas de espera, ¡contáctanos!',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero2 Widget ******************* -->
+
+  <Hero
+    tagline="Compromiso con la Excelencia"
+    title="Compromiso con la Excelencia en Atención Médica Domiciliaria"
+    subtitle="Nuestra <strong>filosofía</strong> se basa en ofrecer un <strong>servicio competente</strong>, humano y accesible, que pone la salud de nuestros pacientes en el centro de todo lo que hacemos."
+    actions={[
+      { variant: 'primary', text: 'WhatsApp', href: '#', icon: 'tabler:square-rounded-arrow-right' },
+      { text: 'Llamada de emergencia', href: '#' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6956352/pexels-photo-6956352.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'A spotlight on a product. Product Details Landing Page Demo',
+    }}
+  />
+
+  <CallToAction
+    title="Tu Salud, Nuestro Compromiso"
+    subtitle="Con un equipo de <strong>médicos a domicilio</strong> dedicados, trabajamos para ofrecerte la mejor experiencia en cuidado de la salud en casa."
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Download Template',
+        href: 'https://wa.link/7cprhk',
+        icon: 'tabler:download',
+      },
+    ]}
+  />
+</Layout>

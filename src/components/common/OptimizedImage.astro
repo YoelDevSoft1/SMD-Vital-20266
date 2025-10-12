@@ -1,0 +1,40 @@
+---
+import { Image } from 'astro:assets';
+
+export interface Props {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  loading?: 'lazy' | 'eager';
+  class?: string;
+  sizes?: string;
+}
+
+const {
+  src,
+  alt,
+  width = 800,
+  height = 600,
+  loading = 'lazy',
+  class: className = '',
+  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+} = Astro.props;
+
+// Optimizar alt text para SEO
+const optimizedAlt = alt.includes('SMD Vital') ? alt : `${alt} - SMD Vital Bogotá`;
+---
+
+<Image
+  src={src}
+  alt={optimizedAlt}
+  width={width}
+  height={height}
+  loading={loading}
+  class={`${className} transition-opacity duration-300`}
+  sizes={sizes}
+  format="webp"
+  quality={85}
+  decoding="async"
+  fetchpriority={loading === 'eager' ? 'high' : 'auto'}
+/>

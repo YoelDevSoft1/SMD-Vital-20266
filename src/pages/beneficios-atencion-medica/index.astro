@@ -1,0 +1,303 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los beneficios de la atención médica a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los beneficios incluyen comodidad, atención personalizada, reducción de estrés, menor riesgo de infecciones, ahorro de tiempo y dinero, y mejor seguimiento del tratamiento en el entorno familiar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué elegir atención médica a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La atención médica a domicilio ofrece mayor comodidad, atención personalizada, reducción de costos de transporte, menor riesgo de contagios y mejor adherencia al tratamiento en un ambiente familiar.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Beneficios Atención Médica Bogotá',
+  description: 'Descubre los beneficios de la atención médica a domicilio en Bogotá. Servicios médicos profesionales con ventajas únicas para tu salud y bienestar.',
+  url: SITE.site + '/beneficios-atencion-medica/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  medicalSpecialty: ['PrimaryCare', 'Nursing', 'HomeHealthCare'],
+  keywords: 'beneficios atención médica, ventajas médico a domicilio, atención médica domiciliaria, médico a domicilio bogotá',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+const metadata = {
+  title: 'Beneficios de la Atención Médica a Domicilio en Bogotá | SMD Vital',
+  description: 'Descubre los beneficios de la atención médica a domicilio en Bogotá. Comodidad, atención personalizada, ahorro de tiempo y mejor cuidado médico en tu hogar.',
+  keywords: 'beneficios atención médica, ventajas médico a domicilio, atención médica domiciliaria, médico a domicilio bogotá, beneficios salud domiciliaria',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
+};
+
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+  <section class="relative -mt-[76px]">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Beneficios Atención Médica' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Ventajas Únicas"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Conocer Beneficios', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Llamar Ahora', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Beneficios de la atención médica a domicilio en Bogotá - SMD Vital',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Beneficios de la Atención Médica a Domicilio
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Ventajas Únicas para tu Salud
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Cuidado Médico en tu Hogar
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Descubre los beneficios únicos</span> de la atención médica a domicilio en Bogotá. Comodidad, atención personalizada y mejor cuidado médico en la comodidad de tu hogar.
+      <br /><br />
+      Nuestro servicio te ofrece ventajas exclusivas que no encontrarás en la atención médica tradicional. Descubre por qué miles de familias confían en nosotros.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+  <Features
+    id="beneficios"
+    tagline="Ventajas Exclusivas"
+    title="¿Por qué elegir atención médica a domicilio?"
+    subtitle="Descubre las ventajas únicas de la atención médica a domicilio que te brindan mayor comodidad, mejor cuidado y resultados superiores para tu salud."
+    columns={3}
+    items={[
+      {
+        title: 'Máxima Comodidad',
+        description: 'Recibe atención médica profesional en la comodidad de tu hogar, sin desplazamientos ni esperas.',
+        icon: 'tabler:home',
+      },
+      {
+        title: 'Atención Personalizada',
+        description: 'Cuidado médico adaptado a tus necesidades específicas con tiempo dedicado exclusivamente a ti.',
+        icon: 'tabler:user-heart',
+      },
+      {
+        title: 'Ahorro de Tiempo',
+        description: 'Evita desplazamientos, tráfico y largas esperas. Aprovecha tu tiempo para lo que realmente importa.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Menor Riesgo de Infecciones',
+        description: 'Reduce el riesgo de contagios al evitar salas de espera y ambientes hospitalarios.',
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Ahorro Económico',
+        description: 'Elimina costos de transporte, parqueadero y tiempo perdido en desplazamientos.',
+        icon: 'tabler:currency-dollar',
+      },
+      {
+        title: 'Mejor Seguimiento',
+        description: 'Control médico continuo en tu entorno familiar para un mejor seguimiento del tratamiento.',
+        icon: 'tabler:chart-line',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Ventajas **************** -->
+  <Content
+    id="ventajas"
+    title="Ventajas de la Atención Médica a Domicilio"
+    subtitle="Descubre por qué la atención médica a domicilio es la mejor opción para tu salud y bienestar"
+    isReversed
+    items={[
+      {
+        title: 'Comodidad Total',
+        description: 'Recibe atención médica profesional en tu hogar, sin desplazamientos ni esperas innecesarias.',
+        icon: 'tabler:home',
+      },
+      {
+        title: 'Atención Personalizada',
+        description: 'Cuidado médico dedicado exclusivamente a ti, con tiempo suficiente para resolver todas tus dudas.',
+        icon: 'tabler:user-heart',
+      },
+      {
+        title: 'Ahorro de Tiempo y Dinero',
+        description: 'Elimina costos de transporte, parqueadero y tiempo perdido en desplazamientos.',
+        icon: 'tabler:currency-dollar',
+      },
+      {
+        title: 'Menor Riesgo de Contagios',
+        description: 'Reduce el riesgo de infecciones al evitar salas de espera y ambientes hospitalarios.',
+        icon: 'tabler:shield-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Ventajas de la atención médica a domicilio en Bogotá',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  />
+
+  <!-- FAQs Widget ******************* -->
+  <FAQs
+    title="Preguntas frecuentes sobre beneficios de atención médica"
+    subtitle="Respuestas a las dudas más comunes sobre las ventajas de la atención médica a domicilio"
+    items={[
+      {
+        title: '¿Cuáles son los beneficios de la atención médica a domicilio?',
+        description: 'Los beneficios incluyen comodidad, atención personalizada, reducción de estrés, menor riesgo de infecciones, ahorro de tiempo y dinero, y mejor seguimiento del tratamiento en el entorno familiar.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Por qué elegir atención médica a domicilio?',
+        description: 'La atención médica a domicilio ofrece mayor comodidad, atención personalizada, reducción de costos de transporte, menor riesgo de contagios y mejor adherencia al tratamiento en un ambiente familiar.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+  <Steps2
+    title="Descubre los Beneficios de Nuestro Servicio"
+    subtitle="Atención médica a domicilio con ventajas únicas. Personal certificado con amplia experiencia. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Conocer Beneficios por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20quiero%20conocer%20los%20beneficios%20de%20la%20atención%20médica%20a%20domicilio',
+      icon: 'tabler:brand-whatsapp',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: 'Contacto directo y respuesta inmediata',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamada Telefónica',
+        description: 'Atención personalizada por teléfono',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda Bogotá',
+        icon: 'tabler:clock',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPosts Widget **************** -->
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre beneficios de atención médica"
+    information={`Visita nuestro blog para conocer más sobre los beneficios de la atención médica a domicilio, ventajas para la salud y cuidado médico en el hogar. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+
+</Layout>

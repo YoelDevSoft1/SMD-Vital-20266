@@ -1,0 +1,883 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la enfermería a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un servicio de atención de enfermería profesional que se brinda en el hogar del paciente, incluyendo cuidados especializados, administración de medicamentos, curaciones y monitoreo de signos vitales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es doloroso el servicio de enfermería?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No, nuestros servicios de enfermería están diseñados para ser cómodos y seguros. Las enfermeras utilizan técnicas suaves y profesionales para minimizar cualquier molestia durante los procedimientos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la enfermería a domicilio en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio de la enfermería a domicilio en Bogotá es de $80,000 COP por hora. Este valor incluye evaluación inicial, cuidados especializados, materiales estériles y seguimiento posterior. Sin costos ocultos, precios transparentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre enfermería a domicilio y hospitalaria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La enfermería a domicilio se brinda en el hogar del paciente, ofreciendo mayor comodidad y personalización. La hospitalaria se realiza en centros médicos con equipos especializados pero menos intimidad familiar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo contratar enfermería sin prescripción médica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para algunos servicios como administración de medicamentos inyectables sí se requiere prescripción médica. Para cuidados básicos y monitoreo, podemos evaluar las necesidades del paciente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Con qué frecuencia necesito servicios de enfermería?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende de las necesidades específicas del paciente. Algunos requieren atención diaria, otros cada 2-3 días. Después de la evaluación inicial, te daremos una recomendación personalizada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué contraindicaciones tiene la enfermería a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No se recomienda en casos de emergencias médicas graves que requieran atención hospitalaria inmediata. Nuestro personal realiza una evaluación previa para determinar si el servicio es seguro para ti.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden atender a niños y adultos mayores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, adaptamos el servicio según la edad y condición del paciente, brindando una experiencia segura para todos. Tenemos experiencia trabajando con pacientes pediátricos y geriátricos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cada cuánto tiempo necesito enfermería especializada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La frecuencia varía según las necesidades específicas del paciente. Algunos requieren atención diaria, otros cada 2-3 días. Después de la primera evaluación, te daremos una recomendación personalizada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo la enfermería a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes hacerlo fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Enfermería a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Enfermería Profesional Barato',
+  description: 'Enfermería a domicilio barato en Bogotá. Cuidados especializados, administración de medicamentos, curaciones a domicilio. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  url: SITE.site + '/enfemeria-a-nivel-domiciliario-y-hospitalario/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    },
+    {
+      '@type': 'City',
+      name: 'Funza'
+    },
+    {
+      '@type': 'City',
+      name: 'Mosquera'
+    },
+    {
+      '@type': 'City',
+      name: 'Cota'
+    }
+  ],
+  medicalSpecialty: [
+    'Nursing',
+    'PrimaryCare',
+    'Geriatrics',
+    'Pediatrics',
+    'CriticalCare'
+  ],
+  keywords: 'enfermería a domicilio bogotá, enfermera a domicilio barato, cuidados domiciliarios, enfermería profesional, curaciones a domicilio, inyectología domicilio, enfermería 24 horas, cuidados especializados, enfermería pediátrica, enfermería geriátrica',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Enfermería a Domicilio',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Cuidados Básicos de Enfermería',
+          description: 'Administración de medicamentos, toma de signos vitales y monitoreo básico'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Cuidados Especializados',
+          description: 'Curaciones complejas, manejo de sondas y cuidados post-operatorios'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Enfermería Pediátrica y Geriátrica',
+          description: 'Cuidados especializados para niños y adultos mayores'
+        }
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    reviewCount: '500',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+const metadata = {
+  title: 'Enfermería a Domicilio en Bogotá | Profesional y Económico | SMD Vital',
+  description:
+    'Enfermería a domicilio en Bogotá. Servicio médico profesional con precios desde $80.000 COP por hora. Enfermeras a domicilio especializadas en cuidados especializados. Atención 24/7 en toda la capital.',
+  keywords: 'enfermería a domicilio, enfermera a domicilio, enfermería bogotá, enfermera bogotá, enfermería precio, médico a domicilio, médicos a domicilio, medico a domicilio bogota, servicio médico a domicilio, atención médica a domicilio, cuidados domiciliarios bogota, enfermería a domicilio bogotá',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/3279197/pexels-photo-3279197.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
+};
+
+// Schema HowTo para el procedimiento de enfermería
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo realizar cuidados de enfermería profesional a domicilio',
+  description: 'Procedimiento paso a paso para realizar cuidados de enfermería profesional de forma segura en el hogar',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/6129193/pexels-photo-6129193.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Procedimiento profesional de enfermería a domicilio con equipos médicos especializados'
+  },
+  totalTime: 'PT60M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '80000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Equipos médicos especializados',
+      description: 'Instrumental médico profesional para cuidados especializados'
+    },
+    {
+      '@type': 'HowToSupply', 
+      name: 'Materiales estériles',
+      description: 'Guantes, gasas, jeringas y otros materiales de un solo uso'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Medicamentos prescritos',
+      description: 'Medicamentos según prescripción médica del paciente'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Equipos de monitoreo',
+      description: 'Termómetros, tensiómetros y otros equipos de monitoreo'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Equipos de monitoreo',
+      description: 'Instrumentos para toma de signos vitales y monitoreo continuo'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Materiales de curación',
+      description: 'Equipos especializados para curaciones y heridas'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Equipos de administración',
+      description: 'Instrumentos para administración segura de medicamentos'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Evaluación Inicial del Paciente',
+      text: 'Evaluación completa del paciente, revisión de historia clínica y determinación de necesidades específicas de cuidado.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/3279197/pexels-photo-3279197.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Evaluación inicial del paciente para cuidados de enfermería profesional'
+      },
+      url: SITE.site + '/enfemeria-a-nivel-domiciliario-y-hospitalario/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Desarrollo del Plan de Cuidados',
+      text: 'Creación de un plan de cuidados personalizado según las necesidades del paciente y prescripción médica.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/6129193/pexels-photo-6129193.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Desarrollo del plan de cuidados personalizado para enfermería a domicilio'
+      },
+      url: SITE.site + '/enfemeria-a-nivel-domiciliario-y-hospitalario/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Implementación de Cuidados',
+      text: 'Aplicación de cuidados especializados, administración de medicamentos y monitoreo continuo del paciente.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/6129193/pexels-photo-6129193.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Implementación de cuidados especializados con equipos médicos profesionales'
+      },
+      url: SITE.site + '/enfemeria-a-nivel-domiciliario-y-hospitalario/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Seguimiento y Educación',
+      text: 'Monitoreo de evolución, educación al paciente y familia, y coordinación con el equipo médico tratante.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/6129193/pexels-photo-6129193.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Seguimiento y educación para cuidados de enfermería completos'
+      },
+      url: SITE.site + '/enfemeria-a-nivel-domiciliario-y-hospitalario/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
+
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Enfermería a Domicilio' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Cuidado Experto para tu Salud"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Enfermería Barato WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda Cuidados', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/3279197/pexels-photo-3279197.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Profesional de enfermería realizando cuidados especializados a domicilio con equipos médicos - SMD Vital Bogotá',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Enfermería a Domicilio en Bogotá
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Servicio Profesional y Económico
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Cuidados Especializados
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Enfermería a domicilio profesional en Bogotá</span> con cuidados especializados, administración de medicamentos y curaciones profesionales para aliviar molestias y mejorar tu bienestar sin salir de casa.
+      <br /><br />
+      Nuestro equipo certificado te ofrece un servicio confiable y económico en las 20 localidades de la capital. Precios transparentes sin costos ocultos.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestra enfermería a domicilio en Bogotá?"
+    subtitle="Ofrecemos atención de enfermería profesional en tu hogar con técnicas seguras y especializadas para aliviar molestias y mejorar tu bienestar. Nuestro equipo certificado te brinda un servicio confiable y económico en las 20 localidades de la capital."
+    columns={3}
+    items={[
+      {
+        title: 'Sin Dolor ni Molestias',
+        description:
+          'Procedimientos completamente cómodos con técnicas profesionales certificadas. Alivio inmediato y mejora en el bienestar del paciente.',
+        icon: 'tabler:heart-handshake',
+      },
+      {
+        title: 'Equipos Especializados',
+        description: `Utilizamos instrumental médico profesional certificado para cuidados especializados, administración de medicamentos y curaciones de forma segura.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda la ciudad. Agenda tu cita y recibe atención profesional el mismo día sin largas esperas.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Personal Certificado',
+        description: `Enfermeras especializadas con certificación en cuidados especializados y amplia experiencia en atención domiciliaria.`,
+        icon: 'tabler:certificate',
+      },
+      {
+        title: 'Resultados Inmediatos',
+        description: 'Mejora instantánea del bienestar y cuidados especializados garantizados en cada visita.',
+        icon: 'tabler:check',
+      },
+      {
+        title: 'Cobertura Total',
+        description: `Servicio disponible en las 20 localidades de la capital y municipios cercanos. Atención 24/7 todos los días.`,
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Procedimiento **************** -->
+
+  <Content
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestro Procedimiento?"
+    subtitle="Proceso profesional paso a paso realizado por especialistas certificados"
+    isReversed
+    items={[
+      {
+        title: '1. Evaluación Inicial del Paciente',
+        description:
+          'Evaluación completa del paciente, revisión de historia clínica y determinación de necesidades específicas de cuidado.',
+        icon: 'tabler:clipboard-check',
+      },
+      {
+        title: '2. Desarrollo del Plan de Cuidados',
+        description: `Creación de un plan de cuidados personalizado según las necesidades del paciente y prescripción médica.`,
+        icon: 'tabler:file-text',
+      },
+      {
+        title: '3. Implementación de Cuidados',
+        description: `Aplicación de cuidados especializados, administración de medicamentos y monitoreo continuo del paciente.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: '4. Seguimiento y Educación',
+        description: `Monitoreo de evolución, educación al paciente y familia, y coordinación con el equipo médico tratante.`,
+        icon: 'tabler:school',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6129193/pexels-photo-6129193.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Procedimiento paso a paso de enfermería a domicilio con equipos médicos especializados',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h2>
+      <p class="text-muted mt-4">
+        Utilizamos técnicas aprobadas por la Organización Mundial de la Salud (OMS) y el Ministerio de Salud de Colombia para garantizar tu seguridad y bienestar.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo necesitas **************** -->
+
+  <Content
+    id="cuando-necesitas"
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Indicaciones para Enfermería a Domicilio',
+        description: `✓ Cuidados post-operatorios y recuperación<br>
+                      ✓ Enfermedades crónicas (diabetes, hipertensión)<br>
+                      ✓ Cuidados paliativos y terminales<br>
+                      ✓ Administración de medicamentos complejos<br>
+                      ✓ Monitoreo de signos vitales continuo`,
+        icon: 'tabler:stethoscope',
+      },
+      {
+        title: '¿Quiénes lo Necesitan?',
+        description: `✓ Pacientes post-operatorios en recuperación<br>
+                      ✓ Adultos mayores con dependencia<br>
+                      ✓ Pacientes con enfermedades crónicas<br>
+                      ✓ Personas con movilidad reducida<br>
+                      ✓ Familias que necesitan apoyo especializado`,
+        icon: 'tabler:users',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6097980/pexels-photo-6097980.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Paciente con necesidades de enfermería a domicilio consultando sobre cuidados especializados',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Atención de Enfermería?
+      </h2>
+      <p class="text-muted mt-4">
+        Si necesitas cuidados especializados, monitoreo continuo o simplemente prefieres la comodidad de tu hogar, nuestro servicio está diseñado para ti. 
+        <strong>No uses cuidadores no profesionales</strong> ni intentes realizar procedimientos médicos sin supervisión, ya que pueden causar complicaciones graves.
+      </p>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Precios **************** -->
+
+  <Content
+    id="precios"
+    title="Precios de Enfermería a Domicilio"
+    subtitle="Servicio médico especializado a domicilio con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
+    isReversed
+    items={[
+      {
+        title: 'Precio Fijo Garantizado',
+        description: `$80.000 COP por hora - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: 'Todo Incluido',
+        description: `Evaluación inicial, cuidados especializados, materiales estériles, equipos médicos y seguimiento posterior.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el resultado, realizamos una segunda visita sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $120.000+ | Otros domicilios: $100.000+ | SMD Vital: $80.000 por hora (precio fijo)`,
+        icon: 'tabler:chart-bar',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios transparentes y competitivos para enfermería a domicilio en Bogotá - $80.000 COP por hora',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+  </Content>
+
+  <!-- Content Widget - Por qué NO usar cuidadores no profesionales **************** -->
+
+  <Content
+    id="no-cuidadores-amateur"
+    title="¿Por qué NO usar cuidadores no profesionales?"
+    subtitle="Información importante sobre los riesgos de usar cuidadores no certificados y la importancia de la enfermería profesional"
+    isReversed={false}
+    items={[
+      {
+        title: 'Falta de conocimiento médico',
+        description: `Los cuidadores no profesionales carecen de formación médica adecuada, pudiendo cometer errores graves en la administración de medicamentos o cuidados.`,
+        icon: 'tabler:alert-triangle',
+      },
+      {
+        title: 'Riesgo de complicaciones graves',
+        description: `Un cuidado inadecuado puede causar infecciones, empeoramiento de condiciones crónicas, reacciones adversas a medicamentos y hospitalizaciones de emergencia.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Infecciones y contaminación',
+        description: `La falta de técnicas asépticas puede causar infecciones graves, especialmente en heridas, sondas y dispositivos médicos.`,
+        icon: 'tabler:shield-x',
+      },
+      {
+        title: 'Pérdida de la función natural',
+        description: `Sin monitoreo profesional adecuado, las condiciones del paciente pueden empeorar sin detección temprana, requiriendo atención de emergencia.`,
+        icon: 'tabler:refresh-alert',
+      },
+      {
+        title: 'Falta de responsabilidad legal',
+        description: `Los cuidadores no profesionales no tienen responsabilidad legal ni seguros, dejando al paciente y familia desprotegidos ante complicaciones.`,
+        icon: 'tabler:circle-x',
+      },
+      {
+        title: 'Solución profesional segura',
+        description: `Nuestro servicio utiliza técnicas médicas especializadas que garantizan cuidados seguros y efectivos. Resultados inmediatos sin riesgos.`,
+        icon: 'tabler:circle-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Riesgos médicos de usar cuidadores no profesionales para enfermería a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-red-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Sección de Servicios Relacionados con Enlaces Internos -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Servicios Complementarios</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        Además de la enfermería a domicilio, ofrecemos atención médica integral en Bogotá
+      </p>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        La <strong>enfermería a domicilio profesional</strong> es parte de nuestro amplio catálogo de servicios médicos domiciliarios.
+        Si necesitas una <a href="/valoracion-medica-domiciliaria" class="text-primary hover:underline">valoración médica completa</a>,
+        nuestro equipo puede evaluar múltiples aspectos de tu salud durante la visita.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Para quienes requieren monitoreo constante, ofrecemos
+        <a href="/toma-de-signos-vitales" class="text-primary hover:underline">toma de signos vitales</a> y
+        <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">laboratorio clínico a domicilio</a>.
+        También realizamos <a href="/sutura-y-retiro-de-puntos" class="text-primary hover:underline">curaciones y retiro de puntos</a>
+        con técnicas asépticas certificadas.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Si prefieres una consulta inicial sin desplazamiento, conoce nuestra
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">teleconsulta médica</a> disponible las 24 horas.
+        Para diagnósticos más complejos, contamos con <a href="/lavado-de-oidos-a-domicilio" class="text-primary hover:underline">lavado de oídos profesional</a>
+        y otros procedimientos especializados a domicilio.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Explora todos nuestros <a href="/servicios" class="text-primary hover:underline font-semibold">servicios médicos a domicilio</a>
+        o visita nuestro <a href="/blog" class="text-primary hover:underline">blog de salud</a> para consejos de cuidado en casa.
+      </p>
+    </div>
+  </section>
+
+  <!-- Sección de Estadísticas -->
+  <section class="py-8 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-4 text-center">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">500+</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Pacientes Atendidos</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">4.8/5</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Calificación Promedio</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">45min</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Tiempo de Respuesta</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">24/7</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Disponibilidad</span>
+        </div>
+      </div>
+      <p class="mt-6 text-lg font-semibold text-accent">
+        ✓ Disponible hoy en tu localidad
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA Final -->
+  <Steps2
+    title="Agenda tu Enfermería a Domicilio Ahora - Respuesta en 45 Minutos"
+    subtitle="Enfermería a domicilio barato en Bogotá. Cuidados especializados, administración de medicamentos, curaciones a domicilio. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Enfermería Barato WhatsApp',
+      href: 'https://wa.me/573042912564',
+      target: '_blank',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamar Ahora',
+        description: 'Respuesta inmediata',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent dark:from-slate-800"></div>
+    </Fragment>
+  </Steps2>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes sobre enfermería a domicilio"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio profesional de cuidados especializados"
+    items={[
+      {
+        title: '¿Qué es la enfermería a domicilio?',
+        description: 'Es un servicio de atención de enfermería profesional que se brinda en el hogar del paciente, incluyendo cuidados especializados, administración de medicamentos, curaciones y monitoreo de signos vitales.',
+      },
+      {
+        title: '¿Qué servicios de enfermería ofrecen a domicilio?',
+        description: 'Ofrecemos administración de medicamentos, curaciones y heridas, toma de signos vitales, inyectología, cuidado de sondas, rehabilitación, educación al paciente y familia, y monitoreo de enfermedades crónicas.',
+      },
+      {
+        title: '¿Cuánto cuesta la enfermería a domicilio en Bogotá?',
+        description: 'El precio de la enfermería a domicilio en Bogotá es de $80.000 COP por hora. Este valor incluye evaluación inicial, cuidados especializados, materiales estériles y seguimiento posterior. Sin costos ocultos, precios transparentes.',
+      },
+      {
+        title: '¿Pueden atender pacientes con enfermedades crónicas?',
+        description: 'Sí, tenemos enfermeras especializadas en el cuidado de pacientes con diabetes, hipertensión, enfermedades cardiovasculares, post-operatorios y cuidados paliativos.',
+      },
+      {
+        title: '¿Qué diferencia hay entre enfermería a domicilio y hospitalaria?',
+        description: 'La enfermería a domicilio se brinda en el hogar del paciente, ofreciendo mayor comodidad y personalización. La hospitalaria se realiza en centros médicos con equipos especializados pero menos intimidad familiar.',
+      },
+      {
+        title: '¿Necesito prescripción médica para contratar enfermería?',
+        description: 'Para algunos servicios como administración de medicamentos inyectables sí se requiere prescripción médica. Para cuidados básicos y monitoreo, podemos evaluar las necesidades del paciente.',
+      },
+      {
+        title: '¿Pueden atender a niños y adultos mayores?',
+        description: 'Sí, tenemos enfermeras especializadas en pediatría y geriatría, con técnicas específicas para cada grupo etario y condiciones especiales de cuidado.',
+      },
+      {
+        title: '¿Qué debo tener listo para la visita de enfermería?',
+        description: 'Solo necesitas tener el espacio preparado, documentos médicos actuales, lista de medicamentos y un ambiente cómodo. Nosotros llevamos todo el equipo necesario.',
+      },
+      {
+        title: '¿Los servicios están cubiertos por EPS o medicina prepagada?',
+        description: 'Algunos servicios pueden tener cobertura parcial. Te ayudamos con la gestión de autorizaciones y emitimos facturas para reembolsos ante pólizas de salud.',
+      },
+      {
+        title: '¿Cómo agendo el servicio de enfermería a domicilio?',
+        description: 'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en toda Bogotá.',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas sobre nuestro servicio de enfermería? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPost Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre servicios de enfermería"
+    information={`Nuestro blog está diseñado para ofrecerte información útil y consejos sobre el cuidado de la salud. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

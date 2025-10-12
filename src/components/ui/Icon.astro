@@ -1,0 +1,39 @@
+---
+// Componente de iconos usando Iconify con soporte para Carbon y otros sets
+// Basado en la documentación oficial: https://iconify.design/docs/
+
+import { Icon as AstroIcon } from 'astro-icon/components';
+
+export interface Props {
+  name: string;
+  class?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  set?: 'carbon' | 'tabler' | 'heroicons' | 'mdi';
+}
+
+const { 
+  name, 
+  class: className = '', 
+  size = 'md',
+  set = 'carbon'
+} = Astro.props;
+
+const sizeClasses = {
+  sm: 'w-4 h-4',
+  md: 'w-5 h-5',
+  lg: 'w-6 h-6',
+  xl: 'w-8 h-8'
+};
+
+// Construir el nombre completo del icono
+// Si el nombre ya incluye el prefijo (ej: "carbon:home"), usarlo directamente
+// Si no, agregar el prefijo del set
+const fullIconName = name.includes(':') ? name : `${set}:${name}`;
+const iconClass = `${sizeClasses[size]} ${className}`.trim();
+---
+
+<!-- Usando astro-icon para mejor rendimiento y compatibilidad -->
+<AstroIcon 
+  name={fullIconName} 
+    class={iconClass} 
+/>

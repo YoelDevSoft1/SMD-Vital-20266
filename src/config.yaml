@@ -1,0 +1,81 @@
+site:
+  name: SMD Vital Bogotá
+  site: 'https://smdvitalbogota.com'
+  base: '/'
+  trailingSlash: false
+
+  googleSiteVerificationId: 2HVWH3O2ShwC1GMYvEtBd6fbgBe3RryOJNnIWz3SYKs
+
+# Metadatos SEO predeterminados
+metadata:
+  title:
+    default: 'SMD Vital Bogotá - Médicos a Domicilio 24/7'
+    template: '%s — SMD Vital Bogotá'
+  description: '✅ Médicos certificados a domicilio en Bogotá. Respuesta en 45 min. Valoraciones, curaciones, laboratorio y teleconsultas. Cobertura 24/7 en las 20 localidades. ¡Agenda ahora!'
+  keywords: 'médico a domicilio bogotá, atención médica domiciliaria, doctor a domicilio bogotá, enfermera a domicilio, teleconsulta médica bogotá, emergencias médicas bogotá, servicios médicos domiciliarios, medicina domiciliaria bogotá'
+  robots:
+    index: true
+    follow: true
+  openGraph:
+    site_name: SMD Vital Bogotá
+    images:
+      - url: '~/assets/images/hero-image.png'
+        width: 1200
+        height: 630
+        alt: 'Médicos profesionales a domicilio en Bogotá - SMD Vital'
+    type: website
+    locale: es_CO
+  twitter:
+    handle: '@SMDVitalBogota'
+    site: '@SMDVitalBogota'
+    cardType: summary_large_image
+# Configuración de internacionalización (idioma)
+i18n:
+  language: es
+  textDirection: ltr
+
+# Configuración del blog
+apps:
+  blog:
+    isEnabled: true
+    postsPerPage: 6
+
+    post:
+      isEnabled: true
+      permalink: '/%slug%' # Variables: %slug%, %year%, %month%, %day%, %hour%, %minute%, %second%, %category% (Ajusta la estructura de las URL de las publicaciones)
+      robots:
+        index: true
+
+    list:
+      isEnabled: true
+      pathname: 'blog' # Ruta principal del blog, puedes cambiar esto a "articles" (/articles)
+      robots:
+        index: true
+
+    category:
+      isEnabled: true
+      pathname: 'categoria' # Ruta principal de categorías /category/some-category, puedes cambiar esto a "group" (/group/some-category)
+      robots:
+        index: true
+
+    tag:
+      isEnabled: true
+      pathname: 'etiqueta' # Ruta principal de etiquetas /tag/some-tag, puedes cambiar esto a "topics" (/topics/some-category)
+      robots:
+        index: false
+
+    isRelatedPostsEnabled: true
+    relatedPostsCount: 4
+
+# Configuración de analíticas
+analytics:
+  vendors:
+    googleAnalytics:
+      id: G-C4842C2XKM # o ""
+
+# Configuración de la interfaz de usuario
+ui:
+  theme: 'dark' # Valores: "system" | "light" | "dark" | "light:only" | "dark:only"
+
+
+

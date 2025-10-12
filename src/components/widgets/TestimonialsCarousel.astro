@@ -1,0 +1,286 @@
+---
+import Icon from '~/components/ui/Icon.astro';
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  location: string;
+  rating: number;
+  text: string;
+  service: string;
+  date: string;
+  avatar?: string;
+  verified?: boolean;
+}
+
+export interface Props {
+  testimonials?: Testimonial[];
+  className?: string;
+  autoplay?: boolean;
+  autoplayDelay?: number;
+}
+
+const defaultTestimonials: Testimonial[] = [
+  {
+    id: '1',
+    name: 'María González',
+    location: 'Chapinero, Bogotá',
+    rating: 5,
+    text: 'Excelente servicio. El médico llegó en menos de 30 minutos y fue muy profesional. Mi madre se sintió muy cómoda durante la consulta.',
+    service: 'Valoración médica domiciliaria',
+    date: 'Hace 2 días',
+    verified: true,
+  },
+  {
+    id: '2',
+    name: 'Carlos Mendoza',
+    location: 'Usaquén, Bogotá',
+    rating: 5,
+    text: 'Increíble atención. La enfermera fue muy cuidadosa con la curación de mi herida. Definitivamente los recomiendo.',
+    service: 'Curación de heridas',
+    date: 'Hace 1 semana',
+    verified: true,
+  },
+  {
+    id: '3',
+    name: 'Ana Rodríguez',
+    location: 'Suba, Bogotá',
+    rating: 5,
+    text: 'El servicio de laboratorio a domicilio fue perfecto. No tuve que salir de casa y los resultados llegaron rápido.',
+    service: 'Laboratorio domiciliario',
+    date: 'Hace 3 días',
+    verified: true,
+  },
+  {
+    id: '4',
+    name: 'Roberto Silva',
+    location: 'Kennedy, Bogotá',
+    rating: 5,
+    text: 'La teleconsulta fue muy conveniente. El doctor fue muy claro en las indicaciones y me ayudó mucho.',
+    service: 'Teleconsulta médica',
+    date: 'Hace 5 días',
+    verified: true,
+  },
+  {
+    id: '5',
+    name: 'Laura Pérez',
+    location: 'Engativá, Bogotá',
+    rating: 5,
+    text: 'Servicio excepcional. El médico fue muy paciente con mi abuelo y le explicó todo detalladamente.',
+    service: 'Atención geriátrica',
+    date: 'Hace 1 semana',
+    verified: true,
+  },
+  {
+    id: '6',
+    name: 'Fernando Martínez',
+    location: 'Fontibón, Bogotá',
+    rating: 5,
+    text: 'Muy profesionales y puntuales. La atención fue de primera calidad y el precio justo.',
+    service: 'Consulta médica general',
+    date: 'Hace 4 días',
+    verified: true,
+  },
+];
+
+const { 
+  testimonials = defaultTestimonials, 
+  className = '',
+  autoplay = true,
+  autoplayDelay = 5000
+} = Astro.props;
+---
+
+<div class={`testimonials-carousel ${className}`}>
+  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+        Lo que dicen nuestros pacientes
+      </h2>
+      <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+        Más de 12,500 pacientes han confiado en nuestros servicios médicos domiciliarios
+      </p>
+      
+      <!-- Stats -->
+      <div class="flex flex-wrap justify-center gap-8 mt-8">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">4.9/5</div>
+          <div class="text-sm text-gray-600 dark:text-gray-300">Calificación promedio</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-600 dark:text-green-400">97%</div>
+          <div class="text-sm text-gray-600 dark:text-gray-300">Satisfacción</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">12.5K+</div>
+          <div class="text-sm text-gray-600 dark:text-gray-300">Pacientes atendidos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carousel Container -->
+    <div class="relative">
+      <div class="overflow-hidden">
+        <div 
+          class="flex transition-transform duration-500 ease-in-out"
+          id="testimonials-slider"
+        >
+          {testimonials.map((testimonial) => (
+            <div class="w-full flex-shrink-0 px-4">
+              <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 h-full">
+                <!-- Rating -->
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center space-x-1">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <Icon 
+                        name={i < testimonial.rating ? 'tabler:star-filled' : 'tabler:star'} 
+                        class={`w-4 h-4 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`} 
+                      />
+                    ))}
+                  </div>
+                  {testimonial.verified && (
+                    <div class="flex items-center text-green-600 dark:text-green-400">
+                      <Icon name="tabler:circle-check" class="w-4 h-4 mr-1" />
+                      <span class="text-xs font-medium">Verificado</span>
+                    </div>
+                  )}
+                </div>
+
+                <!-- Testimonial Text -->
+                <blockquote class="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
+                  "{testimonial.text}"
+                </blockquote>
+
+                <!-- Service Badge -->
+                <div class="mb-4">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                    <Icon name="tabler:medical-cross" class="w-3 h-3 mr-1" />
+                    {testimonial.service}
+                  </span>
+                </div>
+
+                <!-- Author Info -->
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                      <span class="text-white font-semibold text-sm">
+                        {testimonial.name.split(' ').map(n => n[0]).join('')}
+                      </span>
+                    </div>
+                    <div>
+                      <div class="font-semibold text-gray-900 dark:text-white">
+                        {testimonial.name}
+                      </div>
+                      <div class="text-sm text-gray-500 dark:text-gray-400">
+                        {testimonial.location}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-xs text-gray-400 dark:text-gray-500">
+                    {testimonial.date}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Navigation Arrows -->
+      <button 
+        class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white dark:bg-gray-800 rounded-full p-3 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 z-10"
+        id="prev-btn"
+      >
+        <Icon name="tabler:chevron-left" class="w-5 h-5 text-gray-600 dark:text-gray-300" />
+      </button>
+      
+      <button 
+        class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white dark:bg-gray-800 rounded-full p-3 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 z-10"
+        id="next-btn"
+      >
+        <Icon name="tabler:chevron-right" class="w-5 h-5 text-gray-600 dark:text-gray-300" />
+      </button>
+    </div>
+
+    <!-- Dots Indicator -->
+    <div class="flex justify-center mt-8 space-x-2">
+      {testimonials.map((_, index) => (
+        <button 
+          class={`w-3 h-3 rounded-full transition-all duration-300 ${
+            index === 0 ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+          }`}
+          data-slide={index}
+        ></button>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ testimonials, autoplay, autoplayDelay }}>
+  // Carousel functionality
+  let currentSlide = 0;
+  const totalSlides = testimonials.length;
+  const slider = document.getElementById('testimonials-slider');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const dots = document.querySelectorAll('[data-slide]');
+  
+  function updateSlider() {
+    if (slider) {
+      slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
+    
+    // Update dots
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('bg-blue-600', index === currentSlide);
+      dot.classList.toggle('bg-gray-300', index !== currentSlide);
+      dot.classList.toggle('dark:bg-gray-600', index !== currentSlide);
+    });
+  }
+  
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateSlider();
+  }
+  
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    updateSlider();
+  }
+  
+  // Event listeners
+  if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+  if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+  
+  // Dot navigation
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      currentSlide = index;
+      updateSlider();
+    });
+  });
+  
+  // Autoplay
+  if (autoplay) {
+    setInterval(nextSlide, autoplayDelay);
+  }
+  
+  // Pause on hover
+  const carousel = document.querySelector('.testimonials-carousel');
+  if (carousel) {
+    carousel.addEventListener('mouseenter', () => {
+      // Pause autoplay logic here if needed
+    });
+  }
+</script>
+
+<style>
+  .testimonials-carousel {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  }
+  
+  .dark .testimonials-carousel {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+</style>

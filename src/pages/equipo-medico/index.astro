@@ -1,0 +1,303 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Quiénes conforman nuestro equipo médico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Nuestro equipo está conformado por médicos generales, especialistas, enfermeras profesionales, técnicos en salud y personal de apoyo, todos certificados y con amplia experiencia en atención domiciliaria.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué certificaciones tiene nuestro personal médico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Nuestro personal médico cuenta con certificaciones profesionales vigentes, licencias de práctica médica, certificaciones en atención domiciliaria y capacitación continua en protocolos de bioseguridad.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Equipo Médico Profesional Bogotá',
+  description: 'Conoce nuestro equipo médico profesional especializado en atención domiciliaria en Bogotá. Médicos certificados, enfermeras especializadas y personal de salud altamente capacitado.',
+  url: SITE.site + '/equipo-medico/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  medicalSpecialty: ['PrimaryCare', 'Nursing', 'HomeHealthCare'],
+  keywords: 'equipo médico, médicos certificados, enfermeras especializadas, personal médico bogotá, equipo de salud domiciliaria',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+const metadata = {
+  title: 'Equipo Médico Profesional | SMD Vital Bogotá',
+  description: 'Conoce nuestro equipo médico profesional especializado en atención domiciliaria en Bogotá. Médicos certificados, enfermeras especializadas y personal de salud altamente capacitado.',
+  keywords: 'equipo médico, médicos certificados, enfermeras especializadas, personal médico bogotá, equipo de salud domiciliaria, médicos a domicilio',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
+};
+
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+  <section class="relative -mt-[76px]">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Acerca de', href: '/acerca' },
+          { label: 'Equipo Médico' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Profesionales Certificados"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Conocer Equipo', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Llamar Ahora', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Equipo médico profesional especializado en atención domiciliaria en Bogotá - SMD Vital',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Nuestro Equipo Médico Profesional
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Especialistas Certificados
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Atención Domiciliaria de Calidad
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Conoce nuestro equipo médico profesional</span> especializado en atención domiciliaria en Bogotá. Médicos certificados, enfermeras especializadas y personal de salud altamente capacitado.
+      <br /><br />
+      Nuestro equipo está comprometido con brindar la mejor atención médica en la comodidad de tu hogar, con profesionalismo, calidez humana y excelencia médica.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+  <Features
+    id="equipo"
+    tagline="Profesionales Especializados"
+    title="¿Quiénes conforman nuestro equipo médico?"
+    subtitle="Nuestro equipo está conformado por profesionales de la salud altamente capacitados y certificados, especializados en atención domiciliaria y comprometidos con tu bienestar."
+    columns={3}
+    items={[
+      {
+        title: 'Médicos Generales',
+        description: 'Médicos generales certificados con amplia experiencia en atención domiciliaria y medicina familiar.',
+        icon: 'tabler:stethoscope',
+      },
+      {
+        title: 'Enfermeras Especializadas',
+        description: 'Enfermeras profesionales con certificación en cuidados especializados y atención domiciliaria.',
+        icon: 'tabler:user-heart',
+      },
+      {
+        title: 'Técnicos en Salud',
+        description: 'Técnicos especializados en toma de muestras, electrocardiografía y procedimientos médicos.',
+        icon: 'tabler:microscope',
+      },
+      {
+        title: 'Personal de Apoyo',
+        description: 'Personal administrativo y logístico especializado en coordinación de servicios médicos.',
+        icon: 'tabler:users',
+      },
+      {
+        title: 'Especialistas',
+        description: 'Médicos especialistas en diferentes áreas para consultas y procedimientos específicos.',
+        icon: 'tabler:certificate',
+      },
+      {
+        title: 'Personal de Emergencias',
+        description: 'Equipo de respuesta rápida para situaciones de emergencia médica a domicilio.',
+        icon: 'tabler:ambulance',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Certificaciones **************** -->
+  <Content
+    id="certificaciones"
+    title="Certificaciones y Especializaciones"
+    subtitle="Nuestro personal médico cuenta con las certificaciones y especializaciones necesarias para brindar atención médica de la más alta calidad"
+    isReversed
+    items={[
+      {
+        title: 'Licencias Profesionales',
+        description: 'Todas las licencias profesionales vigentes y certificadas por las autoridades competentes.',
+        icon: 'tabler:certificate',
+      },
+      {
+        title: 'Certificaciones en Atención Domiciliaria',
+        description: 'Especialización y certificación en protocolos de atención médica a domicilio.',
+        icon: 'tabler:home',
+      },
+      {
+        title: 'Capacitación Continua',
+        description: 'Programa de educación médica continua y actualización en nuevas técnicas y protocolos.',
+        icon: 'tabler:book',
+      },
+      {
+        title: 'Protocolos de Bioseguridad',
+        description: 'Certificación en protocolos de bioseguridad y manejo de equipos médicos.',
+        icon: 'tabler:shield-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Certificaciones y especializaciones del equipo médico profesional SMD Vital',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  />
+
+  <!-- FAQs Widget ******************* -->
+  <FAQs
+    title="Preguntas frecuentes sobre nuestro equipo médico"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro personal médico y sus certificaciones"
+    items={[
+      {
+        title: '¿Quiénes conforman nuestro equipo médico?',
+        description: 'Nuestro equipo está conformado por médicos generales, especialistas, enfermeras profesionales, técnicos en salud y personal de apoyo, todos certificados y con amplia experiencia en atención domiciliaria.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué certificaciones tiene nuestro personal médico?',
+        description: 'Nuestro personal médico cuenta con certificaciones profesionales vigentes, licencias de práctica médica, certificaciones en atención domiciliaria y capacitación continua en protocolos de bioseguridad.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+  <Steps2
+    title="Conoce a Nuestro Equipo Médico"
+    subtitle="Equipo médico profesional especializado en atención domiciliaria. Personal certificado con amplia experiencia. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Conocer Equipo por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20quiero%20conocer%20más%20sobre%20su%20equipo%20médico',
+      icon: 'tabler:brand-whatsapp',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: 'Contacto directo y respuesta inmediata',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamada Telefónica',
+        description: 'Atención personalizada por teléfono',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda Bogotá',
+        icon: 'tabler:clock',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPosts Widget **************** -->
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre nuestro equipo médico"
+    information={`Visita nuestro blog para conocer más sobre nuestro equipo médico, certificaciones profesionales y atención domiciliaria especializada. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+
+</Layout>

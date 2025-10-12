@@ -1,0 +1,882 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la inyectología a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un servicio médico especializado que consiste en la aplicación de medicamentos, vitaminas y tratamientos terapéuticos mediante inyecciones intramusculares, subcutáneas o intravenosas en la comodidad de tu hogar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es doloroso el procedimiento?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No, la inyectología a domicilio, si se realiza correctamente, es prácticamente indolora y segura. Nuestro personal se asegura de minimizar cualquier molestia utilizando técnicas profesionales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la inyectología a domicilio en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio de la inyectología a domicilio en Bogotá es de $100,000 COP. Este valor incluye evaluación inicial, aplicación profesional, materiales estériles y seguimiento posterior. Sin costos ocultos, precios transparentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre inyectología a domicilio y en clínica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La inyectología a domicilio se realiza en tu hogar, ofreciendo mayor comodidad y privacidad. La clínica requiere desplazamiento pero tiene equipos especializados. Nuestro servicio combina ambas ventajas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo recibir inyecciones sin prescripción médica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para medicamentos prescritos sí se requiere prescripción médica. Para vitaminas y sueros multivitamínicos podemos evaluar las necesidades del paciente y aplicar según protocolos médicos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Con qué frecuencia puedo recibir inyecciones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende del tipo de tratamiento y prescripción médica. Algunos requieren aplicación diaria, otros semanal o mensual. Después de la evaluación inicial, te daremos una recomendación personalizada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué contraindicaciones tiene la inyectología?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No se recomienda en casos de alergias conocidas a los medicamentos, infecciones activas en el sitio de inyección, o condiciones médicas específicas. Nuestro personal realiza una evaluación previa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden atender a niños y adultos mayores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, adaptamos el procedimiento según la edad y condición del paciente, brindando una experiencia segura para todos. Tenemos experiencia trabajando con pacientes pediátricos y geriátricos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cada cuánto tiempo necesito inyectología?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La frecuencia varía según el tipo de tratamiento y necesidades específicas. Algunos requieren aplicación diaria, otros semanal. Después de la primera evaluación, te daremos una recomendación personalizada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo la inyectología a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes hacerlo fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Inyectología a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Inyectología Profesional Barato',
+  description: 'Inyectología a domicilio barato en Bogotá. Aplicación de medicamentos, vitaminas, inmunizaciones a domicilio. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  url: SITE.site + '/inyectologia-a-domicilio/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    },
+    {
+      '@type': 'City',
+      name: 'Funza'
+    },
+    {
+      '@type': 'City',
+      name: 'Mosquera'
+    },
+    {
+      '@type': 'City',
+      name: 'Cota'
+    }
+  ],
+  medicalSpecialty: [
+    'Nursing',
+    'PrimaryCare',
+    'InternalMedicine',
+    'FamilyMedicine'
+  ],
+  keywords: 'inyectología a domicilio, inyectologia a domicilio, servicio de inyectología a domicilio, servicio inyectologia a domicilio, servicio de inyectologia cerca de mi, servicio de inyectología, inyecciones a domicilio, aplicación medicamentos domicilio, vitaminas intramusculares',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Inyectología a Domicilio',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Aplicación de Medicamentos',
+          description: 'Inyecciones intramusculares, subcutáneas e intravenosas de medicamentos prescritos'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Vitaminas y Sueros',
+          description: 'Aplicación de vitaminas intramusculares y sueros multivitamínicos'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Inmunizaciones',
+          description: 'Aplicación de vacunas y tratamientos inmunológicos'
+        }
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    reviewCount: '350',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+const metadata = {
+  title: 'Inyectología a Domicilio en Bogotá | Profesional y Económico | SMD Vital',
+  description:
+    'Inyectología a domicilio en Bogotá. Servicio médico profesional con precios desde $100.000 COP. Aplicación de medicamentos, vitaminas e inmunizaciones a domicilio. Atención 24/7 en toda la capital.',
+  keywords: 'inyectología a domicilio, inyectologia a domicilio, servicio de inyectología a domicilio, servicio inyectologia a domicilio, servicio de inyectologia cerca de mi, servicio de inyectología, inyecciones a domicilio, aplicación medicamentos domicilio, vitaminas intramusculares',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
+};
+
+// Schema HowTo para el procedimiento de inyectología
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo realizar inyectología profesional a domicilio',
+  description: 'Procedimiento paso a paso para realizar inyectología profesional de forma segura en el hogar',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Procedimiento profesional de inyectología a domicilio con equipos médicos especializados'
+  },
+  totalTime: 'PT30M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '100000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Medicamentos prescritos',
+      description: 'Medicamentos según prescripción médica del paciente'
+    },
+    {
+      '@type': 'HowToSupply', 
+      name: 'Materiales estériles',
+      description: 'Jeringas, agujas, alcohol, gasas y otros materiales de un solo uso'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Equipos de seguridad',
+      description: 'Guantes, mascarillas y otros elementos de protección'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Contenedor de desechos',
+      description: 'Recipiente especial para desechos médicos'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Jeringas estériles',
+      description: 'Jeringas de diferentes calibres según el tipo de inyección'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Agujas especializadas',
+      description: 'Agujas intramusculares, subcutáneas e intravenosas'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Equipos de monitoreo',
+      description: 'Instrumentos para verificar signos vitales antes y después'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Evaluación Inicial del Paciente',
+      text: 'Evaluación médica completa, revisión de historia clínica y verificación de contraindicaciones.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Evaluación inicial del paciente para inyectología profesional'
+      },
+      url: SITE.site + '/inyectologia-a-domicilio/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Preparación del Material',
+      text: 'Preparación de medicamentos, materiales estériles y verificación de dosis correctas.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Preparación de materiales estériles para inyectología a domicilio'
+      },
+      url: SITE.site + '/inyectologia-a-domicilio/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Aplicación Profesional',
+      text: 'Aplicación de la inyección utilizando técnicas asépticas y sitios anatómicos apropiados.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Aplicación profesional de inyecciones con técnicas asépticas'
+      },
+      url: SITE.site + '/inyectologia-a-domicilio/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Seguimiento y Cuidados',
+      text: 'Monitoreo post-inyección, educación al paciente y disposición segura de desechos.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Seguimiento y cuidados posteriores para inyectología completa'
+      },
+      url: SITE.site + '/inyectologia-a-domicilio/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
+
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Inyectología a Domicilio' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Cuidado Experto para tu Salud"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Inyectología Barato WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda Inyecciones', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Profesional médico realizando inyectología a domicilio con equipos especializados - SMD Vital Bogotá',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Inyectología a Domicilio en Bogotá
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Servicio Profesional y Económico
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Aplicación de Medicamentos
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Inyectología a domicilio profesional en Bogotá</span> con aplicación de medicamentos, vitaminas e inmunizaciones para mejorar tu salud y bienestar sin salir de casa.
+      <br /><br />
+      Nuestro equipo certificado te ofrece un servicio confiable y económico en las 20 localidades de la capital. Precios transparentes sin costos ocultos.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestra inyectología a domicilio en Bogotá?"
+    subtitle="Ofrecemos aplicación de medicamentos profesional en tu hogar con técnicas seguras y especializadas para mejorar tu salud y bienestar. Nuestro equipo certificado te brinda un servicio confiable y económico en las 20 localidades de la capital."
+    columns={3}
+    items={[
+      {
+        title: 'Sin Dolor ni Molestias',
+        description:
+          'Procedimientos prácticamente indoloros con técnicas profesionales certificadas. Aplicación suave y cómoda para tu bienestar.',
+        icon: 'tabler:heart-handshake',
+      },
+      {
+        title: 'Equipos Especializados',
+        description: `Utilizamos instrumental médico profesional certificado para inyecciones intramusculares, subcutáneas e intravenosas de forma segura.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda la ciudad. Agenda tu cita y recibe atención profesional el mismo día sin largas esperas.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Personal Certificado',
+        description: `Profesionales especializados con certificación en inyectología y amplia experiencia en aplicación de medicamentos.`,
+        icon: 'tabler:certificate',
+      },
+      {
+        title: 'Resultados Inmediatos',
+        description: 'Aplicación efectiva de medicamentos y vitaminas con resultados inmediatos en tu bienestar.',
+        icon: 'tabler:check',
+      },
+      {
+        title: 'Cobertura Total',
+        description: `Servicio disponible en las 20 localidades de la capital y municipios cercanos. Atención 24/7 todos los días.`,
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Procedimiento **************** -->
+
+  <Content
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestro Procedimiento?"
+    subtitle="Proceso profesional paso a paso realizado por especialistas certificados"
+    isReversed
+    items={[
+      {
+        title: '1. Evaluación Inicial del Paciente',
+        description:
+          'Evaluación médica completa, revisión de historia clínica y verificación de contraindicaciones para el tratamiento.',
+        icon: 'tabler:clipboard-check',
+      },
+      {
+        title: '2. Preparación del Material',
+        description: `Preparación de medicamentos, materiales estériles y verificación de dosis correctas según prescripción médica.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: '3. Aplicación Profesional',
+        description: `Aplicación de la inyección utilizando técnicas asépticas y sitios anatómicos apropiados para máxima efectividad.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: '4. Seguimiento y Cuidados',
+        description: `Monitoreo post-inyección, educación al paciente y disposición segura de desechos médicos.`,
+        icon: 'tabler:shield-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Procedimiento paso a paso de inyectología a domicilio con equipos médicos especializados',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h2>
+      <p class="text-muted mt-4">
+        Utilizamos técnicas aprobadas por la Organización Mundial de la Salud (OMS) y el Ministerio de Salud de Colombia para garantizar tu seguridad y bienestar.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo necesitas **************** -->
+
+  <Content
+    id="cuando-necesitas"
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Indicaciones para Inyectología a Domicilio',
+        description: `✓ Aplicación de medicamentos prescritos<br>
+                      ✓ Vitaminas intramusculares y sueros<br>
+                      ✓ Inmunizaciones y vacunas<br>
+                      ✓ Tratamientos para el dolor<br>
+                      ✓ Sueros multivitamínicos`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: '¿Quiénes lo Necesitan?',
+        description: `✓ Pacientes con medicamentos inyectables<br>
+                      ✓ Personas que requieren vitaminas<br>
+                      ✓ Tratamientos de inmunización<br>
+                      ✓ Terapias de dolor crónico<br>
+                      ✓ Suplementación nutricional`,
+        icon: 'tabler:users',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/5998452/pexels-photo-5998452.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Paciente con necesidades de inyectología a domicilio consultando sobre aplicación de medicamentos',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Inyectología a Domicilio?
+      </h2>
+      <p class="text-muted mt-4">
+        Si necesitas aplicación de medicamentos, vitaminas o inmunizaciones, nuestro servicio está diseñado para ti. 
+        <strong>No intentes aplicar inyecciones tú mismo</strong> ni uses personal no certificado, ya que pueden causar complicaciones graves.
+      </p>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Precios **************** -->
+
+  <Content
+    id="precios"
+    title="Precios de Inyectología a Domicilio"
+    subtitle="Servicio médico especializado a domicilio con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
+    isReversed
+    items={[
+      {
+        title: 'Precio Fijo Garantizado',
+        description: `$100.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: 'Todo Incluido',
+        description: `Evaluación inicial, aplicación profesional, materiales estériles, equipos médicos y seguimiento posterior.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el resultado, realizamos una segunda aplicación sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $150.000+ | Otros domicilios: $120.000+ | SMD Vital: $100.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios transparentes y competitivos para inyectología a domicilio en Bogotá - $100.000 COP',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+  </Content>
+
+  <!-- Content Widget - Por qué NO aplicar inyecciones uno mismo **************** -->
+
+  <Content
+    id="no-auto-inyecciones"
+    title="¿Por qué NO aplicar inyecciones uno mismo?"
+    subtitle="Información importante sobre los riesgos de la auto-aplicación y la importancia de la inyectología profesional"
+    isReversed={false}
+    items={[
+      {
+        title: 'Riesgo de infecciones graves',
+        description: `La falta de técnicas asépticas puede causar infecciones graves, abscesos y complicaciones que requieren hospitalización.`,
+        icon: 'tabler:alert-triangle',
+      },
+      {
+        title: 'Lesiones nerviosas y vasculares',
+        description: `La aplicación incorrecta puede causar lesiones en nervios, vasos sanguíneos y tejidos, generando daños permanentes.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Dosificación incorrecta',
+        description: `Sin conocimiento médico, es fácil aplicar dosis incorrectas que pueden causar sobredosis o subdosificación peligrosa.`,
+        icon: 'tabler:alert-octagon',
+      },
+      {
+        title: 'Sitios de inyección inadecuados',
+        description: `La aplicación en sitios incorrectos puede causar dolor, inflamación y absorción inadecuada del medicamento.`,
+        icon: 'tabler:map-pin',
+      },
+      {
+        title: 'Falta de manejo de reacciones',
+        description: `Sin supervisión médica, no puedes manejar reacciones alérgicas o efectos secundarios que pueden ser graves.`,
+        icon: 'tabler:shield-x',
+      },
+      {
+        title: 'Solución profesional segura',
+        description: `Nuestro servicio utiliza técnicas médicas especializadas que garantizan aplicación segura y efectiva. Resultados inmediatos sin riesgos.`,
+        icon: 'tabler:circle-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Riesgos médicos de aplicar inyecciones uno mismo - Por qué es importante la inyectología profesional',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-red-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Sección de Servicios Relacionados con Enlaces Internos -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Servicios Complementarios</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        Además de la inyectología a domicilio, ofrecemos atención médica integral en Bogotá
+      </p>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        La <strong>inyectología a domicilio profesional</strong> es parte de nuestro amplio catálogo de servicios médicos domiciliarios.
+        Si necesitas una <a href="/valoracion-medica-domiciliaria" class="text-primary hover:underline">valoración médica completa</a>,
+        nuestro equipo puede evaluar múltiples aspectos de tu salud durante la visita.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Para quienes requieren monitoreo constante, ofrecemos
+        <a href="/toma-de-signos-vitales" class="text-primary hover:underline">toma de signos vitales</a> y
+        <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">laboratorio clínico a domicilio</a>.
+        También realizamos <a href="/sutura-y-retiro-de-puntos" class="text-primary hover:underline">curaciones y retiro de puntos</a>
+        con técnicas asépticas certificadas.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Si prefieres una consulta inicial sin desplazamiento, conoce nuestra
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">teleconsulta médica</a> disponible las 24 horas.
+        Para diagnósticos más complejos, contamos con <a href="/lavado-de-oidos-a-domicilio" class="text-primary hover:underline">lavado de oídos profesional</a>
+        y otros procedimientos especializados a domicilio.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Explora todos nuestros <a href="/servicios" class="text-primary hover:underline font-semibold">servicios médicos a domicilio</a>
+        o visita nuestro <a href="/blog" class="text-primary hover:underline">blog de salud</a> para consejos de cuidado en casa.
+      </p>
+    </div>
+  </section>
+
+  <!-- Sección de Estadísticas -->
+  <section class="py-8 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-4 text-center">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">350+</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Pacientes Atendidos</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">4.8/5</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Calificación Promedio</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">45min</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Tiempo de Respuesta</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">24/7</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Disponibilidad</span>
+        </div>
+      </div>
+      <p class="mt-6 text-lg font-semibold text-accent">
+        ✓ Disponible hoy en tu localidad
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA Final -->
+  <Steps2
+    title="Agenda tu Inyectología a Domicilio Ahora - Respuesta en 45 Minutos"
+    subtitle="Inyectología a domicilio barato en Bogotá. Aplicación de medicamentos, vitaminas e inmunizaciones a domicilio. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Inyectología Barato WhatsApp',
+      href: 'https://wa.me/573042912564',
+      target: '_blank',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamar Ahora',
+        description: 'Respuesta inmediata',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent dark:from-slate-800"></div>
+    </Fragment>
+  </Steps2>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes sobre inyectología a domicilio"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio profesional de aplicación de medicamentos"
+    items={[
+      {
+        title: '¿Qué es la inyectología a domicilio?',
+        description: 'Es un servicio médico especializado que consiste en la aplicación de medicamentos, vitaminas y tratamientos terapéuticos mediante inyecciones intramusculares, subcutáneas o intravenosas en la comodidad de tu hogar.',
+      },
+      {
+        title: '¿Qué tipos de inyecciones pueden aplicar a domicilio?',
+        description: 'Aplicamos vitaminas intramusculares, medicamentos prescritos, inmunizaciones, tratamientos para el dolor, sueros multivitamínicos y otros compuestos terapéuticos según prescripción médica.',
+      },
+      {
+        title: '¿Cuánto cuesta la inyectología a domicilio en Bogotá?',
+        description: 'El precio de la inyectología a domicilio en Bogotá es de $100.000 COP. Este valor incluye evaluación inicial, aplicación profesional, materiales estériles y seguimiento posterior. Sin costos ocultos, precios transparentes.',
+      },
+      {
+        title: '¿Es seguro recibir inyecciones a domicilio?',
+        description: 'Sí, contamos con profesionales certificados en inyectología y seguimos estrictos protocolos de higiene y seguridad. Utilizamos materiales estériles de un solo uso y técnicas asépticas certificadas.',
+      },
+      {
+        title: '¿Qué diferencia hay entre inyectología a domicilio y en clínica?',
+        description: 'La inyectología a domicilio se realiza en tu hogar, ofreciendo mayor comodidad y privacidad. La clínica requiere desplazamiento pero tiene equipos especializados. Nuestro servicio combina ambas ventajas.',
+      },
+      {
+        title: '¿Puedo recibir inyecciones sin prescripción médica?',
+        description: 'Para medicamentos prescritos sí se requiere prescripción médica. Para vitaminas y sueros multivitamínicos podemos evaluar las necesidades del paciente y aplicar según protocolos médicos.',
+      },
+      {
+        title: '¿Con qué frecuencia puedo recibir inyecciones?',
+        description: 'Depende del tipo de tratamiento y prescripción médica. Algunos requieren aplicación diaria, otros semanal o mensual. Después de la evaluación inicial, te daremos una recomendación personalizada.',
+      },
+      {
+        title: '¿Qué contraindicaciones tiene la inyectología?',
+        description: 'No se recomienda en casos de alergias conocidas a los medicamentos, infecciones activas en el sitio de inyección, o condiciones médicas específicas. Nuestro personal realiza una evaluación previa.',
+      },
+      {
+        title: '¿Pueden atender a niños y adultos mayores?',
+        description: 'Sí, adaptamos el procedimiento según la edad y condición del paciente, brindando una experiencia segura para todos. Tenemos experiencia trabajando con pacientes pediátricos y geriátricos.',
+      },
+      {
+        title: '¿Cómo agendo la inyectología a domicilio?',
+        description: 'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en toda Bogotá.',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas sobre nuestro servicio de inyectología? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPost Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre servicios de inyectología"
+    information={`Nuestro blog está diseñado para ofrecerte información útil y consejos sobre el cuidado de la salud. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

@@ -1,0 +1,85 @@
+---
+import Hero from '~/components/widgets/Hero.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Layout from '~/layouts/PageLayout.astro';
+
+const metadata = {
+  title: 'Servicios Médicos Domiciliarios en Bogotá | SMD Vital',
+  description:
+    'Nuestros médicos a domicilio en Bogotá ofrecen atención médica de calidad en la comodidad de tu hogar. Olvídate del tráfico y las largas esperas, ¡contáctanos!',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+  <Hero
+    tagline="Acerca de Nosotros"
+    image={{
+      src: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
+      alt: 'Atención Médica Domiciliaria',
+    }}
+  >
+    <Fragment slot="title">
+      Atención Médica Domiciliaria <br />
+      <span class="text-accent dark:text-white highlight">Profesional y Confiable</span>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      En SMD Vital estamos comprometidos con tu bienestar. Nuestro equipo de profesionales de la salud brinda servicios
+      médicos a domicilio en Bogotá, ofreciéndote atención de calidad sin que tengas que salir de tu hogar. Evita
+      desplazamientos, largas esperas y el estrés del tráfico. Nuestros médicos y personal capacitado te brindarán
+      cuidados integrales y personalizados, mejorando tu calidad de vida.
+    </Fragment>
+  </Hero>
+
+  <!-- Nuestros Valores ****************** -->
+  <Steps2
+    title="Nuestros valores"
+    subtitle="En SMD Vital, cada acción que realizamos está guiada por nuestros principios fundamentales, asegurando una atención médica humana, ética y de calidad."
+    items={[
+      {
+        title: 'Enfoque Centrado en el Paciente',
+        description:
+          'Cada paciente es único. Escuchamos tus necesidades y adaptamos nuestros servicios para brindar una atención cercana y personalizada.',
+      },
+      {
+        title: 'Mejora Continua',
+        description:
+          'Buscamos la excelencia en todo lo que hacemos. Evaluamos constantemente nuestros procedimientos para ofrecerte una atención cada vez mejor.',
+      },
+      {
+        title: 'Prácticas Éticas',
+        description:
+          'Mantenemos un estricto compromiso con la ética y la responsabilidad, asegurando la confidencialidad y el respeto en cada visita.',
+      },
+    ]}
+  />
+
+  <!-- Contáctanos ****************** -->
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas o necesitas agendar una visita médica a domicilio? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+</Layout>

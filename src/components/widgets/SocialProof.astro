@@ -1,0 +1,96 @@
+﻿---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import type { Widget } from '~/types';
+
+export interface Props extends Widget {
+  title?: string;
+  subtitle?: string;
+  tagline?: string;
+  items?: Array<{
+    icon: string;
+    title: string;
+    description: string;
+    color: string;
+  }>;
+}
+
+const {
+  title = 'Confiado por Empresas y Familias',
+  subtitle = 'Más de 12,500 pacientes atendidos en Bogotá',
+  tagline,
+  items = [
+    {
+      icon: '🏥',
+      title: 'Hospitales',
+      description: 'Partners médicos',
+      color: 'blue'
+    },
+    {
+      icon: '🏢',
+      title: 'Empresas',
+      description: 'Servicios corporativos',
+      color: 'green'
+    },
+    {
+      icon: '👨‍👩‍👧‍👦',
+      title: 'Familias',
+      description: 'Cuidado en casa',
+      color: 'purple'
+    },
+    {
+      icon: '📜',
+      title: 'Certificado',
+      description: 'Ministerio de Salud',
+      color: 'orange'
+    }
+  ],
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+
+const getColorClasses = (color: string) => {
+  const colors = {
+    blue: 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400',
+    green: 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400',
+    purple: 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400',
+    orange: 'bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400'
+  };
+  return colors[color] || colors.blue;
+};
+---
+
+<WidgetWrapper 
+  id={id} 
+  isDark={isDark} 
+  containerClass={`max-w-7xl mx-auto ${classes?.container ?? ''}`} 
+  bg={bg}
+>
+  <Headline 
+    title={title} 
+    subtitle={subtitle} 
+    tagline={tagline} 
+    classes={{
+      container: 'text-center mb-12',
+      title: 'text-3xl font-bold text-gray-900 dark:text-white mb-4',
+      subtitle: 'text-lg text-gray-600 dark:text-gray-300',
+      ...((classes?.headline as Record<string, string>) ?? {})
+    }}
+  />
+  
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-60">
+    {
+      items.map((item) => (
+        <div class="text-center">
+          <div class={`${getColorClasses(item.color)} rounded-lg p-6 mb-4`}>
+            <span class="text-2xl font-bold">{item.icon}</span>
+          </div>
+          <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">{item.title}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">{item.description}</p>
+        </div>
+      ))
+    }
+  </div>
+</WidgetWrapper>

@@ -1,0 +1,773 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Content from '~/components/widgets/Content.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la teleconsulta médica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un servicio de consulta médica virtual que permite recibir atención médica profesional a través de videollamada segura, sin necesidad de desplazarse a una clínica o consultorio.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la teleconsulta médica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio de la teleconsulta médica en Bogotá es de $80,000 COP. Este valor incluye consulta virtual, diagnóstico, recomendaciones de tratamiento y prescripciones médicas digitales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué necesito para recibir la teleconsulta?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Solo necesitas un dispositivo con cámara y micrófono (celular, tablet o computador), conexión estable a internet y un lugar tranquilo. Nuestro equipo te envía el enlace y te acompaña durante el proceso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo recibir fórmulas médicas por teleconsulta?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, al finalizar la teleconsulta recibirás las fórmulas médicas, incapacidades, órdenes de laboratorio o recomendaciones digitales, con validez legal en Colombia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo se recomienda pasar a una visita presencial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Si el médico identifica signos de alarma o requiere examen físico detallado, coordinamos una visita a domicilio o te orientamos hacia el centro de urgencias más cercano.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el tiempo de respuesta para teleconsulta?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Respondemos en menos de 5 minutos por WhatsApp o call center. Envías tus datos básicos y en minutos recibirás la confirmación y el enlace de conexión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué especialidades médicas están disponibles?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Contamos con medicina general, pediatría, medicina interna, psicología y especialistas aliados. Todos registrados ante el Ministerio de Salud de Colombia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es segura la teleconsulta médica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, utilizamos plataformas seguras con encriptación de datos y cumplimos con todas las normativas de protección de información médica en Colombia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo hacer teleconsulta para control de enfermedades crónicas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, la teleconsulta es ideal para control de hipertensión, diabetes, EPOC y salud mental. Evaluamos signos vitales que reportas y ajustamos tratamientos sin salir de casa.',
+      },
+    },
+    {
+    '@type': 'Question',
+      name: '¿Cómo agendo una teleconsulta médica?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+        text: 'Puedes agendar fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Telemedicina y Teleconsulta Bogotá',
+  alternateName: 'SMD Vital Bogotá - Consulta Médica Online',
+  description: 'Telemedicina y teleconsulta médica online en Bogotá. Consulta médica virtual por videollamada con médicos certificados. Atención médica online 24/7 en las 20 localidades.',
+  url: SITE.site + '/teleconsulta-medica/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+    '@type': 'City',
+    name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    }
+  ],
+  medicalSpecialty: [
+    'PrimaryCare',
+    'InternalMedicine',
+    'Pediatrics',
+    'Psychology',
+    'Telemedicine'
+  ],
+  keywords: 'telemedicina, teleconsulta, teleconsulta médica, consulta médica online, videoconsulta, médico virtual, telemedicina online, atención médica online, médico a domicilio virtual, consulta médica virtual, telemedicina bogotá, médico virtual bogotá',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Telemedicina y Teleconsulta',
+    itemListElement: [
+      {
+    '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Telemedicina y Teleconsulta Online',
+          description: 'Consulta médica virtual por videollamada con diagnóstico y recomendaciones de tratamiento'
+        },
+        price: '80000',
+    priceCurrency: 'COP',
+        availability: 'https://schema.org/InStock',
+        validFrom: '2024-01-01',
+        priceValidUntil: '2024-12-31',
+        includesObject: [
+          'Consulta virtual por videollamada',
+          'Diagnóstico médico profesional',
+          'Recomendaciones de tratamiento',
+          'Prescripciones médicas digitales',
+          'Seguimiento posterior'
+        ]
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    reviewCount: '150',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+// Schema Reviews para testimonios
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  itemReviewed: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital - Telemedicina y Teleconsulta Bogotá'
+  },
+  author: {
+    '@type': 'Person',
+    name: 'Ana Martínez'
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '5',
+    bestRating: '5'
+  },
+  reviewBody: 'Excelente servicio de teleconsulta médica. El médico fue muy profesional, me explicó todo claramente y recibí mis fórmulas médicas al instante. Muy recomendado para evitar desplazamientos.'
+};
+
+// Schema HowTo para el procedimiento de teleconsulta
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo realizar telemedicina y teleconsulta médica profesional',
+  description: 'Procedimiento paso a paso para realizar consulta médica virtual y telemedicina de forma profesional y segura',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/4225920/pexels-photo-4225920.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Procedimiento profesional de telemedicina y teleconsulta médica por videollamada segura'
+  },
+  totalTime: 'PT30M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '80000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Dispositivo con cámara',
+      description: 'Celular, tablet o computador con cámara y micrófono funcionales'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Conexión a internet',
+      description: 'Conexión estable a internet para videollamada de calidad'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Lugar tranquilo',
+      description: 'Espacio privado y tranquilo para la consulta médica'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Plataforma de videollamada',
+      description: 'Sistema seguro de videollamada con encriptación de datos'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Sistema de registro médico',
+      description: 'Plataforma para documentación y prescripciones médicas'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Contacto y Triage',
+      text: 'Contactar por WhatsApp o call center, registrar síntomas y antecedentes para asignar al profesional médico adecuado.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4225920/pexels-photo-4225920.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Proceso de contacto y triage inicial para telemedicina y teleconsulta médica'
+      },
+      url: SITE.site + '/teleconsulta-medica/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Videollamada Segura',
+      text: 'Recibir enlace de conexión y participar en videollamada HD con el médico especialista desde cualquier dispositivo.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4225920/pexels-photo-4225920.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Videollamada segura para telemedicina y consulta médica virtual profesional'
+      },
+      url: SITE.site + '/teleconsulta-medica/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Diagnóstico y Tratamiento',
+      text: 'Durante la sesión se resuelven dudas, se define medicamentos y plan terapéutico personalizado con documentación completa.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4225920/pexels-photo-4225920.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Proceso de diagnóstico y definición de tratamiento durante telemedicina y teleconsulta'
+      },
+      url: SITE.site + '/teleconsulta-medica/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Seguimiento y Control',
+      text: 'Entrega de fórmulas médicas digitales, seguimiento posterior y coordinación de visitas presenciales si es necesario.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4225920/pexels-photo-4225920.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Seguimiento posterior y entrega de documentación médica digital en telemedicina'
+      },
+      url: SITE.site + '/teleconsulta-medica/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
+
+const metadata = {
+  title: 'Telemedicina en Bogotá | Teleconsulta Médica Online | SMD Vital',
+  description: 'Telemedicina y teleconsulta médica online en Bogotá. Consulta médica virtual por videollamada con médicos certificados. Atención médica online 24/7. Precio $80.000 COP.',
+  keywords: 'telemedicina, teleconsulta, teleconsulta médica, consulta médica online, videoconsulta, médico virtual, telemedicina online, atención médica online, médico a domicilio virtual, consulta médica virtual, telemedicina bogotá, médico virtual bogotá',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/4225920/pexels-photo-4225920.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
+};
+
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Teleconsulta Médica' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Telemedicina y Consulta Médica Virtual"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Telemedicina WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agendar Teleconsulta', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4225920/pexels-photo-4225920.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Médico profesional realizando teleconsulta médica a domicilio por videollamada - SMD Vital Bogotá',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Telemedicina en Bogotá
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Teleconsulta Médica Online
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Consulta Médica Virtual
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Telemedicina y teleconsulta médica online</span> con médicos certificados para consulta médica virtual, diagnóstico por videollamada y atención médica online en la comodidad de tu hogar.
+      <br /><br />
+      Nuestro equipo profesional te ofrece telemedicina y consulta médica virtual en las 20 localidades de Bogotá. Precios transparentes sin costos ocultos.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestra telemedicina y teleconsulta médica?"
+    subtitle="Ofrecemos telemedicina y consulta médica virtual con médicos certificados y tecnología especializada para brindar el mejor diagnóstico online en la comodidad de tu hogar."
+    columns={3}
+    items={[
+      {
+        title: 'Médicos Certificados',
+        description: 'Profesionales médicos certificados con amplia experiencia en telemedicina y consulta médica virtual.',
+        icon: 'tabler:stethoscope',
+      },
+      {
+        title: 'Tecnología Avanzada',
+        description: 'Videollamada HD segura, revisión de exámenes previos y formulación de medicamentos digitales.',
+        icon: 'tabler:video',
+      },
+      {
+        title: 'Respuesta en 5 Minutos',
+        description: 'Contacto inmediato por WhatsApp o call center. En minutos recibirás confirmación y enlace de conexión.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Diagnóstico Inmediato',
+        description: 'Consulta virtual con diagnóstico profesional, recomendaciones de tratamiento y prescripciones médicas digitales.',
+        icon: 'tabler:microscope',
+      },
+      {
+        title: 'Documentación Legal',
+        description: 'Fórmulas médicas, incapacidades y órdenes de laboratorio con validez legal en Colombia.',
+        icon: 'tabler:file-description',
+      },
+      {
+        title: 'Cobertura Total',
+        description: 'Servicio disponible en las 20 localidades de Bogotá y municipios cercanos. Atención 24/7 todos los días.',
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Procedimiento **************** -->
+
+  <Content
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestra Telemedicina y Teleconsulta?"
+    subtitle="Proceso profesional paso a paso de telemedicina realizado por médicos certificados con tecnología especializada"
+    isReversed
+    items={[
+      {
+        title: '1. Contacto y Triage Digital',
+        description:
+          'Contactar por WhatsApp o call center, registrar síntomas y antecedentes para asignar al profesional médico adecuado.',
+        icon: 'tabler:phone',
+      },
+      {
+        title: '2. Videollamada Segura',
+        description: `Recibir enlace de conexión y participar en videollamada HD con el médico especialista desde cualquier dispositivo.`,
+        icon: 'tabler:video',
+      },
+      {
+        title: '3. Diagnóstico y Tratamiento',
+        description: `Durante la sesión se resuelven dudas, se define medicamentos y plan terapéutico personalizado con documentación completa.`,
+        icon: 'tabler:microscope',
+      },
+      {
+        title: '4. Seguimiento y Control',
+        description: `Entrega de fórmulas médicas digitales, seguimiento posterior y coordinación de visitas presenciales si es necesario.`,
+        icon: 'tabler:file-description',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4031824/pexels-photo-4031824.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Procedimiento paso a paso de teleconsulta médica profesional por videollamada segura',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h2>
+      <p class="text-muted mt-4">
+        Utilizamos plataformas seguras con encriptación de datos y cumplimos con todas las normativas de protección de información médica en Colombia.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo Necesitas **************** -->
+
+  <Content
+    id="cuando-necesitas"
+    tagline="Casos Ideales"
+    title="¿Cuándo Necesitas Telemedicina y Teleconsulta?"
+    subtitle="Identifica cuándo es apropiado realizar telemedicina y consulta médica virtual para resolver tu necesidad de salud."
+    items={[
+      {
+        title: 'Control de Enfermedades Crónicas',
+        description: `✓ Hipertensión y diabetes<br>
+                      ✓ EPOC y asma<br>
+                      ✓ Salud mental<br>
+                      ✓ Evaluación de signos vitales<br>
+                      ✓ Ajuste de medicamentos`,
+        icon: 'tabler:heart-rate-monitor',
+      },
+      {
+        title: 'Urgencias Leves y Pediatría',
+        description: `✓ Fiebre y gripas<br>
+                      ✓ Alergias y dermatitis<br>
+                      ✓ Dolores abdominales<br>
+                      ✓ Cuadros respiratorios moderados<br>
+                      ✓ Segunda opinión médica`,
+        icon: 'tabler:stethoscope',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/7195184/pexels-photo-7195184.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Paciente con síntomas médicos consultando sobre teleconsulta médica profesional a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Telemedicina y Teleconsulta?
+      </h2>
+      <p class="text-muted mt-4">
+        La telemedicina y teleconsulta médica es ideal para control de enfermedades crónicas, urgencias leves y seguimiento médico regular. 
+        Evita desplazamientos innecesarios y recibe atención médica profesional desde la comodidad de tu hogar.
+      </p>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Precios **************** -->
+
+  <Content
+    id="precios"
+    title="Precios de Telemedicina y Teleconsulta"
+    subtitle="Servicio de telemedicina y consulta médica virtual con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
+    isReversed
+    items={[
+      {
+        title: 'Precio Fijo Garantizado',
+        description: `$80.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: 'Todo Incluido',
+        description: `Telemedicina y consulta virtual por videollamada, diagnóstico médico profesional, recomendaciones de tratamiento y prescripciones médicas digitales.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el servicio, realizamos una segunda telemedicina y teleconsulta sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $120.000+ | Otros virtuales: $100.000+ | SMD Vital: $80.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4225920/pexels-photo-4225920.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios transparentes y competitivos para telemedicina y teleconsulta médica profesional en Bogotá - $80.000 COP',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+  </Content>
+
+  <!-- Sección de Servicios Relacionados con Enlaces Internos -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Servicios Complementarios</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        Además de la telemedicina y teleconsulta médica, ofrecemos <a href="/servicios" class="text-primary hover:underline font-semibold">atención médica integral a domicilio</a> en la capital
+      </p>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        La <strong>telemedicina y teleconsulta médica profesional</strong> es parte de nuestro amplio catálogo de <a href="/servicios" class="text-primary hover:underline">servicios médicos domiciliarios</a>.
+        Si necesitas una <a href="/valoracion-medica-domiciliaria" class="text-primary hover:underline">valoración médica presencial</a>,
+        nuestro equipo puede realizar evaluación física completa durante la visita.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Para quienes requieren atención especializada, ofrecemos
+        <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">servicios de laboratorio clínico</a> y
+        <a href="/toma-de-signos-vitales" class="text-primary hover:underline">toma de signos vitales</a>.
+        También realizamos <a href="/electrocardiografia-basica" class="text-primary hover:underline">electrocardiografías</a>
+        con equipos portátiles especializados. <a href="/contacto" class="text-primary hover:underline font-semibold">Contáctanos</a> para más información.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Si prefieres una consulta inicial sin desplazamiento, conoce nuestra
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">telemedicina y teleconsulta médica</a> disponible las 24 horas.
+        Para diagnósticos más complejos, contamos con <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">laboratorio clínico a domicilio</a>
+        que incluye <a href="/toma-de-muestras-a-domicilio" class="text-primary hover:underline">toma de muestras</a> y análisis especializados.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes sobre telemedicina y teleconsulta"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio de telemedicina y consulta médica virtual especializada"
+    items={[
+      {
+        title: '¿Qué es la telemedicina y teleconsulta médica?',
+        description: 'La telemedicina es un servicio de consulta médica virtual que permite recibir atención médica profesional a través de videollamada segura, sin necesidad de desplazarse a una clínica o consultorio.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuánto cuesta la telemedicina y teleconsulta?',
+        description: 'El precio de la telemedicina y teleconsulta médica en Bogotá es de $80,000 COP. Este valor incluye consulta virtual, diagnóstico, recomendaciones de tratamiento y prescripciones médicas digitales.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué necesito para recibir telemedicina?',
+        description: 'Solo necesitas un dispositivo con cámara y micrófono (celular, tablet o computador), conexión estable a internet y un lugar tranquilo. Nuestro equipo te envía el enlace y te acompaña durante el proceso.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Puedo recibir fórmulas médicas por telemedicina?',
+        description: 'Sí, al finalizar la telemedicina y teleconsulta recibirás las fórmulas médicas, incapacidades, órdenes de laboratorio o recomendaciones digitales, con validez legal en Colombia.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuándo se recomienda pasar a una visita presencial?',
+        description: 'Si el médico identifica signos de alarma o requiere examen físico detallado, coordinamos una visita a domicilio o te orientamos hacia el centro de urgencias más cercano.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuál es el tiempo de respuesta para telemedicina?',
+        description: 'Respondemos en menos de 5 minutos por WhatsApp o call center. Envías tus datos básicos y en minutos recibirás la confirmación y el enlace de conexión.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué especialidades médicas están disponibles?',
+        description: 'Contamos con medicina general, pediatría, medicina interna, psicología y especialistas aliados. Todos registrados ante el Ministerio de Salud de Colombia.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Es segura la telemedicina?',
+        description: 'Sí, utilizamos plataformas seguras con encriptación de datos y cumplimos con todas las normativas de protección de información médica en Colombia.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Puedo hacer telemedicina para control de enfermedades crónicas?',
+        description: 'Sí, la telemedicina es ideal para control de hipertensión, diabetes, EPOC y salud mental. Evaluamos signos vitales que reportas y ajustamos tratamientos sin salir de casa.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo agendo telemedicina y teleconsulta?',
+        description: 'Puedes agendar fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Agenda tu Telemedicina Ahora - Respuesta en 5 Minutos"
+    subtitle="Servicio de telemedicina y consulta médica virtual. Personal certificado con más de 500 teleconsultas exitosas. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Agendar Telemedicina por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20necesito%20agendar%20telemedicina%20y%20teleconsulta',
+      icon: 'tabler:brand-whatsapp',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: 'Envíanos un mensaje en cualquier momento y te responderemos de inmediato para coordinar tu telemedicina y teleconsulta.',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamada Directa',
+        description: 'Si prefieres hablar con un asesor, llámanos a nuestro call center. Atención 24/7.',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Respuesta en 5 Minutos',
+        description: 'Nuestro equipo médico responde en menos de 5 minutos y coordina tu telemedicina y teleconsulta inmediatamente.',
+        icon: 'tabler:clock',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPosts Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Aprende más sobre telemedicina"
+    information={`Visita nuestro blog para conocer más sobre la telemedicina, beneficios de la consulta médica virtual y cuidado de la salud online. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>

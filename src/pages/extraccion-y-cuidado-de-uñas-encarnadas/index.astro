@@ -1,0 +1,934 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+import Testimonials from '~/components/widgets/Testimonials.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es una uña encarnada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es cuando la uña del pie crece hacia la piel del dedo, causando dolor, inflamación y posible infección. Requiere atención profesional para evitar complicaciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es doloroso el procedimiento?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No, utilizamos anestesia local para eliminar completamente el dolor durante el procedimiento. Nuestro personal se asegura de minimizar cualquier molestia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la extracción de uñas encarnadas a domicilio en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio de la extracción de uñas encarnadas a domicilio en Bogotá es de $95,000 COP. Este valor incluye evaluación inicial, procedimiento completo, materiales estériles y cuidados posteriores. Sin costos ocultos, precios transparentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre extracción e intervención quirúrgica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La extracción es un procedimiento ambulatorio con anestesia local que se realiza en casa. La cirugía requiere hospitalización y anestesia general. Nuestro método es menos invasivo y más cómodo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo extraer una uña encarnada yo mismo en casa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No se recomienda hacerlo sin supervisión profesional. El uso incorrecto de tijeras, pinzas u otros objetos puede empeorar la situación y causar infección grave. Nuestro servicio profesional garantiza seguridad y efectividad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Con qué frecuencia debo revisar mis uñas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende de cada persona. Si tienes tendencia a uñas encarnadas, nuestro equipo puede aconsejarte sobre la periodicidad adecuada, generalmente cada 2-3 semanas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué contraindicaciones tiene la extracción de uñas encarnadas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No se recomienda en casos de infección grave, diabetes descontrolada o problemas circulatorios severos. Nuestro personal realiza una evaluación previa para determinar si el procedimiento es seguro para ti.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden atender a niños y adultos mayores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, adaptamos el procedimiento según la edad y condición del paciente, brindando una experiencia segura para todos. Tenemos experiencia trabajando con pacientes pediátricos y geriátricos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cada cuánto tiempo debo hacerme revisión de uñas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La frecuencia varía según la tendencia individual a uñas encarnadas. Algunos pacientes necesitan revisión cada 2-3 semanas, mientras que otros pueden esperar 1-2 meses. Después de la primera evaluación, te daremos una recomendación personalizada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo la extracción de uñas encarnadas a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes hacerlo fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Extracción de Uñas Encarnadas a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Extracción Uñas Encarnadas Barato',
+  description: 'Extracción de uñas encarnadas a domicilio barato en Bogotá. Procedimiento podológico profesional, anestesia local a domicilio. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  url: SITE.site + '/extraccion-y-cuidado-de-uñas-encarnadas/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    },
+    {
+      '@type': 'City',
+      name: 'Funza'
+    },
+    {
+      '@type': 'City',
+      name: 'Mosquera'
+    },
+    {
+      '@type': 'City',
+      name: 'Cota'
+    }
+  ],
+  medicalSpecialty: [
+    'Podiatry',
+    'Dermatology',
+    'PrimaryCare',
+    'Nursing'
+  ],
+  keywords: 'uñas encarnadas bogotá, extracción uñas encarnadas barato, podología a domicilio, uñeros precio, extracción uñas encarnadas económico, podología profesional, uñas encarnadas domicilio, podología a domicilio, extracción uñas encarnadas 24 horas, podología urgente',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Extracción de Uñas Encarnadas',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Extracción de Uñas Encarnadas Profesional',
+          description: 'Extracción de uñas encarnadas con técnicas seguras y profesionales'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Evaluación Podológica Inicial',
+          description: 'Inspección para determinar el grado de encarnación y técnica más adecuada'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Post-Tratamiento y Consejos',
+          description: 'Indicaciones para cuidado posterior y prevención de futuras uñas encarnadas'
+        }
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '120',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+// Schema Reviews para testimonios
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  itemReviewed: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital - Extracción de Uñas Encarnadas a Domicilio Bogotá'
+  },
+  author: {
+    '@type': 'Person',
+    name: 'Carlos Mendoza'
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '5',
+    bestRating: '5'
+  },
+  reviewBody: 'Excelente servicio de extracción de uñas encarnadas a domicilio. El personal es muy profesional y el procedimiento fue completamente indoloro. Recomendado 100%.'
+};
+
+const metadata = {
+  title: 'Extracción de Uñas Encarnadas a Domicilio en Bogotá | Profesional y Económico | SMD Vital',
+  description:
+    'Extracción de uñas encarnadas en Bogotá a domicilio. Servicio podológico profesional con precios desde $95.000 COP. Podólogos a domicilio especializados en extracción de uñas. Atención 24/7 en toda la capital.',
+  keywords: 'uñas encarnadas, extracción uñas encarnadas, uñas encarnadas bogotá, podólogo a domicilio, podólogos a domicilio, podologia a domicilio bogota, servicio podológico a domicilio, atención podológica a domicilio, extracción uñas bogota, uñas encarnadas bogotá',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/5619447/pexels-photo-5619447.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
+};
+
+// Schema HowTo para el procedimiento de extracción de uñas encarnadas
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo realizar extracción de uñas encarnadas profesional a domicilio',
+  description: 'Procedimiento paso a paso para realizar extracción de uñas encarnadas profesional de forma segura en el hogar',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/4989138/pexels-photo-4989138.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Procedimiento profesional de extracción de uñas encarnadas a domicilio con herramientas podológicas especializadas'
+  },
+  totalTime: 'PT45M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '95000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Anestesia local',
+      description: 'Medicamento para eliminar el dolor durante el procedimiento'
+    },
+    {
+      '@type': 'HowToSupply', 
+      name: 'Herramientas podológicas estériles',
+      description: 'Instrumentos especializados para extracción segura'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Materiales de curación',
+      description: 'Apósitos y vendajes para cuidado posterior'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Materiales estériles',
+      description: 'Guantes, gasas y otros materiales de un solo uso'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Herramientas podológicas especializadas',
+      description: 'Instrumentos de precisión para extracción de uñas encarnadas'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Jeringa para anestesia',
+      description: 'Equipo para aplicación de anestesia local'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Tijeras podológicas',
+      description: 'Herramientas especializadas para corte de uñas'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Evaluación Podológica Inicial',
+      text: 'Realizar inspección profesional del dedo afectado para determinar el grado de encarnación. Identificar la técnica más segura según la condición del paciente.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/5619447/pexels-photo-5619447.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Evaluación podológica inicial con herramientas especializadas para diagnóstico preciso'
+      },
+      url: SITE.site + '/extraccion-y-cuidado-de-uñas-encarnadas/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Preparación del Paciente',
+      text: 'Explicar el procedimiento al paciente y posicionarlo cómodamente. Aplicar anestesia local para eliminar el dolor durante la extracción.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4989138/pexels-photo-4989138.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Preparación del paciente para procedimiento de extracción de uñas encarnadas profesional'
+      },
+      url: SITE.site + '/extraccion-y-cuidado-de-uñas-encarnadas/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Extracción Profesional',
+      text: 'Realizar extracción de la uña encarnada con herramientas podológicas especializadas. Procedimiento completamente indoloro de 15-20 minutos.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4989138/pexels-photo-4989138.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Extracción profesional con herramientas podológicas especializadas'
+      },
+      url: SITE.site + '/extraccion-y-cuidado-de-uñas-encarnadas/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Curación y Cuidados Posteriores',
+      text: 'Aplicar apósitos estériles y proporcionar recomendaciones para el cuidado posterior y prevención de futuras uñas encarnadas.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4989138/pexels-photo-4989138.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Curación final y cuidados posteriores para extracción de uñas encarnadas completa'
+      },
+      url: SITE.site + '/extraccion-y-cuidado-de-uñas-encarnadas/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
+
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Llamar Ahora',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Extracción de Uñas Encarnadas a Domicilio' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <Hero2
+    tagline="Cuidado Experto para tus Pies"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Extracción Uñas Encarnadas Barato WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda Extracción de Uñas', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/5619447/pexels-photo-5619447.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Profesional podólogo realizando extracción de uñas encarnadas a domicilio con equipos especializados - SMD Vital Bogotá',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="title">
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Extracción de Uñas Encarnadas en Bogotá a Domicilio
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Servicio Profesional y Económico
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Cuidado Podológico Seguro
+        </div>
+      </div>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Extracción de uñas encarnadas profesional a domicilio</span> con técnicas seguras y podólogos especializados para aliviar dolor y recuperar tu movilidad sin salir de casa.
+      <br /><br />
+      Nuestro equipo certificado te ofrece un servicio confiable y económico en las 20 localidades de la capital. Precios transparentes sin costos ocultos.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestro servicio de extracción de uñas encarnadas a domicilio?"
+    subtitle="Ofrecemos atención podológica profesional en tu hogar con técnicas seguras y especializadas para aliviar dolor y recuperar tu movilidad. Nuestro equipo certificado te brinda un servicio confiable y económico en las 20 localidades de la capital."
+    columns={3}
+    items={[
+      {
+        title: 'Sin Dolor ni Molestias',
+        description:
+          'Procedimiento completamente indoloro con anestesia local profesional. Alivio inmediato del dolor y recuperación de la movilidad.',
+        icon: 'tabler:heart-handshake',
+      },
+      {
+        title: 'Técnicas Especializadas',
+        description: `Utilizamos técnicas podológicas profesionales certificadas para la extracción segura de uñas encarnadas.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda la ciudad. Agenda tu cita y recibe atención profesional el mismo día sin largas esperas.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Personal Certificado',
+        description: `Podólogos especializados con certificación en procedimientos podológicos y amplia experiencia.`,
+        icon: 'tabler:certificate',
+      },
+      {
+        title: 'Resultados Inmediatos',
+        description: 'Eliminación completa del dolor y recuperación de la movilidad en una sola sesión.',
+        icon: 'tabler:check',
+      },
+      {
+        title: 'Cobertura Total',
+        description: `Servicio disponible en las 20 localidades de la capital y municipios cercanos. Atención 24/7 todos los días.`,
+        icon: 'tabler:map-pin',
+      },
+    ]}
+  />
+
+  <!-- Content Widget - Procedimiento **************** -->
+
+  <Content
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestro Procedimiento?"
+    subtitle="Proceso profesional paso a paso realizado por especialistas certificados"
+    isReversed
+    items={[
+      {
+        title: '1. Evaluación Podológica Inicial',
+        description:
+          'Inspección profesional del dedo afectado para determinar el grado de encarnación. Identificamos la técnica más segura según tu condición.',
+        icon: 'tabler:eye',
+      },
+      {
+        title: '2. Preparación del Procedimiento',
+        description: `Aplicamos anestesia local para eliminar el dolor. Preparamos el equipo estéril y verificamos que no existan contraindicaciones.`,
+        icon: 'tabler:droplet',
+      },
+      {
+        title: '3. Extracción Profesional',
+        description: `Extracción de la uña encarnada con técnicas podológicas especializadas. Procedimiento completamente indoloro de 15-20 minutos.`,
+        icon: 'tabler:scissors',
+      },
+      {
+        title: '4. Curación y Cuidados',
+        description: `Aplicación de apósitos estériles. Instrucciones de cuidado posterior y prevención de futuras uñas encarnadas.`,
+        icon: 'tabler:circle-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4989138/pexels-photo-4989138.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Procedimiento paso a paso de extracción de uñas encarnadas profesional con herramientas podológicas especializadas',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h2>
+      <p class="text-muted mt-4">
+        Utilizamos técnicas aprobadas por la Organización Mundial de la Salud (OMS) y el Ministerio de Salud de Colombia para garantizar tu seguridad y bienestar.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo necesitas **************** -->
+
+  <Content
+    id="cuando-necesitas"
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Síntomas de Uñas Encarnadas',
+        description: `✓ Dolor intenso en el dedo del pie<br>
+                      ✓ Enrojecimiento e inflamación<br>
+                      ✓ Sensibilidad al tacto<br>
+                      ✓ Dificultad para caminar<br>
+                      ✓ Pus o secreción`,
+        icon: 'tabler:alert-circle',
+      },
+      {
+        title: '¿Quiénes lo Necesitan?',
+        description: `✓ Personas con uñas gruesas o curvas<br>
+                      ✓ Usuarios de calzado ajustado<br>
+                      ✓ Deportistas y corredores<br>
+                      ✓ Diabéticos (mayor riesgo de infección)<br>
+                      ✓ Adultos mayores`,
+        icon: 'tabler:users',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/3985168/pexels-photo-3985168.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Paciente con síntomas de uñas encarnadas consultando sobre extracción profesional a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Atención Podológica?
+      </h2>
+      <p class="text-muted mt-4">
+        Si experimentas alguno de estos síntomas, es momento de agendar una evaluación profesional. Las uñas encarnadas pueden afectar tu movilidad y calidad de vida. 
+        <strong>No intentes cortar la uña tú mismo</strong>, ya que puede empeorar la situación y causar infección grave.
+      </p>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Precios **************** -->
+
+  <Content
+    id="precios"
+    title="Precios de Extracción de Uñas Encarnadas a Domicilio"
+    subtitle="Servicio podológico especializado a domicilio con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
+    isReversed
+    items={[
+      {
+        title: 'Precio Fijo Garantizado',
+        description: `$95.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: 'Todo Incluido',
+        description: `Evaluación inicial, procedimiento completo, materiales estériles, anestesia local y cuidados posteriores.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el resultado, realizamos una segunda evaluación sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $150.000+ | Otros domicilios: $120.000+ | SMD Vital: $95.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4021202/pexels-photo-4021202.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios transparentes y competitivos para extracción de uñas encarnadas profesional a domicilio en Bogotá - $95.000 COP',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+  </Content>
+
+  <!-- Content Widget - Por qué NO cortar uñas tú mismo **************** -->
+
+  <Content
+    id="no-cortar-unas"
+    title="¿Por qué NO cortar uñas encarnadas tú mismo?"
+    subtitle="Información importante sobre los riesgos de la auto-extracción y la importancia del tratamiento profesional"
+    isReversed={false}
+    items={[
+      {
+        title: 'Empeora la situación',
+        description: `Cortar uñas encarnadas sin conocimiento puede empujar la uña más profundo en la piel, creando una herida más grave y dolorosa.`,
+        icon: 'tabler:arrow-down',
+      },
+      {
+        title: 'Riesgo de infección grave',
+        description: `Puede causar infecciones severas, abscesos y en casos extremos, gangrena que requiere amputación del dedo.`,
+        icon: 'tabler:alert-triangle',
+      },
+      {
+        title: 'Herramientas inadecuadas',
+        description: `El uso de tijeras comunes, pinzas o cortaúñas no esterilizados puede introducir bacterias y causar infecciones dolorosas.`,
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: 'Pérdida de la técnica correcta',
+        description: `Solo un podólogo profesional conoce las técnicas adecuadas para extraer uñas encarnadas sin causar daño adicional.`,
+        icon: 'tabler:shield-x',
+      },
+      {
+        title: 'Dolor innecesario',
+        description: `La auto-extracción sin anestesia causa dolor extremo y puede empeorar la inflamación existente.`,
+        icon: 'tabler:heart-off',
+      },
+      {
+        title: 'Solución profesional segura',
+        description: `Nuestro servicio utiliza técnicas podológicas especializadas que extraen la uña de forma segura con anestesia local.`,
+        icon: 'tabler:circle-check',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Riesgos médicos de cortar uñas encarnadas uno mismo - Por qué es importante la extracción profesional a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-red-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Sección de Servicios Relacionados con Enlaces Internos -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Servicios Complementarios</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        Además de la extracción de uñas encarnadas, ofrecemos <a href="/servicios" class="text-primary hover:underline font-semibold">atención médica integral a domicilio</a> en la capital
+      </p>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        La <strong>extracción de uñas encarnadas</strong> es parte de nuestro amplio catálogo de <a href="/servicios" class="text-primary hover:underline">servicios médicos domiciliarios</a>.
+        Si necesitas una <a href="/valoracion-medica-domiciliaria" class="text-primary hover:underline">valoración médica completa</a>,
+        nuestro equipo puede evaluar múltiples aspectos de tu salud durante la visita.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Para quienes requieren monitoreo constante, ofrecemos
+        <a href="/toma-de-signos-vitales" class="text-primary hover:underline">toma de signos vitales</a> y
+        <a href="/enfemeria-a-nivel-domiciliario-y-hospitalario" class="text-primary hover:underline">servicios de enfermería especializada</a>.
+        También realizamos <a href="/cura-de-heridas-simples-y-complejas" class="text-primary hover:underline">curaciones y cuidado de heridas</a>
+        con técnicas asépticas certificadas. <a href="/contacto" class="text-primary hover:underline font-semibold">Contáctanos</a> para más información.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Si prefieres una consulta inicial sin desplazamiento, conoce nuestra
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">teleconsulta médica</a> disponible las 24 horas.
+        Para diagnósticos más complejos, contamos con <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">laboratorio clínico a domicilio</a>
+        con toma de muestras profesional y resultados digitales.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Explora todos nuestros <a href="/servicios" class="text-primary hover:underline font-semibold">servicios médicos a domicilio</a>
+        o visita nuestro <a href="/blog" class="text-primary hover:underline">blog de salud</a> para consejos de cuidado en casa.
+      </p>
+    </div>
+  </section>
+
+  <!-- Testimonios - Lo que dicen nuestros pacientes -->
+  <Testimonials
+    title="Lo que Dicen Nuestros Pacientes"
+    subtitle="Más de 1,200 extracciones de uñas encarnadas realizadas con éxito en Bogotá"
+    testimonials={[
+      {
+        testimonial: `Tenía una uña encarnada horrible que me impedía caminar. Llamé a las 8pm y llegaron a Kennedy en 30 minutos. El alivio fue INMEDIATO. Ahora puedo caminar normal.`,
+        name: 'Carlos Mendoza',
+        job: 'Kennedy Central',
+        image: {
+          alt: 'Carlos Mendoza - Paciente satisfecho extracción uñas encarnadas',
+        },
+      },
+      {
+        testimonial: `Excelente servicio. Pensé que sería más caro, pero $95.000 por todo incluido es súper económico comparado con ir a una clínica. Lo recomiendo 100%.`,
+        name: 'Ana Patricia López',
+        job: 'Suba Compartir',
+        image: {
+          alt: 'Ana Patricia López - Cliente satisfecha SMD Vital',
+        },
+      },
+      {
+        testimonial: `Mi hijo de 8 años tenía uña encarnada y estaba muy asustado. La podóloga fue muy paciente y el niño no lloró. Servicio pediátrico excelente.`,
+        name: 'María González',
+        job: 'Chapinero Alto',
+        image: {
+          alt: 'María González - Madre satisfecha servicio pediátrico',
+        },
+      },
+    ]}
+    callToAction={{
+      text: 'Ver más reseñas verificadas',
+      href: '#',
+      icon: 'tabler:arrow-right',
+    }}
+  />
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes sobre extracción de uñas encarnadas"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio podológico especializado"
+    items={[
+      {
+        title: '¿Qué es una uña encarnada?',
+        description:
+          'Es cuando la uña del pie crece hacia la piel del dedo, causando dolor, inflamación y posible infección. Requiere atención profesional para evitar complicaciones.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Es doloroso el procedimiento?',
+        description: `No, utilizamos anestesia local para eliminar completamente el dolor durante el procedimiento. Nuestro personal se asegura de minimizar cualquier molestia.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuánto cuesta la extracción de uñas encarnadas a domicilio?',
+        description:
+          'El precio de la extracción de uñas encarnadas a domicilio es de $95.000 COP para todas las localidades. Este valor incluye evaluación inicial, procedimiento completo, materiales estériles y cuidados posteriores. Sin costos ocultos, precios transparentes.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué diferencia hay entre extracción e intervención quirúrgica?',
+        description:
+          'La extracción es un procedimiento ambulatorio con anestesia local que se realiza en casa. La cirugía requiere hospitalización y anestesia general. Nuestro método es menos invasivo y más cómodo.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Puedo extraer una uña encarnada yo mismo en casa?',
+        description:
+          'No se recomienda hacerlo sin supervisión profesional. El uso incorrecto de tijeras u otros objetos puede empeorar la situación y causar infección grave. Nuestro servicio profesional garantiza seguridad.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Con qué frecuencia debo revisar mis uñas?',
+        description:
+          'Depende de cada persona. Si tienes tendencia a uñas encarnadas, nuestro equipo puede aconsejarte sobre la periodicidad adecuada, generalmente cada 2-3 semanas.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué contraindicaciones tiene la extracción de uñas encarnadas?',
+        description:
+          'No se recomienda en casos de infección grave, diabetes descontrolada o problemas circulatorios severos. Nuestro personal realiza una evaluación previa para determinar si el procedimiento es seguro.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Pueden atender a niños y adultos mayores?',
+        description:
+          'Sí, adaptamos el procedimiento según la edad y condición del paciente, brindando una experiencia segura para todos. Tenemos experiencia con pacientes pediátricos y geriátricos.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cada cuánto tiempo debo hacerme revisión de uñas?',
+        description:
+          'La frecuencia varía según la tendencia individual a uñas encarnadas. Algunos pacientes necesitan revisión cada 2-3 semanas, mientras que otros pueden esperar 1-2 meses. Después de la primera evaluación, te daremos una recomendación personalizada.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo agendo la extracción de uñas encarnadas a domicilio?',
+        description:
+          'Puedes hacerlo fácilmente a través de WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Sección de Trust Signals y Estadísticas -->
+  <section class="py-8 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-4 text-center">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">1,200+</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Uñas Extraídas</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">4.9/5</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Calificación Promedio</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">45 min</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Tiempo de Llegada</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">24/7</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Disponibilidad</span>
+        </div>
+      </div>
+      <p class="mt-6 text-lg font-semibold text-accent">
+        ✓ Disponible hoy en tu localidad
+      </p>
+    </div>
+  </section>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Agenda tu Cita Ahora - Atención en 45 Minutos"
+    subtitle="Servicio podológico especializado a domicilio. Personal certificado con más de 1,200 extracciones exitosas. Respuesta inmediata por WhatsApp."
+    callToAction={{
+      text: 'Agendar Extracción de Uñas Encarnadas por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20necesito%20agendar%20una%20extracción%20de%20uñas%20encarnadas%20a%20domicilio',
+      icon: 'tabler:brand-whatsapp',
+    }}
+    items={[
+      {
+        title: 'WhatsApp 24/7',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamar Ahora',
+        description: 'Atención Inmediata',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo Electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent dark:from-slate-800"></div>
+    </Fragment>
+  </Steps2>
+
+  <!-- BlogLatestPosts Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Conoce más sobre el cuidado de tus pies"
+    information={`Visita nuestro blog para aprender más sobre el manejo y cuidado de uñas encarnadas y otros problemas podales. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>
+

@@ -1,0 +1,63 @@
+---
+import { ANALYTICS } from 'astrowind:config';
+
+const gaId = ANALYTICS?.vendors?.googleAnalytics?.id;
+---
+
+{gaId ? (
+  <script
+    is:inline
+    define:vars={{
+      gaId,
+    }}
+  >
+    (() => {
+      if (window.__smd_ga_loader) {
+        return;
+      }
+
+      window.__smd_ga_loader = true;
+
+      const loadGa = () => {
+        if (window.__smd_ga_initialized) {
+          return;
+        }
+
+        window.__smd_ga_initialized = true;
+
+        const script = document.createElement('script');
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+        script.async = true;
+        script.onload = () => {
+          window.__smd_ga_script_ready = true;
+          window.dataLayer = window.dataLayer || [];
+          function gtag(...args) {
+            window.dataLayer.push(args);
+          }
+          gtag('js', new Date());
+          gtag('config', gaId, { send_page_view: true });
+        };
+        document.head.appendChild(script);
+      };
+
+      const engagementEvents = ['scroll', 'mousemove', 'touchstart', 'click'];
+      const handleEngagement = () => {
+        loadGa();
+        engagementEvents.forEach((evt) => window.removeEventListener(evt, handleEngagement, { passive: true }));
+      };
+
+      engagementEvents.forEach((eventName) => {
+        window.addEventListener(eventName, handleEngagement, { once: true, passive: true });
+      });
+
+      window.addEventListener('load', loadGa, { once: true });
+      document.addEventListener('astro:after-swap', () => {
+        if (window.__smd_ga_script_ready && typeof window.gtag === 'function') {
+          window.gtag('config', gaId, { page_path: window.location.pathname, send_page_view: true });
+        } else {
+          loadGa();
+        }
+      });
+    })();
+  </script>
+) : null}

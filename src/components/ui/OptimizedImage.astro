@@ -1,0 +1,193 @@
+---
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+
+export interface OptimizedImageProps {
+  src: string | object;
+  alt: string;
+  width?: number;
+  height?: number;
+  className?: string;
+  priority?: boolean;
+  placeholder?: 'blur' | 'empty';
+  blurDataURL?: string;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  quality?: number;
+  format?: 'webp' | 'avif' | 'png' | 'jpg';
+  fallback?: string;
+}
+
+const {
+  src,
+  alt,
+  width = 800,
+  height = 600,
+  className = '',
+  priority = false,
+  placeholder = 'blur',
+  blurDataURL,
+  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+  loading = 'lazy',
+  quality = 80,
+  format = 'webp',
+  fallback
+} = Astro.props;
+
+// Generate blur placeholder if not provided
+const defaultBlurDataURL = blurDataURL || 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=';
+
+// Determine loading strategy
+const loadingStrategy = priority ? 'eager' : loading;
+
+// Generate responsive sizes
+const responsiveSizes = sizes;
+
+// Create optimized image with fallback
+const imageConfig = {
+  src,
+  alt,
+  width,
+  height,
+  quality,
+  format,
+  loading: loadingStrategy,
+  decoding: 'async' as const,
+  class: className,
+  sizes: responsiveSizes,
+  ...(placeholder === 'blur' && { placeholder: 'blur' as const, blurDataURL: defaultBlurDataURL })
+};
+---
+
+<div class="optimized-image-container relative overflow-hidden">
+  <!-- Main optimized image -->
+  <Image {...imageConfig} />
+  
+  <!-- Loading placeholder -->
+  {!priority && (
+    <div class="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center">
+      <Icon name="tabler:photo" class="w-8 h-8 text-gray-400 dark:text-gray-500" />
+    </div>
+  )}
+  
+  <!-- Fallback image for older browsers -->
+  {fallback && (
+    <noscript>
+      <img 
+        src={fallback} 
+        alt={alt} 
+        width={width} 
+        height={height}
+        class={className}
+        loading={loadingStrategy}
+      />
+    </noscript>
+  )}
+  
+  <!-- Error fallback -->
+  <div class="image-error-fallback hidden absolute inset-0 bg-gray-100 dark:bg-gray-800 items-center justify-center">
+    <div class="text-center">
+      <Icon name="tabler:photo-off" class="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+      <p class="text-sm text-gray-500 dark:text-gray-400">Error al cargar la imagen</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Image loading optimization
+  document.addEventListener('DOMContentLoaded', () => {
+    const images = document.querySelectorAll('.optimized-image-container img');
+    
+    images.forEach((img: HTMLImageElement) => {
+      // Handle loading states
+      img.addEventListener('load', () => {
+        const container = img.closest('.optimized-image-container');
+        const placeholder = container?.querySelector('.animate-pulse');
+        if (placeholder && placeholder instanceof HTMLElement) {
+          placeholder.style.display = 'none';
+        }
+      });
+      
+      // Handle error states
+      img.addEventListener('error', () => {
+        const container = img.closest('.optimized-image-container');
+        const errorFallback = container?.querySelector('.image-error-fallback');
+        if (errorFallback) {
+          errorFallback.classList.remove('hidden');
+          errorFallback.classList.add('flex');
+        }
+        img.style.display = 'none';
+      });
+      
+      // Intersection Observer for lazy loading
+      if (img.loading === 'lazy') {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const imgElement = entry.target as HTMLImageElement;
+              if (imgElement.dataset.src) {
+                imgElement.src = imgElement.dataset.src;
+                imgElement.removeAttribute('data-src');
+              }
+              observer.unobserve(imgElement);
+            }
+          });
+        });
+        
+        observer.observe(img);
+      }
+    });
+  });
+</script>
+
+<style>
+  .optimized-image-container {
+    position: relative;
+    display: block;
+  }
+  
+  .optimized-image-container img {
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .optimized-image-container img[loading="lazy"] {
+    opacity: 0;
+  }
+  
+  .optimized-image-container img[loading="lazy"].loaded {
+    opacity: 1;
+  }
+  
+  /* Blur placeholder animation */
+  .optimized-image-container img[data-placeholder="blur"] {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+  }
+  
+  .optimized-image-container img[data-placeholder="blur"].loaded {
+    filter: blur(0);
+  }
+  
+  /* Responsive image sizing */
+  .optimized-image-container img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  
+  /* Aspect ratio preservation */
+  .optimized-image-container::before {
+    content: '';
+    display: block;
+    padding-top: calc((var(--aspect-ratio, 3/4)) * 100%);
+  }
+  
+  .optimized-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>

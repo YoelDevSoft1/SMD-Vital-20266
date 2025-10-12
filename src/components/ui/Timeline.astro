@@ -1,0 +1,110 @@
+---
+import { twMerge } from 'tailwind-merge';
+import Icon from './Icon.astro';
+import type { Item } from '~/types';
+
+export interface Props {
+  items?: Array<Item>;
+  defaultIcon?: string;
+  classes?: Record<string, string>;
+}
+
+const { items = [], classes = {}, defaultIcon } = Astro.props as Props;
+
+const {
+  container: containerClass = '',
+  panel: panelClass = '',
+  title: titleClass = '',
+  description: descriptionClass = '',
+  icon: defaultIconClass = 'text-primary dark:text-slate-200 border-primary dark:border-blue-700',
+} = classes;
+
+// Mapeo de iconos de Tabler a nombres con prefijo correcto
+const getIconName = (iconName: string) => {
+  const iconMap: Record<string, string> = {
+    // Iconos de Tabler que se mantienen en Tabler
+    'tabler:brand-whatsapp': 'tabler:brand-whatsapp',
+    'tabler:brand-tailwind': 'tabler:brand-tailwind',
+    'tabler:components': 'tabler:components',
+    'tabler:list-check': 'tabler:list-check',
+    'tabler:rocket': 'tabler:rocket',
+    'tabler:arrows-right-left': 'tabler:arrows-right-left',
+    'tabler:bulb': 'tabler:bulb',
+    'tabler:package': 'tabler:package',
+    'tabler:letter-case': 'tabler:letter-case',
+    'tabler:paint': 'tabler:paint',
+    'tabler:check': 'tabler:check',
+    'tabler:message-circle-2': 'tabler:message-circle-2',
+    'tabler:clipboard-check': 'tabler:clipboard-check',
+    'tabler:ambulance': 'tabler:ambulance',
+    
+    // Iconos de Tabler mapeados a Heroicons
+    'tabler:phone-call': 'heroicons:phone',
+    'tabler:square-rounded-arrow-right': 'heroicons:arrow-right',
+    'tabler:download': 'heroicons:arrow-down-tray',
+    'tabler:chevron-right': 'heroicons:chevron-right',
+    'tabler:stethoscope': 'heroicons:heart-pulse',
+    'tabler:bandage': 'heroicons:heart-pulse',
+    'tabler:medical-cross': 'heroicons:plus-circle',
+    'tabler:microscope': 'heroicons:magnifying-glass',
+    'tabler:device-desktop': 'heroicons:computer-desktop',
+    'tabler:heart': 'heroicons:heart',
+    'tabler:wheelchair': 'heroicons:wheelchair',
+    'tabler:heartbeat': 'heroicons:heart-pulse',
+    'tabler:baby-carriage': 'heroicons:baby',
+    'tabler:users-group': 'heroicons:users',
+    'tabler:test-pipe': 'heroicons:beaker',
+    'tabler:building': 'heroicons:building-office',
+    'tabler:heart-handshake': 'heroicons:handshake',
+    'tabler:plane': 'heroicons:airplane',
+    'tabler:clock-bolt': 'heroicons:clock',
+    'tabler:stars': 'heroicons:star',
+    'tabler:users': 'heroicons:users',
+    'tabler:sun': 'heroicons:sun',
+    'tabler:moon': 'heroicons:moon',
+  };
+  
+  return iconMap[iconName] || iconName;
+};
+---
+
+{
+  items && items.length && (
+    <div class={containerClass}>
+      {items.map(({ title, description, icon, classes: itemClasses = {} }, index = 0) => (
+        <div
+          class={twMerge(
+            'flex intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade',
+            panelClass,
+            itemClasses?.panel
+          )}
+        >
+          <div class="flex flex-col items-center mr-4 rtl:mr-0 rtl:ml-4">
+            <div>
+              <div class="flex items-center justify-center">
+                {(icon || defaultIcon) && (
+                  <div class={twMerge('w-10 h-10 p-2 rounded-full border-2', defaultIconClass, itemClasses?.icon)}>
+                    <Icon 
+                      name={getIconName(icon || defaultIcon || '')} 
+                      class="w-6 h-6" 
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+            {index !== items.length - 1 && <div class="w-px h-full bg-black/10 dark:bg-slate-400/50" />}
+          </div>
+          <div class={`pt-1 ${index !== items.length - 1 ? 'pb-8' : ''}`}>
+            {title && <p class={twMerge('text-xl font-bold', titleClass, itemClasses?.title)} set:html={title} />}
+            {description && (
+              <p
+                class={twMerge('text-muted mt-2', descriptionClass, itemClasses?.description)}
+                set:html={description}
+              />
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}

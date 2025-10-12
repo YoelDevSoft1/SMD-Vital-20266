@@ -1,0 +1,422 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Header from '~/components/widgets/Header.astro';
+import Hero2 from '~/components/widgets/Hero2.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Content from '~/components/widgets/Content.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué tipo de muestras pueden tomarse a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Podemos realizar una amplia variedad de exámenes, como análisis de sangre, orina, heces, pruebas hormonales, entre otros.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es seguro recibir este servicio en casa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, nuestro personal sigue estrictos protocolos de bioseguridad para garantizar tu protección y la del profesional.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo tendré mis resultados?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El tiempo varía según el tipo de prueba, generalmente entre 24 y 72 horas, dependiendo del laboratorio y la complejidad del examen.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo solicitar pruebas especializadas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, ofrecemos una amplia gama de pruebas. En caso de necesitar exámenes muy específicos, evaluaremos su disponibilidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo la toma de muestra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes agendar fácilmente a través de nuestro WhatsApp, llamando a nuestro call center o completando el formulario en nuestro sitio web.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalTest',
+  name: 'Toma de Muestras a Domicilio',
+  description: 'Servicio profesional de toma de muestras y exámenes clínicos a domicilio en Bogotá. Análisis de sangre, orina y pruebas especializadas con resultados confiables.',
+  usedToDiagnose: 'Diversos',
+  signDetected: 'Múltiples parámetros de salud según el tipo de examen',
+  medicineOffered: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+  },
+};
+
+const metadata = {
+  title: 'Toma de Muestras a Domicilio Bogotá 24/7 | Laboratorio Clínico en Casa | SMD Vital',
+  description:
+    'Servicio profesional de toma de muestras a domicilio en Bogotá. Análisis de sangre, orina, heces y pruebas especializadas. Resultados confiables sin salir de casa. ¡Agenda ya!',
+  keywords: 'toma de muestras a domicilio bogotá, laboratorio clínico a domicilio, análisis de sangre casa, exámenes médicos domicilio, pruebas clínicas bogotá, laboratorio domiciliario',
+  ignoreTitleTemplate: true,
+  openGraph: {
+    title: 'Toma de Muestras a Domicilio en Bogotá | SMD Vital',
+    description: 'Exámenes clínicos profesionales en tu hogar. Análisis de sangre, orina y pruebas especializadas. Resultados confiables. Atención 24/7 en toda Bogotá.',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/3735696/pexels-photo-3735696.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+        alt: 'Servicio profesional de toma de muestras a domicilio en Bogotá - SMD Vital',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Toma de Muestras a Domicilio Bogotá | SMD Vital',
+    description: 'Exámenes clínicos profesionales en tu hogar. Resultados confiables sin desplazamientos. Atención 24/7.',
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+  </Fragment>
+
+  <Fragment slot="header">
+    <Header
+      {...headerData}
+      actions={[
+        {
+          variant: 'secondary',
+          text: 'Emergencia',
+          href: 'tel:3042912564',
+        },
+        {
+          variant: 'primary',
+          text: 'WhatsApp',
+          href: 'https://wa.me/573042912564',
+        },
+      ]}
+      isSticky
+    />
+  </Fragment>
+
+  <!-- Hero2 Widget ******************* -->
+
+  <Hero2
+    tagline="Resultados Confiables sin Salir de Casa"
+    actions={[
+      { variant: 'primary', target: '_blank', text: 'Agendar Ahora por WhatsApp', href: 'https://wa.me/573042912564', icon: 'tabler:brand-whatsapp' },
+      { variant: 'secondary', text: 'Llamar 24/7', href: 'tel:3042912564' },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/3735696/pexels-photo-3735696.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Servicio profesional de toma de muestras a domicilio en Bogotá - SMD Vital',
+      loading: 'eager',
+    }}
+  >
+    <Fragment slot="title">
+      Toma de Muestras Profesional<br />
+      <span class="text-accent dark:text-white highlight">a Domicilio</span> en Bogotá
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="font-semibold text-lg">Exámenes clínicos con resultados confiables y precisos</span> realizados por profesionales certificados en tu hogar.
+      <br /><br />
+      Evita desplazamientos y laboratorios · Análisis de sangre, orina y heces · Pruebas especializadas · Resultados en 24-72 horas · Atención 24/7 en toda Bogotá · Estrictos protocolos de bioseguridad
+      <br /><br />
+      Agenda hoy mismo y recibe tus exámenes sin salir de casa.
+    </Fragment>
+  </Hero2>
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="Toma de Muestras a Domicilio en Bogotá"
+    subtitle="Exámenes clínicos con resultados confiables y precisos realizados por profesionales certificados en la comodidad de tu hogar"
+    columns={3}
+    items={[
+      {
+        title: 'Profesionales Calificados',
+        description:
+          'Nuestro equipo está conformado por técnicos de laboratorio altamente capacitados para realizar la toma de muestras con precisión.',
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Higiene y Seguridad',
+        description: `Cumplimos con estrictos protocolos de bioseguridad para garantizar que la toma de muestras se realice de forma segura.`,
+        icon: 'tabler:home',
+      },
+      {
+        title: 'Variedad de Exámenes',
+        description:
+          'Ofrecemos una amplia gama de pruebas clínicas, desde análisis de sangre hasta exámenes especializados.',
+        icon: 'tabler:clipboard-list',
+      },
+      {
+        title: 'Comodidad Garantizada',
+        description: `No necesitas salir de casa, nosotros vamos a tu domicilio, evitando largos desplazamientos y esperas innecesarias.`,
+        icon: 'tabler:clock',
+      },
+    ]}
+  />
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    title="Nuestros Servicios"
+    subtitle="Descubre cómo SMD Vital Bogotá puede ayudarte con la toma de muestras a domicilio."
+    isReversed
+    items={[
+      {
+        title: 'Evaluación Inicial',
+        description:
+          'Realizamos una breve consulta para entender las pruebas que necesitas y programar la toma de muestras.',
+      },
+      {
+        title: 'Toma de Muestras en Casa',
+        description: `Un profesional acude a tu hogar con el equipo necesario, garantizando una extracción rápida y sin molestias innecesarias.`,
+      },
+      {
+        title: 'Procesamiento en Laboratorio',
+        description: `Trabajamos con laboratorios certificados que aseguran resultados precisos y confiables para tus exámenes.`,
+      },
+      {
+        title: 'Entrega de Resultados',
+        description: `Recibe tus resultados en línea, por correo electrónico u otra plataforma, sin necesidad de salir de tu casa.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/8540029/pexels-photo-8540029.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Servicios de Toma de Muestras a Domicilio',
+      loading: 'lazy',
+    }}
+  />
+
+  <Content
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Beneficios para tu Salud',
+        description: `Al ahorrarte el desplazamiento a un laboratorio, reduces el estrés y la exposición a posibles contagios, cuidando mejor de tu bienestar.`,
+      },
+      {
+        title: 'Ventajas:',
+        description: `Menor riesgo de infecciones. <br /> Ahorro de tiempo. <br /> Experiencia más cómoda y relajada.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/207601/pexels-photo-207601.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Beneficios de la Toma de Muestras a Domicilio',
+      loading: 'lazy',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Facilidad y Precisión <br /><span class="text-2xl">en Cada Examen</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isReversed
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Tecnología Actualizada',
+        description: `Utilizamos equipos y técnicas modernas para asegurar la calidad de las muestras y la exactitud en los resultados.`,
+      },
+      {
+        title: 'Ventajas:',
+        description: `Resultados precisos. <br /> Menos margen de error. <br /> Procesos rápidos y confiables.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4047146/pexels-photo-4047146.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Tecnología Avanzada en la Toma de Muestras',
+      loading: 'lazy',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Avances Tecnológicos <br /><span class="text-2xl">para tu Salud</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isReversed
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Soporte y Asesoramiento',
+        description: `Nuestro equipo está disponible para responder tus preguntas y guiarte en la interpretación de los resultados.`,
+      },
+      {
+        title: 'Ventajas:',
+        description: `Atención personalizada. <br /> Resolución de dudas. <br /> Confianza y respaldo médico.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4040561/pexels-photo-4040561.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Soporte Continuo en Toma de Muestras a Domicilio',
+      loading: 'lazy',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Acompañamiento <br /><span class="text-2xl">Cercano y Confiable</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    items={[
+      {
+        title: 'Atención en Casos Urgentes',
+        description: `Ofrecemos servicios prioritarios para situaciones que requieren resultados rápidos, brindándote tranquilidad en momentos críticos.`,
+      },
+      {
+        title: 'Beneficios:',
+        description: `Respuesta inmediata. <br /> Reducción de la incertidumbre. <br /> Soporte en situaciones críticas.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/9574325/pexels-photo-9574325.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Atención Urgente en Toma de Muestras',
+      loading: 'lazy',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Respuesta Rápida <br /><span class="text-2xl">y Eficiente</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Preguntas frecuentes"
+    items={[
+      {
+        title: '¿Qué tipo de muestras pueden tomarse a domicilio?',
+        description:
+          'Podemos realizar una amplia variedad de exámenes, como análisis de sangre, orina, heces, pruebas hormonales, entre otros.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Es seguro recibir este servicio en casa?',
+        description: `Sí, nuestro personal sigue estrictos protocolos de bioseguridad para garantizar tu protección y la del profesional.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuándo tendré mis resultados?',
+        description:
+          'El tiempo varía según el tipo de prueba, generalmente entre 24 y 72 horas, dependiendo del laboratorio y la complejidad del examen.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Puedo solicitar pruebas especializadas?',
+        description:
+          'Sí, ofrecemos una amplia gama de pruebas. En caso de necesitar exámenes muy específicos, evaluaremos su disponibilidad.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo agendo la toma de muestra?',
+        description:
+          'Puedes agendar fácilmente a través de nuestro WhatsApp, llamando a nuestro call center o completando el formulario en nuestro sitio web.',
+        icon: 'tabler:chevrons-right',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </FAQs>
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="Contáctanos"
+    subtitle="¿Tienes preguntas sobre nuestro servicio de toma de muestras a domicilio? ¡Estamos aquí para ayudarte!"
+    callToAction={{
+      text: 'WhatsApp',
+      href: 'https://wa.me/573042912564',
+    }}
+    items={[
+      {
+        title: 'Correo electrónico',
+        description: 'salud@smdvitalbogota.com',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Call Center',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:headset',
+      },
+      {
+        title: 'Síguenos',
+        description: '@smdvitalbogota',
+        icon: 'tabler:brand-twitter',
+      },
+    ]}
+  />
+
+  <!-- BlogLatestPosts Widget **************** -->
+
+  <BlogLatestPosts
+    id="blog"
+    title="Conoce más sobre la toma de muestras y su importancia"
+    information={`Visita nuestro blog para aprender más sobre la variedad de exámenes clínicos disponibles, su relevancia y cómo pueden ayudarte a mantener una buena salud. ¡Gracias por leernos!`}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </BlogLatestPosts>
+</Layout>
