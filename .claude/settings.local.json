@@ -8,7 +8,9 @@
       "Bash(cat:*)",
       "Bash(npx astro info:*)",
       "Bash(dir:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(curl:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

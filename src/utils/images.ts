@@ -75,18 +75,35 @@ export const adaptOpenGraphImages = async (
 
         if (
           typeof resolvedImage === 'string' &&
-          (resolvedImage.startsWith('http://') || resolvedImage.startsWith('https://')) &&
-          isUnpicCompatible(resolvedImage)
+          (resolvedImage.startsWith('http://') || resolvedImage.startsWith('https://'))
         ) {
-          _image = (await unpicOptimizer(resolvedImage, [defaultWidth], defaultWidth, defaultHeight, 'jpg'))[0];
-        } else if (resolvedImage) {
+          // For remote URLs, use unpicOptimizer if compatible, otherwise return as-is
+          if (isUnpicCompatible(resolvedImage)) {
+            _image = (await unpicOptimizer(resolvedImage, [defaultWidth], defaultWidth, defaultHeight, 'jpg'))[0];
+          } else {
+            // Return remote URL as-is without optimization
+            _image = {
+              src: resolvedImage,
+              width: defaultWidth,
+              height: defaultHeight,
+            };
+          }
+        } else if (resolvedImage && typeof resolvedImage !== 'string') {
+          // Only use astroAsseetsOptimizer for ImageMetadata objects
           const dimensions =
-            typeof resolvedImage !== 'string' && resolvedImage?.width <= defaultWidth
+            resolvedImage?.width <= defaultWidth
               ? [resolvedImage?.width, resolvedImage?.height]
               : [defaultWidth, defaultHeight];
           _image = (
             await astroAsseetsOptimizer(resolvedImage, [dimensions[0]], dimensions[0], dimensions[1], 'jpg')
           )[0];
+        } else if (resolvedImage) {
+          // For local paths that are strings, return as-is
+          _image = {
+            src: resolvedImage,
+            width: defaultWidth,
+            height: defaultHeight,
+          };
         }
 
         if (typeof _image === 'object') {

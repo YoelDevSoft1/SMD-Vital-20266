@@ -225,7 +225,22 @@ export const astroAsseetsOptimizer: ImagesOptimizer = async (
 
   return Promise.all(
     breakpoints.map(async (w: number) => {
-      const result = await getImage({ src: image, width: w, inferSize: true, ...(format ? { format: format } : {}) });
+      // Calculate height based on aspect ratio if width and height are provided
+      const h = _width && _height ? computeHeight(w, _width / _height) : undefined;
+
+      // For remote images (strings), both width and height are required
+      const imageOptions: any = {
+        src: image,
+        width: w,
+        ...(format ? { format: format } : {}),
+      };
+
+      // Only add height if we calculated it, to avoid undefined height for ImageMetadata
+      if (h) {
+        imageOptions.height = h;
+      }
+
+      const result = await getImage(imageOptions);
 
       return {
         src: result?.src,

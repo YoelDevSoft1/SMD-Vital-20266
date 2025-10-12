@@ -19,7 +19,7 @@ metadata:
   openGraph:
     site_name: SMD Vital Bogotá
     images:
-      - url: '~/assets/images/hero-image.png'
+      - url: 'https://smdvitalbogota.com/images/hero-image.png'
         width: 1200
         height: 630
         alt: 'Médicos profesionales a domicilio en Bogotá - SMD Vital'

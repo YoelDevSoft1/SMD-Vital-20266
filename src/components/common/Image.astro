@@ -43,11 +43,28 @@ let image: ImageType | undefined = undefined;
 
 if (
   typeof _image === 'string' &&
-  (_image.startsWith('http://') || _image.startsWith('https://')) &&
-  isUnpicCompatible(_image)
+  (_image.startsWith('http://') || _image.startsWith('https://'))
 ) {
-  image = await getImagesOptimized(_image, props, unpicOptimizer);
+  // Remote images: use unpic if compatible, otherwise use as-is
+  if (isUnpicCompatible(_image)) {
+    image = await getImagesOptimized(_image, props, unpicOptimizer);
+  } else {
+    // For remote images not supported by unpic, use them directly without optimization
+    image = {
+      src: _image,
+      attributes: {
+        width: props.width,
+        height: props.height,
+        loading: props.loading,
+        decoding: props.decoding,
+        alt: props.alt,
+        class: props.class,
+        style: props.style,
+      },
+    };
+  }
 } else if (_image) {
+  // Local images: use Astro's image optimization
   image = await getImagesOptimized(_image, props, astroAsseetsOptimizer);
 }
 ---
