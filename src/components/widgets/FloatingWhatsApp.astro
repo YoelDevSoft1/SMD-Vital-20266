@@ -56,7 +56,7 @@
     </div>
     <div class="message-footer">
       <a
-        href="https://wa.link/7cprhk"
+        href="https://wa.me/573042912564"
         target="_blank"
         rel="noopener noreferrer"
         class="whatsapp-cta-button"
@@ -396,6 +396,15 @@ box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
     const closeBtn = document.getElementById('close-message');
     let isMessageVisible = false;
 
+    // Asegurar que el contenedor esté posicionado correctamente
+    const container = document.getElementById('whatsapp-float');
+    if (container) {
+      container.style.position = 'fixed';
+      container.style.bottom = '24px';
+      container.style.right = '24px';
+      container.style.zIndex = '9999';
+    }
+
     const showMessage = () => {
       message?.classList.remove('hidden');
       button?.classList.add('hidden');
@@ -408,6 +417,17 @@ box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
       isMessageVisible = false;
     };
 
+    // Forzar posicionamiento después de un breve delay
+    setTimeout(() => {
+      if (container) {
+        container.style.position = 'fixed';
+        container.style.bottom = '24px';
+        container.style.right = '24px';
+        container.style.zIndex = '999999';
+        container.style.display = 'block';
+      }
+    }, 100);
+
     // Mostrar mensaje automáticamente después de 5 segundos
     setTimeout(() => {
       if (!isMessageVisible) {
@@ -417,7 +437,7 @@ box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
 
     button?.addEventListener('click', () => {
       if (isMessageVisible) {
-        window.open('https://wa.link/7cprhk', '_blank');
+        window.open('https://wa.me/573042912564', '_blank');
       } else {
         showMessage();
       }
