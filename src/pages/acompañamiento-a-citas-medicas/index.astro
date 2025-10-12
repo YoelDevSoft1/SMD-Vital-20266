@@ -6,95 +6,292 @@ import Hero2 from '~/components/widgets/Hero2.astro';
 import Features from '~/components/widgets/Features.astro';
 import Steps2 from '~/components/widgets/Steps2.astro';
 import Content from '~/components/widgets/Content.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
 
 import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
 import FAQs from '~/components/widgets/FAQs.astro';
 import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
 
+// Schema.org para FAQs
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el acompañamiento a citas médicas a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un servicio especializado que consiste en brindar asistencia personalizada, apoyo logístico y emocional durante consultas médicas, exámenes y procedimientos, garantizando una experiencia segura y tranquila en la comodidad de tu hogar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta el acompañamiento a citas médicas en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio del acompañamiento a citas médicas a domicilio en Bogotá es de $120.000 COP. Este valor incluye asistencia personalizada, coordinación con el personal médico, apoyo logístico y seguimiento completo. Sin costos ocultos, precios transparentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué tipos de citas médicas pueden acompañar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Acompañamos consultas generales, citas de especialidad, exámenes médicos, procedimientos ambulatorios, tratamientos especializados y consultas pediátricas. Nuestro equipo se adapta a cualquier tipo de cita médica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿El servicio es adecuado para personas mayores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, nuestro acompañamiento está especialmente diseñado para personas mayores, brindando apoyo adicional, asistencia en movilidad y tranquilidad durante todo el proceso médico.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Ofrecen acompañamiento pediátrico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, contamos con acompañamiento pediátrico especializado que reduce la ansiedad de los niños durante consultas y procedimientos médicos, brindando tranquilidad a los padres.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo el acompañamiento a citas médicas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en toda Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Acompañamiento a Citas Médicas a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Acompañante Médico Barato',
+  description: 'Acompañamiento a citas médicas a domicilio barato en Bogotá. Acompañante médico, asistencia médica a domicilio, acompañamiento para personas mayores. Servicio 24/7 en las 20 localidades. Precio $120.000 COP.',
+  url: SITE.site + '/acompañamiento-a-citas-medicas/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    }
+  ],
+  medicalSpecialty: [
+    'Nursing',
+    'PrimaryCare',
+    'PatientCare',
+    'Geriatrics',
+    'Pediatrics'
+  ],
+  keywords: 'acompañamiento a citas médicas, acompañamiento médico a domicilio, acompañante médico bogotá, acompañamiento a consultas médicas, asistencia médica a domicilio, acompañamiento para personas mayores, acompañamiento pediátrico',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '85',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+// Schema Reviews
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  itemReviewed: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital - Acompañamiento a Citas Médicas a Domicilio Bogotá'
+  },
+  author: {
+    '@type': 'Person',
+    name: 'María Elena Rodríguez'
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '5',
+    bestRating: '5'
+  },
+  reviewBody: 'Excelente servicio de acompañamiento a citas médicas. El personal fue muy profesional y me ayudó mucho durante mi consulta. Muy recomendado para personas mayores.'
+};
+
 const metadata = {
-  title: 'Acompañamiento a Citas Médicas en Bogotá | SMD Vital',
+  title: 'Acompañamiento a Citas Médicas a Domicilio en Bogotá | Profesional y Económico | SMD Vital',
   description:
-    'Recibe acompañamiento profesional a citas médicas en Bogotá con SMD Vital. Garantiza asistencia, apoyo y orientación en tus consultas médicas de manera segura y confiable.',
+    'Acompañamiento a citas médicas a domicilio barato en Bogotá. Acompañante médico, asistencia médica a domicilio, acompañamiento para personas mayores. Servicio 24/7 en las 20 localidades. Precio $120.000 COP.',
+  keywords: 'acompañamiento a citas médicas, acompañamiento médico a domicilio, acompañante médico bogotá, acompañamiento a consultas médicas, asistencia médica a domicilio, acompañamiento para personas mayores, acompañamiento pediátrico, acompañamiento a exámenes médicos',
   ignoreTitleTemplate: true,
+  openGraph: {
+    title: 'Acompañamiento a Citas Médicas a Domicilio Bogotá | $120.000 COP | SMD Vital',
+    description: 'Acompañamiento profesional a citas médicas a domicilio barato en Bogotá. Asistencia personalizada, apoyo logístico. Servicio 24/7 en toda Bogotá. Precio $120.000 COP.',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/8460157/pexels-photo-8460157.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+        alt: 'Acompañamiento a citas médicas a domicilio en Bogotá - SMD Vital',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@SMDVitalBogota',
+    creator: '@SMDVitalBogota',
+    title: 'Acompañamiento a Citas Médicas a Domicilio Bogotá | SMD Vital',
+    description: 'Acompañamiento profesional a citas médicas en tu hogar. Servicio especializado 24/7 en toda Bogotá.',
+  },
 };
 ---
 
 <Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
+  </Fragment>
+
   <Fragment slot="header">
     <Header
       {...headerData}
       actions={[
         {
           variant: 'secondary',
-          text: 'Emergencia',
+          text: 'Llamar Ahora',
           href: 'tel:3042912564',
         },
         {
           variant: 'primary',
           text: 'WhatsApp',
           href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
         },
       ]}
       isSticky
     />
   </Fragment>
 
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Acompañamiento a Citas Médicas' },
+        ]}
+      />
+    </div>
+  </section>
+
   <!-- Hero2 Widget ******************* -->
 
   <Hero2
-    tagline="Tu Aliado en el Acompañamiento Médico"
+    tagline="Acompañamiento Profesional"
     actions={[
-      { variant: 'primary', target: '_blank', text: 'WhatsApp', href: 'https://wa.me/573042912564' },
-      { variant: 'secondary', text: 'Llamada de emergencia', href: 'tel:3042912564' },
+      { variant: 'primary', target: '_blank', text: 'Acompañamiento Barato WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda Acompañamiento', href: 'tel:3042912564' },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/8460157/pexels-photo-8460157.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Acompañamiento a Citas Médicas',
+      alt: 'Acompañamiento a citas médicas a domicilio en Bogotá - Servicio profesional SMD Vital',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
     }}
   >
     <Fragment slot="title">
-      Facilita tu Experiencia Médica con <br /><span class="text-accent dark:text-white highlight">SMD Vital</span><br
-      />
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Acompañamiento a Citas Médicas en Bogotá a Domicilio
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Acompañante Médico Profesional
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Asistencia Médica a Domicilio
+        </div>
+      </div>
     </Fragment>
 
     <Fragment slot="subtitle">
-      <span class="hidden sm:inline">
-        Con <span class="font-semibold">SMD Vital Bogotá</span>, te acompañamos en cada paso de tu consulta médica.</span
-      >
-      Nuestro servicio garantiza apoyo logístico, emocional y de comunicación con el personal médico para una experiencia
-      segura y tranquila.
+      <span class="font-semibold text-lg">Acompañamiento a citas médicas a domicilio barato en Bogotá</span> con asistencia personalizada, apoyo logístico y coordinación con el personal médico para una experiencia segura y tranquila.
+      <br /><br />
+      <strong>Acompañamiento para personas mayores</strong> y <strong>acompañamiento pediátrico</strong> con precio fijo de $120.000 COP. Nuestro equipo especializado te ofrece un servicio confiable y económico en las 20 localidades de Bogotá, Colombia. Precios transparentes sin costos ocultos.
     </Fragment>
   </Hero2>
 
   <!-- Features Widget *************** -->
 
   <Features
-    id="features"
-    title="¿Por qué elegir nuestro Acompañamiento a Citas Médicas?"
-    subtitle="Beneficios únicos de nuestro servicio en Bogotá"
-    columns={2}
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestro acompañamiento a citas médicas a domicilio barato en Bogotá?"
+    subtitle="Acompañamiento profesional a citas médicas a domicilio barato en Bogotá con asistencia personalizada, apoyo logístico y coordinación con el personal médico. Nuestro equipo especializado te ofrece un servicio confiable y económico en las 20 localidades de Bogotá, Colombia."
+    columns={3}
     items={[
       {
-        title: 'Asistencia personalizada',
+        title: 'Asistencia Personalizada Completa',
         description:
-          'Nuestro equipo garantiza un acompañamiento ajustado a tus necesidades, brindando apoyo logístico y emocional en cada etapa de tu cita médica.',
+          'Acompañamiento a consultas médicas ajustado a tus necesidades específicas, brindando apoyo logístico y emocional en cada etapa de tu cita médica.',
         icon: 'tabler:layers-union',
       },
       {
-        title: 'Comunicación eficaz con los profesionales médicos',
+        title: 'Comunicación Eficaz con Médicos',
         description: `Facilitamos la interacción con el personal médico, asegurando que comprendas claramente los procedimientos y recomendaciones durante tu cita.`,
         icon: 'tabler:artboard',
       },
       {
-        title: 'Apoyo para personas mayores o con movilidad reducida',
+        title: 'Acompañamiento para Personas Mayores',
         description:
-          'Especialmente diseñado para quienes necesitan asistencia adicional, asegurando su comodidad y tranquilidad en todo momento.',
+          'Especialmente diseñado para personas mayores, brindando asistencia adicional, apoyo en movilidad y tranquilidad durante todo el proceso médico.',
         icon: 'tabler:writing',
       },
       {
-        title: 'Puntualidad y organización',
+        title: 'Acompañamiento Pediátrico',
+        description: `Servicio especializado para niños que reduce la ansiedad durante consultas y procedimientos médicos, brindando tranquilidad a los padres.`,
+        icon: 'tabler:heart',
+      },
+      {
+        title: 'Coordinación y Puntualidad',
         description: `Te ayudamos a coordinar tus citas médicas, evitando retrasos y garantizando que todo fluya sin inconvenientes.`,
         icon: 'tabler:podium',
+      },
+      {
+        title: 'Cobertura Total Bogotá',
+        description: `Servicio disponible en las 20 localidades de Bogotá y municipios cercanos. Atención 24/7 todos los días del año.`,
+        icon: 'tabler:map-pin',
       },
     ]}
   />
@@ -220,26 +417,106 @@ const metadata = {
     </Fragment>
   </Content>
 
+  <!-- Content Widget - Precios **************** -->
+  <Content
+    id="precios"
+    title="Precios de Acompañamiento a Citas Médicas a Domicilio"
+    subtitle="Servicio médico especializado a domicilio con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
+    isReversed
+    items={[
+      {
+        title: 'Precio Fijo Garantizado',
+        description: `$120.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: 'Todo Incluido',
+        description: `Asistencia personalizada, coordinación con médicos, apoyo logístico, seguimiento completo y orientación.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el resultado, realizamos una segunda evaluación sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $200.000+ | Otros domicilios: $150.000+ | SMD Vital: $120.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/6291179/pexels-photo-6291179.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios transparentes y competitivos para acompañamiento a citas médicas a domicilio en Bogotá - $120.000 COP',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+  </Content>
+
+  <!-- Sección de Trust Signals y Estadísticas -->
+  <section class="py-8 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-4 text-center">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">300+</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Citas Acompañadas</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">4.9/5</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Calificación Promedio</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">45 min</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Tiempo de Llegada</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">24/7</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Disponibilidad</span>
+        </div>
+      </div>
+      <p class="mt-6 text-lg font-semibold text-accent">
+        ✓ Disponible hoy en tu localidad
+      </p>
+    </div>
+  </section>
+
   <!-- FAQs Widget ******************* -->
 
   <FAQs
-    title="Preguntas frecuentes"
+    title="Preguntas frecuentes sobre acompañamiento a citas médicas a domicilio"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio médico especializado"
     items={[
       {
-        title: '¿Qué incluye el servicio de acompañamiento a citas médicas?',
+        title: '¿Qué es el acompañamiento a citas médicas a domicilio?',
         description:
-          'Incluye asistencia personalizada desde el inicio hasta el final de tu cita, apoyo logístico, comunicación con el personal médico y orientación en procedimientos necesarios.',
+          'Es un servicio especializado que consiste en brindar asistencia personalizada, apoyo logístico y emocional durante consultas médicas, exámenes y procedimientos, garantizando una experiencia segura y tranquila en la comodidad de tu hogar.',
         icon: 'tabler:chevrons-right',
       },
       {
-        title: '¿Está disponible el servicio para cualquier tipo de cita médica?',
-        description: `Sí, ofrecemos acompañamiento para consultas generales, citas de especialidad, exámenes médicos y procedimientos ambulatorios.`,
+        title: '¿Cuánto cuesta el acompañamiento a citas médicas en Bogotá?',
+        description: `El precio del acompañamiento a citas médicas a domicilio en Bogotá es de $120.000 COP. Este valor incluye asistencia personalizada, coordinación con el personal médico, apoyo logístico y seguimiento completo. Sin costos ocultos, precios transparentes.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué tipos de citas médicas pueden acompañar?',
+        description: `Acompañamos consultas generales, citas de especialidad, exámenes médicos, procedimientos ambulatorios, tratamientos especializados y consultas pediátricas. Nuestro equipo se adapta a cualquier tipo de cita médica.`,
         icon: 'tabler:chevrons-right',
       },
       {
         title: '¿El servicio es adecuado para personas mayores?',
-        description:
-          'Absolutamente. Nuestro equipo está capacitado para brindar el apoyo necesario a personas mayores o con necesidades específicas, asegurando su bienestar durante el proceso.',
+        description: `Sí, nuestro acompañamiento está especialmente diseñado para personas mayores, brindando apoyo adicional, asistencia en movilidad y tranquilidad durante todo el proceso médico.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Ofrecen acompañamiento pediátrico?',
+        description: `Sí, contamos con acompañamiento pediátrico especializado que reduce la ansiedad de los niños durante consultas y procedimientos médicos, brindando tranquilidad a los padres.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo agendo el acompañamiento a citas médicas?',
+        description: `Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en toda Bogotá.`,
         icon: 'tabler:chevrons-right',
       },
     ]}
@@ -252,37 +529,42 @@ const metadata = {
   <!-- Steps2 Widget ****************** -->
 
   <Steps2
-    title="Contáctanos"
-    subtitle="¿Tienes preguntas sobre nuestro servicio de acompañamiento? ¡Estamos aquí para ayudarte!"
+    title="Agenda tu Acompañamiento Ahora - Atención en 45 Minutos"
+    subtitle="Servicio médico especializado a domicilio. Personal certificado con más de 300 citas acompañadas exitosamente. Respuesta inmediata por WhatsApp."
     callToAction={{
-      text: 'WhatsApp',
-      href: 'https://wa.me/573042912564',
+      text: 'Agendar Acompañamiento por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20necesito%20agendar%20acompañamiento%20a%20citas%20médicas%20a%20domicilio',
+      icon: 'tabler:brand-whatsapp',
     }}
     items={[
       {
-        title: 'Correo electrónico',
+        title: 'WhatsApp 24/7',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamar Ahora',
+        description: 'Atención Inmediata',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo Electrónico',
         description: 'salud@smdvitalbogota.com',
         icon: 'tabler:mail',
       },
-      {
-        title: 'Call Center',
-        description: '+57 (304) 291-2564',
-        icon: 'tabler:headset',
-      },
-      {
-        title: 'Síguenos',
-        description: '@smdvitalbogota',
-        icon: 'tabler:brand-twitter',
-      },
     ]}
-  />
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent dark:from-slate-800"></div>
+    </Fragment>
+  </Steps2>
 
   <!-- BlogLatestPost Widget **************** -->
 
   <BlogLatestPosts
     id="blog"
-    title="Conoce más sobre nuestros servicios"
-    information={`Nuestro blog está diseñado para ofrecerte información útil y consejos sobre cómo aprovechar al máximo nuestros servicios médicos. ¡Gracias por leernos!`}
+    title="Conoce más sobre acompañamiento a citas médicas"
+    information={`Visita nuestro blog para aprender más sobre el acompañamiento médico, consejos para citas médicas y la importancia de tener apoyo profesional. ¡Gracias por leernos!`}
   >
     <Fragment slot="bg">
       <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>

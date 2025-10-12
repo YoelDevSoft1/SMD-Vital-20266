@@ -510,36 +510,140 @@ const metadata = {
     ]}
   />
 
-  <!-- Content Widget **************** -->
+  <!-- Content Widget - Procedimiento **************** -->
 
   <Content
-    title="Casos de Uso"
-    subtitle="Descubre cómo SMD Vital Bogotá apoya a pacientes con COVID-19."
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestra Atención a Pacientes COVID-19?"
+    subtitle="Proceso especializado paso a paso con protocolos de bioseguridad certificados"
     isReversed
     items={[
       {
-        title: 'Atención Preventiva',
+        title: '1. Evaluación Inicial y Preparación',
         description:
-          'Realizamos chequeos regulares para identificar y prevenir complicaciones relacionadas con el COVID-19.',
+          'Realizamos evaluación médica completa, verificamos signos vitales y preparamos el área de aislamiento con ventilación adecuada.',
+        icon: 'tabler:clipboard-check',
       },
       {
-        title: 'Cuidado de Pacientes en Aislamiento',
-        description: `Apoyo integral para pacientes que requieren aislamiento en casa, garantizando su bienestar físico y emocional.`,
+        title: '2. Implementación de Protocolos de Bioseguridad',
+        description: `Colocamos equipos de protección personal, desinfectamos superficies y establecemos protocolos de entrada y salida del área.`,
+        icon: 'tabler:shield-check',
       },
       {
-        title: 'Tratamientos en Etapas Avanzadas',
-        description: `Asistencia médica especializada para casos graves o complicados de COVID-19.`,
+        title: '3. Monitoreo Diario de Signos Vitales',
+        description: `Medimos temperatura, saturación de oxígeno, frecuencia cardíaca y presión arterial cada 4-6 horas, documentando todos los valores.`,
+        icon: 'tabler:heartbeat',
       },
       {
-        title: 'Recuperación Post-COVID',
-        description: `Servicios diseñados para apoyar la rehabilitación y fortalecer la salud después de superar el COVID-19.`,
+        title: '4. Seguimiento y Coordinación Médica',
+        description: `Mantenemos comunicación constante con el médico tratante, coordinamos medicamentos y evaluamos necesidad de hospitalización.`,
+        icon: 'tabler:phone',
       },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/4167560/pexels-photo-4167560.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Casos de Uso para Pacientes COVID-19',
+      alt: 'Procedimiento especializado de atención a pacientes COVID-19 a domicilio con protocolos de bioseguridad',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
     }}
-  />
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h2>
+      <p class="text-muted mt-4">
+        Seguimos protocolos aprobados por el Ministerio de Salud de Colombia y la Organización Mundial de la Salud para garantizar la máxima seguridad en el cuidado de pacientes COVID-19.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo necesitas **************** -->
+
+  <Content
+    id="cuando-necesitas"
+    isAfterContent={true}
+    items={[
+      {
+        title: 'Indicaciones para Atención COVID-19',
+        description: `✓ Pacientes con COVID-19 confirmado<br>
+                      ✓ Personas con síntomas respiratorios<br>
+                      ✓ Contactos estrechos en aislamiento<br>
+                      ✓ Pacientes de alto riesgo<br>
+                      ✓ Rehabilitación post-COVID`,
+        icon: 'tabler:stethoscope',
+      },
+      {
+        title: '¿Quiénes lo Necesitan?',
+        description: `✓ Pacientes COVID-19 en aislamiento domiciliario<br>
+                      ✓ Personas con síntomas respiratorios<br>
+                      ✓ Adultos mayores con COVID-19<br>
+                      ✓ Pacientes con comorbilidades<br>
+                      ✓ Familiares de pacientes COVID-19`,
+        icon: 'tabler:users',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4167562/pexels-photo-4167562.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Indicaciones para atención especializada de pacientes COVID-19 a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Atención COVID-19 a Domicilio?
+      </h2>
+      <p class="text-muted mt-4">
+        Si tienes COVID-19 confirmado, síntomas respiratorios, o eres contacto estrecho, nuestro servicio está diseñado para ti.
+        <strong>Los protocolos de bioseguridad</strong> garantizan la máxima seguridad para ti y tu familia.
+      </p>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Precios **************** -->
+
+  <Content
+    id="precios"
+    title="Precios de Atención a Pacientes COVID-19 a Domicilio"
+    subtitle="Servicio médico especializado con protocolos de bioseguridad. Precios justos y transparentes para tu tranquilidad."
+    isReversed
+    items={[
+      {
+        title: 'Precio Fijo Garantizado',
+        description: `$180.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: 'Todo Incluido',
+        description: `Evaluación inicial, monitoreo diario, medicamentos básicos, protocolos de bioseguridad y seguimiento médico especializado.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Seguridad',
+        description: `Protocolos de bioseguridad certificados por el Ministerio de Salud. Si no quedas satisfecho, segunda intervención sin costo.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas especializadas: $300.000+ | Otros domicilios: $250.000+ | SMD Vital: $180.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/5938374/pexels-photo-5938374.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios transparentes y competitivos para atención a pacientes COVID-19 a domicilio en Bogotá - $180.000 COP',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
+    }}
+  >
+  </Content>
 
   <Content
     isAfterContent={true}
@@ -628,23 +732,66 @@ const metadata = {
   <!-- FAQs Widget ******************* -->
 
   <FAQs
-    title="Preguntas frecuentes"
+    id="faqs"
+    title="Preguntas Frecuentes sobre Atención a Pacientes COVID-19"
+    subtitle="Resolvemos las dudas más comunes sobre nuestro servicio de cuidado COVID-19 a domicilio en Bogotá"
     items={[
       {
-        title: '¿Qué incluye el servicio de atención a pacientes COVID-19?',
-        description: 'Incluye monitoreo de signos vitales, administración de medicamentos y seguimiento médico.',
-        icon: 'tabler:chevrons-right',
-      },
-      {
-        title: '¿Puedo recibir atención a domicilio?',
-        description: `Sí, contamos con un servicio especializado para atenderte en tu hogar, minimizando riesgos de contagio.`,
-        icon: 'tabler:chevrons-right',
-      },
-      {
-        title: '¿Qué medidas de bioseguridad se aplican?',
+        title: '¿Qué incluye la atención a pacientes COVID-19 a domicilio?',
         description:
-          'Todo nuestro personal sigue estrictos protocolos de bioseguridad para garantizar la seguridad de pacientes y médicos.',
-        icon: 'tabler:chevrons-right',
+          'Incluye monitoreo de signos vitales, administración de medicamentos, seguimiento médico diario, protocolos de bioseguridad estrictos y atención especializada para pacientes en aislamiento domiciliario.',
+        icon: 'tabler:medical-cross',
+      },
+      {
+        title: '¿Cuánto cuesta la atención a pacientes COVID-19 a domicilio en Bogotá?',
+        description: `El precio de la atención a pacientes COVID-19 a domicilio en Bogotá es de $180.000 COP. Este valor incluye evaluación inicial, monitoreo diario, medicamentos básicos y seguimiento médico especializado. Sin costos ocultos.`,
+        icon: 'tabler:currency-peso',
+      },
+      {
+        title: '¿Qué protocolos de bioseguridad siguen para COVID-19?',
+        description:
+          'Seguimos protocolos estrictos: uso de EPP completo (mascarilla N95, guantes, bata, gafas), desinfección de equipos, ventilación adecuada, distanciamiento social y seguimiento de síntomas del personal médico.',
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: '¿Pueden atender emergencias COVID-19 a domicilio?',
+        description: `Sí, contamos con servicio de emergencias 24/7 para pacientes COVID-19. Nuestro equipo especializado responde en 45 minutos con equipos de oxigenoterapia y medicamentos de emergencia.`,
+        icon: 'tabler:clock',
+      },
+      {
+        title: '¿Qué incluye el monitoreo de pacientes COVID-19?',
+        description: 'Incluye medición de temperatura, saturación de oxígeno, frecuencia cardíaca, presión arterial, evaluación de síntomas respiratorios y seguimiento de la evolución clínica diariamente.',
+        icon: 'tabler:heartbeat',
+      },
+      {
+        title: '¿Ofrecen rehabilitación post-COVID-19?',
+        description:
+          'Sí, ofrecemos programas de rehabilitación pulmonar, ejercicios respiratorios, fisioterapia y seguimiento médico para pacientes que han superado el COVID-19 y necesitan recuperar su capacidad pulmonar.',
+        icon: 'tabler:lungs',
+      },
+      {
+        title: '¿Qué medicamentos pueden administrar a domicilio?',
+        description:
+          'Administramos medicamentos prescritos por médico, antipiréticos, analgésicos, vitaminas, suplementos y medicamentos de apoyo. No administramos medicamentos experimentales sin prescripción médica.',
+        icon: 'tabler:pill',
+      },
+      {
+        title: '¿Cómo se coordina con el hospital si el paciente empeora?',
+        description:
+          'Mantenemos comunicación directa con hospitales y clínicas. Si el paciente requiere hospitalización, coordinamos el traslado inmediato y transferimos toda la información médica relevante.',
+        icon: 'tabler:building-hospital',
+      },
+      {
+        title: '¿Qué hacer si un familiar también tiene síntomas?',
+        description:
+          'Si hay síntomas en familiares, recomendamos aislamiento inmediato, evaluación médica para todos los contactos y seguimiento epidemiológico. Ofrecemos atención para toda la familia si es necesario.',
+        icon: 'tabler:users',
+      },
+      {
+        title: '¿Cómo agendo atención COVID-19 a domicilio?',
+        description:
+          'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+        icon: 'tabler:phone',
       },
     ]}
   >
@@ -656,37 +803,42 @@ const metadata = {
   <!-- Steps2 Widget ****************** -->
 
   <Steps2
-    title="Contáctanos"
-    subtitle="¿Tienes preguntas sobre nuestro servicio para pacientes COVID-19? ¡Estamos aquí para ayudarte!"
+    id="contacto"
+    title="¿Necesitas Atención a Pacientes COVID-19 a Domicilio?"
+    subtitle="Agenda tu cita ahora y recibe atención especializada con protocolos de bioseguridad en la comodidad de tu hogar. Nuestro equipo está listo para brindarte el mejor cuidado."
     callToAction={{
-      text: 'WhatsApp',
+      text: 'Agendar COVID-19 WhatsApp',
       href: 'https://wa.me/573042912564',
     }}
     items={[
       {
-        title: 'Correo electrónico',
+        title: 'WhatsApp Directo',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamada Telefónica',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo Electrónico',
         description: 'salud@smdvitalbogota.com',
         icon: 'tabler:mail',
       },
-      {
-        title: 'Call Center',
-        description: '+57 (304) 291-2564',
-        icon: 'tabler:headset',
-      },
-      {
-        title: 'Síguenos',
-        description: '@smdvitalbogota',
-        icon: 'tabler:brand-twitter',
-      },
     ]}
-  />
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900"></div>
+    </Fragment>
+  </Steps2>
 
   <!-- BlogLatestPost Widget **************** -->
 
   <BlogLatestPosts
     id="blog"
-    title="Conoce más sobre el cuidado para pacientes COVID-19"
-    information={`Visita nuestro blog para aprender más sobre el manejo y cuidado de pacientes con COVID-19. ¡Gracias por leernos!`}
+    title="Artículos sobre Cuidado COVID-19 y Protocolos de Bioseguridad"
+    information={`Descubre más sobre el manejo de pacientes COVID-19, protocolos de bioseguridad, rehabilitación post-COVID y consejos para el cuidado en casa. Nuestro blog médico te mantiene informado sobre las mejores prácticas.`}
   >
     <Fragment slot="bg">
       <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>

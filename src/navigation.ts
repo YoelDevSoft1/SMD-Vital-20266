@@ -93,7 +93,7 @@ export const headerData = {
         },
         {
           text: 'Acompañamiento a citas médicas',
-          href: getPermalink('/acompanamiento-a-citas-medicas'),
+          href: getPermalink('/acompañamiento-a-citas-medicas'),
         },
       ],
     },

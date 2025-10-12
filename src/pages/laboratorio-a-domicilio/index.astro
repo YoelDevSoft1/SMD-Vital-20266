@@ -282,14 +282,17 @@ const metadata = {
       isSticky
     />
   </Fragment>
-  <div class="container mx-auto px-4 pt-20 md:pt-24">
-    <Breadcrumbs
-      items={[
-        { label: 'Servicios', href: '/servicios' },
-        { label: 'Laboratorio a Domicilio' },
-      ]}
-    />
-  </div>
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Laboratorio a Domicilio' },
+        ]}
+      />
+    </div>
+  </section>
 
   <Hero2
     tagline="Análisis Clínicos en tu Hogar"
