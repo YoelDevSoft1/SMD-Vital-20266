@@ -40,17 +40,25 @@ const gaId = ANALYTICS?.vendors?.googleAnalytics?.id;
         document.head.appendChild(script);
       };
 
-      const engagementEvents = ['scroll', 'mousemove', 'touchstart', 'click'];
-      const handleEngagement = () => {
-        loadGa();
-        engagementEvents.forEach((evt) => window.removeEventListener(evt, handleEngagement, { passive: true }));
-      };
+      // Use requestIdleCallback for better performance - load GA when browser is idle
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          loadGa();
+        }, { timeout: 3000 });
+      } else {
+        // Fallback to load event for browsers without requestIdleCallback
+        const engagementEvents = ['scroll', 'mousemove', 'touchstart', 'click'];
+        const handleEngagement = () => {
+          loadGa();
+          engagementEvents.forEach((evt) => window.removeEventListener(evt, handleEngagement, { passive: true }));
+        };
 
-      engagementEvents.forEach((eventName) => {
-        window.addEventListener(eventName, handleEngagement, { once: true, passive: true });
-      });
+        engagementEvents.forEach((eventName) => {
+          window.addEventListener(eventName, handleEngagement, { once: true, passive: true });
+        });
 
-      window.addEventListener('load', loadGa, { once: true });
+        window.addEventListener('load', loadGa, { once: true });
+      }
       document.addEventListener('astro:after-swap', () => {
         if (window.__smd_ga_script_ready && typeof window.gtag === 'function') {
           window.gtag('config', gaId, { page_path: window.location.pathname, send_page_view: true });

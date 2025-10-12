@@ -21,6 +21,25 @@
 ---
 
 <style is:inline>
+  /* Optimize rendering performance with CSS containment */
+  body {
+    contain: layout style paint;
+  }
+
+  /* Prevent forced reflow by using will-change sparingly */
+  .hero-image,
+  .animate-fade,
+  .animate-float,
+  [class*="transition"] {
+    will-change: auto;
+  }
+
+  /* Use content-visibility for off-screen content */
+  section:not(:first-of-type) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+
   :root {
     --aw-font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --aw-font-serif: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

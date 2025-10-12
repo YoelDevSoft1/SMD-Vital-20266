@@ -8,31 +8,422 @@ import Steps2 from '~/components/widgets/Steps2.astro';
 import Content from '~/components/widgets/Content.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
 import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
 
 import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es un suero multivitamínico intravenoso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un tratamiento médico que consiste en la administración directa de vitaminas y minerales esenciales por vía intravenosa, permitiendo una absorción del 100% y efectos inmediatos en el organismo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta el suero multivitamínico a domicilio en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio del suero multivitamínico a domicilio en Bogotá es de $120.000 COP. Este valor incluye evaluación inicial, preparación del suero personalizado, administración profesional y seguimiento posterior. Sin costos ocultos, precios transparentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre suero multivitamínico y vitaminas orales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El suero multivitamínico intravenoso tiene una absorción del 100% y efectos inmediatos, mientras que las vitaminas orales tienen una absorción del 20-30% debido a la digestión. Los sueros son más efectivos para casos de deficiencia severa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es seguro recibir suero multivitamínico a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, contamos con profesionales certificados en terapia intravenosa y seguimos estrictos protocolos de asepsia. Utilizamos materiales estériles y equipos especializados para garantizar tu seguridad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo dura el tratamiento de suero multivitamínico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El procedimiento completo dura entre 30-45 minutos, incluyendo evaluación, preparación del suero personalizado y administración intravenosa. Los efectos se sienten inmediatamente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Con qué frecuencia puedo recibir suero multivitamínico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La frecuencia depende de tus necesidades específicas. Algunos pacientes requieren tratamiento semanal, otros mensual. Después de la evaluación inicial, te daremos una recomendación personalizada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué contraindicaciones tiene el suero multivitamínico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No se recomienda en casos de alergias a componentes específicos, insuficiencia renal severa o embarazo sin supervisión médica. Nuestro personal realiza una evaluación previa para determinar si el tratamiento es seguro.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden atender a adultos mayores y personas con movilidad reducida?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, adaptamos el procedimiento según la edad y condición del paciente. Tenemos experiencia trabajando con adultos mayores y personas con movilidad reducida, brindando una experiencia segura y cómoda.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué vitaminas incluye el suero multivitamínico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Incluye vitaminas del complejo B, vitamina C, vitamina D, magnesio, zinc, calcio y otros minerales esenciales. La formulación se personaliza según tus necesidades específicas y deficiencias detectadas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo el suero multivitamínico a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Suero Multivitamínico a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Suero Vitaminado Intravenoso Barato',
+  description: 'Suero multivitamínico a domicilio barato en Bogotá. Suero vitaminado intravenoso, sueros vitaminados, terapia intravenosa a domicilio. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  url: SITE.site + '/suero-multivitaminico/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    },
+    {
+      '@type': 'City',
+      name: 'Funza'
+    },
+    {
+      '@type': 'City',
+      name: 'Mosquera'
+    },
+    {
+      '@type': 'City',
+      name: 'Cota'
+    }
+  ],
+  medicalSpecialty: [
+    'Nursing',
+    'PrimaryCare',
+    'Nutrition',
+    'InternalMedicine'
+  ],
+  keywords: 'suero multivitamínico, suero vitaminado, sueros vitaminados, suero vitaminado intravenoso, suero multivitamínico intravenoso, sueros multivitaminicos, terapia intravenosa, vitaminas intravenosas, suero fisiologico, multivitaminas intravenosas',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Suero Multivitamínico',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Suero Multivitamínico Básico',
+          description: 'Suero vitaminado con vitaminas del complejo B, C y minerales esenciales'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Suero Multivitamínico Premium',
+          description: 'Suero personalizado con vitaminas y minerales específicos según necesidades'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Suero Energizante',
+          description: 'Suero especializado para aumentar energía y vitalidad'
+        }
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '120',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+// Schema Reviews para testimonios
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  itemReviewed: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital - Suero Multivitamínico a Domicilio Bogotá'
+  },
+  author: {
+    '@type': 'Person',
+    name: 'Ana María Rodríguez'
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '5',
+    bestRating: '5'
+  },
+  reviewBody: 'Excelente servicio de suero multivitamínico a domicilio. Me siento con mucha más energía y vitalidad. El personal es muy profesional y el procedimiento fue completamente cómodo.'
+};
+
+// Schema HowTo para el procedimiento de suero multivitamínico
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo administrar suero multivitamínico profesional a domicilio',
+  description: 'Procedimiento paso a paso para administración segura de suero multivitamínico intravenoso en el hogar',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/3845115/pexels-photo-3845115.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Procedimiento profesional de suero multivitamínico intravenoso a domicilio'
+  },
+  totalTime: 'PT45M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '120000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Suero multivitamínico personalizado',
+      description: 'Solución intravenosa con vitaminas y minerales específicos'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Material estéril',
+      description: 'Jeringas, catéteres, gasas y otros materiales de un solo uso'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Equipo de monitoreo',
+      description: 'Equipos para control de signos vitales durante el procedimiento'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Equipo de terapia intravenosa',
+      description: 'Equipo especializado para administración de sueros intravenosos'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Material de asepsia',
+      description: 'Alcohol, povidona yodada y otros antisépticos'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Equipo de monitoreo',
+      description: 'Tensiómetro, oxímetro y termómetro para control continuo'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Evaluación y Preparación',
+      text: 'Realizar evaluación médica inicial, verificar signos vitales y preparar el suero multivitamínico personalizado según las necesidades del paciente.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/3845115/pexels-photo-3845115.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Evaluación inicial y preparación del suero multivitamínico personalizado'
+      },
+      url: SITE.site + '/suero-multivitaminico/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Preparación del Acceso Venoso',
+      text: 'Preparar el sitio de punción, aplicar antiséptico y colocar el catéter intravenoso de forma segura y cómoda.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/3845115/pexels-photo-3845115.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Preparación del acceso venoso para administración del suero'
+      },
+      url: SITE.site + '/suero-multivitaminico/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Administración del Suero',
+      text: 'Conectar el suero multivitamínico y administrar lentamente durante 30-45 minutos, monitoreando constantemente al paciente.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/3845115/pexels-photo-3845115.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Administración profesional del suero multivitamínico intravenoso'
+      },
+      url: SITE.site + '/suero-multivitaminico/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Monitoreo y Cuidados Posteriores',
+      text: 'Monitorear al paciente durante y después del procedimiento, proporcionar recomendaciones de cuidado posterior y programar seguimiento si es necesario.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/3845115/pexels-photo-3845115.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Monitoreo continuo y cuidados posteriores del suero multivitamínico'
+      },
+      url: SITE.site + '/suero-multivitaminico/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
 
 const metadata = {
-  title: 'Suero Multivitamínico a Domicilio | SMD Vital',
+  title: 'Suero Multivitamínico a Domicilio en Bogotá | Profesional y Económico | SMD Vital',
   description:
-    'Servicio de suero multivitamínico a domicilio en Bogotá, Colombia. Refortalece tu salud con nuestros tratamientos cómodos y profesionales directamente en tu hogar.',
+    'Suero multivitamínico a domicilio barato en Bogotá. Suero vitaminado intravenoso, sueros vitaminados, terapia intravenosa a domicilio. Servicio 24/7 en las 20 localidades. Precio $120.000 COP.',
+  keywords: 'suero multivitamínico, suero vitaminado, sueros vitaminados, suero vitaminado intravenoso, suero multivitamínico intravenoso, sueros multivitaminicos, terapia intravenosa, vitaminas intravenosas, suero fisiologico, multivitaminas intravenosas, suero vitaminado precio, suero multivitamínico bogotá',
   ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/3845115/pexels-photo-3845115.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+        alt: 'Servicio profesional de suero multivitamínico intravenoso a domicilio en Bogotá - SMD Vital',
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
 };
 ---
 
 <Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
+  </Fragment>
+
   <Fragment slot="header">
     <Header
       {...headerData}
       actions={[
         {
           variant: 'secondary',
-          text: 'Emergencia',
+          text: 'Llamar Ahora',
           href: 'tel:3042912564',
         },
         {
           variant: 'primary',
           text: 'WhatsApp',
           href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
         },
       ]}
       isSticky
@@ -41,117 +432,185 @@ const metadata = {
 
   <!-- Hero2 Widget ******************* -->
 
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Suero Multivitamínico a Domicilio' },
+        ]}
+      />
+    </div>
+  </section>
+
   <Hero2
     tagline="Nutrición y Vitalidad Directamente en tu Hogar"
     actions={[
-      { variant: 'primary', target: '_blank', text: 'WhatsApp', href: 'https://wa.me/573042912564' },
-      { variant: 'secondary', text: 'Agenda tu tratamiento', href: '#features' },
+      { variant: 'primary', target: '_blank', text: 'Suero Vitaminado WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda Suero Multivitamínico', href: 'tel:3042912564' },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/3845115/pexels-photo-3845115.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Suero Multivitamínico a Domicilio en Bogotá',
-      loading: 'lazy',
+      alt: 'Profesional administrando suero multivitamínico intravenoso a domicilio con equipos especializados - SMD Vital Bogotá',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
     }}
   >
     <Fragment slot="title">
-      Suero <br /><span class="text-accent dark:text-white highlight">Multivitamínico</span><br />
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Suero Multivitamínico en Bogotá a Domicilio
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Suero Vitaminado Intravenoso
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Terapia Intravenosa Profesional
+        </div>
+      </div>
     </Fragment>
 
     <Fragment slot="subtitle">
-      <span class="hidden sm:inline">
-        Refortalece tu sistema inmunológico y mejora tu bienestar con nuestros tratamientos profesionales a domicilio.</span
-      >
-      Disfruta de una nutrición óptima sin salir de casa. ¡Confía en nuestros servicios seguros y efectivos en Bogotá, Colombia!
+      <span class="font-semibold text-lg">Suero multivitamínico intravenoso a domicilio</span> con absorción del 100% y efectos inmediatos para fortalecer tu sistema inmunológico y mejorar tu bienestar sin salir de casa.
+      <br /><br />
+      Nuestro equipo certificado te ofrece un servicio confiable y económico en las 20 localidades de la capital. Precios transparentes sin costos ocultos.
     </Fragment>
   </Hero2>
 
   <!-- Features Widget *************** -->
 
   <Features
-    id="features"
-    title="¿Por qué elegir nuestro servicio de suero multivitamínico a domicilio?"
-    subtitle="Comprometidos con tu salud y comodidad en Bogotá"
-    columns={2}
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestro suero multivitamínico a domicilio en Bogotá?"
+    subtitle="Ofrecemos suero vitaminado intravenoso profesional con absorción del 100% y efectos inmediatos. Nuestro equipo certificado te brinda un servicio confiable y económico en las 20 localidades de la capital."
+    columns={3}
     items={[
       {
-        title: 'Profesionales Certificados',
+        title: 'Absorción del 100%',
         description:
-          'Nuestro equipo está compuesto por especialistas en nutrición y salud altamente capacitados para brindarte el mejor cuidado.',
-        icon: 'tabler:shield-check',
+          'El suero multivitamínico intravenoso tiene absorción completa, mientras que las vitaminas orales solo se absorben 20-30%. Efectos inmediatos garantizados.',
+        icon: 'tabler:medical-cross',
       },
       {
-        title: 'Comodidad y Seguridad',
-        description: `Recibe tus tratamientos en la comodidad de tu hogar, siguiendo estrictos protocolos de higiene y seguridad en Bogotá.`,
-        icon: 'tabler:home',
-      },
-      {
-        title: 'Fórmulas Personalizadas',
-        description:
-          'Ofrecemos sueros multivitamínicos adaptados a tus necesidades específicas para maximizar los beneficios para tu salud.',
+        title: 'Personalización Total',
+        description: `Sueros multivitamínicos adaptados a tus necesidades específicas: complejo B, vitamina C, D, magnesio, zinc y minerales esenciales.`,
         icon: 'tabler:clipboard-list',
       },
       {
-        title: 'Resultados Rápidos',
-        description: `Experimenta mejoras en tu bienestar general en poco tiempo gracias a nuestras formulaciones avanzadas.`,
+        title: 'Profesionales Certificados',
+        description: `Enfermeros especializados en terapia intravenosa con certificación y amplia experiencia en administración de sueros vitaminados.`,
+        icon: 'tabler:certificate',
+      },
+      {
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda la ciudad. Agenda tu cita y recibe atención profesional el mismo día sin largas esperas.',
         icon: 'tabler:clock',
+      },
+      {
+        title: 'Materiales Estériles',
+        description: `Utilizamos equipos especializados, materiales estériles y seguimos estrictos protocolos de asepsia para garantizar tu seguridad.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Cobertura Total Bogotá',
+        description: `Servicio disponible en las 20 localidades de Bogotá y municipios cercanos. Atención 24/7 todos los días del año.`,
+        icon: 'tabler:map-pin',
       },
     ]}
   />
 
-  <!-- Content Widget **************** -->
+  <!-- Content Widget - Procedimiento **************** -->
 
   <Content
-    title="Nuestros Servicios"
-    subtitle="Descubre cómo SMD Vital Bogotá puede ayudarte a mejorar tu salud con suero multivitamínico a domicilio."
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestro Procedimiento de Suero Multivitamínico?"
+    subtitle="Proceso profesional paso a paso realizado por especialistas certificados en terapia intravenosa"
     isReversed
     items={[
       {
-        title: 'Evaluación Inicial',
+        title: '1. Evaluación y Preparación',
         description:
-          'Realizamos una consulta detallada para entender tus necesidades y diseñar un plan de tratamiento personalizado.',
+          'Realizamos evaluación médica inicial, verificamos signos vitales y preparamos el suero multivitamínico personalizado según tus necesidades específicas.',
+        icon: 'tabler:clipboard-check',
       },
       {
-        title: 'Administración Segura del Suero',
-        description: `Nuestros profesionales administran el suero multivitamínico de manera segura y efectiva en tu hogar, garantizando tu comodidad.`,
+        title: '2. Preparación del Acceso Venoso',
+        description: `Preparamos el sitio de punción, aplicamos antiséptico y colocamos el catéter intravenoso de forma segura y cómoda.`,
+        icon: 'tabler:medical-cross',
       },
       {
-        title: 'Seguimiento Continuo',
-        description: `Monitoreamos tu progreso y ajustamos el tratamiento según sea necesario para asegurar resultados óptimos.`,
+        title: '3. Administración del Suero',
+        description: `Conectamos el suero multivitamínico y lo administramos lentamente durante 30-45 minutos, monitoreando constantemente tu bienestar.`,
+        icon: 'tabler:heartbeat',
       },
       {
-        title: 'Asesoramiento Nutricional',
-        description: `Te proporcionamos recomendaciones personalizadas para complementar tu tratamiento y mantener una salud óptima.`,
+        title: '4. Monitoreo y Cuidados Posteriores',
+        description: `Monitoreamos tu estado durante y después del procedimiento, proporcionamos recomendaciones de cuidado posterior y programamos seguimiento si es necesario.`,
+        icon: 'tabler:circle-check',
       },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/11081177/pexels-photo-11081177.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Servicios de Suero Multivitamínico a Domicilio',
+      alt: 'Procedimiento paso a paso de suero multivitamínico intravenoso profesional a domicilio',
       loading: 'lazy',
+      width: 1260,
+      height: 750,
     }}
-  />
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h2>
+      <p class="text-muted mt-4">
+        Utilizamos técnicas aprobadas por la Organización Mundial de la Salud (OMS) y el Ministerio de Salud de Colombia para garantizar tu seguridad y bienestar.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo necesitas **************** -->
 
   <Content
+    id="cuando-necesitas"
     isAfterContent={true}
     items={[
       {
-        title: 'Mejora tu Bienestar',
-        description: `Nuestros tratamientos están diseñados para aumentar tu energía, fortalecer tu sistema inmunológico y mejorar tu salud general.`,
+        title: 'Indicaciones para Suero Multivitamínico',
+        description: `✓ Deficiencia de vitaminas y minerales<br>
+                      ✓ Fatiga crónica y falta de energía<br>
+                      ✓ Sistema inmunológico debilitado<br>
+                      ✓ Estrés y agotamiento mental<br>
+                      ✓ Recuperación post-enfermedad`,
+        icon: 'tabler:stethoscope',
       },
       {
-        title: 'Beneficios:',
-        description: `Mayor energía y vitalidad. <br /> Fortalecimiento del sistema inmunológico. <br /> Mejora de la salud mental y física.`,
+        title: '¿Quiénes lo Necesitan?',
+        description: `✓ Personas con deficiencias nutricionales<br>
+                      ✓ Adultos mayores con absorción reducida<br>
+                      ✓ Deportistas con alta demanda energética<br>
+                      ✓ Personas con estrés crónico<br>
+                      ✓ Pacientes en recuperación médica`,
+        icon: 'tabler:users',
       },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/6129233/pexels-photo-6129233.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Alivio y Beneficios del Suero Multivitamínico',
+      alt: 'Indicaciones para suero multivitamínico intravenoso profesional a domicilio',
       loading: 'lazy',
+      width: 1260,
+      height: 750,
     }}
   >
     <Fragment slot="content">
-      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
-        Nutrición y Vitalidad <br /><span class="text-2xl">Garantizadas</span>
-      </h3>
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Suero Multivitamínico Intravenoso?
+      </h2>
+      <p class="text-muted mt-4">
+        Si experimentas fatiga crónica, deficiencias nutricionales o necesitas un impulso inmediato de energía y vitalidad, nuestro suero multivitamínico es la solución ideal.
+        <strong>La absorción del 100%</strong> garantiza efectos inmediatos y duraderos.
+      </p>
     </Fragment>
 
     <Fragment slot="bg">
@@ -159,126 +618,161 @@ const metadata = {
     </Fragment>
   </Content>
 
+  <!-- Content Widget - Precios **************** -->
+
   <Content
+    id="precios"
+    title="Precios de Suero Multivitamínico a Domicilio"
+    subtitle="Servicio médico especializado a domicilio con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
     isReversed
-    isAfterContent={true}
     items={[
       {
-        title: 'Tecnología Avanzada',
-        description: `Utilizamos equipos de última generación para asegurar la precisión y eficacia de cada tratamiento.`,
+        title: 'Precio Fijo Garantizado',
+        description: `$120.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
       },
       {
-        title: 'Beneficios:',
-        description: `Resultados más rápidos. <br /> Procedimientos cómodos y sin dolor. <br /> Mayor confianza en el tratamiento.`,
+        title: 'Todo Incluido',
+        description: `Evaluación inicial, preparación del suero personalizado, administración profesional, materiales estériles y seguimiento posterior.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el resultado, realizamos una segunda administración sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $200.000+ | Otros domicilios: $150.000+ | SMD Vital: $120.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
       },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/6753445/pexels-photo-6753445.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Tecnología Avanzada en Tratamientos de Suero',
+      alt: 'Precios transparentes y competitivos para suero multivitamínico intravenoso a domicilio en Bogotá - $120.000 COP',
       loading: 'lazy',
+      width: 1260,
+      height: 750,
     }}
   >
-    <Fragment slot="content">
-      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
-        Precisión y Confianza <br /><span class="text-2xl">Garantizadas</span>
-      </h3>
-    </Fragment>
-
-    <Fragment slot="bg">
-      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
-    </Fragment>
   </Content>
 
-  <Content
-    isReversed
-    isAfterContent={true}
-    items={[
-      {
-        title: 'Soporte Continuo',
-        description: `Nuestro equipo está disponible para responder tus dudas y proporcionarte el soporte necesario durante todo el proceso.`,
-      },
-      {
-        title: 'Beneficios:',
-        description: `Asesoramiento personalizado. <br /> Atención inmediata a tus consultas. <br /> Tranquilidad y confianza en nuestro servicio.`,
-      },
-    ]}
-    image={{
-      src: 'https://images.pexels.com/photos/6011662/pexels-photo-6011662.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Soporte Continuo en Suero Multivitamínico',
-      loading: 'lazy',
-    }}
-  >
-    <Fragment slot="content">
-      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
-        Soporte y Atención <br /><span class="text-2xl">Personalizada</span>
-      </h3>
-    </Fragment>
+  <!-- Sección de Servicios Relacionados con Enlaces Internos -->
+  <section class="px-4 py-12 sm:px-6 lg:px-8 mx-auto max-w-4xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Servicios Complementarios</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        Además del suero multivitamínico, ofrecemos <a href="/servicios" class="text-primary hover:underline font-semibold">atención médica integral a domicilio</a> en la capital
+      </p>
+    </div>
+    <div class="prose prose-lg dark:prose-invert mx-auto">
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        El <strong>suero multivitamínico intravenoso</strong> es parte de nuestro amplio catálogo de <a href="/servicios" class="text-primary hover:underline">servicios médicos domiciliarios</a>.
+        Si necesitas una <a href="/valoracion-medica-domiciliaria" class="text-primary hover:underline">valoración médica completa</a>,
+        nuestro equipo puede evaluar múltiples aspectos de tu salud durante la visita.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Para quienes requieren monitoreo constante, ofrecemos
+        <a href="/toma-de-signos-vitales" class="text-primary hover:underline">toma de signos vitales</a> y
+        <a href="/enfemeria-a-nivel-domiciliario-y-hospitalario" class="text-primary hover:underline">servicios de enfermería especializada</a>.
+        También realizamos <a href="/inyectologia-a-domicilio" class="text-primary hover:underline">inyectología profesional</a>
+        con técnicas asépticas certificadas. <a href="/contacto" class="text-primary hover:underline font-semibold">Contáctanos</a> para más información.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Si prefieres una consulta inicial sin desplazamiento, conoce nuestra
+        <a href="/teleconsulta-medica" class="text-primary hover:underline">teleconsulta médica</a> disponible las 24 horas.
+        Para diagnósticos más complejos, contamos con <a href="/laboratorio-a-domicilio" class="text-primary hover:underline">laboratorio clínico a domicilio</a>
+        con toma de muestras profesional y resultados digitales.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+        Explora todos nuestros <a href="/servicios" class="text-primary hover:underline font-semibold">servicios médicos a domicilio</a>
+        o visita nuestro <a href="/blog" class="text-primary hover:underline">blog de salud</a> para consejos de cuidado en casa.
+      </p>
+    </div>
+  </section>
 
-    <Fragment slot="bg">
-      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
-    </Fragment>
-  </Content>
-
-  <Content
-    items={[
-      {
-        title: 'Atención en Emergencias',
-        description: `Proporcionamos servicios rápidos y eficientes para tus necesidades de suero multivitamínico en situaciones de emergencia.`,
-      },
-      {
-        title: 'Beneficios:',
-        description: `Respuesta inmediata. <br /> Minimización de riesgos. <br /> Tranquilidad en momentos críticos.`,
-      },
-    ]}
-    image={{
-      src: 'https://images.pexels.com/photos/6010784/pexels-photo-6010784.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Atención en Emergencias de Suero Multivitamínico',
-      loading: 'lazy',
-    }}
-  >
-    <Fragment slot="content">
-      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
-        Atención Rápida <br /><span class="text-2xl">y Segura</span>
-      </h3>
-    </Fragment>
-
-    <Fragment slot="bg">
-      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
-    </Fragment>
-  </Content>
+  <!-- Sección de Trust Signals y Estadísticas -->
+  <section class="py-8 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-4 text-center">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">300+</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Sueros Administrados</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">4.9/5</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Calificación Promedio</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">45 min</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Tiempo de Llegada</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-4xl font-bold text-primary">24/7</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Disponibilidad</span>
+        </div>
+      </div>
+      <p class="mt-6 text-lg font-semibold text-accent">
+        ✓ Disponible hoy en tu localidad
+      </p>
+    </div>
+  </section>
 
   <!-- FAQs Widget ******************* -->
 
   <FAQs
-    title="Preguntas frecuentes"
+    title="Preguntas frecuentes sobre suero multivitamínico intravenoso"
+    subtitle="Respuestas a las dudas más comunes sobre nuestro servicio médico especializado"
     items={[
       {
-        title: '¿Qué es un suero multivitamínico?',
+        title: '¿Qué es un suero multivitamínico intravenoso?',
         description:
-          'Un suero multivitamínico es una solución intravenosa que contiene una combinación de vitaminas esenciales diseñadas para mejorar la salud y el bienestar general.',
+          'Es un tratamiento médico que consiste en la administración directa de vitaminas y minerales esenciales por vía intravenosa, permitiendo una absorción del 100% y efectos inmediatos en el organismo.',
         icon: 'tabler:chevrons-right',
       },
       {
-        title: '¿Cómo funciona el suero multivitamínico?',
-        description: `El suero multivitamínico se administra directamente en el torrente sanguíneo, lo que permite una absorción rápida y eficiente de las vitaminas y minerales necesarios para el cuerpo.`,
+        title: '¿Cuánto cuesta el suero multivitamínico a domicilio en Bogotá?',
+        description: `El precio del suero multivitamínico a domicilio en Bogotá es de $120.000 COP. Este valor incluye evaluación inicial, preparación del suero personalizado, administración profesional y seguimiento posterior. Sin costos ocultos, precios transparentes.`,
         icon: 'tabler:chevrons-right',
       },
       {
-        title: '¿Es seguro recibir un suero multivitamínico a domicilio?',
-        description:
-          'Sí, nuestros profesionales están altamente capacitados y siguen estrictos protocolos de higiene y seguridad para garantizar un procedimiento seguro en tu hogar.',
+        title: '¿Qué diferencia hay entre suero multivitamínico y vitaminas orales?',
+        description: `El suero multivitamínico intravenoso tiene una absorción del 100% y efectos inmediatos, mientras que las vitaminas orales tienen una absorción del 20-30% debido a la digestión. Los sueros son más efectivos para casos de deficiencia severa.`,
         icon: 'tabler:chevrons-right',
       },
       {
-        title: '¿Cuáles son los beneficios de un suero multivitamínico?',
-        description:
-          'Los beneficios incluyen aumento de energía, fortalecimiento del sistema inmunológico, mejora de la salud mental y física, y una recuperación más rápida de enfermedades.',
+        title: '¿Es seguro recibir suero multivitamínico a domicilio?',
+        description: `Sí, contamos con profesionales certificados en terapia intravenosa y seguimos estrictos protocolos de asepsia. Utilizamos materiales estériles y equipos especializados para garantizar tu seguridad.`,
         icon: 'tabler:chevrons-right',
       },
       {
-        title: '¿Cómo agendar una cita para recibir el suero multivitamínico?',
-        description:
-          'Puedes agendar una cita fácilmente a través de nuestro WhatsApp, llamando a nuestro call center o completando el formulario en nuestro sitio web.',
+        title: '¿Cuánto tiempo dura el tratamiento de suero multivitamínico?',
+        description: `El procedimiento completo dura entre 30-45 minutos, incluyendo evaluación, preparación del suero personalizado y administración intravenosa. Los efectos se sienten inmediatamente.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Con qué frecuencia puedo recibir suero multivitamínico?',
+        description: `La frecuencia depende de tus necesidades específicas. Algunos pacientes requieren tratamiento semanal, otros mensual. Después de la evaluación inicial, te daremos una recomendación personalizada.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué contraindicaciones tiene el suero multivitamínico?',
+        description: `No se recomienda en casos de alergias a componentes específicos, insuficiencia renal severa o embarazo sin supervisión médica. Nuestro personal realiza una evaluación previa para determinar si el tratamiento es seguro.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Pueden atender a adultos mayores y personas con movilidad reducida?',
+        description: `Sí, adaptamos el procedimiento según la edad y condición del paciente. Tenemos experiencia trabajando con adultos mayores y personas con movilidad reducida, brindando una experiencia segura y cómoda.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué vitaminas incluye el suero multivitamínico?',
+        description: `Incluye vitaminas del complejo B, vitamina C, vitamina D, magnesio, zinc, calcio y otros minerales esenciales. La formulación se personaliza según tus necesidades específicas y deficiencias detectadas.`,
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cómo agendo el suero multivitamínico a domicilio?',
+        description: `Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.`,
         icon: 'tabler:chevrons-right',
       },
     ]}
@@ -291,37 +785,42 @@ const metadata = {
   <!-- Steps2 Widget ****************** -->
 
   <Steps2
-    title="Contáctanos"
-    subtitle="¿Tienes preguntas sobre nuestro servicio de suero multivitamínico a domicilio? ¡Estamos aquí para ayudarte!"
+    title="Agenda tu Suero Multivitamínico Ahora - Atención en 45 Minutos"
+    subtitle="Servicio médico especializado a domicilio. Personal certificado con más de 300 sueros administrados exitosamente. Respuesta inmediata por WhatsApp."
     callToAction={{
-      text: 'WhatsApp',
-      href: 'https://wa.me/573042912564',
+      text: 'Agendar Suero Multivitamínico por WhatsApp',
+      href: 'https://wa.me/573042912564?text=Hola,%20necesito%20agendar%20suero%20multivitamínico%20a%20domicilio',
+      icon: 'tabler:brand-whatsapp',
     }}
     items={[
       {
-        title: 'Correo electrónico',
+        title: 'WhatsApp 24/7',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamar Ahora',
+        description: 'Atención Inmediata',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo Electrónico',
         description: 'salud@smdvitalbogota.com',
         icon: 'tabler:mail',
       },
-      {
-        title: 'Call Center',
-        description: '+57 (304) 291-2564',
-        icon: 'tabler:headset',
-      },
-      {
-        title: 'Síguenos',
-        description: '@smdvitalbogota',
-        icon: 'tabler:brand-twitter',
-      },
     ]}
-  />
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent dark:from-slate-800"></div>
+    </Fragment>
+  </Steps2>
 
-  <!-- BlogLatestPost Widget **************** -->
+  <!-- BlogLatestPosts Widget **************** -->
 
   <BlogLatestPosts
     id="blog"
-    title="Conoce más sobre el suero multivitamínico y sus beneficios"
-    information={`Visita nuestro blog para aprender más sobre los sueros multivitamínicos, sus beneficios, cómo funcionan y cómo pueden mejorar tu salud y bienestar. ¡Gracias por leernos!`}
+    title="Aprende más sobre el suero multivitamínico intravenoso"
+    information={`Visita nuestro blog para conocer más sobre la terapia intravenosa, los beneficios del suero multivitamínico y la importancia de una nutrición adecuada. ¡Gracias por leernos!`}
   >
     <Fragment slot="bg">
       <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>

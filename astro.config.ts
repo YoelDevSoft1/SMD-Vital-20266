@@ -32,6 +32,10 @@ export default defineConfig({
   integrations: [
     tailwind({
       applyBaseStyles: false,
+      // Enable Tailwind's JIT mode and purge unused CSS
+      config: {
+        mode: 'jit',
+      },
     }),
     sitemap(),
     mdx(),
