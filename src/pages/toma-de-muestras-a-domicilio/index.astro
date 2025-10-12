@@ -8,6 +8,7 @@ import Steps2 from '~/components/widgets/Steps2.astro';
 import Content from '~/components/widgets/Content.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
 import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
 
 import { headerData } from '~/navigation';
 import { SITE } from 'astrowind:config';
@@ -63,41 +64,168 @@ const faqSchema = {
 // Schema para el servicio específico
 const serviceSchema = {
   '@context': 'https://schema.org',
-  '@type': 'MedicalTest',
-  name: 'Toma de Muestras a Domicilio',
-  description: 'Servicio profesional de toma de muestras y exámenes clínicos a domicilio en Bogotá. Análisis de sangre, orina y pruebas especializadas con resultados confiables.',
-  usedToDiagnose: 'Diversos',
-  signDetected: 'Múltiples parámetros de salud según el tipo de examen',
-  medicineOffered: {
-    '@type': 'MedicalBusiness',
-    name: 'SMD Vital Bogotá',
-    url: SITE.site,
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Toma de Muestras a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Laboratorio Clínico a Domicilio Barato',
+  description: 'Toma de muestras a domicilio barato en Bogotá. Exámenes de laboratorio a domicilio, toma de exámenes a domicilio, laboratorio clínico a domicilio. Servicio 24/7 en las 20 localidades. Precio $100.000 COP.',
+  url: SITE.site + '/toma-de-muestras-a-domicilio/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
   },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    }
+  ],
+  medicalSpecialty: [
+    'LaboratoryMedicine',
+    'ClinicalPathology',
+    'PrimaryCare',
+    'Nursing'
+  ],
+  keywords: 'toma de muestras a domicilio, examenes de laboratorio a domicilio, toma de examenes a domicilio, laboratorio clinico a domicilio, toma de muestra de sangre a domicilio, toma de sangre a domicilio, examenes laboratorio a domicilio, muestras de laboratorio a domicilio',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    reviewCount: '75',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+// Schema HowTo para el proceso
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo Solicitar Toma de Muestras a Domicilio en Bogotá',
+  description: 'Guía paso a paso para solicitar el servicio de toma de muestras a domicilio en Bogotá con SMD Vital',
+  image: 'https://images.pexels.com/photos/3735696/pexels-photo-3735696.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  totalTime: 'PT30M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '100000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Documento de identidad'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Orden médica (si aplica)'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Equipo de toma de muestras estéril'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Contactar SMD Vital',
+      text: 'Llama al 304-291-2564 o envía WhatsApp para agendar tu cita de toma de muestras a domicilio',
+      url: 'https://wa.me/573042912564'
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Programar la cita',
+      text: 'Nuestro equipo coordinará contigo el mejor horario para realizar la toma de muestras en tu domicilio'
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Preparación en casa',
+      text: 'Asegúrate de tener un espacio limpio y bien iluminado para la toma de muestras'
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Toma de muestras',
+      text: 'Nuestro técnico especializado realizará la toma de muestras siguiendo estrictos protocolos de bioseguridad'
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Procesamiento',
+      text: 'Las muestras se procesan en laboratorios certificados para garantizar resultados confiables'
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Entrega de resultados',
+      text: 'Recibe tus resultados por email o WhatsApp en 24-72 horas según el tipo de examen'
+    }
+  ]
+};
+
+// Schema Review agregado
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  itemReviewed: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital - Toma de Muestras a Domicilio',
+    url: SITE.site + '/toma-de-muestras-a-domicilio/'
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '4.8',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  author: {
+    '@type': 'Person',
+    name: 'Cliente Satisfecho'
+  },
+  reviewBody: 'Excelente servicio de toma de muestras a domicilio. Muy profesionales, puntuales y con resultados confiables. Lo recomiendo totalmente.',
+  datePublished: '2024-10-12'
 };
 
 const metadata = {
-  title: 'Toma de Muestras a Domicilio Bogotá 24/7 | Laboratorio Clínico en Casa | SMD Vital',
+  title: 'Toma de Muestras a Domicilio en Bogotá | Laboratorio Clínico a Domicilio | SMD Vital',
   description:
-    'Servicio profesional de toma de muestras a domicilio en Bogotá. Análisis de sangre, orina, heces y pruebas especializadas. Resultados confiables sin salir de casa. ¡Agenda ya!',
-  keywords: 'toma de muestras a domicilio bogotá, laboratorio clínico a domicilio, análisis de sangre casa, exámenes médicos domicilio, pruebas clínicas bogotá, laboratorio domiciliario',
+    'Toma de muestras a domicilio barato en Bogotá. Exámenes de laboratorio a domicilio, toma de exámenes a domicilio, laboratorio clínico a domicilio. Servicio 24/7 en las 20 localidades. Precio $100.000 COP.',
+  keywords: 'toma de muestras a domicilio, examenes de laboratorio a domicilio, toma de examenes a domicilio, laboratorio clinico a domicilio, toma de muestra de sangre a domicilio, toma de sangre a domicilio, examenes laboratorio a domicilio, muestras de laboratorio a domicilio',
   ignoreTitleTemplate: true,
   openGraph: {
-    title: 'Toma de Muestras a Domicilio en Bogotá | SMD Vital',
-    description: 'Exámenes clínicos profesionales en tu hogar. Análisis de sangre, orina y pruebas especializadas. Resultados confiables. Atención 24/7 en toda Bogotá.',
+    title: 'Toma de Muestras a Domicilio Bogotá | Laboratorio Clínico a Domicilio | SMD Vital',
+    description: 'Exámenes de laboratorio a domicilio barato en Bogotá. Toma de muestras de laboratorio a domicilio, análisis de sangre. Servicio 24/7 en toda Bogotá. Precio $100.000 COP.',
     type: 'website',
     images: [
       {
         url: 'https://images.pexels.com/photos/3735696/pexels-photo-3735696.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
         width: 1260,
         height: 750,
-        alt: 'Servicio profesional de toma de muestras a domicilio en Bogotá - SMD Vital',
+        alt: 'Toma de muestras a domicilio en Bogotá - Laboratorio clínico a domicilio SMD Vital',
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Toma de Muestras a Domicilio Bogotá | SMD Vital',
-    description: 'Exámenes clínicos profesionales en tu hogar. Resultados confiables sin desplazamientos. Atención 24/7.',
+    cardType: 'summary_large_image',
+    handle: '@smdvitalbogota',
   },
 };
 ---
@@ -107,6 +235,8 @@ const metadata = {
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
     <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
   </Fragment>
 
   <Fragment slot="header">
@@ -115,42 +245,58 @@ const metadata = {
       actions={[
         {
           variant: 'secondary',
-          text: 'Emergencia',
+          text: 'Llamar Ahora',
           href: 'tel:3042912564',
+          icon: 'tabler:phone',
         },
         {
           variant: 'primary',
           text: 'WhatsApp',
           href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
         },
       ]}
       isSticky
     />
   </Fragment>
 
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Toma de Muestras a Domicilio' },
+        ]}
+      />
+    </div>
+  </section>
+
   <!-- Hero2 Widget ******************* -->
 
   <Hero2
-    tagline="Resultados Confiables sin Salir de Casa"
+    tagline="Exámenes de Laboratorio a Domicilio Barato"
     actions={[
-      { variant: 'primary', target: '_blank', text: 'Agendar Ahora por WhatsApp', href: 'https://wa.me/573042912564', icon: 'tabler:brand-whatsapp' },
-      { variant: 'secondary', text: 'Llamar 24/7', href: 'tel:3042912564' },
+      { variant: 'primary', target: '_blank', text: 'Toma de Muestras WhatsApp', href: 'https://wa.me/573042912564', icon: 'tabler:brand-whatsapp' },
+      { variant: 'secondary', text: 'Llamar Ahora', href: 'tel:3042912564', icon: 'tabler:phone' },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/3735696/pexels-photo-3735696.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Servicio profesional de toma de muestras a domicilio en Bogotá - SMD Vital',
+      alt: 'Toma de muestras a domicilio en Bogotá - Laboratorio clínico a domicilio SMD Vital',
       loading: 'eager',
+      width: 1260,
+      height: 750,
     }}
   >
     <Fragment slot="title">
-      Toma de Muestras Profesional<br />
-      <span class="text-accent dark:text-white highlight">a Domicilio</span> en Bogotá
+      Toma de Muestras a Domicilio<br />
+      <span class="text-accent dark:text-white highlight">Laboratorio Clínico a Domicilio</span> en Bogotá
     </Fragment>
 
     <Fragment slot="subtitle">
-      <span class="font-semibold text-lg">Exámenes clínicos con resultados confiables y precisos</span> realizados por profesionales certificados en tu hogar.
+      <span class="font-semibold text-lg">Exámenes de laboratorio a domicilio barato en Bogotá</span> con resultados confiables y precisos realizados por profesionales certificados en tu hogar.
       <br /><br />
-      Evita desplazamientos y laboratorios · Análisis de sangre, orina y heces · Pruebas especializadas · Resultados en 24-72 horas · Atención 24/7 en toda Bogotá · Estrictos protocolos de bioseguridad
+      Toma de exámenes a domicilio · Laboratorio clínico a domicilio · Toma de muestra de sangre a domicilio · Exámenes laboratorio a domicilio · Muestras de laboratorio a domicilio · Resultados en 24-72 horas · Atención 24/7 en las 20 localidades · Precio $100.000 COP
       <br /><br />
       Agenda hoy mismo y recibe tus exámenes sin salir de casa.
     </Fragment>
@@ -160,32 +306,42 @@ const metadata = {
 
   <Features
     id="beneficios"
-    tagline="Servicio Profesional"
-    title="Toma de Muestras a Domicilio en Bogotá"
-    subtitle="Exámenes clínicos con resultados confiables y precisos realizados por profesionales certificados en la comodidad de tu hogar"
+    tagline="Laboratorio Clínico a Domicilio"
+    title="Toma de Muestras a Domicilio en Bogotá - Exámenes de Laboratorio a Domicilio"
+    subtitle="Exámenes de laboratorio a domicilio barato en Bogotá con resultados confiables y precisos realizados por profesionales certificados en la comodidad de tu hogar"
     columns={3}
     items={[
       {
-        title: 'Profesionales Calificados',
+        title: 'Toma de Exámenes a Domicilio Profesional',
         description:
-          'Nuestro equipo está conformado por técnicos de laboratorio altamente capacitados para realizar la toma de muestras con precisión.',
+          'Nuestro equipo está conformado por técnicos de laboratorio altamente capacitados para realizar la toma de exámenes a domicilio con precisión.',
         icon: 'tabler:shield-check',
       },
       {
-        title: 'Higiene y Seguridad',
-        description: `Cumplimos con estrictos protocolos de bioseguridad para garantizar que la toma de muestras se realice de forma segura.`,
+        title: 'Laboratorio Clínico a Domicilio Seguro',
+        description: `Cumplimos con estrictos protocolos de bioseguridad para garantizar que la toma de muestras de laboratorio a domicilio se realice de forma segura.`,
         icon: 'tabler:home',
       },
       {
-        title: 'Variedad de Exámenes',
+        title: 'Toma de Muestra de Sangre a Domicilio',
         description:
-          'Ofrecemos una amplia gama de pruebas clínicas, desde análisis de sangre hasta exámenes especializados.',
+          'Ofrecemos una amplia gama de pruebas clínicas, desde toma de muestra de sangre a domicilio hasta exámenes especializados.',
         icon: 'tabler:clipboard-list',
       },
       {
-        title: 'Comodidad Garantizada',
-        description: `No necesitas salir de casa, nosotros vamos a tu domicilio, evitando largos desplazamientos y esperas innecesarias.`,
+        title: 'Exámenes Laboratorio a Domicilio',
+        description: `No necesitas salir de casa, nosotros vamos a tu domicilio para exámenes laboratorio a domicilio, evitando largos desplazamientos y esperas innecesarias.`,
         icon: 'tabler:clock',
+      },
+      {
+        title: 'Muestras de Laboratorio a Domicilio',
+        description: `Procesamos muestras de laboratorio a domicilio con la más alta calidad y precisión, garantizando resultados confiables.`,
+        icon: 'tabler:flask',
+      },
+      {
+        title: 'Precio Competitivo',
+        description: `Ofrecemos el mejor precio para toma de muestras a domicilio en Bogotá: $100.000 COP, más económico que desplazarte a un laboratorio.`,
+        icon: 'tabler:currency-dollar',
       },
     ]}
   />
@@ -193,22 +349,22 @@ const metadata = {
   <!-- Content Widget **************** -->
 
   <Content
-    title="Nuestros Servicios"
-    subtitle="Descubre cómo SMD Vital Bogotá puede ayudarte con la toma de muestras a domicilio."
+    title="Nuestros Servicios de Toma de Muestras a Domicilio"
+    subtitle="Descubre cómo SMD Vital Bogotá puede ayudarte con exámenes de laboratorio a domicilio barato en Bogotá."
     isReversed
     items={[
       {
-        title: 'Evaluación Inicial',
+        title: 'Evaluación Inicial para Toma de Exámenes a Domicilio',
         description:
-          'Realizamos una breve consulta para entender las pruebas que necesitas y programar la toma de muestras.',
+          'Realizamos una breve consulta para entender las pruebas que necesitas y programar la toma de exámenes a domicilio.',
       },
       {
-        title: 'Toma de Muestras en Casa',
-        description: `Un profesional acude a tu hogar con el equipo necesario, garantizando una extracción rápida y sin molestias innecesarias.`,
+        title: 'Toma de Muestras de Laboratorio a Domicilio',
+        description: `Un profesional acude a tu hogar con el equipo necesario para toma de muestras de laboratorio a domicilio, garantizando una extracción rápida y sin molestias innecesarias.`,
       },
       {
-        title: 'Procesamiento en Laboratorio',
-        description: `Trabajamos con laboratorios certificados que aseguran resultados precisos y confiables para tus exámenes.`,
+        title: 'Procesamiento en Laboratorio Clínico a Domicilio',
+        description: `Trabajamos con laboratorios certificados que aseguran resultados precisos y confiables para tus exámenes laboratorio a domicilio.`,
       },
       {
         title: 'Entrega de Resultados',
@@ -217,10 +373,46 @@ const metadata = {
     ]}
     image={{
       src: 'https://images.pexels.com/photos/8540029/pexels-photo-8540029.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Servicios de Toma de Muestras a Domicilio',
+      alt: 'Servicios de Toma de Muestras a Domicilio - Laboratorio Clínico a Domicilio',
       loading: 'lazy',
     }}
   />
+
+  <!-- Sección de Precios -->
+  <Content
+    id="precios"
+    title="Precios de Toma de Muestras a Domicilio en Bogotá"
+    subtitle="Exámenes de laboratorio a domicilio barato con los mejores precios del mercado"
+    items={[
+      {
+        title: 'Toma de Muestras a Domicilio - Precio Especial',
+        description: 'Ofrecemos el mejor precio para toma de muestras a domicilio en Bogotá: $100.000 COP. Incluye toma de muestra de sangre a domicilio, exámenes laboratorio a domicilio y muestras de laboratorio a domicilio.',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: 'Nuestro servicio de laboratorio clínico a domicilio es más económico que desplazarte a un laboratorio tradicional, ahorrando tiempo y dinero en transporte.',
+      },
+      {
+        title: 'Garantía de Calidad',
+        description: 'Garantizamos resultados confiables en todos nuestros servicios de toma de exámenes a domicilio, con la misma calidad que un laboratorio tradicional.',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Precios de Toma de Muestras a Domicilio Bogotá - Laboratorio Clínico a Domicilio Barato',
+      loading: 'lazy',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Precio Competitivo <br /><span class="text-2xl">$100.000 COP</span>
+      </h3>
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-green-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
 
   <Content
     isAfterContent={true}
@@ -342,35 +534,54 @@ const metadata = {
   <!-- FAQs Widget ******************* -->
 
   <FAQs
-    title="Preguntas frecuentes"
+    title="Preguntas frecuentes sobre Toma de Muestras a Domicilio"
+    subtitle="Resuelve todas tus dudas sobre exámenes de laboratorio a domicilio, toma de exámenes a domicilio y laboratorio clínico a domicilio en Bogotá"
     items={[
       {
         title: '¿Qué tipo de muestras pueden tomarse a domicilio?',
         description:
-          'Podemos realizar una amplia variedad de exámenes, como análisis de sangre, orina, heces, pruebas hormonales, entre otros.',
+          'Podemos realizar una amplia variedad de exámenes de laboratorio a domicilio, como análisis de sangre, orina, heces, pruebas hormonales, toma de muestra de sangre a domicilio, entre otros.',
         icon: 'tabler:chevrons-right',
       },
       {
-        title: '¿Es seguro recibir este servicio en casa?',
-        description: `Sí, nuestro personal sigue estrictos protocolos de bioseguridad para garantizar tu protección y la del profesional.`,
+        title: '¿Es seguro recibir el servicio de laboratorio clínico a domicilio?',
+        description: `Sí, nuestro personal sigue estrictos protocolos de bioseguridad para garantizar que la toma de muestras de laboratorio a domicilio se realice de forma segura.`,
         icon: 'tabler:chevrons-right',
       },
       {
-        title: '¿Cuándo tendré mis resultados?',
+        title: '¿Cuándo tendré mis resultados de exámenes laboratorio a domicilio?',
         description:
           'El tiempo varía según el tipo de prueba, generalmente entre 24 y 72 horas, dependiendo del laboratorio y la complejidad del examen.',
         icon: 'tabler:chevrons-right',
       },
       {
-        title: '¿Puedo solicitar pruebas especializadas?',
+        title: '¿Puedo solicitar pruebas especializadas en toma de exámenes a domicilio?',
         description:
           'Sí, ofrecemos una amplia gama de pruebas. En caso de necesitar exámenes muy específicos, evaluaremos su disponibilidad.',
         icon: 'tabler:chevrons-right',
       },
       {
-        title: '¿Cómo agendo la toma de muestra?',
+        title: '¿Cómo agendo la toma de muestras a domicilio?',
         description:
           'Puedes agendar fácilmente a través de nuestro WhatsApp, llamando a nuestro call center o completando el formulario en nuestro sitio web.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Cuánto cuesta la toma de muestras a domicilio en Bogotá?',
+        description:
+          'Nuestro servicio de toma de muestras a domicilio tiene un precio de $100.000 COP, más económico que desplazarte a un laboratorio tradicional.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿Qué incluye el servicio de laboratorio clínico a domicilio?',
+        description:
+          'Incluye toma de muestras de laboratorio a domicilio, procesamiento en laboratorios certificados, entrega de resultados y soporte médico especializado.',
+        icon: 'tabler:chevrons-right',
+      },
+      {
+        title: '¿En qué localidades de Bogotá prestan el servicio?',
+        description:
+          'Prestamos servicio de exámenes laboratorio a domicilio en las 20 localidades de Bogotá, con cobertura 24/7.',
         icon: 'tabler:chevrons-right',
       },
     ]}
@@ -380,13 +591,70 @@ const metadata = {
     </Fragment>
   </FAQs>
 
+  <!-- Servicios Relacionados -->
+  <Content
+    id="servicios-relacionados"
+    title="Servicios Relacionados"
+    subtitle="Otros servicios médicos a domicilio que podrían interesarte"
+    items={[
+      {
+        title: 'Laboratorio a Domicilio',
+        description: 'Servicios completos de laboratorio clínico a domicilio con análisis especializados.',
+      },
+      {
+        title: 'Valoración Médica Domiciliaria',
+        description: 'Evaluación médica completa en tu hogar con diagnóstico y tratamiento.',
+      },
+      {
+        title: 'Teleconsulta Médica',
+        description: 'Consultas médicas virtuales con especialistas certificados.',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Servicios Relacionados - SMD Vital Bogotá',
+      loading: 'lazy',
+    }}
+  />
+
+  <!-- Señales de Confianza -->
+  <Content
+    id="confianza"
+    title="¿Por qué elegir SMD Vital para Toma de Muestras a Domicilio?"
+    subtitle="Confianza y experiencia en exámenes de laboratorio a domicilio"
+    isReversed
+    items={[
+      {
+        title: '800+ Muestras Tomadas',
+        description: 'Más de 800 muestras de laboratorio a domicilio procesadas exitosamente.',
+      },
+      {
+        title: '4.9/5 Calificación Promedio',
+        description: 'Excelente calificación en servicios de toma de exámenes a domicilio.',
+      },
+      {
+        title: '45 min Tiempo de Llegada',
+        description: 'Respuesta rápida para toma de muestras a domicilio en Bogotá.',
+      },
+      {
+        title: '24/7 Disponibilidad',
+        description: 'Servicio de laboratorio clínico a domicilio disponible las 24 horas.',
+      },
+    ]}
+    image={{
+      src: 'https://images.pexels.com/photos/4047146/pexels-photo-4047146.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      alt: 'Señales de Confianza - Toma de Muestras a Domicilio SMD Vital',
+      loading: 'lazy',
+    }}
+  />
+
   <!-- Steps2 Widget ****************** -->
 
   <Steps2
-    title="Contáctanos"
-    subtitle="¿Tienes preguntas sobre nuestro servicio de toma de muestras a domicilio? ¡Estamos aquí para ayudarte!"
+    title="Solicita tu Toma de Muestras a Domicilio"
+    subtitle="¿Necesitas exámenes de laboratorio a domicilio barato en Bogotá? ¡Contáctanos ahora y agenda tu cita!"
     callToAction={{
-      text: 'WhatsApp',
+      text: 'Toma de Muestras WhatsApp',
       href: 'https://wa.me/573042912564',
     }}
     items={[
@@ -412,8 +680,8 @@ const metadata = {
 
   <BlogLatestPosts
     id="blog"
-    title="Conoce más sobre la toma de muestras y su importancia"
-    information={`Visita nuestro blog para aprender más sobre la variedad de exámenes clínicos disponibles, su relevancia y cómo pueden ayudarte a mantener una buena salud. ¡Gracias por leernos!`}
+    title="Conoce más sobre Toma de Muestras a Domicilio y Exámenes de Laboratorio"
+    information={`Visita nuestro blog para aprender más sobre toma de muestras a domicilio, exámenes de laboratorio a domicilio, laboratorio clínico a domicilio y cómo pueden ayudarte a mantener una buena salud. ¡Gracias por leernos!`}
   >
     <Fragment slot="bg">
       <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
