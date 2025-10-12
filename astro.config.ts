@@ -23,6 +23,7 @@ const whenExternalScripts = (items: (() => AstroIntegration) | (() => AstroInteg
 
 export default defineConfig({
   output: 'static',
+  trailingSlash: 'never',
 
   // Optimize build for better performance - inline all stylesheets to avoid render blocking
   build: {
@@ -32,10 +33,6 @@ export default defineConfig({
   integrations: [
     tailwind({
       applyBaseStyles: false,
-      // Enable Tailwind's JIT mode and purge unused CSS
-      config: {
-        mode: 'jit',
-      },
     }),
     sitemap(),
     mdx(),

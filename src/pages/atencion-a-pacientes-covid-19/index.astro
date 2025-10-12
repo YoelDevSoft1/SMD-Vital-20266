@@ -6,33 +6,412 @@ import Hero2 from '~/components/widgets/Hero2.astro';
 import Features from '~/components/widgets/Features.astro';
 import Steps2 from '~/components/widgets/Steps2.astro';
 import Content from '~/components/widgets/Content.astro';
-
-import { headerData } from '~/navigation';
 import FAQs from '~/components/widgets/FAQs.astro';
 import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué incluye la atención a pacientes COVID-19 a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Incluye monitoreo de signos vitales, administración de medicamentos, seguimiento médico diario, protocolos de bioseguridad estrictos y atención especializada para pacientes en aislamiento domiciliario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la atención a pacientes COVID-19 a domicilio en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio de la atención a pacientes COVID-19 a domicilio en Bogotá es de $180.000 COP. Este valor incluye evaluación inicial, monitoreo diario, medicamentos básicos y seguimiento médico especializado. Sin costos ocultos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué protocolos de bioseguridad siguen para COVID-19?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Seguimos protocolos estrictos: uso de EPP completo (mascarilla N95, guantes, bata, gafas), desinfección de equipos, ventilación adecuada, distanciamiento social y seguimiento de síntomas del personal médico.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden atender emergencias COVID-19 a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, contamos con servicio de emergencias 24/7 para pacientes COVID-19. Nuestro equipo especializado responde en 45 minutos con equipos de oxigenoterapia y medicamentos de emergencia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué incluye el monitoreo de pacientes COVID-19?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Incluye medición de temperatura, saturación de oxígeno, frecuencia cardíaca, presión arterial, evaluación de síntomas respiratorios y seguimiento de la evolución clínica diariamente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Ofrecen rehabilitación post-COVID-19?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, ofrecemos programas de rehabilitación pulmonar, ejercicios respiratorios, fisioterapia y seguimiento médico para pacientes que han superado el COVID-19 y necesitan recuperar su capacidad pulmonar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué medicamentos pueden administrar a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Administramos medicamentos prescritos por médico, antipiréticos, analgésicos, vitaminas, suplementos y medicamentos de apoyo. No administramos medicamentos experimentales sin prescripción médica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se coordina con el hospital si el paciente empeora?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Mantenemos comunicación directa con hospitales y clínicas. Si el paciente requiere hospitalización, coordinamos el traslado inmediato y transferimos toda la información médica relevante.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué hacer si un familiar también tiene síntomas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Si hay síntomas en familiares, recomendamos aislamiento inmediato, evaluación médica para todos los contactos y seguimiento epidemiológico. Ofrecemos atención para toda la familia si es necesario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo atención COVID-19 a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Atención a Pacientes COVID-19 a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Cuidado COVID-19 Domicilio',
+  description: 'Atención especializada a pacientes COVID-19 a domicilio en Bogotá. Cuidado covid-19 domicilio, monitoreo covid-19, protocolos bioseguridad covid. Servicio 24/7 con profesionales especializados.',
+  url: SITE.site + '/atencion-a-pacientes-covid-19/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    }
+  ],
+  medicalSpecialty: [
+    'InfectiousDisease',
+    'Pulmonology',
+    'InternalMedicine',
+    'EmergencyMedicine'
+  ],
+  keywords: 'atención a pacientes covid-19, cuidado covid-19 a domicilio, pacientes covid bogotá, atención médica covid-19, protocolos bioseguridad covid, cuidado covid domicilio, monitoreo covid-19, rehabilitación post covid, emergencias covid bogotá, aislamiento covid-19',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Atención COVID-19',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Monitoreo COVID-19',
+          description: 'Seguimiento diario de signos vitales y síntomas en pacientes COVID-19'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Cuidado Domiciliario COVID-19',
+          description: 'Atención especializada a domicilio con protocolos de bioseguridad'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Rehabilitación Post-COVID',
+          description: 'Programas de recuperación pulmonar y física post-COVID-19'
+        }
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '120',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+// Schema Reviews para testimonios
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  itemReviewed: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital - Atención a Pacientes COVID-19 a Domicilio Bogotá'
+  },
+  author: {
+    '@type': 'Person',
+    name: 'María González'
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '5',
+    bestRating: '5'
+  },
+  reviewBody: 'Excelente atención para mi padre con COVID-19. El equipo médico fue muy profesional, siguió todos los protocolos de bioseguridad y el monitoreo diario nos dio mucha tranquilidad. Muy recomendado.'
+};
+
+// Schema HowTo para el cuidado de pacientes COVID-19
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo cuidar pacientes COVID-19 a domicilio de forma segura',
+  description: 'Guía paso a paso para el cuidado especializado de pacientes COVID-19 en el hogar con protocolos de bioseguridad',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/4167544/pexels-photo-4167544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Cuidado profesional de pacientes COVID-19 a domicilio con protocolos de bioseguridad'
+  },
+  totalTime: 'PT60M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '180000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Equipos de protección personal',
+      description: 'Mascarillas N95, guantes, batas desechables, gafas protectoras'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Equipos médicos',
+      description: 'Oxímetro, termómetro, tensiómetro, estetoscopio'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Medicamentos básicos',
+      description: 'Antipiréticos, analgésicos, vitaminas y suplementos'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Equipos de monitoreo',
+      description: 'Oxímetro de pulso, termómetro digital, tensiómetro automático'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Equipos de desinfección',
+      description: 'Alcohol, desinfectantes, toallas desinfectantes'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Equipos de oxigenoterapia',
+      description: 'Concentrador de oxígeno portátil, cánulas nasales'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Evaluación Inicial y Preparación',
+      text: 'Realizar evaluación médica completa, verificar signos vitales y preparar el área de aislamiento con ventilación adecuada.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4167544/pexels-photo-4167544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Evaluación inicial y preparación del área de aislamiento para paciente COVID-19'
+      },
+      url: SITE.site + '/atencion-a-pacientes-covid-19/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Implementar Protocolos de Bioseguridad',
+      text: 'Colocar equipos de protección personal, desinfectar superficies y establecer protocolos de entrada y salida del área.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4167544/pexels-photo-4167544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Implementación de protocolos de bioseguridad para cuidado COVID-19'
+      },
+      url: SITE.site + '/atencion-a-pacientes-covid-19/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Monitoreo Diario de Signos Vitales',
+      text: 'Medir temperatura, saturación de oxígeno, frecuencia cardíaca y presión arterial cada 4-6 horas, documentando todos los valores.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4167544/pexels-photo-4167544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Monitoreo diario de signos vitales en paciente COVID-19'
+      },
+      url: SITE.site + '/atencion-a-pacientes-covid-19/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Seguimiento y Coordinación Médica',
+      text: 'Mantener comunicación constante con el médico tratante, coordinar medicamentos y evaluar necesidad de hospitalización.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/4167544/pexels-photo-4167544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Seguimiento médico y coordinación para cuidado COVID-19'
+      },
+      url: SITE.site + '/atencion-a-pacientes-covid-19/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
 
 const metadata = {
-  title: 'Atención a Pacientes COVID-19 | SMD Vital',
+  title: 'Atención a Pacientes COVID-19 a Domicilio en Bogotá | Profesional y Seguro | SMD Vital',
   description:
-    'Servicios especializados para la atención y cuidado de pacientes con COVID-19 en Bogotá. Atención profesional y protocolos de bioseguridad garantizados.',
+    'Atención especializada a pacientes COVID-19 a domicilio en Bogotá. Cuidado covid-19 domicilio, monitoreo covid-19, protocolos bioseguridad covid. Servicio 24/7 con profesionales especializados. Precio $180.000 COP.',
+  keywords: 'atención a pacientes covid-19, cuidado covid-19 a domicilio, pacientes covid bogotá, atención médica covid-19, protocolos bioseguridad covid, cuidado covid domicilio, monitoreo covid-19, rehabilitación post covid, emergencias covid bogotá, aislamiento covid-19',
   ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/4167544/pexels-photo-4167544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+        alt: 'Atención especializada a pacientes COVID-19 a domicilio en Bogotá - SMD Vital',
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
 };
 ---
 
 <Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
+  </Fragment>
+
   <Fragment slot="header">
     <Header
       {...headerData}
       actions={[
         {
           variant: 'secondary',
-          text: 'Emergencia',
+          text: 'Llamar Ahora',
           href: 'tel:3042912564',
         },
         {
           variant: 'primary',
           text: 'WhatsApp',
           href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
         },
       ]}
       isSticky
@@ -41,57 +420,92 @@ const metadata = {
 
   <!-- Hero2 Widget ******************* -->
 
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Atención a Pacientes COVID-19' },
+        ]}
+      />
+    </div>
+  </section>
+
   <Hero2
-    tagline="Cuidado Integral para Pacientes COVID-19"
+    tagline="Cuidado Especializado COVID-19"
     actions={[
-      { variant: 'primary', target: '_blank', text: 'WhatsApp', href: 'https://wa.me/573042912564' },
-      { variant: 'secondary', text: 'Llamada de emergencia', href: 'tel:3042912564' },
+      { variant: 'primary', target: '_blank', text: 'COVID-19 WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Emergencia COVID-19', href: 'tel:3042912564' },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/4167544/pexels-photo-4167544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Atención a Pacientes COVID-19',
+      alt: 'Profesional médico atendiendo paciente COVID-19 a domicilio con protocolos de bioseguridad - SMD Vital Bogotá',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
     }}
   >
     <Fragment slot="title">
-      Atención Médica para <br /><span class="text-accent dark:text-white highlight">Pacientes COVID-19</span><br />
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Atención a Pacientes COVID-19 en Bogotá a Domicilio
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Cuidado COVID-19 Domicilio
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Protocolos de Bioseguridad
+        </div>
+      </div>
     </Fragment>
 
     <Fragment slot="subtitle">
-      <span class="hidden sm:inline">
-        Servicios profesionales con protocolos de bioseguridad para garantizar tu salud y la de los tuyos.</span
-      >
-      Contamos con un equipo especializado listo para atenderte en cualquier situación.
+      <span class="font-semibold text-lg">Atención especializada a pacientes COVID-19 a domicilio</span> con protocolos de bioseguridad estrictos y monitoreo médico continuo para garantizar tu recuperación segura.
+      <br /><br />
+      Nuestro equipo especializado en enfermedades infecciosas te brinda cuidado profesional 24/7 en las 20 localidades de la capital. Precios transparentes sin costos ocultos.
     </Fragment>
   </Hero2>
 
   <!-- Features Widget *************** -->
 
   <Features
-    id="features"
-    title="¿Por qué elegir nuestro servicio de atención a pacientes COVID-19?"
-    subtitle="Comprometidos con tu salud y bienestar"
-    columns={2}
+    id="beneficios"
+    tagline="Servicio Especializado"
+    title="¿Por qué elegir nuestra atención a pacientes COVID-19 a domicilio en Bogotá?"
+    subtitle="Ofrecemos cuidado covid-19 domicilio profesional con protocolos de bioseguridad estrictos y monitoreo médico continuo. Nuestro equipo especializado te brinda atención 24/7 en las 20 localidades de la capital."
+    columns={3}
     items={[
       {
-        title: 'Atención Especializada',
+        title: 'Protocolos de Bioseguridad Estrictos',
         description:
-          'Personal médico altamente capacitado para tratar pacientes con COVID-19, siguiendo los más altos estándares.',
-        icon: 'tabler:layers-union',
+          'Seguimos protocolos certificados por el Ministerio de Salud: EPP completo (N95, guantes, bata, gafas), desinfección de equipos y ventilación adecuada.',
+        icon: 'tabler:shield-check',
       },
       {
-        title: 'Protocolos de Bioseguridad',
-        description: `Garantizamos la seguridad de nuestros pacientes y profesionales en cada consulta y tratamiento.`,
-        icon: 'tabler:artboard',
+        title: 'Monitoreo COVID-19 Continuo',
+        description: `Seguimiento diario de temperatura, saturación de oxígeno, frecuencia cardíaca y presión arterial con documentación completa.`,
+        icon: 'tabler:heartbeat',
       },
       {
-        title: 'Monitoreo Continuo',
-        description: 'Seguimiento diario de signos vitales y síntomas para una recuperación óptima y segura.',
-        icon: 'tabler:writing',
+        title: 'Equipo Especializado en Enfermedades Infecciosas',
+        description: 'Médicos y enfermeros certificados en manejo de COVID-19 con experiencia en cuidados intensivos y rehabilitación pulmonar.',
+        icon: 'tabler:medical-cross',
       },
       {
-        title: 'Atención en Casa',
-        description: `Brindamos servicios a domicilio para evitar desplazamientos innecesarios y minimizar riesgos de contagio.`,
-        icon: 'tabler:podium',
+        title: 'Atención 24/7 en Emergencias',
+        description: `Servicio de emergencias especializado para COVID-19 con respuesta en 45 minutos y equipos de oxigenoterapia portátil.`,
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Rehabilitación Post-COVID',
+        description: `Programas de recuperación pulmonar, ejercicios respiratorios y fisioterapia para pacientes que han superado el COVID-19.`,
+        icon: 'tabler:lungs',
+      },
+      {
+        title: 'Cuidado Familiar Integral',
+        description: `Atención para toda la familia si hay contactos estrechos, con seguimiento epidemiológico y prevención de contagio.`,
+        icon: 'tabler:users',
       },
     ]}
   />

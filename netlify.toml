@@ -54,8 +54,8 @@
   status = 301
 
 [[redirects]]
-  from = "/lavado-de-oidos-a-domicilio"
-  to = "/servicios/lavado-de-oidos-a-domicilio"
+  from = "/servicios/lavado-de-oidos-a-domicilio"
+  to = "/lavado-de-oidos-a-domicilio"
   status = 301
 
 [[headers]]

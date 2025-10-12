@@ -6,33 +6,424 @@ import Hero2 from '~/components/widgets/Hero2.astro';
 import Features from '~/components/widgets/Features.astro';
 import Steps2 from '~/components/widgets/Steps2.astro';
 import Content from '~/components/widgets/Content.astro';
-
-import { headerData } from '~/navigation';
 import FAQs from '~/components/widgets/FAQs.astro';
 import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+
+import { headerData } from '~/navigation';
+import { SITE } from 'astrowind:config';
+
+// Schema.org para FAQs (Expandido con 10 preguntas)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el retiro y colocación de sonda vesical a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es un servicio médico especializado que consiste en la retirada segura de sondas vesicales existentes y la colocación de nuevas sondas (catéter Foley) en la comodidad de tu hogar, realizado por profesionales certificados en urología.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta el retiro y colocación de sonda vesical a domicilio en Bogotá?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio del retiro y colocación de sonda vesical a domicilio en Bogotá es de $150.000 COP. Este valor incluye evaluación inicial, procedimiento completo, materiales estériles y cuidados posteriores. Sin costos ocultos, precios transparentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué tipos de sondas vesicales pueden manejar a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Manejamos sondas Foley de diferentes calibres, sondas de silicona, sondas de látex y sondas especializadas. Nuestros profesionales evalúan cada caso y determinan el tipo de sonda más adecuado según las necesidades del paciente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es seguro realizar el retiro y colocación de sonda vesical a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, contamos con profesionales certificados en urología y seguimos estrictos protocolos de asepsia. Utilizamos materiales estériles de un solo uso y técnicas asépticas certificadas para garantizar tu seguridad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo dura el procedimiento de sonda vesical?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El procedimiento completo dura entre 20-30 minutos, incluyendo evaluación inicial, retiro de la sonda existente, colocación de la nueva sonda y cuidados posteriores. Es un procedimiento rápido y eficiente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre sonda vesical y catéter Foley?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La sonda vesical es el término general, mientras que el catéter Foley es un tipo específico de sonda que tiene un balón inflable para mantenerla en su lugar. Ambos términos se usan indistintamente en la práctica médica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué contraindicaciones tiene el retiro y colocación de sonda vesical?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No se recomienda en casos de infección urinaria activa, estenosis uretral severa, o trauma uretral reciente. Nuestro personal realiza una evaluación previa para determinar si el procedimiento es seguro para el paciente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden atender a adultos mayores y personas con movilidad reducida?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, adaptamos el procedimiento según la edad y condición del paciente. Tenemos experiencia trabajando con adultos mayores y personas con movilidad reducida, brindando una experiencia segura y cómoda.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué cuidados necesito después del procedimiento?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Incluye mantener una buena higiene perineal, beber abundante agua, estar atento a signos de infección y seguir las indicaciones específicas que te proporcione nuestro equipo médico.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo agendo el retiro y colocación de sonda vesical a domicilio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+      },
+    },
+  ],
+};
+
+// Schema para el servicio específico (LocalBusiness mejorado)
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: 'SMD Vital - Retiro y Colocación de Sonda Vesical a Domicilio Bogotá',
+  alternateName: 'SMD Vital Bogotá - Sonda Vesical a Domicilio Barato',
+  description: 'Retiro y colocación de sonda vesical a domicilio barato en Bogotá. Sonda vesical a domicilio, catéter Foley, cuidado de sonda vesical. Servicio 24/7 en las 20 localidades. Precios económicos sin costos ocultos.',
+  url: SITE.site + '/retiro-y-colocacion-de-sonda-vesical/',
+  telephone: '+57-304-291-2564',
+  email: 'salud@smdvitalbogota.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Servicio a Domicilio',
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: '110111',
+    addressCountry: 'CO'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.7110',
+    longitude: '-74.0721'
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Bogotá',
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Chía',
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+    },
+    {
+      '@type': 'City',
+      name: 'Cajicá',
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+    },
+    {
+      '@type': 'City',
+      name: 'Soacha',
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+    },
+    {
+      '@type': 'City',
+      name: 'Funza'
+    },
+    {
+      '@type': 'City',
+      name: 'Mosquera'
+    },
+    {
+      '@type': 'City',
+      name: 'Cota'
+    }
+  ],
+  medicalSpecialty: [
+    'Urology',
+    'Nursing',
+    'PrimaryCare',
+    'InternalMedicine'
+  ],
+  keywords: 'retiro y colocación de sonda vesical, sonda vesical a domicilio, catéter vesical, sonda foley, cuidado de sonda vesical, retiro de sonda, colocación de sonda, sonda vesical bogotá, catéter foley a domicilio, cuidado de sonda vesical a domicilio',
+  priceRange: '$$',
+  openingHours: ['Mo-Su 00:00-23:59'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Sonda Vesical',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Retiro de Sonda Vesical',
+          description: 'Retirada segura de sondas vesicales existentes con técnicas asépticas'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Colocación de Sonda Vesical',
+          description: 'Instalación de nuevas sondas vesicales (catéter Foley) con técnicas profesionales'
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Cuidado de Sonda Vesical',
+          description: 'Mantenimiento y cuidado especializado de sondas vesicales existentes'
+        }
+      }
+    ]
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    reviewCount: '95',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  sameAs: [
+    'https://www.facebook.com/profile.php?id=61556817451561',
+    'https://www.instagram.com/smdvitalbogota_/',
+    'https://x.com/smdvitalbogotaoficial'
+  ],
+  currenciesAccepted: 'COP',
+  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
+  availableLanguage: ['es']
+};
+
+// Schema Reviews para testimonios
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  itemReviewed: {
+    '@type': 'MedicalBusiness',
+    name: 'SMD Vital - Retiro y Colocación de Sonda Vesical a Domicilio Bogotá'
+  },
+  author: {
+    '@type': 'Person',
+    name: 'Carlos Mendoza'
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '5',
+    bestRating: '5'
+  },
+  reviewBody: 'Excelente servicio de retiro y colocación de sonda vesical a domicilio. El personal es muy profesional y el procedimiento fue completamente cómodo. Muy recomendado para el cuidado de sondas vesicales.'
+};
+
+// Schema HowTo para el procedimiento de sonda vesical
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Cómo realizar retiro y colocación de sonda vesical profesional a domicilio',
+  description: 'Procedimiento paso a paso para retiro seguro y colocación de sondas vesicales (catéter Foley) en el hogar',
+  image: {
+    '@type': 'ImageObject',
+    url: 'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    caption: 'Procedimiento profesional de retiro y colocación de sonda vesical a domicilio'
+  },
+  totalTime: 'PT30M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'COP',
+    value: '150000'
+  },
+  supply: [
+    {
+      '@type': 'HowToSupply',
+      name: 'Sonda vesical estéril',
+      description: 'Catéter Foley de calibre apropiado según necesidades del paciente'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Material estéril',
+      description: 'Guantes, gasas, antisépticos y otros materiales de un solo uso'
+    },
+    {
+      '@type': 'HowToSupply',
+      name: 'Solución de irrigación',
+      description: 'Solución estéril para limpieza y lubricación'
+    }
+  ],
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'Equipo de urología',
+      description: 'Instrumentos especializados para procedimientos urológicos'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Material de asepsia',
+      description: 'Antisépticos, lubricantes y otros materiales de preparación'
+    },
+    {
+      '@type': 'HowToTool',
+      name: 'Equipo de monitoreo',
+      description: 'Tensiómetro y oxímetro para control de signos vitales'
+    }
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Evaluación y Preparación',
+      text: 'Realizar evaluación médica inicial, verificar signos vitales y preparar el área de trabajo con técnicas asépticas.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Evaluación inicial y preparación aséptica para procedimiento de sonda vesical'
+      },
+      url: SITE.site + '/retiro-y-colocacion-de-sonda-vesical/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Retiro de Sonda Existente',
+      text: 'Retirar la sonda vesical existente de forma cuidadosa, desinflando el balón y removiendo la sonda con técnica aséptica.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Retiro cuidadoso de sonda vesical existente con técnicas profesionales'
+      },
+      url: SITE.site + '/retiro-y-colocacion-de-sonda-vesical/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Colocación de Nueva Sonda',
+      text: 'Insertar la nueva sonda vesical (catéter Foley) con lubricación adecuada y técnica aséptica, inflando el balón para fijación.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Colocación profesional de nueva sonda vesical con técnica aséptica'
+      },
+      url: SITE.site + '/retiro-y-colocacion-de-sonda-vesical/#procedimiento'
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Verificación y Cuidados Posteriores',
+      text: 'Verificar el correcto funcionamiento de la sonda, proporcionar instrucciones de cuidado posterior y programar seguimiento si es necesario.',
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Verificación final y cuidados posteriores para sonda vesical'
+      },
+      url: SITE.site + '/retiro-y-colocacion-de-sonda-vesical/#procedimiento'
+    }
+  ],
+  author: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    telephone: '+57-304-291-2564',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO'
+    }
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SMD Vital Bogotá',
+    url: SITE.site,
+    logo: {
+      '@type': 'ImageObject',
+      url: SITE.site + '/images/logo.png'
+    }
+  },
+  datePublished: '2024-01-01',
+  dateModified: new Date().toISOString().split('T')[0]
+};
 
 const metadata = {
-  title: 'Retiro y Colocación de Sonda Vesical | SMD Vital',
+  title: 'Retiro y Colocación de Sonda Vesical a Domicilio en Bogotá | Profesional y Económico | SMD Vital',
   description:
-    'Servicios profesionales de retiro y colocación de sonda vesical a domicilio en Bogotá, Colombia. Atención segura y cómoda directamente en tu hogar.',
+    'Retiro y colocación de sonda vesical a domicilio barato en Bogotá. Sonda vesical a domicilio, catéter Foley, cuidado de sonda vesical. Servicio 24/7 en las 20 localidades. Precio $150.000 COP.',
+  keywords: 'retiro y colocación de sonda vesical, sonda vesical a domicilio, catéter vesical, sonda foley, cuidado de sonda vesical, retiro de sonda, colocación de sonda, sonda vesical bogotá, catéter foley a domicilio, cuidado de sonda vesical a domicilio',
   ignoreTitleTemplate: true,
+  openGraph: {
+    siteName: 'SMD Vital Bogotá',
+    type: 'website',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        width: 1260,
+        height: 750,
+        alt: 'Servicio profesional de retiro y colocación de sonda vesical a domicilio en Bogotá - SMD Vital',
+      },
+    ],
+  },
+  twitter: {
+    handle: '@SMDVitalBogota',
+    site: '@SMDVitalBogota',
+    cardType: 'summary_large_image',
+  },
 };
 ---
 
 <Layout metadata={metadata}>
+  <!-- Schema.org JSON-LD -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
+  </Fragment>
+
   <Fragment slot="header">
     <Header
       {...headerData}
       actions={[
         {
           variant: 'secondary',
-          text: 'Emergencia',
+          text: 'Llamar Ahora',
           href: 'tel:3042912564',
         },
         {
           variant: 'primary',
           text: 'WhatsApp',
           href: 'https://wa.me/573042912564',
+          icon: 'tabler:brand-whatsapp',
         },
       ]}
       isSticky
@@ -41,114 +432,185 @@ const metadata = {
 
   <!-- Hero2 Widget ******************* -->
 
+  <section class="relative -mt-[76px]">
+    <!-- Breadcrumbs integrados -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'Servicios', href: '/servicios' },
+          { label: 'Retiro y Colocación de Sonda Vesical' },
+        ]}
+      />
+    </div>
+  </section>
+
   <Hero2
-    tagline="Cuidado Integral para tu Bienestar"
+    tagline="Cuidado Urológico Profesional"
     actions={[
-      { variant: 'primary', target: '_blank', text: 'WhatsApp', href: 'https://wa.me/573042912564' },
-      { variant: 'secondary', text: 'Agenda tu cita', href: 'tel:3042912564' },
+      { variant: 'primary', target: '_blank', text: 'Sonda Vesical WhatsApp', href: 'https://wa.me/573042912564' },
+      { variant: 'secondary', text: 'Agenda Sonda Vesical', href: 'tel:3042912564' },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Retiro y Colocación de Sonda Vesical a Domicilio en Bogotá',
+      alt: 'Profesional realizando retiro y colocación de sonda vesical a domicilio con técnicas asépticas - SMD Vital Bogotá',
+      loading: 'eager',
+      width: 1260,
+      height: 750,
     }}
   >
     <Fragment slot="title">
-      Retiro y <br /><span class="text-accent dark:text-white highlight">Colocación de Sonda Vesical</span><br />
+      <div class="leading-[0.9]">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+          Retiro y Colocación de Sonda Vesical en Bogotá a Domicilio
+        </h1>
+        <div class="text-2xl md:text-3xl text-accent dark:text-white highlight font-semibold">
+          Sonda Vesical a Domicilio
+        </div>
+        <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mt-2">
+          Catéter Foley Profesional
+        </div>
+      </div>
     </Fragment>
 
     <Fragment slot="subtitle">
-      <span class="hidden sm:inline">
-        Procedimientos seguros y profesionales realizados por especialistas en la comodidad de tu hogar.</span
-      >
-      Garantizamos tu comodidad y bienestar con servicios de alta calidad en Bogotá, Colombia.
+      <span class="font-semibold text-lg">Retiro y colocación de sonda vesical a domicilio</span> con técnicas asépticas profesionales y materiales estériles para garantizar tu comodidad y bienestar sin salir de casa.
+      <br /><br />
+      Nuestro equipo certificado te ofrece un servicio confiable y económico en las 20 localidades de la capital. Precios transparentes sin costos ocultos.
     </Fragment>
   </Hero2>
 
   <!-- Features Widget *************** -->
 
   <Features
-    id="features"
-    title="¿Por qué elegir nuestro servicio de retiro y colocación de sonda vesical?"
-    subtitle="Comprometidos con tu salud y comodidad en Bogotá"
-    columns={2}
+    id="beneficios"
+    tagline="Servicio Profesional"
+    title="¿Por qué elegir nuestro retiro y colocación de sonda vesical a domicilio en Bogotá?"
+    subtitle="Ofrecemos sonda vesical a domicilio profesional con técnicas asépticas certificadas y materiales estériles. Nuestro equipo certificado te brinda un servicio confiable y económico en las 20 localidades de la capital."
+    columns={3}
     items={[
       {
-        title: 'Profesionales Certificados',
+        title: 'Técnicas Asépticas Certificadas',
         description:
-          'Nuestro equipo está compuesto por especialistas en urología altamente capacitados para realizar procedimientos seguros y efectivos.',
-        icon: 'tabler:shield-check',
+          'Utilizamos técnicas asépticas certificadas y materiales estériles de un solo uso para garantizar la máxima seguridad y prevenir infecciones.',
+        icon: 'tabler:medical-cross',
       },
       {
-        title: 'Comodidad y Seguridad',
-        description: `Realiza tus procedimientos en la comodidad de tu hogar, siguiendo estrictos protocolos de higiene y seguridad en Bogotá.`,
-        icon: 'tabler:home',
+        title: 'Profesionales en Urología',
+        description: `Enfermeros especializados en urología con certificación y amplia experiencia en retiro y colocación de sondas vesicales (catéter Foley).`,
+        icon: 'tabler:certificate',
       },
       {
-        title: 'Atención Personalizada',
-        description:
-          'Ofrecemos un enfoque individualizado para cada paciente, asegurando que cada procedimiento se adapte a tus necesidades específicas.',
+        title: 'Atención en 45 Minutos',
+        description: 'Respuesta rápida en toda la ciudad. Agenda tu cita y recibe atención profesional el mismo día sin largas esperas.',
+        icon: 'tabler:clock',
+      },
+      {
+        title: 'Materiales Estériles Incluidos',
+        description: `Sondas vesicales estériles, catéter Foley, lubricantes, antisépticos y todos los materiales necesarios incluidos en el servicio.`,
+        icon: 'tabler:package',
+      },
+      {
+        title: 'Cuidado Personalizado',
+        description: `Adaptamos el procedimiento según tus necesidades específicas, edad y condición médica para brindarte la mejor experiencia.`,
         icon: 'tabler:user',
       },
       {
-        title: 'Tecnología Avanzada',
-        description: `Utilizamos equipos de última generación para garantizar la precisión y comodidad durante cada procedimiento.`,
-        icon: 'tabler:device-laptop',
+        title: 'Cobertura Total Bogotá',
+        description: `Servicio disponible en las 20 localidades de Bogotá y municipios cercanos. Atención 24/7 todos los días del año.`,
+        icon: 'tabler:map-pin',
       },
     ]}
   />
 
-  <!-- Content Widget **************** -->
+  <!-- Content Widget - Procedimiento **************** -->
 
   <Content
-    title="Nuestros Servicios"
-    subtitle="Descubre cómo SMD Vital Bogotá puede ayudarte con el retiro y colocación de sonda vesical a domicilio."
+    id="procedimiento"
+    title="¿Cómo Funciona Nuestro Procedimiento de Sonda Vesical?"
+    subtitle="Proceso profesional paso a paso realizado por especialistas certificados en urología"
     isReversed
     items={[
       {
-        title: 'Evaluación Inicial',
+        title: '1. Evaluación y Preparación',
         description:
-          'Realizamos una consulta detallada para entender tus necesidades y determinar el mejor enfoque para el procedimiento.',
+          'Realizamos evaluación médica inicial, verificamos signos vitales y preparamos el área de trabajo con técnicas asépticas certificadas.',
+        icon: 'tabler:clipboard-check',
       },
       {
-        title: 'Preparación del Procedimiento',
-        description: `Preparamos todo lo necesario en tu hogar, asegurando un ambiente cómodo y seguro para el procedimiento.`,
+        title: '2. Retiro de Sonda Existente',
+        description: `Retiramos la sonda vesical existente de forma cuidadosa, desinflando el balón y removiendo la sonda con técnica aséptica.`,
+        icon: 'tabler:medical-cross',
       },
       {
-        title: 'Retiro de Sonda Vesical',
-        description: `Nuestros especialistas realizan el retiro de la sonda vesical de manera cuidadosa y sin causar molestias.`,
+        title: '3. Colocación de Nueva Sonda',
+        description: `Insertamos la nueva sonda vesical (catéter Foley) con lubricación adecuada y técnica aséptica, inflando el balón para fijación.`,
+        icon: 'tabler:heartbeat',
       },
       {
-        title: 'Colocación de Nueva Sonda',
-        description: `Instalamos una nueva sonda vesical utilizando técnicas avanzadas para asegurar su correcta colocación y funcionamiento.`,
+        title: '4. Verificación y Cuidados Posteriores',
+        description: `Verificamos el correcto funcionamiento de la sonda, proporcionamos instrucciones de cuidado posterior y programamos seguimiento si es necesario.`,
+        icon: 'tabler:circle-check',
       },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/7904481/pexels-photo-7904481.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Servicios de Retiro y Colocación de Sonda Vesical a Domicilio',
+      alt: 'Procedimiento paso a paso de retiro y colocación de sonda vesical profesional a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
     }}
-  />
+  >
+    <Fragment slot="content">
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        Procedimiento Certificado
+      </h2>
+      <p class="text-muted mt-4">
+        Utilizamos técnicas aprobadas por la Organización Mundial de la Salud (OMS) y el Ministerio de Salud de Colombia para garantizar tu seguridad y bienestar.
+      </p>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget - Cuándo necesitas **************** -->
 
   <Content
+    id="cuando-necesitas"
     isAfterContent={true}
     items={[
       {
-        title: 'Alivio y Bienestar',
-        description: `Nuestros servicios están diseñados para proporcionarte alivio y mejorar tu calidad de vida mediante procedimientos seguros y efectivos.`,
+        title: 'Indicaciones para Sonda Vesical',
+        description: `✓ Retención urinaria<br>
+                      ✓ Cirugías urológicas<br>
+                      ✓ Problemas de vejiga neurogénica<br>
+                      ✓ Incontinencia urinaria<br>
+                      ✓ Cuidado post-quirúrgico`,
+        icon: 'tabler:stethoscope',
       },
       {
-        title: 'Beneficios:',
-        description: `Reducción del malestar. <br /> Mejora de la movilidad. <br /> Bienestar general optimizado.`,
+        title: '¿Quiénes lo Necesitan?',
+        description: `✓ Pacientes con sondas vesicales existentes<br>
+                      ✓ Personas con problemas urológicos<br>
+                      ✓ Adultos mayores con incontinencia<br>
+                      ✓ Pacientes post-quirúrgicos<br>
+                      ✓ Personas con movilidad reducida`,
+        icon: 'tabler:users',
       },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/4989130/pexels-photo-4989130.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Alivio y Beneficios de Nuestros Servicios',
+      alt: 'Indicaciones para retiro y colocación de sonda vesical profesional a domicilio',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
     }}
   >
     <Fragment slot="content">
-      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
-        Alivio y Bienestar <br /><span class="text-2xl">Garantizados</span>
-      </h3>
+      <h2 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        ¿Cuándo Necesitas Retiro y Colocación de Sonda Vesical?
+      </h2>
+      <p class="text-muted mt-4">
+        Si tienes una sonda vesical existente que necesita ser cambiada, o requieres la colocación de una nueva sonda, nuestro servicio está diseñado para ti.
+        <strong>Las técnicas asépticas</strong> garantizan la máxima seguridad y comodidad.
+      </p>
     </Fragment>
 
     <Fragment slot="bg">
@@ -156,123 +618,186 @@ const metadata = {
     </Fragment>
   </Content>
 
+  <!-- Content Widget - Precios **************** -->
+
   <Content
+    id="precios"
+    title="Precios de Retiro y Colocación de Sonda Vesical a Domicilio"
+    subtitle="Servicio médico especializado a domicilio con precios justos y transparentes. Sin sorpresas, sin costos adicionales."
     isReversed
-    isAfterContent={true}
     items={[
       {
-        title: 'Tecnología de Punta',
-        description: `Utilizamos equipos avanzados para asegurar la precisión y comodidad en cada procedimiento de retiro y colocación de sonda vesical.`,
+        title: 'Precio Fijo Garantizado',
+        description: `$150.000 COP - Precio único para todas las localidades de la ciudad. Sin costos ocultos, sin sorpresas.`,
+        icon: 'tabler:currency-peso',
       },
       {
-        title: 'Beneficios:',
-        description: `Resultados más precisos. <br /> Procedimientos sin dolor. <br /> Mayor confianza en el tratamiento.`,
+        title: 'Todo Incluido',
+        description: `Evaluación inicial, procedimiento completo, materiales estériles, sonda vesical y cuidados posteriores.`,
+        icon: 'tabler:checklist',
+      },
+      {
+        title: 'Garantía de Satisfacción',
+        description: `Si no quedas satisfecho con el resultado, realizamos una segunda intervención sin costo adicional.`,
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Comparación de Precios',
+        description: `Clínicas tradicionales: $250.000+ | Otros domicilios: $200.000+ | SMD Vital: $150.000 (precio fijo)`,
+        icon: 'tabler:chart-bar',
       },
     ]}
     image={{
       src: 'https://images.pexels.com/photos/8413387/pexels-photo-8413387.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Tecnología Avanzada en Procedimientos de Sonda Vesical',
+      alt: 'Precios transparentes y competitivos para retiro y colocación de sonda vesical a domicilio en Bogotá - $150.000 COP',
+      loading: 'lazy',
+      width: 1260,
+      height: 750,
     }}
   >
-    <Fragment slot="content">
-      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
-        Precisión y Confianza <br /><span class="text-2xl">Garantizadas</span>
-      </h3>
-    </Fragment>
-
-    <Fragment slot="bg">
-      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
-    </Fragment>
   </Content>
 
-  <Content
-    isReversed
-    isAfterContent={true}
-    items={[
-      {
-        title: 'Soporte Continuo',
-        description: `Nuestro equipo está disponible para responder tus dudas y proporcionarte el soporte necesario durante todo el proceso de retiro y colocación de sonda vesical.`,
-      },
-      {
-        title: 'Beneficios:',
-        description: `Asesoramiento personalizado. <br /> Atención inmediata a tus consultas. <br /> Tranquilidad y confianza en nuestro servicio.`,
-      },
-    ]}
-    image={{
-      src: 'https://images.pexels.com/photos/4270091/pexels-photo-4270091.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Soporte Continuo en Procedimientos de Sonda Vesical',
-    }}
-  >
-    <Fragment slot="content">
-      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
-        Soporte y Atención <br /><span class="text-2xl">Personalizada</span>
-      </h3>
-    </Fragment>
+  <!-- Servicios Relacionados **************** -->
 
-    <Fragment slot="bg">
-      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
-    </Fragment>
-  </Content>
+  <section class="py-16 bg-gray-50 dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          Otros Servicios Médicos a Domicilio
+        </h2>
+        <p class="text-lg text-gray-600 dark:text-gray-300">
+          Complementa tu cuidado con nuestros servicios especializados
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a href="/lavado-de-oidos-a-domicilio/" class="group bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-accent mb-2">Lavado de Oídos</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">Limpieza profesional de oídos a domicilio</p>
+        </a>
+        <a href="/inyectologia-a-domicilio/" class="group bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-accent mb-2">Inyectología</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">Aplicación de inyecciones y medicamentos</p>
+        </a>
+        <a href="/cura-de-heridas-simples-y-complejas/" class="group bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-accent mb-2">Cura de Heridas</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">Tratamiento especializado de heridas</p>
+        </a>
+        <a href="/toma-de-signos-vitales/" class="group bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-accent mb-2">Signos Vitales</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">Monitoreo de presión arterial y vitales</p>
+        </a>
+        <a href="/laboratorio-a-domicilio/" class="group bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-accent mb-2">Laboratorio</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">Toma de muestras y exámenes médicos</p>
+        </a>
+        <a href="/teleconsulta-medica/" class="group bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-accent mb-2">Teleconsulta</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">Consulta médica virtual profesional</p>
+        </a>
+      </div>
+    </div>
+  </section>
 
-  <Content
-    items={[
-      {
-        title: 'Atención en Emergencias',
-        description: `Proporcionamos servicios rápidos y eficientes para tus necesidades de retiro y colocación de sonda vesical en situaciones de emergencia.`,
-      },
-      {
-        title: 'Beneficios:',
-        description: `Respuesta inmediata. <br /> Minimización de riesgos. <br /> Tranquilidad en momentos críticos.`,
-      },
-    ]}
-    image={{
-      src: 'https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Atención en Emergencias de Sonda Vesical',
-    }}
-  >
-    <Fragment slot="content">
-      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
-        Atención Rápida <br /><span class="text-2xl">y Segura</span>
-      </h3>
-    </Fragment>
+  <!-- Trust Signals **************** -->
 
-    <Fragment slot="bg">
-      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
-    </Fragment>
-  </Content>
+  <section class="py-16 bg-white dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          ¿Por qué Confiar en SMD Vital?
+        </h2>
+        <p class="text-lg text-gray-600 dark:text-gray-300">
+          Datos que respaldan nuestra experiencia en retiro y colocación de sonda vesical
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-accent mb-2">500+</div>
+          <div class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Sondas Vesicales</div>
+          <div class="text-sm text-gray-600 dark:text-gray-300">Procedimientos Realizados</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold text-accent mb-2">4.9/5</div>
+          <div class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Calificación</div>
+          <div class="text-sm text-gray-600 dark:text-gray-300">Promedio de Satisfacción</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold text-accent mb-2">45 min</div>
+          <div class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Tiempo</div>
+          <div class="text-sm text-gray-600 dark:text-gray-300">De Llegada Promedio</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold text-accent mb-2">24/7</div>
+          <div class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Disponibilidad</div>
+          <div class="text-sm text-gray-600 dark:text-gray-300">Todos los Días del Año</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- FAQs Widget ******************* -->
 
   <FAQs
-    title="Preguntas frecuentes"
+    id="faqs"
+    title="Preguntas Frecuentes sobre Retiro y Colocación de Sonda Vesical"
+    subtitle="Resolvemos las dudas más comunes sobre nuestro servicio de sonda vesical a domicilio en Bogotá"
     items={[
       {
-        title: '¿Qué es una sonda vesical?',
+        title: '¿Qué es el retiro y colocación de sonda vesical a domicilio?',
         description:
-          'Una sonda vesical es un dispositivo médico que se inserta en la vejiga a través de la uretra para drenar la orina.',
-        icon: 'tabler:chevrons-right',
+          'Es un servicio médico especializado que consiste en la retirada segura de sondas vesicales existentes y la colocación de nuevas sondas (catéter Foley) en la comodidad de tu hogar, realizado por profesionales certificados en urología.',
+        icon: 'tabler:medical-cross',
       },
       {
-        title: '¿Por qué necesito una sonda vesical?',
-        description: `Es necesaria en casos de retención urinaria, cirugías u otros procedimientos médicos que requieren el drenaje de orina.`,
-        icon: 'tabler:chevrons-right',
+        title: '¿Cuánto cuesta el retiro y colocación de sonda vesical a domicilio en Bogotá?',
+        description: `El precio del retiro y colocación de sonda vesical a domicilio en Bogotá es de $150.000 COP. Este valor incluye evaluación inicial, procedimiento completo, materiales estériles y cuidados posteriores. Sin costos ocultos, precios transparentes.`,
+        icon: 'tabler:currency-peso',
       },
       {
-        title: '¿Es doloroso el procedimiento?',
+        title: '¿Qué tipos de sondas vesicales pueden manejar a domicilio?',
+        description: `Manejamos sondas Foley de diferentes calibres, sondas de silicona, sondas de látex y sondas especializadas. Nuestros profesionales evalúan cada caso y determinan el tipo de sonda más adecuado según las necesidades del paciente.`,
+        icon: 'tabler:package',
+      },
+      {
+        title: '¿Es seguro realizar el retiro y colocación de sonda vesical a domicilio?',
         description:
-          'El procedimiento de retiro y colocación de sonda vesical puede causar molestias leves, pero nuestros profesionales están capacitados para minimizar cualquier incomodidad.',
-        icon: 'tabler:chevrons-right',
+          'Sí, contamos con profesionales certificados en urología y seguimos estrictos protocolos de asepsia. Utilizamos materiales estériles de un solo uso y técnicas asépticas certificadas para garantizar tu seguridad.',
+        icon: 'tabler:shield-check',
       },
       {
-        title: '¿Cuánto tiempo dura el procedimiento?',
-        description: 'El procedimiento generalmente dura entre 15 y 30 minutos, dependiendo de cada caso específico.',
-        icon: 'tabler:chevrons-right',
+        title: '¿Cuánto tiempo dura el procedimiento de sonda vesical?',
+        description: 'El procedimiento completo dura entre 20-30 minutos, incluyendo evaluación inicial, retiro de la sonda existente, colocación de la nueva sonda y cuidados posteriores. Es un procedimiento rápido y eficiente.',
+        icon: 'tabler:clock',
       },
       {
-        title: '¿Qué debo hacer después del procedimiento?',
+        title: '¿Qué diferencia hay entre sonda vesical y catéter Foley?',
         description:
-          'Se recomienda seguir las indicaciones de tu especialista, mantener una buena higiene y estar atento a cualquier señal de infección o complicación.',
-        icon: 'tabler:chevrons-right',
+          'La sonda vesical es el término general, mientras que el catéter Foley es un tipo específico de sonda que tiene un balón inflable para mantenerla en su lugar. Ambos términos se usan indistintamente en la práctica médica.',
+        icon: 'tabler:help-circle',
+      },
+      {
+        title: '¿Qué contraindicaciones tiene el retiro y colocación de sonda vesical?',
+        description:
+          'No se recomienda en casos de infección urinaria activa, estenosis uretral severa, o trauma uretral reciente. Nuestro personal realiza una evaluación previa para determinar si el procedimiento es seguro para el paciente.',
+        icon: 'tabler:alert-triangle',
+      },
+      {
+        title: '¿Pueden atender a adultos mayores y personas con movilidad reducida?',
+        description:
+          'Sí, adaptamos el procedimiento según la edad y condición del paciente. Tenemos experiencia trabajando con adultos mayores y personas con movilidad reducida, brindando una experiencia segura y cómoda.',
+        icon: 'tabler:user',
+      },
+      {
+        title: '¿Qué cuidados necesito después del procedimiento?',
+        description:
+          'Incluye mantener una buena higiene perineal, beber abundante agua, estar atento a signos de infección y seguir las indicaciones específicas que te proporcione nuestro equipo médico.',
+        icon: 'tabler:heart',
+      },
+      {
+        title: '¿Cómo agendo el retiro y colocación de sonda vesical a domicilio?',
+        description:
+          'Puedes agendar por WhatsApp al +57 304 291 2564, llamando a nuestro call center o completando el formulario en nuestro sitio web. Atendemos 24/7 en todas las localidades de Bogotá.',
+        icon: 'tabler:phone',
       },
     ]}
   >
@@ -284,37 +809,42 @@ const metadata = {
   <!-- Steps2 Widget ****************** -->
 
   <Steps2
-    title="Contáctanos"
-    subtitle="¿Tienes preguntas sobre nuestro servicio de retiro y colocación de sonda vesical a domicilio? ¡Estamos aquí para ayudarte!"
+    id="contacto"
+    title="¿Necesitas Retiro y Colocación de Sonda Vesical a Domicilio?"
+    subtitle="Agenda tu cita ahora y recibe atención profesional en la comodidad de tu hogar. Nuestro equipo especializado en urología está listo para brindarte el mejor servicio."
     callToAction={{
-      text: 'WhatsApp',
+      text: 'Agendar Sonda Vesical WhatsApp',
       href: 'https://wa.me/573042912564',
     }}
     items={[
       {
-        title: 'Correo electrónico',
+        title: 'WhatsApp Directo',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:brand-whatsapp',
+      },
+      {
+        title: 'Llamada Telefónica',
+        description: '+57 (304) 291-2564',
+        icon: 'tabler:phone',
+      },
+      {
+        title: 'Correo Electrónico',
         description: 'salud@smdvitalbogota.com',
         icon: 'tabler:mail',
       },
-      {
-        title: 'Call Center',
-        description: '+57 (304) 291-2564',
-        icon: 'tabler:headset',
-      },
-      {
-        title: 'Síguenos',
-        description: '@smdvitalbogota',
-        icon: 'tabler:brand-twitter',
-      },
     ]}
-  />
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900"></div>
+    </Fragment>
+  </Steps2>
 
   <!-- BlogLatestPost Widget **************** -->
 
   <BlogLatestPosts
     id="blog"
-    title="Conoce más sobre el cuidado de tu salud vesical"
-    information={`Visita nuestro blog para aprender más sobre el retiro y colocación de sonda vesical, cuidados post-procedimiento y otros consejos para mantener una buena salud vesical. ¡Gracias por leernos!`}
+    title="Artículos sobre Cuidado Urológico y Sonda Vesical"
+    information={`Descubre más sobre el cuidado de la salud urológica, procedimientos de sonda vesical, y consejos para mantener una buena salud vesical. Nuestro blog médico te mantiene informado sobre las mejores prácticas.`}
   >
     <Fragment slot="bg">
       <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>

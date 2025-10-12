@@ -2,7 +2,7 @@ site:
   name: SMD Vital Bogotá
   site: 'https://smdvitalbogota.com'
   base: '/'
-  trailingSlash: false
+  trailingSlash: 'never'
 
   googleSiteVerificationId: 2HVWH3O2ShwC1GMYvEtBd6fbgBe3RryOJNnIWz3SYKs
 
