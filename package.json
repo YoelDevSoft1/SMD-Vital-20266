@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && npm run copy-home",
+    "build": "astro build",
     "build:astro": "astro build",
     "copy-home": "node -e \"require('fs').copyFileSync('dist/home/index.html', 'dist/index.html')\"",
     "preview": "astro preview",
