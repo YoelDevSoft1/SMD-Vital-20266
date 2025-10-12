@@ -1,0 +1,49 @@
+﻿[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[build.processing.html]
+  pretty_urls = false
+
+[[redirects]]
+  from = "http://www.smdvitalbogota.com/*"
+  to = "https://smdvitalbogota.com/:splat"
+  status = 301
+
+[[redirects]]
+  from = "https://www.smdvitalbogota.com/*"
+  to = "https://smdvitalbogota.com/:splat"
+  status = 301
+
+[[redirects]]
+  from = "http://smdvitalbogota.com/*"
+  to = "https://smdvitalbogota.com/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/acerca"
+  to = "/inicio/quienes-somos"
+  status = 301
+
+[[redirects]]
+  from = "/prueba-de-antigeno-a-domicilio"
+  to = "/antigeno"
+  status = 301
+
+[[redirects]]
+  from = "/terms"
+  to = "/terminos"
+  status = 301
+
+[[redirects]]
+  from = "/lavado-de-oidos-a-domicilio"
+  to = "/servicios/lavado-de-oidos-a-domicilio"
+  status = 301
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
