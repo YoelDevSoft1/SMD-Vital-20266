@@ -28,7 +28,7 @@ export const GET = async () => {
         lastBuildDate: new Date(),
         ttl: 60,
         items: [], // Array vacío pero válido
-        trailingSlash: SITE.trailingSlash,
+        trailingSlash: SITE.trailingSlash === 'never' ? false : true,
       });
 
       return new Response(rss, {
@@ -74,7 +74,7 @@ export const GET = async () => {
         } : undefined,
       })),
 
-      trailingSlash: SITE.trailingSlash,
+      trailingSlash: SITE.trailingSlash === 'never' ? false : true,
     });
 
     return new Response(rss, {
@@ -95,7 +95,7 @@ export const GET = async () => {
       copyright: `© ${new Date().getFullYear()} ${SITE.name}. Todos los derechos reservados.`,
       lastBuildDate: new Date(),
       items: [],
-      trailingSlash: SITE.trailingSlash,
+      trailingSlash: SITE.trailingSlash === 'never' ? false : true,
     });
 
     return new Response(rss, {

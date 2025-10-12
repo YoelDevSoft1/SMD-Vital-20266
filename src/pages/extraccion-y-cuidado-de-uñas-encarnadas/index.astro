@@ -1,5 +1,6 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
+import { SITE } from 'astrowind:config';
 
 import Header from '~/components/widgets/Header.astro';
 import Hero2 from '~/components/widgets/Hero2.astro';
@@ -12,7 +13,6 @@ import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
 import Testimonials from '~/components/widgets/Testimonials.astro';
 
 import { headerData } from '~/navigation';
-import { SITE } from 'astrowind:config';
 
 // Schema.org para FAQs (Expandido con 10 preguntas)
 const faqSchema = {
@@ -399,7 +399,7 @@ const howToSchema = {
     url: SITE.site,
     logo: {
       '@type': 'ImageObject',
-      url: SITE.site + '/images/logo.png'
+      url: SITE.site + '/images/hero-image.png'
     }
   },
   datePublished: '2024-01-01',

@@ -90,8 +90,26 @@ export const adaptOpenGraphImages = async (
         }
 
         if (typeof _image === 'object') {
+          const imageSrc = 'src' in _image && typeof _image.src === 'string' ? _image.src : '';
+          let imageUrl = '';
+          
+          if (imageSrc) {
+            try {
+              // Si es una URL absoluta, usarla directamente
+              if (imageSrc.startsWith('http://') || imageSrc.startsWith('https://')) {
+                imageUrl = imageSrc;
+              } else {
+                // Si es una ruta relativa, crear URL con astroSite
+                imageUrl = String(new URL(imageSrc, astroSite));
+              }
+            } catch (error) {
+              // Si hay error creando la URL, usar string vacío
+              imageUrl = '';
+            }
+          }
+          
           return {
-            url: 'src' in _image && typeof _image.src === 'string' ? String(new URL(_image.src, astroSite)) : '',
+            url: imageUrl,
             width: 'width' in _image && typeof _image.width === 'number' ? _image.width : undefined,
             height: 'height' in _image && typeof _image.height === 'number' ? _image.height : undefined,
           };
