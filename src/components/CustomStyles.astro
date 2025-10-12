@@ -1,6 +1,6 @@
 ---
-// Import font with font-display swap for better performance
-import '@fontsource-variable/inter/index.css';
+// Font will be loaded from Google Fonts with optimized preconnect
+// No import needed here - using Google Fonts CDN
 
 // 'DM Sans'
 // Nunito
@@ -25,6 +25,8 @@ import '@fontsource-variable/inter/index.css';
   @font-face {
     font-family: 'Inter Variable';
     font-display: swap;
+    font-weight: 100 900;
+    src: local('Inter Variable'), local('InterVariable');
   }
 
   :root {
