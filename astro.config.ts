@@ -24,9 +24,9 @@ const whenExternalScripts = (items: (() => AstroIntegration) | (() => AstroInteg
 export default defineConfig({
   output: 'static',
 
-  // Optimize build for better performance
+  // Optimize build for better performance - inline all stylesheets to avoid render blocking
   build: {
-    inlineStylesheets: 'auto',
+    inlineStylesheets: 'always',
   },
 
   integrations: [
@@ -91,6 +91,15 @@ export default defineConfig({
     resolve: {
       alias: {
         '~': path.resolve(__dirname, './src'),
+      },
+    },
+    build: {
+      cssCodeSplit: true,
+      rollupOptions: {
+        output: {
+          manualChunks: undefined,
+          assetFileNames: '_astro/[name].[hash][extname]',
+        },
       },
     },
   },

@@ -1,0 +1,33 @@
+---
+// Component to load CSS asynchronously to avoid render blocking
+---
+
+<script is:inline>
+  // Load CSS asynchronously to avoid render blocking
+  (function() {
+    const loadCSS = function(href) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      document.head.appendChild(link);
+    };
+
+    // Use requestIdleCallback to defer CSS loading
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(function() {
+        const stylesheets = document.querySelectorAll('link[rel="preload"][as="style"]');
+        stylesheets.forEach(function(stylesheet) {
+          stylesheet.rel = 'stylesheet';
+        });
+      });
+    } else {
+      // Fallback for browsers that don't support requestIdleCallback
+      window.addEventListener('load', function() {
+        const stylesheets = document.querySelectorAll('link[rel="preload"][as="style"]');
+        stylesheets.forEach(function(stylesheet) {
+          stylesheet.rel = 'stylesheet';
+        });
+      });
+    }
+  })();
+</script>
