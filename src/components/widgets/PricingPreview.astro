@@ -92,7 +92,7 @@ const getColorClasses = (color: string) => {
         <div class={`bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border-2 ${getColorClasses(item.color)} relative`}>
           {item.isPopular && (
             <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
-              <span class="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+              <span class="bg-green-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
                 Más Popular
               </span>
             </div>
@@ -121,7 +121,7 @@ const getColorClasses = (color: string) => {
     <a 
       href={ctaHref} 
       target="_blank" 
-      class="inline-flex items-center px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transición-colors"
+      class="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transición-colors"
     >
       <Icon name="brand-whatsapp" set="tabler" class="w-6 h-6 mr-2" />
       {ctaText}
