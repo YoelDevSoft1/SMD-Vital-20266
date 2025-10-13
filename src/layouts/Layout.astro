@@ -12,6 +12,7 @@ import SiteVerification from '~/components/common/SiteVerification.astro';
 import Analytics from '~/components/common/Analytics.astro';
 import BasicScripts from '~/components/common/BasicScripts.astro';
 import MedicalClinicSchema from '~/components/common/MedicalClinicSchema.astro';
+import FloatingWhatsApp from '~/components/widgets/FloatingWhatsApp.astro';
 
 import type { MetaData as MetaDataType } from '~/types';
 
@@ -59,5 +60,8 @@ const { language, textDirection } = I18N;
     <slot />
 
     <BasicScripts />
+
+    <!-- Botón flotante de WhatsApp - renderizado al final del body para asegurar position: fixed -->
+    <FloatingWhatsApp />
   </body>
 </html>

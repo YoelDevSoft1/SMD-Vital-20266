@@ -2,7 +2,11 @@
 // Componente de WhatsApp flotante mejorado con disponibilidad en tiempo real
 ---
 
-<div id="whatsapp-float" class="whatsapp-float-container">
+<div
+  id="whatsapp-float"
+  class="whatsapp-float-container"
+  style="position: fixed !important; bottom: 24px !important; right: 24px !important; z-index: 9999 !important; pointer-events: auto !important;"
+>
   <button
     id="whatsapp-button"
     class="whatsapp-button"
@@ -72,13 +76,46 @@
   </div>
 </div>
 
+<style is:global>
+  /* Asegurar que body y html no interfieran con position: fixed */
+  html,
+  body {
+    transform: none !important;
+    perspective: none !important;
+    filter: none !important;
+    will-change: auto !important;
+  }
+  
+  /* Asegurar que el botón de WhatsApp siempre esté visible */
+  #whatsapp-float {
+    position: fixed !important;
+    bottom: 24px !important;
+    right: 24px !important;
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+    transform: none !important;
+    contain: none !important;
+  }
+  
+  /* Prevenir que cualquier contenedor interfiera */
+  * {
+    contain: none !important;
+  }
+  
+  /* Restaurar contain solo para elementos específicos que lo necesiten */
+  section:not(:first-of-type) {
+    contain: style paint;
+  }
+</style>
+
 <style>
   .whatsapp-float-container {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 9999;
+    position: fixed !important;
+    bottom: 24px !important;
+    right: 24px !important;
+    z-index: 9999 !important;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    pointer-events: auto !important;
   }
 
   .whatsapp-button {
@@ -390,20 +427,38 @@ box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
 </style>
 
 <script>
+  // Función para forzar el posicionamiento fijo
+  function ensureFixedPosition() {
+    const container = document.getElementById('whatsapp-float');
+    if (container) {
+      // Forzar estilos críticos para posicionamiento
+      container.style.setProperty('position', 'fixed', 'important');
+      container.style.setProperty('bottom', '24px', 'important');
+      container.style.setProperty('right', '24px', 'important');
+      container.style.setProperty('z-index', '999999', 'important');
+      container.style.setProperty('pointer-events', 'auto', 'important');
+      container.style.setProperty('transform', 'none', 'important');
+      container.style.setProperty('contain', 'none', 'important');
+      container.style.setProperty('will-change', 'auto', 'important');
+      
+      // Asegurar que el contenedor esté visible
+      container.style.setProperty('opacity', '1', 'important');
+      container.style.setProperty('visibility', 'visible', 'important');
+      container.style.setProperty('display', 'block', 'important');
+    }
+  }
+
+  // Ejecutar inmediatamente
+  ensureFixedPosition();
+
   document.addEventListener('DOMContentLoaded', () => {
     const button = document.getElementById('whatsapp-button');
     const message = document.getElementById('whatsapp-message');
     const closeBtn = document.getElementById('close-message');
     let isMessageVisible = false;
 
-    // Asegurar que el contenedor esté posicionado correctamente
-    const container = document.getElementById('whatsapp-float');
-    if (container) {
-      container.style.position = 'fixed';
-      container.style.bottom = '24px';
-      container.style.right = '24px';
-      container.style.zIndex = '9999';
-    }
+    // Asegurar posicionamiento al cargar
+    ensureFixedPosition();
 
     const showMessage = () => {
       message?.classList.remove('hidden');
@@ -417,15 +472,20 @@ box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
       isMessageVisible = false;
     };
 
-    // Forzar posicionamiento después de un breve delay
+    // Forzar posicionamiento periódicamente - más frecuente y por más tiempo
+    const positionInterval = setInterval(ensureFixedPosition, 100);
+
+    // Detener el intervalo después de 10 segundos
     setTimeout(() => {
-      if (container) {
-        container.style.position = 'fixed';
-        container.style.bottom = '24px';
-        container.style.right = '24px';
-        container.style.zIndex = '9999';
-      }
-    }, 100);
+      clearInterval(positionInterval);
+    }, 10000);
+    
+    // Verificar también en eventos de scroll y resize
+    window.addEventListener('scroll', ensureFixedPosition, { passive: true });
+    window.addEventListener('resize', ensureFixedPosition, { passive: true });
+    
+    // Verificar cuando se cambia de página (para SPAs)
+    window.addEventListener('popstate', ensureFixedPosition);
 
     // Mostrar mensaje automáticamente después de 5 segundos
     setTimeout(() => {

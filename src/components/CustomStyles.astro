@@ -21,9 +21,9 @@
 ---
 
 <style is:inline>
-  /* Optimize rendering performance with CSS containment */
+  /* Optimize rendering performance with CSS containment - excluding layout to allow fixed positioning */
   body {
-    contain: layout style paint;
+    contain: style paint;
   }
 
   /* Prevent forced reflow by using will-change sparingly */
