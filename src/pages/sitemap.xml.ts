@@ -2,6 +2,20 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { SITE } from 'astrowind:config';
 
+// Función para formatear fechas al formato ISO 8601 requerido por Google
+const formatDateForSitemap = (date: Date | string | undefined): string => {
+  if (!date) return new Date().toISOString();
+  
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  // Verificar si la fecha es válida
+  if (isNaN(dateObj.getTime())) {
+    return new Date().toISOString();
+  }
+  
+  return dateObj.toISOString();
+};
+
 export const GET: APIRoute = async ({ site }) => {
   const posts = await getCollection('post');
   const pages = await getCollection('page');
@@ -15,7 +29,8 @@ export const GET: APIRoute = async ({ site }) => {
   ${allPages
     .map((page) => {
       const url = new URL(page.slug, site);
-      const lastmod = page.data.publishDate || page.data.modDate;
+      const lastmod = formatDateForSitemap(page.data.publishDate || page.data.modDate);
+      const publishDate = formatDateForSitemap(page.data.publishDate);
       
       return `
   <url>
@@ -35,7 +50,7 @@ export const GET: APIRoute = async ({ site }) => {
         <news:name>SMD Vital Bogotá</news:name>
         <news:language>es</news:language>
       </news:publication>
-      <news:publication_date>${page.data.publishDate}</news:publication_date>
+      <news:publication_date>${publishDate}</news:publication_date>
       <news:title>${page.data.title}</news:title>
       <news:keywords>${page.data.tags?.join(', ') || ''}</news:keywords>
     </news:news>` : ''}

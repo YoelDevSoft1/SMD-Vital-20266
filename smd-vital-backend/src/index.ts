@@ -62,9 +62,12 @@ class SMDVitalServer {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
-          scriptSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.tailwindcss.com"],
+          scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdn.jsdelivr.net"],
+          scriptSrcAttr: ["'unsafe-inline'"],
           imgSrc: ["'self'", "data:", "https:"],
+          fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "data:"],
+          connectSrc: ["'self'", "https://cdn.jsdelivr.net"],
         },
       },
     }));
