@@ -19,6 +19,9 @@ const formatDateForSitemap = (date: Date | string | undefined): string => {
 export const GET: APIRoute = async ({ site }) => {
   const posts = await getCollection('post');
   const pages = await getCollection('page');
+  
+  // Forzar el uso de la URL sin www
+  const baseUrl = 'https://smdvitalbogota.com';
 
   // Páginas estáticas del sitio
   const staticPages = [
@@ -66,7 +69,7 @@ export const GET: APIRoute = async ({ site }) => {
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   ${allPages
     .map((page) => {
-      const url = new URL(page.slug, site);
+      const url = new URL(page.slug, baseUrl);
       const lastmod = formatDateForSitemap(page.data.publishDate || page.data.modDate);
       const publishDate = formatDateForSitemap(page.data.publishDate);
       const isPost = page.collection === 'post';

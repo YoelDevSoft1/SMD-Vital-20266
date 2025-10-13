@@ -8,7 +8,7 @@ tags:
   - salud-domiciliaria
   - marketing
 metadata:
-  canonical: 'https://smdvitalbogota.netlify.app/landing'
+  canonical: 'https://smdvitalbogota.com/salud-domiciliaria'
 author: 'Yoel Pinto'
 category: 'Salud y Marketing'
 ---

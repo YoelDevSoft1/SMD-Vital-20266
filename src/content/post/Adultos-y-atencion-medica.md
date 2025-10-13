@@ -8,7 +8,7 @@ tags:
   - Adultos Mayores
   - Salud Domiciliaria
 metadata:
-  canonical: https://smdvitalbogota.netlify.app/adultos-mayores-salud-domiciliaria
+  canonical: https://smdvitalbogota.com/adultos-y-atencion-medica
 ---
 
 ## Introducción: Atención Médica en el Hogar para Adultos Mayores
