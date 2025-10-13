@@ -9,6 +9,7 @@ import Content from '~/components/widgets/Content.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
 import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
 import Breadcrumbs from '~/components/ui/Breadcrumbs.astro';
+import OptimizedImage from '~/components/common/OptimizedImage.astro';
 
 import { headerData } from '~/navigation';
 import { SITE } from 'astrowind:config';
@@ -259,7 +260,10 @@ const howToSchema = {
   image: {
     '@type': 'ImageObject',
     url: 'https://images.pexels.com/photos/7579831/pexels-photo-7579831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    caption: 'Procedimiento profesional de electrocardiografía básica a domicilio con equipos portátiles'
+    caption: 'Procedimiento profesional de electrocardiografía básica a domicilio en Bogotá con equipos portátiles - SMD Vital',
+    width: 1260,
+    height: 750,
+    alt: 'Electrocardiografía básica a domicilio en Bogotá - Procedimiento profesional con equipos portátiles - SMD Vital'
   },
   totalTime: 'PT20M',
   estimatedCost: {
@@ -309,8 +313,11 @@ const howToSchema = {
       text: 'Evaluar al paciente, explicar el procedimiento y preparar la piel en las áreas donde se colocarán los electrodos.',
       image: {
         '@type': 'ImageObject',
-        url: 'https://images.pexels.com/photos/7579831/pexels-photo-7579831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        caption: 'Evaluación inicial y preparación del paciente para electrocardiografía'
+        url: 'https://images.pexels.com/photos/24193882/pexels-photo-24193882/free-photo-of-mesa-hospital-herramientas-cuidado-de-la-salud.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Evaluación inicial y preparación del paciente para electrocardiografía básica a domicilio en Bogotá - SMD Vital',
+        width: 1260,
+        height: 750,
+        alt: 'Evaluación inicial para electrocardiografía básica a domicilio en Bogotá - Preparación del paciente - SMD Vital'
       },
       url: SITE.site + '/electrocardiografia-basica/#procedimiento'
     },
@@ -322,7 +329,10 @@ const howToSchema = {
       image: {
         '@type': 'ImageObject',
         url: 'https://images.pexels.com/photos/7579831/pexels-photo-7579831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        caption: 'Colocación profesional de electrodos para electrocardiografía'
+        caption: 'Colocación profesional de electrodos para electrocardiografía básica a domicilio en Bogotá - SMD Vital',
+        width: 1260,
+        height: 750,
+        alt: 'Colocación de electrodos para electrocardiografía básica a domicilio en Bogotá - Procedimiento profesional - SMD Vital'
       },
       url: SITE.site + '/electrocardiografia-basica/#procedimiento'
     },
@@ -333,8 +343,11 @@ const howToSchema = {
       text: 'Realizar el registro del electrocardiograma durante 10-15 segundos, asegurando que el paciente esté relajado y quieto.',
       image: {
         '@type': 'ImageObject',
-        url: 'https://images.pexels.com/photos/7579831/pexels-photo-7579831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        caption: 'Registro profesional del electrocardiograma con equipo portátil'
+        url: 'https://images.pexels.com/photos/7583382/pexels-photo-7583382.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Registro profesional del electrocardiograma con equipo portátil a domicilio en Bogotá - SMD Vital',
+        width: 1260,
+        height: 750,
+        alt: 'Registro de electrocardiograma básico a domicilio en Bogotá - Equipo portátil profesional - SMD Vital'
       },
       url: SITE.site + '/electrocardiografia-basica/#procedimiento'
     },
@@ -345,8 +358,11 @@ const howToSchema = {
       text: 'Realizar interpretación básica del ECG, proporcionar reporte inicial y programar seguimiento si es necesario.',
       image: {
         '@type': 'ImageObject',
-        url: 'https://images.pexels.com/photos/7579831/pexels-photo-7579831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        caption: 'Interpretación profesional y reporte de electrocardiograma'
+        url: 'https://images.pexels.com/photos/6291179/pexels-photo-6291179.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        caption: 'Interpretación profesional y reporte de electrocardiograma básico a domicilio en Bogotá - SMD Vital',
+        width: 1260,
+        height: 750,
+        alt: 'Interpretación de electrocardiograma básico a domicilio en Bogotá - Reporte profesional - SMD Vital'
       },
       url: SITE.site + '/electrocardiografia-basica/#procedimiento'
     }
@@ -390,7 +406,8 @@ const metadata = {
         url: 'https://images.pexels.com/photos/7579831/pexels-photo-7579831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
         width: 1260,
         height: 750,
-        alt: 'Servicio profesional de electrocardiografía básica a domicilio en Bogotá - SMD Vital',
+        alt: 'Electrocardiografía básica a domicilio en Bogotá - Profesional realizando ECG con equipo portátil profesional - SMD Vital',
+        type: 'image/jpeg',
       },
     ],
   },
@@ -455,8 +472,8 @@ const metadata = {
       { variant: 'secondary', text: 'Agenda ECG', href: 'tel:3042912564' },
     ]}
     image={{
-      src: 'https://images.pexels.com/photos/7579831/pexels-photo-7579831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Profesional realizando electrocardiografía básica con equipo portátil a domicilio - Servicio médico especializado SMD Vital',
+      src: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1260&h=750&fit=crop',
+      alt: 'Electrocardiografía básica a domicilio en Bogotá - Monitor cardíaco y equipo ECG profesional - SMD Vital',
       loading: 'eager',
       width: 1260,
       height: 750,
@@ -545,8 +562,8 @@ const metadata = {
       },
     ]}
     image={{
-      src: 'https://images.pexels.com/photos/24193882/pexels-photo-24193882/free-photo-of-mesa-hospital-herramientas-cuidado-de-la-salud.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Procedimiento paso a paso de electrocardiografía básica profesional a domicilio',
+      src: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=1260&h=750&fit=crop',
+      alt: 'Equipo de electrocardiografía portátil profesional para ECG a domicilio en Bogotá - SMD Vital',
       loading: 'lazy',
       width: 1260,
       height: 750,
@@ -587,8 +604,8 @@ const metadata = {
       },
     ]}
     image={{
-      src: 'https://images.pexels.com/photos/7583382/pexels-photo-7583382.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Indicaciones para electrocardiografía básica profesional a domicilio',
+      src: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1260&h=750&fit=crop',
+      alt: 'Monitoreo cardíaco con electrocardiografía básica a domicilio en Bogotá - SMD Vital',
       loading: 'lazy',
       width: 1260,
       height: 750,
@@ -636,8 +653,8 @@ const metadata = {
       },
     ]}
     image={{
-      src: 'https://images.pexels.com/photos/6291179/pexels-photo-6291179.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      alt: 'Precios transparentes y competitivos para electrocardiografía básica profesional a domicilio en Bogotá - $90.000 COP',
+      src: 'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1260&h=750&fit=crop',
+      alt: 'Resultados de electrocardiograma - Electrocardiografía básica a domicilio en Bogotá $90.000 COP - SMD Vital',
       loading: 'lazy',
       width: 1260,
       height: 750,
@@ -703,6 +720,73 @@ const metadata = {
       <p class="mt-6 text-lg font-semibold text-accent">
         ✓ Disponible hoy en tu localidad
       </p>
+    </div>
+  </section>
+
+  <!-- Sección de Galería de Imágenes Optimizada para SEO -->
+  <section class="py-16 bg-gray-50 dark:bg-slate-800">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          Equipos Profesionales de Electrocardiografía
+        </h2>
+        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          Utilizamos equipos portátiles de última generación para garantizar resultados precisos y confiables en cada electrocardiografía básica a domicilio en Bogotá.
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Imagen 1: Monitor cardíaco -->
+        <div class="relative group">
+          <OptimizedImage
+            src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop"
+            alt="Monitor cardíaco profesional - Electrocardiografía básica a domicilio en Bogotá - SMD Vital"
+            width={800}
+            height={600}
+            loading="lazy"
+            class="rounded-lg shadow-lg group-hover:shadow-xl transition-shadow duration-300"
+          />
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg"></div>
+          <div class="absolute bottom-4 left-4 right-4">
+            <h3 class="text-white font-semibold text-lg mb-2">Monitor Cardíaco Avanzado</h3>
+            <p class="text-white text-sm opacity-90">Equipos de última generación para resultados precisos</p>
+          </div>
+        </div>
+
+        <!-- Imagen 2: Equipo ECG portátil -->
+        <div class="relative group">
+          <OptimizedImage
+            src="https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&h=600&fit=crop"
+            alt="Equipo ECG portátil profesional - Electrocardiografía a domicilio en Bogotá - SMD Vital"
+            width={800}
+            height={600}
+            loading="lazy"
+            class="rounded-lg shadow-lg group-hover:shadow-xl transition-shadow duration-300"
+          />
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg"></div>
+          <div class="absolute bottom-4 left-4 right-4">
+            <h3 class="text-white font-semibold text-lg mb-2">Equipo ECG Portátil</h3>
+            <p class="text-white text-sm opacity-90">Tecnología de 12 derivaciones para diagnóstico completo</p>
+          </div>
+        </div>
+
+        <!-- Imagen 3: Resultados de ECG -->
+        <div class="relative group">
+          <OptimizedImage
+            src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&h=600&fit=crop"
+            alt="Resultados de electrocardiograma - ECG a domicilio en Bogotá - SMD Vital"
+            width={800}
+            height={600}
+            loading="lazy"
+            class="rounded-lg shadow-lg group-hover:shadow-xl transition-shadow duration-300"
+          />
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg"></div>
+          <div class="absolute bottom-4 left-4 right-4">
+            <h3 class="text-white font-semibold text-lg mb-2">Resultados Inmediatos</h3>
+            <p class="text-white text-sm opacity-90">Interpretación profesional y reporte detallado</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
