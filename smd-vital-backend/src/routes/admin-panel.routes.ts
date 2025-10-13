@@ -1,299 +1,209 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { AdminPanelController } from '../controllers/admin-panel.controller';
 import { authMiddleware, requireRole } from '../middleware/auth.middleware';
-import { logger } from '../utils/logger';
 
 const router = Router();
-const prisma = new PrismaClient();
+const adminPanelController = new AdminPanelController();
 
-// Dashboard statistics
-router.get('/dashboard', authMiddleware, requireRole(['ADMIN']), async (_req, res) => {
-  try {
-    const [
-      totalUsers,
-      totalPatients,
-      totalDoctors,
-      totalAppointments,
-      totalPayments,
-      recentAppointments,
-      recentUsers
-    ] = await Promise.all([
-      prisma.user.count(),
-      prisma.patient.count(),
-      prisma.doctor.count(),
-      prisma.appointment.count(),
-      prisma.payment.count(),
-      prisma.appointment.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          patient: {
-            include: { user: true }
-          },
-          doctor: {
-            include: { user: true }
-          }
-        }
-      }),
-      prisma.user.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-          role: true,
-          isActive: true,
-          createdAt: true
-        }
-      })
-    ]);
+// Apply authentication and authorization to all routes
+router.use(authMiddleware);
+router.use(requireRole(['ADMIN', 'SUPER_ADMIN']));
 
-    const stats = {
-      totalUsers,
-      totalPatients,
-      totalDoctors,
-      totalAppointments,
-      totalPayments,
-      recentAppointments,
-      recentUsers
-    };
+// ========================================
+// DASHBOARD & ANALYTICS
+// ========================================
 
-    res.json({
-      success: true,
-      data: stats,
-      timestamp: new Date().toISOString()
-    });
-  } catch (error: any) {
-    logger.error('Error fetching dashboard stats:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching dashboard statistics',
-      error: error.message
-    });
-  }
-});
+/**
+ * @route   GET /api/v1/admin-panel/dashboard
+ * @desc    Get comprehensive dashboard statistics
+ * @access  Private/Admin
+ */
+router.get('/dashboard', adminPanelController.getDashboard);
 
-// Users management
-router.get('/users', authMiddleware, requireRole(['ADMIN']), async (req, res) => {
-  try {
-    const { page = 1, limit = 10, role, search } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);
+/**
+ * @route   GET /api/v1/admin-panel/analytics
+ * @desc    Get advanced analytics with date range and grouping
+ * @query   startDate, endDate, groupBy (day|week|month)
+ * @access  Private/Admin
+ */
+router.get('/analytics', adminPanelController.getAnalytics);
 
-    const where: any = {};
-    if (role) where.role = role;
-    if (search) {
-      where.OR = [
-        { firstName: { contains: search as string, mode: 'insensitive' } },
-        { lastName: { contains: search as string, mode: 'insensitive' } },
-        { email: { contains: search as string, mode: 'insensitive' } }
-      ];
-    }
+/**
+ * @route   GET /api/v1/admin-panel/revenue
+ * @desc    Get detailed revenue report
+ * @query   startDate, endDate
+ * @access  Private/Admin
+ */
+router.get('/revenue', adminPanelController.getRevenueReport);
 
-    const [users, total] = await Promise.all([
-      prisma.user.findMany({
-        where,
-        skip,
-        take: Number(limit),
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-          role: true,
-          isActive: true,
-          isVerified: true,
-          createdAt: true,
-          updatedAt: true
-        }
-      }),
-      prisma.user.count({ where })
-    ]);
+// ========================================
+// USER MANAGEMENT
+// ========================================
 
-    res.json({
-      success: true,
-      data: {
-        users,
-        pagination: {
-          page: Number(page),
-          limit: Number(limit),
-          total,
-          pages: Math.ceil(total / Number(limit))
-        }
-      }
-    });
-  } catch (error: any) {
-    logger.error('Error fetching users:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching users',
-      error: error.message
-    });
-  }
-});
+/**
+ * @route   GET /api/v1/admin-panel/users
+ * @desc    Get all users with filters and pagination
+ * @query   page, limit, role, search, isActive, isVerified
+ * @access  Private/Admin
+ */
+router.get('/users', adminPanelController.getUsers);
 
-// Update user status
-router.patch('/users/:id/status', authMiddleware, requireRole(['ADMIN']), async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { isActive } = req.body;
+/**
+ * @route   GET /api/v1/admin-panel/users/:id
+ * @desc    Get detailed user information
+ * @access  Private/Admin
+ */
+router.get('/users/:id', adminPanelController.getUserDetails);
 
-    const user = await prisma.user.update({
-      where: { id: id as string },
-      data: { isActive },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        isActive: true
-      }
-    });
+/**
+ * @route   PATCH /api/v1/admin-panel/users/:id/status
+ * @desc    Update user active/inactive status
+ * @body    { isActive: boolean }
+ * @access  Private/Admin
+ */
+router.patch('/users/:id/status', adminPanelController.updateUserStatus);
 
-    res.json({
-      success: true,
-      message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
-      data: user
-    });
-  } catch (error: any) {
-    logger.error('Error updating user status:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error updating user status',
-      error: error.message
-    });
-  }
-});
+/**
+ * @route   PATCH /api/v1/admin-panel/users/:id/verify
+ * @desc    Verify a user account
+ * @access  Private/Admin
+ */
+router.patch('/users/:id/verify', adminPanelController.verifyUser);
 
-// Appointments management
-router.get('/appointments', authMiddleware, requireRole(['ADMIN']), async (req, res) => {
-  try {
-    const { page = 1, limit = 10, status, dateFrom, dateTo } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);
+/**
+ * @route   DELETE /api/v1/admin-panel/users/:id
+ * @desc    Delete a user (soft delete)
+ * @access  Private/Admin
+ */
+router.delete('/users/:id', adminPanelController.deleteUser);
 
-    const where: any = {};
-    if (status) where.status = status;
-    if (dateFrom || dateTo) {
-      where.scheduledAt = {};
-      if (dateFrom) where.scheduledAt.gte = new Date(dateFrom as string);
-      if (dateTo) where.scheduledAt.lte = new Date(dateTo as string);
-    }
+// ========================================
+// DOCTOR MANAGEMENT
+// ========================================
 
-    const [appointments, total] = await Promise.all([
-      prisma.appointment.findMany({
-        where,
-        skip,
-        take: Number(limit),
-        orderBy: { scheduledAt: 'desc' },
-        include: {
-          patient: {
-            include: { user: true }
-          },
-          doctor: {
-            include: { user: true }
-          }
-        }
-      }),
-      prisma.appointment.count({ where })
-    ]);
+/**
+ * @route   GET /api/v1/admin-panel/doctors
+ * @desc    Get all doctors with filters and pagination
+ * @query   page, limit, specialty, isAvailable, search
+ * @access  Private/Admin
+ */
+router.get('/doctors', adminPanelController.getDoctors);
 
-    res.json({
-      success: true,
-      data: {
-        appointments,
-        pagination: {
-          page: Number(page),
-          limit: Number(limit),
-          total,
-          pages: Math.ceil(total / Number(limit))
-        }
-      }
-    });
-  } catch (error: any) {
-    logger.error('Error fetching appointments:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching appointments',
-      error: error.message
-    });
-  }
-});
+/**
+ * @route   PATCH /api/v1/admin-panel/doctors/:id/availability
+ * @desc    Update doctor availability status
+ * @body    { isAvailable: boolean }
+ * @access  Private/Admin
+ */
+router.patch('/doctors/:id/availability', adminPanelController.updateDoctorAvailability);
 
-// Payments management
-router.get('/payments', authMiddleware, requireRole(['ADMIN']), async (req, res) => {
-  try {
-    const { page = 1, limit = 10, status, dateFrom, dateTo } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);
+// ========================================
+// APPOINTMENT MANAGEMENT
+// ========================================
 
-    const where: any = {};
-    if (status) where.status = status;
-    if (dateFrom || dateTo) {
-      where.createdAt = {};
-      if (dateFrom) where.createdAt.gte = new Date(dateFrom as string);
-      if (dateTo) where.createdAt.lte = new Date(dateTo as string);
-    }
+/**
+ * @route   GET /api/v1/admin-panel/appointments
+ * @desc    Get all appointments with filters and pagination
+ * @query   page, limit, status, dateFrom, dateTo, doctorId, patientId
+ * @access  Private/Admin
+ */
+router.get('/appointments', adminPanelController.getAppointments);
 
-    const [payments, total] = await Promise.all([
-      prisma.payment.findMany({
-        where,
-        skip,
-        take: Number(limit),
-        orderBy: { createdAt: 'desc' },
-        include: {
-          appointment: true
-        }
-      }),
-      prisma.payment.count({ where })
-    ]);
+/**
+ * @route   PATCH /api/v1/admin-panel/appointments/:id/status
+ * @desc    Update appointment status
+ * @body    { status: AppointmentStatus }
+ * @access  Private/Admin
+ */
+router.patch('/appointments/:id/status', adminPanelController.updateAppointmentStatus);
 
-    res.json({
-      success: true,
-      data: {
-        payments,
-        pagination: {
-          page: Number(page),
-          limit: Number(limit),
-          total,
-          pages: Math.ceil(total / Number(limit))
-        }
-      }
-    });
-  } catch (error: any) {
-    logger.error('Error fetching payments:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching payments',
-      error: error.message
-    });
-  }
-});
+// ========================================
+// PAYMENT MANAGEMENT
+// ========================================
 
-// System health
-router.get('/system/health', authMiddleware, requireRole(['ADMIN']), async (req, res) => {
-  try {
-    const dbStatus = await prisma.$queryRaw`SELECT 1 as status`;
-    const redisStatus = await req.app.locals['redis']?.ping();
-    
-    res.json({
-      success: true,
-      data: {
-        database: dbStatus ? 'connected' : 'disconnected',
-        redis: redisStatus === 'PONG' ? 'connected' : 'disconnected',
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        timestamp: new Date().toISOString()
-      }
-    });
-  } catch (error: any) {
-    logger.error('Error checking system health:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error checking system health',
-      error: error.message
-    });
-  }
-});
+/**
+ * @route   GET /api/v1/admin-panel/payments
+ * @desc    Get all payments with filters and pagination
+ * @query   page, limit, status, method, dateFrom, dateTo
+ * @access  Private/Admin
+ */
+router.get('/payments', adminPanelController.getPayments);
+
+// ========================================
+// SERVICE MANAGEMENT
+// ========================================
+
+/**
+ * @route   GET /api/v1/admin-panel/services
+ * @desc    Get all services with filters and pagination
+ * @query   page, limit, category, isActive
+ * @access  Private/Admin
+ */
+router.get('/services', adminPanelController.getServices);
+
+/**
+ * @route   PATCH /api/v1/admin-panel/services/:id/status
+ * @desc    Update service active/inactive status
+ * @body    { isActive: boolean }
+ * @access  Private/Admin
+ */
+router.patch('/services/:id/status', adminPanelController.updateServiceStatus);
+
+// ========================================
+// REVIEW MANAGEMENT
+// ========================================
+
+/**
+ * @route   GET /api/v1/admin-panel/reviews
+ * @desc    Get all reviews with filters and pagination
+ * @query   page, limit, doctorId, minRating, isVerified
+ * @access  Private/Admin
+ */
+router.get('/reviews', adminPanelController.getReviews);
+
+/**
+ * @route   PATCH /api/v1/admin-panel/reviews/:id/verify
+ * @desc    Verify a review
+ * @access  Private/Admin
+ */
+router.patch('/reviews/:id/verify', adminPanelController.verifyReview);
+
+/**
+ * @route   DELETE /api/v1/admin-panel/reviews/:id
+ * @desc    Delete a review
+ * @access  Private/Admin
+ */
+router.delete('/reviews/:id', adminPanelController.deleteReview);
+
+// ========================================
+// SYSTEM MANAGEMENT
+// ========================================
+
+/**
+ * @route   GET /api/v1/admin-panel/system/health
+ * @desc    Get system health status
+ * @access  Private/Admin
+ */
+router.get('/system/health', adminPanelController.getSystemHealth);
+
+/**
+ * @route   GET /api/v1/admin-panel/system/logs
+ * @desc    Get system logs with filters
+ * @query   level, limit, startDate, endDate
+ * @access  Private/Admin
+ */
+router.get('/system/logs', adminPanelController.getSystemLogs);
+
+// ========================================
+// DATA EXPORT
+// ========================================
+
+/**
+ * @route   POST /api/v1/admin-panel/export
+ * @desc    Export data in various formats
+ * @body    { type: string, format: string, filters: object }
+ * @access  Private/Admin
+ */
+router.post('/export', adminPanelController.exportData);
 
 export default router;
