@@ -40,7 +40,7 @@ export const GET: APIRoute = async ({ site }) => {
     <priority>${page.collection === 'post' ? '0.8' : '0.6'}</priority>
     ${page.data.image ? `
     <image:image>
-      <image:loc>${page.data.image}</image:loc>
+      <image:loc>${page.data.image.replace(/&/g, '&amp;')}</image:loc>
       <image:title>${page.data.title}</image:title>
       <image:caption>${page.data.excerpt}</image:caption>
     </image:image>` : ''}
