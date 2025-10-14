@@ -1,13 +1,13 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
 import { RegisterRequest, LoginRequest, AuthResponse } from '../types';
 import { EmailService } from './email.service';
 import { RedisService } from './redis.service';
+import prismaClient from '../utils/prisma';
 
-const prisma = new PrismaClient();
+const prisma = prismaClient;
 
 export class AuthService {
   private emailService: EmailService;

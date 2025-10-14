@@ -9,6 +9,11 @@ export class RedisService {
    * Initialize Redis connection
    */
   public static async initialize(): Promise<void> {
+    if (this.client) {
+      logger.info('Redis client already initialized');
+      return;
+    }
+
     try {
       this.client = new Redis(config.redis.url, {
         maxRetriesPerRequest: 3,
@@ -417,6 +422,7 @@ export class RedisService {
     try {
       if (this.client) {
         await this.client.quit();
+        this.client = undefined as unknown as Redis;
         logger.info('Redis disconnected successfully');
       }
     } catch (error: any) {

@@ -46,14 +46,16 @@ router.get('/revenue', adminPanelController.getRevenueReport);
  * @query   page, limit, role, search, isActive, isVerified
  * @access  Private/Admin
  */
-router.get('/users', adminPanelController.getUsers);
+router
+  .route('/users')
+  .get(adminPanelController.getUsers)
+  .post(adminPanelController.createUser);
 
-/**
- * @route   GET /api/v1/admin-panel/users/:id
- * @desc    Get detailed user information
- * @access  Private/Admin
- */
-router.get('/users/:id', adminPanelController.getUserDetails);
+router
+  .route('/users/:id')
+  .get(adminPanelController.getUserDetails)
+  .put(adminPanelController.updateUser)
+  .delete(adminPanelController.deleteUser);
 
 /**
  * @route   PATCH /api/v1/admin-panel/users/:id/status
@@ -70,13 +72,6 @@ router.patch('/users/:id/status', adminPanelController.updateUserStatus);
  */
 router.patch('/users/:id/verify', adminPanelController.verifyUser);
 
-/**
- * @route   DELETE /api/v1/admin-panel/users/:id
- * @desc    Delete a user (soft delete)
- * @access  Private/Admin
- */
-router.delete('/users/:id', adminPanelController.deleteUser);
-
 // ========================================
 // DOCTOR MANAGEMENT
 // ========================================
@@ -87,7 +82,15 @@ router.delete('/users/:id', adminPanelController.deleteUser);
  * @query   page, limit, specialty, isAvailable, search
  * @access  Private/Admin
  */
-router.get('/doctors', adminPanelController.getDoctors);
+router
+  .route('/doctors')
+  .get(adminPanelController.getDoctors)
+  .post(adminPanelController.createDoctor);
+
+router
+  .route('/doctors/:id')
+  .put(adminPanelController.updateDoctor)
+  .delete(adminPanelController.deleteDoctor);
 
 /**
  * @route   PATCH /api/v1/admin-panel/doctors/:id/availability
@@ -96,6 +99,7 @@ router.get('/doctors', adminPanelController.getDoctors);
  * @access  Private/Admin
  */
 router.patch('/doctors/:id/availability', adminPanelController.updateDoctorAvailability);
+
 
 // ========================================
 // APPOINTMENT MANAGEMENT
@@ -110,12 +114,50 @@ router.patch('/doctors/:id/availability', adminPanelController.updateDoctorAvail
 router.get('/appointments', adminPanelController.getAppointments);
 
 /**
+ * @route   GET /api/v1/admin-panel/appointments/:id
+ * @desc    Get appointment details by ID
+ * @access  Private/Admin
+ */
+router.get('/appointments/:id', adminPanelController.getAppointmentDetails);
+
+/**
+ * @route   POST /api/v1/admin-panel/appointments
+ * @desc    Create new appointment
+ * @body    Appointment data
+ * @access  Private/Admin
+ */
+router.post('/appointments', adminPanelController.createAppointment);
+
+/**
+ * @route   PUT /api/v1/admin-panel/appointments/:id
+ * @desc    Update appointment
+ * @body    Appointment data
+ * @access  Private/Admin
+ */
+router.put('/appointments/:id', adminPanelController.updateAppointment);
+
+/**
  * @route   PATCH /api/v1/admin-panel/appointments/:id/status
  * @desc    Update appointment status
  * @body    { status: AppointmentStatus }
  * @access  Private/Admin
  */
 router.patch('/appointments/:id/status', adminPanelController.updateAppointmentStatus);
+
+/**
+ * @route   DELETE /api/v1/admin-panel/appointments/:id
+ * @desc    Delete appointment
+ * @access  Private/Admin
+ */
+router.delete('/appointments/:id', adminPanelController.deleteAppointment);
+
+/**
+ * @route   GET /api/v1/admin-panel/patients
+ * @desc    Get all patients with filters and pagination
+ * @query   page, limit, search, isActive, isVerified
+ * @access  Private/Admin
+ */
+router.get('/patients', adminPanelController.getPatients);
 
 // ========================================
 // PAYMENT MANAGEMENT
@@ -128,6 +170,51 @@ router.patch('/appointments/:id/status', adminPanelController.updateAppointmentS
  * @access  Private/Admin
  */
 router.get('/payments', adminPanelController.getPayments);
+
+/**
+ * @route   GET /api/v1/admin-panel/payments/:id
+ * @desc    Get payment details by ID
+ * @access  Private/Admin
+ */
+router.get('/payments/:id', adminPanelController.getPaymentDetails);
+
+/**
+ * @route   POST /api/v1/admin-panel/payments
+ * @desc    Create new payment
+ * @body    Payment data
+ * @access  Private/Admin
+ */
+router.post('/payments', adminPanelController.createPayment);
+
+/**
+ * @route   PUT /api/v1/admin-panel/payments/:id
+ * @desc    Update payment
+ * @body    Payment data
+ * @access  Private/Admin
+ */
+router.put('/payments/:id', adminPanelController.updatePayment);
+
+/**
+ * @route   PATCH /api/v1/admin-panel/payments/:id/status
+ * @desc    Update payment status
+ * @body    { status: PaymentStatus }
+ * @access  Private/Admin
+ */
+router.patch('/payments/:id/status', adminPanelController.updatePaymentStatus);
+
+/**
+ * @route   DELETE /api/v1/admin-panel/payments/:id
+ * @desc    Delete payment
+ * @access  Private/Admin
+ */
+router.delete('/payments/:id', adminPanelController.deletePayment);
+
+/**
+ * @route   GET /api/v1/admin-panel/analytics/revenue
+ * @desc    Get revenue analytics by month
+ * @access  Private/Admin
+ */
+router.get('/analytics/revenue', adminPanelController.getRevenueAnalytics);
 
 // ========================================
 // SERVICE MANAGEMENT
@@ -160,6 +247,29 @@ router.patch('/services/:id/status', adminPanelController.updateServiceStatus);
  * @access  Private/Admin
  */
 router.get('/reviews', adminPanelController.getReviews);
+
+/**
+ * @route   GET /api/v1/admin-panel/reviews/:id
+ * @desc    Get review details by ID
+ * @access  Private/Admin
+ */
+router.get('/reviews/:id', adminPanelController.getReviewDetails);
+
+/**
+ * @route   POST /api/v1/admin-panel/reviews
+ * @desc    Create new review
+ * @body    Review data
+ * @access  Private/Admin
+ */
+router.post('/reviews', adminPanelController.createReview);
+
+/**
+ * @route   PUT /api/v1/admin-panel/reviews/:id
+ * @desc    Update review
+ * @body    Review data
+ * @access  Private/Admin
+ */
+router.put('/reviews/:id', adminPanelController.updateReview);
 
 /**
  * @route   PATCH /api/v1/admin-panel/reviews/:id/verify

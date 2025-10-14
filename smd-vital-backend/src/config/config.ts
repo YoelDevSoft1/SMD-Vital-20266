@@ -22,8 +22,8 @@ const envSchema = z.object({
   API_VERSION: z.string().default('v1'),
 
   // CORS
-  CORS_ORIGIN: z.string().default('http://localhost:4322'),
-  CORS_CREDENTIALS: z.string().transform(val => val === 'true').default('true'),
+  CORS_ORIGIN: z.string().default('http://localhost:5173'),
+  CORS_CREDENTIALS: z.string().transform(val => val === 'true').default('true'), 
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default('900000'), // 15 minutes
@@ -86,7 +86,7 @@ const env = envSchema.parse({
   PORT: process.env['PORT'] || "3000",
   NODE_ENV: process.env['NODE_ENV'] || "development",
   API_VERSION: process.env['API_VERSION'] || "v1",
-  CORS_ORIGIN: process.env['CORS_ORIGIN'] || "http://localhost:4322",
+  CORS_ORIGIN: process.env['CORS_ORIGIN'] || "http://localhost:5173",
   CORS_CREDENTIALS: process.env['CORS_CREDENTIALS'] || "true",
   RATE_LIMIT_WINDOW_MS: process.env['RATE_LIMIT_WINDOW_MS'] || "900000",
   RATE_LIMIT_MAX_REQUESTS: process.env['RATE_LIMIT_MAX_REQUESTS'] || "100",

@@ -65,6 +65,14 @@ export class AuthController {
       // Login user
       const result = await this.authService.login(validatedData);
       
+      // Debug logging
+      logger.info('Login response - Token generated:', {
+        tokenLength: result.accessToken.length,
+        tokenStart: result.accessToken.substring(0, 20) + '...',
+        tokenEnd: '...' + result.accessToken.substring(result.accessToken.length - 20),
+        isJWTFormat: result.accessToken.split('.').length === 3
+      });
+      
       const response: ApiResponse<AuthResponse> = {
         success: true,
         message: 'Login successful',

@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
 import { ApiResponse } from '../types';
+import prismaClient from '../utils/prisma';
 
-const prisma = new PrismaClient();
+const prisma = prismaClient;
 
 interface JwtPayload {
   userId: string;
@@ -35,6 +35,14 @@ export const authMiddleware = async (
     }
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+
+    // Debug logging
+    logger.info('Auth middleware - Token received:', {
+      tokenLength: token.length,
+      tokenStart: token.substring(0, 20) + '...',
+      tokenEnd: '...' + token.substring(token.length - 20),
+      isJWTFormat: token.split('.').length === 3
+    });
 
     // Verify JWT token
     const decoded = jwt.verify(token, config.jwt.secret) as JwtPayload;

@@ -1,0 +1,16 @@
+services:
+  # Panel de Administración
+  - type: web
+    name: smd-vital-admin
+    env: static
+    buildCommand: npm run build
+    staticPublishPath: admin-panel-frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://smd-vital-backend.onrender.com/api
+      - key: VITE_APP_NAME
+        value: SMD Vital Admin

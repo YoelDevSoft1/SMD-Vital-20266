@@ -86,3 +86,80 @@
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+/* Glassmorphism motion utilities */
+@keyframes glassDrift {
+  0% {
+    transform: translate3d(-6%, -4%, 0) scale(1);
+    opacity: 0.55;
+  }
+  40% {
+    transform: translate3d(4%, 6%, 0) scale(1.08);
+    opacity: 0.75;
+  }
+  70% {
+    transform: translate3d(-2%, 10%, 0) scale(1.04);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate3d(6%, -2%, 0) scale(1.02);
+    opacity: 0.58;
+  }
+}
+
+@keyframes glassDriftReverse {
+  0% {
+    transform: translate3d(5%, -6%, 0) scale(1.02);
+    opacity: 0.6;
+  }
+  45% {
+    transform: translate3d(-8%, 4%, 0) scale(1.07);
+    opacity: 0.78;
+  }
+  80% {
+    transform: translate3d(4%, 8%, 0) scale(1.03);
+    opacity: 0.68;
+  }
+  100% {
+    transform: translate3d(-6%, -3%, 0) scale(1.01);
+    opacity: 0.6;
+  }
+}
+
+@keyframes glassSheen {
+  0% {
+    transform: translateX(-120%) rotate(18deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.45;
+  }
+  55% {
+    transform: translateX(40%) rotate(18deg);
+    opacity: 0.2;
+  }
+  70% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(120%) rotate(18deg);
+    opacity: 0;
+  }
+}
+
+.glass-blob {
+  animation: glassDrift 28s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.glass-blob--reverse {
+  animation: glassDriftReverse 32s ease-in-out infinite alternate;
+}
+
+.glass-blob--slow {
+  animation-duration: 42s;
+}
+
+.glass-sheen {
+  animation: glassSheen 14s ease-in-out infinite;
+}

@@ -1,0 +1,1 @@
+SELECT id, email, role, "isActive" FROM users LIMIT 10;

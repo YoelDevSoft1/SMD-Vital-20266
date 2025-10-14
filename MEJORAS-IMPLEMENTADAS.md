@@ -317,3 +317,14 @@ Las mejoras implementadas posicionan a SMD Vital como un sitio web moderno, opti
 **Fecha de implementación:** 10 de Octubre, 2025
 **Versión:** 2.0
 **Status:** ✅ Completado
+
+---
+
+## 🔧 5. Plataforma Administrativa & Backend
+
+- Prisma ahora se inicializa una única vez y se reutiliza en todo el backend para evitar fugas de conexiones.
+- La configuración del servidor usa un único `config/config.ts` validado por Zod; `config/simple.ts` queda solo como referencia de desarrollo rápido.
+- El arranque del servidor espera a Redis, colas y Socket.IO antes de aceptar tráfico, evitando errores de token al iniciar.
+- Rutas del panel de administración depuradas para eliminar duplicados y devolver paginaciones consistentes.
+- En el panel React se eliminaron logs sensibles y roles no soportados por el backend para que las listas y formularios sean coherentes.
+- Actualizado `api.ts` para registrar errores solo en desarrollo sin exponer tokens en consola.

@@ -33,8 +33,8 @@ export interface User {
   isActive: boolean;
   isVerified: boolean;
   avatar?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 // Dashboard types
@@ -101,6 +101,25 @@ export type AppointmentStatus =
   | 'NO_SHOW'
   | 'RESCHEDULED';
 
+export interface Patient {
+  id: string;
+  userId: string;
+  dateOfBirth: string;
+  gender: 'MALE' | 'FEMALE';
+  emergencyContact: string;
+  medicalHistory?: string;
+  allergies?: string;
+  user: User;
+  _count?: {
+    appointments: number;
+    medicalRecords: number;
+    prescriptions: number;
+    reviews: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Appointment {
   id: string;
   patientId: string;
@@ -114,12 +133,13 @@ export interface Appointment {
   city: string;
   notes?: string;
   diagnosis?: string;
-  patient?: {
-    user: User;
+  prescription?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
   };
-  doctor?: {
-    user: User;
-  };
+  patient?: Patient;
+  doctor?: Doctor;
   service?: Service;
   payments?: Payment[];
   createdAt: string;
@@ -210,6 +230,19 @@ export interface AnalyticsData {
   };
 }
 
+export type AnalyticsMetric = 'appointments' | 'revenue' | 'users';
+
+export interface AnalyticsFilters {
+  startDate?: string;
+  endDate?: string;
+  groupBy?: 'day' | 'week' | 'month';
+  metric?: AnalyticsMetric;
+  compareTo?: 'previous_period' | 'previous_year';
+  doctorId?: string;
+  serviceId?: string;
+  city?: string;
+}
+
 // Revenue types
 export interface RevenueReport {
   period: {
@@ -289,11 +322,13 @@ export interface UserFilters {
 export interface AppointmentFilters {
   page?: number;
   limit?: number;
+  search?: string;
   status?: AppointmentStatus;
   dateFrom?: string;
   dateTo?: string;
   doctorId?: string;
   patientId?: string;
+  serviceId?: string;
 }
 
 export interface PaymentFilters {
@@ -301,6 +336,64 @@ export interface PaymentFilters {
   limit?: number;
   status?: PaymentStatus;
   method?: PaymentMethod;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+// Service filters
+export interface ServiceFilters {
+  page?: number;
+  limit?: number;
+  category?: ServiceCategory;
+  isActive?: boolean;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minDuration?: number;
+  maxDuration?: number;
+}
+
+// Review filters
+export interface ReviewFilters {
+  page?: number;
+  limit?: number;
+  rating?: number;
+  isVerified?: boolean;
+  search?: string;
+  doctorId?: string;
+  patientId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export interface DoctorFilters {
+  page?: number;
+  limit?: number;
+  specialty?: string;
+  search?: string;
+  isAvailable?: boolean;
+  rating?: number;
+  experience?: number;
+}
+
+// System log types
+export interface SystemLog {
+  id: string;
+  level: string;
+  service: string;
+  message: string;
+  timestamp: string;
+  environment?: string;
+  requestId?: string;
+  context?: Record<string, unknown>;
+}
+
+export interface SystemLogFilters {
+  page?: number;
+  limit?: number;
+  level?: string;
+  service?: string;
+  search?: string;
   dateFrom?: string;
   dateTo?: string;
 }

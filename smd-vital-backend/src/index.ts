@@ -4,15 +4,15 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-import { PrismaClient } from '@prisma/client';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 
 // Import configurations
-import { config } from './config/simple';
+import { config } from './config/config';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
+import prismaClient from './utils/prisma';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
@@ -31,16 +31,20 @@ import adminPanelRoutes from './routes/admin-panel.routes';
 import { SocketService } from './services/socket.service';
 import { RedisService } from './services/redis.service';
 import { QueueService } from './services/queue.service';
+import { MetricsService } from './services/metrics.service';
+
+// Import middleware
+import { metricsMiddleware } from './middleware/metrics.middleware';
 
 class SMDVitalServer {
   private app: express.Application;
   private server: any;
   private io: SocketIOServer;
-  private prisma: PrismaClient;
+  private prisma = prismaClient;
+  private metricsService = MetricsService.getInstance();
 
   constructor() {
     this.app = express();
-    this.prisma = new PrismaClient();
     this.server = createServer(this.app);
     this.io = new SocketIOServer(this.server, {
       cors: {
@@ -53,7 +57,6 @@ class SMDVitalServer {
     this.initializeMiddlewares();
     this.initializeRoutes();
     this.initializeErrorHandling();
-    this.initializeServices();
   }
 
   private initializeMiddlewares(): void {
@@ -116,6 +119,9 @@ class SMDVitalServer {
       res.setHeader('X-Request-ID', req.id!);
       next();
     });
+
+    // Metrics middleware
+    this.app.use(metricsMiddleware);
   }
 
   private initializeRoutes(): void {
@@ -128,6 +134,18 @@ class SMDVitalServer {
         environment: config.nodeEnv,
         version: process.env['npm_package_version'] || '1.0.0'
       });
+    });
+
+    // Metrics endpoint for Prometheus
+    this.app.get('/metrics', async (_req, res) => {
+      try {
+        const metrics = await this.metricsService.getMetrics();
+        res.set('Content-Type', 'text/plain');
+        res.status(200).send(metrics);
+      } catch (error) {
+        logger.error('Error getting metrics:', error);
+        res.status(500).json({ error: 'Failed to get metrics' });
+      }
     });
 
     // API routes
@@ -186,9 +204,13 @@ class SMDVitalServer {
       new SocketService(this.io);
       logger.info('Socket service initialized');
 
+      // Initialize Metrics Service
+      this.metricsService.start();
+      logger.info('Metrics service initialized');
+
     } catch (error) {
       logger.error('Failed to initialize services:', error);
-      process.exit(1);
+      throw error;
     }
   }
 
@@ -197,6 +219,9 @@ class SMDVitalServer {
       // Test database connection
       await this.prisma.$connect();
       logger.info('Database connected successfully');
+
+      // Initialize background services before accepting traffic
+      await this.initializeServices();
 
       // Start server
       this.server.listen(config.port, () => {
@@ -227,6 +252,10 @@ class SMDVitalServer {
       // Close Redis connection
       await RedisService.disconnect();
       logger.info('Redis connection closed');
+
+      // Stop metrics service
+      this.metricsService.stop();
+      logger.info('Metrics service stopped');
 
       // Close server
       this.server.close(() => {

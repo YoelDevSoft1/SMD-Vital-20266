@@ -125,14 +125,17 @@ export class AdminPanelController {
         limit: parseInt(limit as string),
         role: role as string,
         search: search as string,
-        isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
-        isVerified: isVerified === 'true' ? true : isVerified === 'false' ? false : undefined
+        ...(isActive && { isActive: isActive === 'true' ? true : false }),
+        ...(isVerified && { isVerified: isVerified === 'true' ? true : false })
       });
 
       const response: ApiResponse = {
         success: true,
         message: 'Users retrieved successfully',
-        data: result,
+        data: {
+          data: result.data,
+          pagination: result.pagination
+        },
         timestamp: new Date().toISOString(),
         requestId: req.id || 'unknown'
       };
@@ -151,6 +154,374 @@ export class AdminPanelController {
   };
 
   /**
+   * @desc    Create new user
+   * @route   POST /api/v1/admin-panel/users
+   * @access  Private/Admin
+   */
+  public createUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email, password, firstName, lastName, phone, role, isActive, isVerified } = req.body;
+
+      const result = await this.adminService.createUser({
+        email,
+        password,
+        firstName,
+        lastName,
+        phone,
+        role,
+        isActive: isActive !== undefined ? isActive : true,
+        isVerified: isVerified !== undefined ? isVerified : false
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'User created successfully',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(201).json(response);
+    } catch (error: any) {
+      logger.error('Error creating user:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error creating user',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  public updateUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { email, firstName, lastName, phone, role, isActive, isVerified } = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'User ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const result = await this.adminService.updateUser(id, {
+        email,
+        firstName,
+        lastName,
+        phone,
+        role,
+        isActive,
+        isVerified
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'User updated successfully',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error updating user:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error updating user',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  public deleteUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'User ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      await this.adminService.deleteUser(id);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'User deleted successfully',
+        data: null,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error deleting user:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error deleting user',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  // ==================== DOCTORS ====================
+
+  /**
+   * @desc    Get all doctors with filters
+   * @route   GET /api/v1/admin-panel/doctors
+   * @access  Private/Admin
+   */
+  public getDoctors = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { page = 1, limit = 10, search, specialty, isAvailable, rating, experience } = req.query;
+
+      const result = await this.adminService.getDoctors({
+        page: parseInt(page as string),
+        limit: parseInt(limit as string),
+        search: search as string,
+        specialty: specialty as string,
+        ...(isAvailable && { isAvailable: isAvailable === 'true' }),
+        ...(rating && { rating: parseInt(rating as string) }),
+        ...(experience && { experience: parseInt(experience as string) }),
+      });
+
+      // Ensure dates are properly serialized
+      const doctorsWithSerializedDates = result.data.map((doctor: any) => ({
+        ...doctor,
+        user: {
+          ...doctor.user,
+          createdAt: doctor.user.createdAt ? new Date(doctor.user.createdAt).toISOString() : null,
+          updatedAt: doctor.user.updatedAt ? new Date(doctor.user.updatedAt).toISOString() : null,
+        }
+      }));
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Doctors retrieved successfully',
+        data: {
+          data: doctorsWithSerializedDates,
+          pagination: result.pagination
+        },
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error getting doctors:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error getting doctors',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Create new doctor
+   * @route   POST /api/v1/admin-panel/doctors
+   * @access  Private/Admin
+   */
+  public createDoctor = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { 
+        email, password, firstName, lastName, phone,
+        licenseNumber, specialty, experience, consultationFee, bio, isAvailable 
+      } = req.body;
+
+      const result = await this.adminService.createDoctor({
+        email,
+        password,
+        firstName,
+        lastName,
+        phone,
+        licenseNumber,
+        specialty,
+        experience: parseInt(experience),
+        consultationFee: parseInt(consultationFee),
+        bio,
+        isAvailable: isAvailable !== undefined ? isAvailable : true
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Doctor created successfully',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(201).json(response);
+    } catch (error: any) {
+      logger.error('Error creating doctor:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error creating doctor',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Update doctor
+   * @route   PUT /api/v1/admin-panel/doctors/:id
+   * @access  Private/Admin
+   */
+  public updateDoctor = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { 
+        email, firstName, lastName, phone,
+        licenseNumber, specialty, experience, consultationFee, bio, isAvailable 
+      } = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Doctor ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const result = await this.adminService.updateDoctor(id, {
+        email,
+        firstName,
+        lastName,
+        phone,
+        licenseNumber,
+        specialty,
+        experience: parseInt(experience),
+        consultationFee: parseInt(consultationFee),
+        bio,
+        isAvailable
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Doctor updated successfully',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error updating doctor:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error updating doctor',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Update doctor availability
+   * @route   PATCH /api/v1/admin-panel/doctors/:id/availability
+   * @access  Private/Admin
+   */
+  public updateDoctorAvailability = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { isAvailable } = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Doctor ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      await this.adminService.updateDoctorAvailability(id, isAvailable);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Doctor availability updated successfully',
+        data: null,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error updating doctor availability:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error updating doctor availability',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Delete doctor
+   * @route   DELETE /api/v1/admin-panel/doctors/:id
+   * @access  Private/Admin
+   */
+  public deleteDoctor = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Doctor ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      await this.adminService.deleteDoctor(id);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Doctor deleted successfully',
+        data: null,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error deleting doctor:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error deleting doctor',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
    * @desc    Get user details
    * @route   GET /api/v1/admin-panel/users/:id
    * @access  Private/Admin
@@ -158,6 +529,16 @@ export class AdminPanelController {
   public getUserDetails = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'User ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
 
       const user = await this.adminService.getUserDetails(id);
 
@@ -191,6 +572,16 @@ export class AdminPanelController {
       const { id } = req.params;
       const { isActive } = req.body;
 
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'User ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
       const user = await this.adminService.updateUserStatus(id, isActive);
 
       const response: ApiResponse = {
@@ -223,6 +614,16 @@ export class AdminPanelController {
     try {
       const { id } = req.params;
 
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'User ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
       const user = await this.adminService.verifyUser(id);
 
       const response: ApiResponse = {
@@ -246,107 +647,8 @@ export class AdminPanelController {
     }
   };
 
-  /**
-   * @desc    Delete user
-   * @route   DELETE /api/v1/admin-panel/users/:id
-   * @access  Private/Admin
-   */
-  public deleteUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { id } = req.params;
 
-      await this.adminService.deleteUser(id);
 
-      const response: ApiResponse = {
-        success: true,
-        message: 'User deleted successfully',
-        timestamp: new Date().toISOString(),
-        requestId: req.id || 'unknown'
-      };
-
-      res.status(200).json(response);
-    } catch (error: any) {
-      logger.error('Error deleting user:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Error deleting user',
-        error: error.message,
-        timestamp: new Date().toISOString(),
-        requestId: req.id || 'unknown'
-      });
-    }
-  };
-
-  /**
-   * @desc    Get all doctors with filters
-   * @route   GET /api/v1/admin-panel/doctors
-   * @access  Private/Admin
-   */
-  public getDoctors = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { page = '1', limit = '10', specialty, isAvailable, search } = req.query;
-
-      const result = await this.adminService.getDoctors({
-        page: parseInt(page as string),
-        limit: parseInt(limit as string),
-        specialty: specialty as string,
-        isAvailable: isAvailable === 'true' ? true : isAvailable === 'false' ? false : undefined,
-        search: search as string
-      });
-
-      const response: ApiResponse = {
-        success: true,
-        message: 'Doctors retrieved successfully',
-        data: result,
-        timestamp: new Date().toISOString(),
-        requestId: req.id || 'unknown'
-      };
-
-      res.status(200).json(response);
-    } catch (error: any) {
-      logger.error('Error fetching doctors:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Error fetching doctors',
-        error: error.message,
-        timestamp: new Date().toISOString(),
-        requestId: req.id || 'unknown'
-      });
-    }
-  };
-
-  /**
-   * @desc    Update doctor availability
-   * @route   PATCH /api/v1/admin-panel/doctors/:id/availability
-   * @access  Private/Admin
-   */
-  public updateDoctorAvailability = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { id } = req.params;
-      const { isAvailable } = req.body;
-
-      const doctor = await this.adminService.updateDoctorAvailability(id, isAvailable);
-
-      const response: ApiResponse = {
-        success: true,
-        message: 'Doctor availability updated successfully',
-        data: doctor,
-        timestamp: new Date().toISOString(),
-        requestId: req.id || 'unknown'
-      };
-
-      res.status(200).json(response);
-    } catch (error: any) {
-      logger.error('Error updating doctor availability:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Error updating doctor availability',
-        error: error.message,
-        timestamp: new Date().toISOString(),
-        requestId: req.id || 'unknown'
-      });
-    }
-  };
 
   /**
    * @desc    Get all appointments with filters
@@ -355,22 +657,27 @@ export class AdminPanelController {
    */
   public getAppointments = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { page = '1', limit = '10', status, dateFrom, dateTo, doctorId, patientId } = req.query;
+      const { page = '1', limit = '10', search, status, dateFrom, dateTo, doctorId, patientId, serviceId } = req.query;
 
       const result = await this.adminService.getAppointments({
         page: parseInt(page as string),
         limit: parseInt(limit as string),
+        search: search as string,
         status: status as string,
         dateFrom: dateFrom as string,
         dateTo: dateTo as string,
         doctorId: doctorId as string,
-        patientId: patientId as string
+        patientId: patientId as string,
+        serviceId: serviceId as string
       });
 
       const response: ApiResponse = {
         success: true,
         message: 'Appointments retrieved successfully',
-        data: result,
+        data: {
+          data: result.data,
+          pagination: result.pagination
+        },
         timestamp: new Date().toISOString(),
         requestId: req.id || 'unknown'
       };
@@ -389,6 +696,123 @@ export class AdminPanelController {
   };
 
   /**
+   * @desc    Get appointment details by ID
+   * @route   GET /api/v1/admin-panel/appointments/:id
+   * @access  Private/Admin
+   */
+  public getAppointmentDetails = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Appointment ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const appointment = await this.adminService.getAppointmentDetails(id);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Appointment details retrieved successfully',
+        data: appointment,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching appointment details:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching appointment details',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Create new appointment
+   * @route   POST /api/v1/admin-panel/appointments
+   * @access  Private/Admin
+   */
+  public createAppointment = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const appointmentData = req.body;
+
+      const appointment = await this.adminService.createAppointment(appointmentData);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Appointment created successfully',
+        data: appointment,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(201).json(response);
+    } catch (error: any) {
+      logger.error('Error creating appointment:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error creating appointment',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Update appointment
+   * @route   PUT /api/v1/admin-panel/appointments/:id
+   * @access  Private/Admin
+   */
+  public updateAppointment = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const appointmentData = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Appointment ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const appointment = await this.adminService.updateAppointment(id, appointmentData);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Appointment updated successfully',
+        data: appointment,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error updating appointment:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error updating appointment',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
    * @desc    Update appointment status
    * @route   PATCH /api/v1/admin-panel/appointments/:id/status
    * @access  Private/Admin
@@ -397,6 +821,16 @@ export class AdminPanelController {
     try {
       const { id } = req.params;
       const { status } = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Appointment ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
 
       const appointment = await this.adminService.updateAppointmentStatus(id, status);
 
@@ -414,6 +848,85 @@ export class AdminPanelController {
       res.status(500).json({
         success: false,
         message: 'Error updating appointment status',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Delete appointment
+   * @route   DELETE /api/v1/admin-panel/appointments/:id
+   * @access  Private/Admin
+   */
+  public deleteAppointment = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Appointment ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      await this.adminService.deleteAppointment(id);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Appointment deleted successfully',
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error deleting appointment:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error deleting appointment',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Get all patients with filters
+   * @route   GET /api/v1/admin-panel/patients
+   * @access  Private/Admin
+   */
+  public getPatients = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { page = '1', limit = '10', search, isActive, isVerified } = req.query;
+
+      const result = await this.adminService.getPatients({
+        page: parseInt(page as string),
+        limit: parseInt(limit as string),
+        search: search as string,
+        ...(isActive && { isActive: isActive === 'true' }),
+        ...(isVerified && { isVerified: isVerified === 'true' })
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Patients retrieved successfully',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching patients:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching patients',
         error: error.message,
         timestamp: new Date().toISOString(),
         requestId: req.id || 'unknown'
@@ -461,6 +974,207 @@ export class AdminPanelController {
   };
 
   /**
+   * @desc    Get payment details by ID
+   * @route   GET /api/v1/admin-panel/payments/:id
+   * @access  Private/Admin
+   */
+  public getPaymentDetails = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Payment ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const payment = await this.adminService.getPaymentDetails(id);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Payment details retrieved successfully',
+        data: payment,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching payment details:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching payment details',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Create new payment
+   * @route   POST /api/v1/admin-panel/payments
+   * @access  Private/Admin
+   */
+  public createPayment = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const paymentData = req.body;
+
+      const payment = await this.adminService.createPayment(paymentData);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Payment created successfully',
+        data: payment,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(201).json(response);
+    } catch (error: any) {
+      logger.error('Error creating payment:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error creating payment',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Update payment
+   * @route   PUT /api/v1/admin-panel/payments/:id
+   * @access  Private/Admin
+   */
+  public updatePayment = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const paymentData = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Payment ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const payment = await this.adminService.updatePayment(id, paymentData);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Payment updated successfully',
+        data: payment,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error updating payment:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error updating payment',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Update payment status
+   * @route   PATCH /api/v1/admin-panel/payments/:id/status
+   * @access  Private/Admin
+   */
+  public updatePaymentStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Payment ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const payment = await this.adminService.updatePaymentStatus(id, status);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Payment status updated successfully',
+        data: payment,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error updating payment status:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error updating payment status',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Delete payment
+   * @route   DELETE /api/v1/admin-panel/payments/:id
+   * @access  Private/Admin
+   */
+  public deletePayment = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Payment ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      await this.adminService.deletePayment(id);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Payment deleted successfully',
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error deleting payment:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error deleting payment',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
    * @desc    Get all services
    * @route   GET /api/v1/admin-panel/services
    * @access  Private/Admin
@@ -473,7 +1187,7 @@ export class AdminPanelController {
         page: parseInt(page as string),
         limit: parseInt(limit as string),
         category: category as string,
-        isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined
+        ...(isActive && { isActive: isActive === 'true' ? true : false })
       });
 
       const response: ApiResponse = {
@@ -506,6 +1220,16 @@ export class AdminPanelController {
     try {
       const { id } = req.params;
       const { isActive } = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Service ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
 
       const service = await this.adminService.updateServiceStatus(id, isActive);
 
@@ -543,8 +1267,8 @@ export class AdminPanelController {
         page: parseInt(page as string),
         limit: parseInt(limit as string),
         doctorId: doctorId as string,
-        minRating: minRating ? parseInt(minRating as string) : undefined,
-        isVerified: isVerified === 'true' ? true : isVerified === 'false' ? false : undefined
+        ...(minRating && { minRating: parseInt(minRating as string) }),
+        ...(isVerified && { isVerified: isVerified === 'true' ? true : false })
       });
 
       const response: ApiResponse = {
@@ -576,6 +1300,16 @@ export class AdminPanelController {
   public verifyReview = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Review ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
 
       const review = await this.adminService.verifyReview(id);
 
@@ -609,6 +1343,16 @@ export class AdminPanelController {
     try {
       const { id } = req.params;
 
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Review ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
       await this.adminService.deleteReview(id);
 
       const response: ApiResponse = {
@@ -624,6 +1368,123 @@ export class AdminPanelController {
       res.status(500).json({
         success: false,
         message: 'Error deleting review',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Get review details by ID
+   * @route   GET /api/v1/admin-panel/reviews/:id
+   * @access  Private/Admin
+   */
+  public getReviewDetails = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Review ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const review = await this.adminService.getReviewDetails(id);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Review details retrieved successfully',
+        data: review,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching review details:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching review details',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Create new review
+   * @route   POST /api/v1/admin-panel/reviews
+   * @access  Private/Admin
+   */
+  public createReview = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const reviewData = req.body;
+
+      const review = await this.adminService.createReview(reviewData);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Review created successfully',
+        data: review,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(201).json(response);
+    } catch (error: any) {
+      logger.error('Error creating review:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error creating review',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Update review
+   * @route   PUT /api/v1/admin-panel/reviews/:id
+   * @access  Private/Admin
+   */
+  public updateReview = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const reviewData = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Review ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const review = await this.adminService.updateReview(id, reviewData);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Review updated successfully',
+        data: review,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error updating review:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error updating review',
         error: error.message,
         timestamp: new Date().toISOString(),
         requestId: req.id || 'unknown'
@@ -654,6 +1515,39 @@ export class AdminPanelController {
       res.status(500).json({
         success: false,
         message: 'Error checking system health',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Get revenue analytics by month
+   * @route   GET /api/v1/admin-panel/analytics/revenue
+   * @access  Private/Admin
+   */
+  public getRevenueAnalytics = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { months = '12' } = req.query;
+      const monthsCount = parseInt(months as string);
+
+      const analytics = await this.adminService.getRevenueAnalytics(monthsCount);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Revenue analytics retrieved successfully',
+        data: analytics,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching revenue analytics:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching revenue analytics',
         error: error.message,
         timestamp: new Date().toISOString(),
         requestId: req.id || 'unknown'

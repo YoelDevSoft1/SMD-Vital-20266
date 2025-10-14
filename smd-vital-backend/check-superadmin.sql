@@ -1,0 +1,1 @@
+SELECT id, email, role, "isActive", "createdAt" FROM users WHERE email = 'superadmin@smdvital.com';

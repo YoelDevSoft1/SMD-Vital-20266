@@ -25,7 +25,7 @@ export const config = {
 
   // CORS configuration
   cors: {
-    origin: process.env['CORS_ORIGIN'] || 'http://localhost:4322',
+    origin: process.env['CORS_ORIGIN'] || ['http://localhost:5173', 'http://localhost:4321', 'http://localhost:3000'],
     credentials: process.env['CORS_CREDENTIALS'] === 'true',
   },
 

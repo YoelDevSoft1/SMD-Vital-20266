@@ -7,6 +7,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apk add --no-cache \
     dumb-init \
+    openssl \
     && addgroup -g 1001 -S nodejs \
     && adduser -S nodejs -u 1001
 
@@ -41,4 +42,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # Start the application
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/index.js"]
+
 

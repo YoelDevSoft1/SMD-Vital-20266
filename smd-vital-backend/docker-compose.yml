@@ -82,6 +82,33 @@ services:
       timeout: 10s
       retries: 5
 
+  # Prisma Studio (Independent Container)
+  prisma-studio:
+    build:
+      context: .
+      dockerfile: Dockerfile.prisma
+    container_name: smd-vital-prisma-studio
+    environment:
+      DATABASE_URL: postgresql://smd_vital_user:smd_vital_password@postgres:5432/smd_vital_db
+    ports:
+      - "5555:5555"
+    networks:
+      - smd-vital-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - dev
+      - tools
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5555"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
@@ -118,6 +145,50 @@ services:
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
 
+  # Node Exporter
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: smd-vital-node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - smd-vital-network
+    restart: unless-stopped
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro'
+    privileged: true
+
+  # Redis Exporter
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: smd-vital-redis-exporter
+    ports:
+      - "9121:9121"
+    environment:
+      REDIS_ADDR: redis://redis:6379
+      REDIS_PASSWORD: smd_vital_redis_password
+    networks:
+      - smd-vital-network
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # PostgreSQL Exporter
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: smd-vital-postgres-exporter
+    ports:
+      - "9187:9187"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://smd_vital_user:smd_vital_password@postgres:5432/smd_vital_db?sslmode=disable"
+    networks:
+      - smd-vital-network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
   # Grafana Dashboard
   grafana:
     image: grafana/grafana:latest
@@ -147,4 +218,6 @@ volumes:
 networks:
   smd-vital-network:
     driver: bridge
+
+
 
