@@ -14,9 +14,17 @@
       "config": {
         "distDir": "admin-panel-frontend/dist"
       }
+    },
+    {
+      "src": "api/vercel.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/vercel.js"
+    },
     {
       "src": "/admin/(.*)",
       "dest": "/admin-panel-frontend/dist/$1"
@@ -25,10 +33,5 @@
       "src": "/(.*)",
       "dest": "/dist/$1"
     }
-  ],
-  "functions": {
-    "smd-vital-backend/src/index.ts": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  ]
 }
