@@ -24,19 +24,19 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { adminService } from '@/services/admin.service';
-import ServicesModal from '@/components/ServicesModal';
-import ServiceDetailsView from '@/components/ServiceDetailsView';
-import CreateServiceForm from '@/components/CreateServiceForm';
-import { ServiceFilters, ServiceCategory } from '@/types';
+// import { Label } from '@/components/ui/Label';
+// import { Select } from '@/components/ui/Select';
+// import { Switch } from '@/components/ui/Switch';
+import { adminService } from '../services/admin.service';
+import ServicesModal from '../components/ServicesModal';
+import ServiceDetailsView from '../components/ServiceDetailsView';
+import CreateServiceForm from '../components/CreateServiceForm';
+import { ServiceCategory } from '../types';
 
 export default function Services() {
   const [showModal, setShowModal] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  // const [showDetails, setShowDetails] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
 
   // Fetch services data for recent services display
