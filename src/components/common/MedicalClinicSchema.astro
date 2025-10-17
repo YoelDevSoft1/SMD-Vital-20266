@@ -21,11 +21,11 @@ const clinic = {
     {
       '@type': 'ImageObject',
       url: `${SITE.site}/_astro/hero-image.png`,
-      width: '1200',
-      height: '630',
+      width: 1200,
+      height: 630,
     },
   ],
-  telephone: '+57 304 291 2564',
+  telephone: '+57-304-291-2564',
   email: 'salud@smdvitalbogota.com',
   medicalSpecialty: [
     'EmergencyMedicine',
@@ -50,7 +50,7 @@ const clinic = {
   ],
   keywords: 'médico a domicilio bogotá, doctor a casa bogotá, médico a domicilio barato, doctor a casa económico, enfermera a domicilio bogotá, laboratorio a domicilio bogotá, médico a domicilio 24 horas, doctor a casa bogotá precio, atención médica domiciliaria bogotá, médico a domicilio urgente, doctor a domicilio bogotá, enfermera profesional a domicilio, laboratorio clínico a domicilio, médico a domicilio chía, doctor a casa cajicá, médico a domicilio soacha, teleconsulta médica bogotá, valoración médica domiciliaria, curaciones a domicilio bogotá, inyectología a domicilio',
   healthPlanNetwork: 'Particular',
-  priceRange: '$$',
+  priceRange: '$$$',
   currenciesAccepted: 'COP',
   paymentAccepted: ['Efectivo', 'Tarjeta de crédito', 'Transferencia electrónica', 'Nequi', 'Daviplata'],
   address: {
@@ -242,6 +242,16 @@ const serviceSchema = {
     '@type': 'MedicalClinic',
     name: 'SMD Vital Bogotá',
     url: SITE.site,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Calle 42A Bis Sur #87I-74',
+      addressLocality: 'Bogotá',
+      addressRegion: 'Bogotá D.C.',
+      postalCode: '110836',
+      addressCountry: 'CO',
+    },
+    telephone: '+57-304-291-2564',
+    priceRange: '$$$',
   },
   areaServed: [
     {
@@ -327,11 +337,21 @@ const reviewSchema = {
   itemReviewed: {
     '@type': 'MedicalClinic',
     name: 'SMD Vital Bogotá',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Calle 42A Bis Sur #87I-74',
+      addressLocality: 'Bogotá',
+      addressRegion: 'Bogotá D.C.',
+      postalCode: '110836',
+      addressCountry: 'CO',
+    },
+    telephone: '+57-304-291-2564',
+    priceRange: '$$$',
   },
   reviewRating: {
     '@type': 'Rating',
     ratingValue: 4.8,
-    bestRating: '5',
+    bestRating: 5,
   },
   author: {
     '@type': 'Person',
