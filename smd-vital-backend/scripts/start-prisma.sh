@@ -13,3 +13,5 @@ fi
 echo "🚀 Ejecutando: docker-compose up prisma-studio"
 docker-compose up prisma-studio
 
+
+

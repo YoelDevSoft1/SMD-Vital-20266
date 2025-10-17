@@ -121,8 +121,8 @@ const serviceSchema = {
   },
   geo: {
     '@type': 'GeoCoordinates',
-    latitude: '4.7110',
-    longitude: '-74.0721'
+    latitude: 4.7110,
+    longitude: -74.0721
   },
   areaServed: [
     {
@@ -165,7 +165,7 @@ const serviceSchema = {
     'FamilyMedicine'
   ],
   keywords: 'inyectología a domicilio, inyectologia a domicilio, servicio de inyectología a domicilio, servicio inyectologia a domicilio, servicio de inyectologia cerca de mi, servicio de inyectología, inyecciones a domicilio, aplicación medicamentos domicilio, vitaminas intramusculares',
-  priceRange: '$$',
+  priceRange: '$$$',
   openingHours: ['Mo-Su 00:00-23:59'],
   openingHoursSpecification: [
     {
@@ -215,10 +215,10 @@ const serviceSchema = {
   },
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '4.8',
-    reviewCount: '350',
-    bestRating: '5',
-    worstRating: '1'
+    ratingValue: 4.8,
+    reviewCount: 350,
+    bestRating: 5,
+    worstRating: 1
   },
   sameAs: [
     'https://www.facebook.com/profile.php?id=61556817451561',
@@ -226,8 +226,8 @@ const serviceSchema = {
     'https://x.com/smdvitalbogotaoficial'
   ],
   currenciesAccepted: 'COP',
-  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
-  availableLanguage: ['es']
+  paymentAccepted: ['Efectivo', 'Transferencia Bancaria', 'Tarjeta'],
+  availableLanguage: ['Spanish']
 };
 
 const metadata = {
@@ -269,7 +269,7 @@ const howToSchema = {
   estimatedCost: {
     '@type': 'MonetaryAmount',
     currency: 'COP',
-    value: '100000'
+    value: 100000
   },
   supply: [
     {

@@ -4,7 +4,7 @@ import { SITE } from 'astrowind:config';
 // SEO: Schema JSON-LD optimizado con URLs absolutas y datos E-E-A-T mejorados
 const clinic = {
   '@context': 'https://schema.org',
-  '@type': ['MedicalClinic', 'LocalBusiness', 'HealthAndBeautyBusiness'],
+  '@type': 'MedicalClinic',
   '@id': `${SITE.site}/#medicalClinic`,
   name: 'SMD Vital – Médico a Domicilio en Bogotá 24/7',
   alternateName: 'SMD Vital Bogotá - Médico a Domicilio',
@@ -14,8 +14,8 @@ const clinic = {
   logo: {
     '@type': 'ImageObject',
     url: `${SITE.site}/_astro/hero-image.png`,
-    width: '1200',
-    height: '630',
+    width: 1200,
+    height: 630,
   },
   image: [
     {
@@ -116,14 +116,14 @@ const clinic = {
       latitude: 4.60971,
       longitude: -74.08175,
     },
-    geoRadius: '50000',
+    geoRadius: 50000,
   },
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '4.8',
-    reviewCount: '247',
-    bestRating: '5',
-    worstRating: '1',
+    ratingValue: 4.8,
+    reviewCount: 247,
+    bestRating: 5,
+    worstRating: 1,
   },
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
@@ -290,8 +290,8 @@ const organizationSchema = {
   logo: {
     '@type': 'ImageObject',
     url: '~/assets/images/hero-image.png',
-    width: '1200',
-    height: '630',
+    width: 1200,
+    height: 630,
   },
   contactPoint: {
     '@type': 'ContactPoint',
@@ -330,7 +330,7 @@ const reviewSchema = {
   },
   reviewRating: {
     '@type': 'Rating',
-    ratingValue: '4.8',
+    ratingValue: 4.8,
     bestRating: '5',
   },
   author: {
@@ -388,21 +388,21 @@ const aggregateOfferSchema = {
   name: 'Servicios Médicos a Domicilio',
   description: 'Atención médica profesional en tu hogar con médicos certificados',
   priceCurrency: 'COP',
-  lowPrice: '80000',
-  highPrice: '250000',
-  offerCount: '8',
+  lowPrice: 80000,
+  highPrice: 250000,
+  offerCount: 8,
   offers: [
     {
       '@type': 'Offer',
       name: 'Valoración Médica Domiciliaria',
-      price: '120000',
+      price: 120000,
       priceCurrency: 'COP',
       availability: 'https://schema.org/InStock',
     },
     {
       '@type': 'Offer',
       name: 'Enfermería Especializada 24/7',
-      price: '100000',
+      price: 100000,
       priceCurrency: 'COP',
       availability: 'https://schema.org/InStock',
     },

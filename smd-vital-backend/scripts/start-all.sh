@@ -13,3 +13,5 @@ fi
 echo "🌐 Iniciando: PostgreSQL, Redis, Backend, Nginx, Prometheus, Grafana y Prisma Studio"
 docker-compose --profile dev up
 
+
+

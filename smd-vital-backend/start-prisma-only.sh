@@ -13,3 +13,5 @@ npx prisma db push --accept-data-loss
 echo "✅ Prisma Studio iniciado en http://localhost:5555"
 npx prisma studio --port 5555 --browser none
 
+
+

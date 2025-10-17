@@ -23,7 +23,7 @@ const faqSchema = {
       name: '¿Qué es el lavado de oídos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es un procedimiento para remcer y otros residuos del canal auditivo, mejorando la audición y previniendo molestias.',
+        text: 'Es un procedimiento para remover cerumen y otros residuos del canal auditivo, mejorando la audición y previniendo molestias.',
       },
     },
     {
@@ -121,8 +121,8 @@ const serviceSchema = {
   },
   geo: {
     '@type': 'GeoCoordinates',
-    latitude: '4.7110',
-    longitude: '-74.0721'
+    latitude: 4.7110,
+    longitude: -74.0721
   },
   areaServed: [
     {
@@ -159,13 +159,11 @@ const serviceSchema = {
     }
   ],
   medicalSpecialty: [
-    'Audiology',
-    'EarNoseThroat',
     'PrimaryCare',
     'Nursing'
   ],
   keywords: 'lavado de oídos bogotá, limpieza de oídos barato, cerumen a domicilio, otoscopia bogotá, lavado de oídos económico, limpieza de oídos profesional, cerumen domicilio, otoscopia a domicilio, lavado de oídos 24 horas, limpieza de oídos urgente',
-  priceRange: '$$',
+  priceRange: '$$$',
   openingHours: ['Mo-Su 00:00-23:59'],
   openingHoursSpecification: [
     {
@@ -215,10 +213,10 @@ const serviceSchema = {
   },
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '4.8',
-    reviewCount: '150',
-    bestRating: '5',
-    worstRating: '1'
+    ratingValue: 4.8,
+    reviewCount: 150,
+    bestRating: 5,
+    worstRating: 1
   },
   sameAs: [
     'https://www.facebook.com/profile.php?id=61556817451561',
@@ -226,8 +224,8 @@ const serviceSchema = {
     'https://x.com/smdvitalbogotaoficial'
   ],
   currenciesAccepted: 'COP',
-  paymentAccepted: 'Efectivo, Transferencia Bancaria, Tarjeta',
-  availableLanguage: ['es']
+  paymentAccepted: ['Efectivo', 'Transferencia Bancaria', 'Tarjeta'],
+  availableLanguage: ['Spanish']
 };
 
 // Schema Reviews para testimonios
@@ -244,8 +242,8 @@ const reviewSchema = {
   },
   reviewRating: {
     '@type': 'Rating',
-    ratingValue: '5',
-    bestRating: '5'
+    ratingValue: 5,
+    bestRating: 5
   },
   reviewBody: 'Excelente servicio de limpieza de oídos a domicilio. El personal es muy profesional y el procedimiento fue completamente indoloro. Recomendado 100%.'
 };
@@ -289,7 +287,7 @@ const howToSchema = {
   estimatedCost: {
     '@type': 'MonetaryAmount',
     currency: 'COP',
-    value: '140000'
+    value: 140000
   },
   supply: [
     {

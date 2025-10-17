@@ -13,3 +13,5 @@ fi
 echo "🚀 Ejecutando: docker-compose up postgres redis backend"
 docker-compose up postgres redis backend
 
+
+
