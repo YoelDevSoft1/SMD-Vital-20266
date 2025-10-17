@@ -14,15 +14,15 @@ const clinic = {
   logo: {
     '@type': 'ImageObject',
     url: `${SITE.site}/_astro/hero-image.png`,
-    width: '1200',
-    height: '630',
+    width: 1200,
+    height: 630,
   },
   image: [
     {
       '@type': 'ImageObject',
       url: `${SITE.site}/_astro/hero-image.png`,
-      width: '1200',
-      height: '630',
+      width: 1200,
+      height: 630,
     },
   ],
   telephone: '+57-304-291-2564',
@@ -63,8 +63,8 @@ const clinic = {
   },
   geo: {
     '@type': 'GeoCoordinates',
-    latitude: '4.60971',
-    longitude: '-74.08175',
+    latitude: 4.60971,
+    longitude: -74.08175,
   },
   openingHoursSpecification: [
     {
@@ -113,17 +113,17 @@ const clinic = {
     '@type': 'GeoCircle',
     geoMidpoint: {
       '@type': 'GeoCoordinates',
-      latitude: '4.60971',
-      longitude: '-74.08175',
+      latitude: 4.60971,
+      longitude: -74.08175,
     },
-    geoRadius: '50000',
+    geoRadius: 50000,
   },
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '4.8',
-    reviewCount: '247',
-    bestRating: '5',
-    worstRating: '1',
+    ratingValue: 4.8,
+    reviewCount: 247,
+    bestRating: 5,
+    worstRating: 1,
   },
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
@@ -255,8 +255,8 @@ const serviceSchema = {
     image: {
       '@type': 'ImageObject',
       url: `${SITE.site}/_astro/hero-image.png`,
-      width: '1200',
-      height: '630',
+      width: 1200,
+      height: 630,
     },
   },
   areaServed: [
@@ -306,8 +306,8 @@ const organizationSchema = {
   logo: {
     '@type': 'ImageObject',
     url: '~/assets/images/hero-image.png',
-    width: '1200',
-    height: '630',
+    width: 1200,
+    height: 630,
   },
   contactPoint: {
     '@type': 'ContactPoint',
@@ -329,7 +329,7 @@ const breadcrumbSchema = {
   itemListElement: [
     {
       '@type': 'ListItem',
-      position: '1',
+      position: 1,
       name: 'Inicio',
       item: SITE.site,
     },
@@ -356,14 +356,14 @@ const reviewSchema = {
     image: {
       '@type': 'ImageObject',
       url: `${SITE.site}/_astro/hero-image.png`,
-      width: '1200',
-      height: '630',
+      width: 1200,
+      height: 630,
     },
   },
   reviewRating: {
     '@type': 'Rating',
-    ratingValue: '4.8',
-    bestRating: '5',
+    ratingValue: 4.8,
+    bestRating: 5,
   },
   author: {
     '@type': 'Person',
@@ -383,29 +383,29 @@ const howToSchema = {
   estimatedCost: {
     '@type': 'MonetaryAmount',
     currency: 'COP',
-    value: '0',
+    value: 0,
   },
   step: [
     {
       '@type': 'HowToStep',
-      position: '1',
+      position: 1,
       name: 'Contactar por WhatsApp o teléfono',
       text: 'Haz clic en WhatsApp o llama al call center. Un asesor clínico te atenderá de inmediato.',
       url: `${SITE.site}/#features`,
       image: '~/assets/images/hero-image.png',
-      width: '1200',
-      height: '630',
+      width: 1200,
+      height: 630,
     },
     {
       '@type': 'HowToStep',
-      position: '2',
+      position: 2,
       name: 'Confirmar disponibilidad y datos',
       text: 'Validamos la dirección en Bogotá, tomamos antecedentes médicos y definimos el profesional y los insumos requeridos.',
       url: `${SITE.site}/#features`,
     },
     {
       '@type': 'HowToStep',
-      position: '3',
+      position: 3,
       name: 'Recibir al profesional médico',
       text: 'El médico o enfermero llega a tu domicilio con un kit completo en menos de 45 minutos. Al finalizar, recibirás indicaciones y seguimiento por WhatsApp.',
       url: `${SITE.site}/#features`,
@@ -420,21 +420,21 @@ const aggregateOfferSchema = {
   name: 'Servicios Médicos a Domicilio',
   description: 'Atención médica profesional en tu hogar con médicos certificados',
   priceCurrency: 'COP',
-  lowPrice: '80000',
-  highPrice: '250000',
-  offerCount: '8',
+  lowPrice: 80000,
+  highPrice: 250000,
+  offerCount: 8,
   offers: [
     {
       '@type': 'Offer',
       name: 'Valoración Médica Domiciliaria',
-      price: '120000',
+      price: 120000,
       priceCurrency: 'COP',
       availability: 'https://schema.org/InStock',
     },
     {
       '@type': 'Offer',
       name: 'Enfermería Especializada 24/7',
-      price: '100000',
+      price: 100000,
       priceCurrency: 'COP',
       availability: 'https://schema.org/InStock',
     },
