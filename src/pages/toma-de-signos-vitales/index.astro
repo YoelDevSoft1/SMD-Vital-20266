@@ -117,7 +117,7 @@ const serviceSchema = {
     addressLocality: 'Bogotá',
     addressRegion: 'Cundinamarca',
     postalCode: '110111',
-    addressCountry: 'CO'
+    addressCountry: 'CO',
   },
   geo: {
     '@type': 'GeoCoordinates',
@@ -128,41 +128,41 @@ const serviceSchema = {
     {
       '@type': 'City',
       name: 'Bogotá',
-      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1'
+      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1',
     },
     {
       '@type': 'City',
       name: 'Chía',
-      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa'
+      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa',
     },
     {
       '@type': 'City',
       name: 'Cajicá',
-      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1'
+      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1',
     },
     {
       '@type': 'City',
       name: 'Soacha',
-      sameAs: 'https://es.wikipedia.org/wiki/Soacha'
+      sameAs: 'https://es.wikipedia.org/wiki/Soacha',
     },
     {
       '@type': 'City',
-      name: 'Funza'
+      name: 'Funza',
     },
     {
       '@type': 'City',
-      name: 'Mosquera'
+      name: 'Mosquera',
     },
     {
       '@type': 'City',
-      name: 'Cota'
+      name: 'Cota',
     }
   ],
   medicalSpecialty: [
     'Nursing',
     'PrimaryCare',
     'InternalMedicine',
-    'FamilyMedicine'
+    'FamilyMedicine',
   ],
   keywords: 'toma de signos vitales, con que se toma la frecuencia respiratoria, con que se toman los signos vitales, frecuencia respiratoria como se toma, para que se toman los signos vitales, para que sirve la toma de signos vitales, procedimiento de toma de signos vitales, tecnica de toma de signos vitales, toma de constantes vitales, toma de frecuencia respiratoria',
   priceRange: '$$$',
@@ -180,7 +180,7 @@ const serviceSchema = {
         'Sunday'
       ],
       opens: '00:00',
-      closes: '23:59'
+      closes: '23:59',
     }
   ],
   hasOfferCatalog: {
@@ -192,7 +192,7 @@ const serviceSchema = {
         itemOffered: {
           '@type': 'MedicalProcedure',
           name: 'Medición de Presión Arterial',
-          description: 'Control de presión arterial sistólica y diastólica con equipos digitales'
+          description: 'Control de presión arterial sistólica y diastólica con equipos digitales',
         }
       },
       {
@@ -200,7 +200,7 @@ const serviceSchema = {
         itemOffered: {
           '@type': 'MedicalProcedure',
           name: 'Monitoreo de Frecuencia Cardíaca',
-          description: 'Medición de pulso y ritmo cardíaco con oxímetro de pulso'
+          description: 'Medición de pulso y ritmo cardíaco con oxímetro de pulso',
         }
       },
       {
@@ -208,7 +208,7 @@ const serviceSchema = {
         itemOffered: {
           '@type': 'MedicalProcedure',
           name: 'Control de Temperatura Corporal',
-          description: 'Medición de temperatura corporal con termómetros digitales'
+          description: 'Medición de temperatura corporal con termómetros digitales',
         }
       }
     ]
@@ -218,16 +218,16 @@ const serviceSchema = {
     ratingValue: 4.8,
     reviewCount: 400,
     bestRating: 5,
-    worstRating: 1
+    worstRating: 1,
   },
   sameAs: [
     'https://www.facebook.com/profile.php?id=61556817451561',
     'https://www.instagram.com/smdvitalbogota_/',
-    'https://x.com/smdvitalbogotaoficial'
+    'https://x.com/smdvitalbogotaoficial',
   ],
   currenciesAccepted: 'COP',
   paymentAccepted: ['Efectivo', 'Transferencia Bancaria', 'Tarjeta'],
-  availableLanguage: ['Spanish']
+  availableLanguage: ['Spanish'],
 };
 
 const metadata = {
@@ -269,45 +269,45 @@ const howToSchema = {
   estimatedCost: {
     '@type': 'MonetaryAmount',
     currency: 'COP',
-    value: 60000
+    value: 60000,
   },
   supply: [
     {
       '@type': 'HowToSupply',
       name: 'Tensiómetro digital',
-      description: 'Equipo para medición de presión arterial sistólica y diastólica'
+      description: 'Equipo para medición de presión arterial sistólica y diastólica',
     },
     {
       '@type': 'HowToSupply', 
       name: 'Oxímetro de pulso',
-      description: 'Instrumento para medir frecuencia cardíaca y saturación de oxígeno'
+      description: 'Instrumento para medir frecuencia cardíaca y saturación de oxígeno',
     },
     {
       '@type': 'HowToSupply',
       name: 'Termómetro digital',
-      description: 'Equipo para medición de temperatura corporal'
+      description: 'Equipo para medición de temperatura corporal',
     },
     {
       '@type': 'HowToSupply',
       name: 'Estetoscopio',
-      description: 'Instrumento para auscultación y medición de frecuencia respiratoria'
+      description: 'Instrumento para auscultación y medición de frecuencia respiratoria',
     }
   ],
   tool: [
     {
       '@type': 'HowToTool',
       name: 'Tensiómetro digital',
-      description: 'Equipo especializado para medición precisa de presión arterial'
+      description: 'Equipo especializado para medición precisa de presión arterial',
     },
     {
       '@type': 'HowToTool',
       name: 'Oxímetro de pulso',
-      description: 'Instrumento para monitoreo de frecuencia cardíaca y oxigenación'
+      description: 'Instrumento para monitoreo de frecuencia cardíaca y oxigenación',
     },
     {
       '@type': 'HowToTool',
       name: 'Termómetro digital',
-      description: 'Equipo para medición precisa de temperatura corporal'
+      description: 'Equipo para medición precisa de temperatura corporal',
     }
   ],
   step: [
@@ -319,9 +319,9 @@ const howToSchema = {
       image: {
         '@type': 'ImageObject',
         url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        caption: 'Preparación del paciente para toma de signos vitales profesional'
+        caption: 'Preparación del paciente para toma de signos vitales profesional',
       },
-      url: SITE.site + '/toma-de-signos-vitales/#procedimiento'
+      url: SITE.site + '/toma-de-signos-vitales/#procedimiento',
     },
     {
       '@type': 'HowToStep',
