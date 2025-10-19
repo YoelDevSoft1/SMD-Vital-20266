@@ -174,30 +174,30 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-7xl h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-7xl h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
-            <CreditCard className="w-6 h-6 text-blue-600" />
+            <CreditCard className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Gestión de Pagos</h2>
-              <p className="text-gray-600">Administra todos los pagos del sistema</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Pagos</h2>
+              <p className="text-gray-600 dark:text-gray-400">Administra todos los pagos del sistema</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <Button variant="outline" onClick={() => setShowCreateForm(true)}>
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4" />
               Nuevo Pago
             </Button>
             <Button variant="outline" onClick={onClose}>
-              <X className="w-4 h-4 mr-2" />
+              <X className="w-4 h-4" />
               Cerrar
             </Button>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="p-6 border-b bg-gray-50">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <Label htmlFor="search">Buscar</Label>
@@ -386,7 +386,7 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     {paymentsData?.data?.data?.data?.map((payment: any) => (
                       <tr key={payment.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">

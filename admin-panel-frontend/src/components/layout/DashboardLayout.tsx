@@ -30,7 +30,7 @@ export default function DashboardLayout() {
   };
 
   return (
-    <div className="relative flex min-h-screen overflow-hidden bg-slate-100 dark:bg-slate-950">
+    <div className="relative flex min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-blue-50/50 dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <Sidebar isOpen={isSidebarOpen} isDesktop={isDesktop} onClose={closeSidebar} />
 
       {isSidebarOpen && !isDesktop && (
@@ -44,7 +44,7 @@ export default function DashboardLayout() {
 
       <div className="flex flex-1 flex-col lg:pl-0">
         <Header onToggleSidebar={toggleSidebar} />
-        <main className="relative z-10 flex-1 overflow-y-auto bg-gradient-to-br from-slate-100 via-slate-100 to-blue-50 px-4 py-8 sm:px-6 lg:px-10 dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
+        <main className="relative z-10 flex-1 overflow-y-auto bg-gradient-to-br from-slate-50/80 via-slate-100/50 to-blue-50/30 px-4 py-8 sm:px-6 lg:px-10 dark:bg-gradient-to-br dark:from-slate-950/50 dark:via-slate-900/30 dark:to-slate-950/50">
           <Outlet />
         </main>
       </div>

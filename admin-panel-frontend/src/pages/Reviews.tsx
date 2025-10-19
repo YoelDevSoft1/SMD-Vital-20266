@@ -119,17 +119,17 @@ export default function Reviews() {
       <Star
         key={i}
         className={`w-4 h-4 ${
-          i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+          i < rating ? 'text-yellow-400 fill-current dark:text-yellow-500' : 'text-gray-300 dark:text-gray-600'
         }`}
       />
     ));
   };
 
   const getRatingColor = (rating: number) => {
-    if (rating >= 4.5) return 'text-green-600 bg-green-100';
-    if (rating >= 3.5) return 'text-yellow-600 bg-yellow-100';
-    if (rating >= 2.5) return 'text-orange-600 bg-orange-100';
-    return 'text-red-600 bg-red-100';
+    if (rating >= 4.5) return 'text-green-600 bg-green-100 dark:text-green-300 dark:bg-green-900/20';
+    if (rating >= 3.5) return 'text-yellow-600 bg-yellow-100 dark:text-yellow-300 dark:bg-yellow-900/20';
+    if (rating >= 2.5) return 'text-orange-600 bg-orange-100 dark:text-orange-300 dark:bg-orange-900/20';
+    return 'text-red-600 bg-red-100 dark:text-red-300 dark:bg-red-900/20';
   };
 
   const getRatingLabel = (rating: number) => {
@@ -144,16 +144,16 @@ export default function Reviews() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Reseñas</h1>
-          <p className="text-gray-600 mt-1">Administra todas las reseñas y calificaciones del sistema</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Reseñas</h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-1">Administra todas las reseñas y calificaciones del sistema</p>
         </div>
         <div className="flex items-center space-x-3">
           <Button variant="outline" onClick={handleViewAll}>
-            <Filter className="w-4 h-4 mr-2" />
+            <Filter className="w-4 h-4" />
             Ver Todas
           </Button>
           <Button onClick={handleCreateNew}>
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4" />
             Nueva Reseña
           </Button>
         </div>
@@ -162,27 +162,27 @@ export default function Reviews() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
-          <div key={index} className="bg-white rounded-lg shadow p-6">
+          <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.title}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
                 <div className="flex items-center mt-2">
                   {stat.changeType === 'positive' ? (
-                    <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+                    <TrendingUp className="w-4 h-4 text-green-500" />
                   ) : (
-                    <TrendingUp className="w-4 h-4 text-red-500 mr-1 rotate-180" />
+                    <TrendingUp className="w-4 h-4 text-red-500 rotate-180" />
                   )}
                   <span className={`text-sm font-medium ${
-                    stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
+                    stat.changeType === 'positive' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                   }`}>
                     {stat.change}
                   </span>
-                  <span className="text-sm text-gray-500 ml-1">vs mes anterior</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">vs mes anterior</span>
                 </div>
               </div>
-              <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                <stat.icon className={`w-6 h-6 ${stat.color}`} />
+              <div className={`p-3 rounded-full ${stat.bgColor} dark:bg-opacity-20`}>
+                <stat.icon className={`w-6 h-6 ${stat.color} dark:opacity-80`} />
               </div>
             </div>
           </div>
@@ -190,10 +190,10 @@ export default function Reviews() {
       </div>
 
       {/* Recent Reviews */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Reseñas Recientes</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Reseñas Recientes</h2>
             <Button variant="outline" onClick={handleViewAll}>
               Ver todas las reseñas
             </Button>
@@ -202,29 +202,29 @@ export default function Reviews() {
         <div className="p-6">
           {reviews.length === 0 ? (
             <div className="text-center py-12">
-              <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No hay reseñas</h3>
-              <p className="text-gray-600 mb-4">No se encontraron reseñas recientes.</p>
+              <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay reseñas</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">No se encontraron reseñas recientes.</p>
               <Button onClick={handleCreateNew}>
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4" />
                 Crear Primera Reseña
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
               {reviews.slice(0, 5).map((review: any) => (
-                <div key={review.id} className="flex items-start justify-between p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                <div key={review.id} className="flex items-start justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow bg-white dark:bg-gray-800">
                   <div className="flex items-start space-x-4">
-                    <div className="p-2 bg-blue-100 rounded-full">
-                      <MessageSquare className="w-5 h-5 text-blue-600" />
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+                      <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-gray-900 dark:text-white">
                           {review.patient?.user?.firstName} {review.patient?.user?.lastName}
                         </p>
-                        <span className="text-sm text-gray-500">para</span>
-                        <p className="font-medium text-gray-900">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">para</span>
+                        <p className="font-medium text-gray-900 dark:text-white">
                           Dr. {review.doctor?.user?.firstName} {review.doctor?.user?.lastName}
                         </p>
                       </div>
@@ -232,19 +232,19 @@ export default function Reviews() {
                         <div className="flex items-center">
                           {getRatingStars(review.rating)}
                         </div>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRatingColor(review.rating)}`}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRatingColor(review.rating)} dark:bg-opacity-20`}>
                           {getRatingLabel(review.rating)}
                         </span>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
                           {review.rating}/5
                         </span>
                       </div>
                       {review.comment && (
-                        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
                           {review.comment}
                         </p>
                       )}
-                      <div className="flex items-center space-x-2 text-xs text-gray-500">
+                      <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
                         <Calendar className="w-3 h-3" />
                         <span>
                           {new Date(review.createdAt).toLocaleDateString('es-ES', {
@@ -262,12 +262,12 @@ export default function Reviews() {
                     }`}>
                       {review.isVerified ? (
                         <>
-                          <Shield className="w-3 h-3 mr-1" />
+                          <Shield className="w-3 h-3" />
                           Verificada
                         </>
                       ) : (
                         <>
-                          <AlertCircle className="w-3 h-3 mr-1" />
+                          <AlertCircle className="w-3 h-3" />
                           Pendiente
                         </>
                       )}

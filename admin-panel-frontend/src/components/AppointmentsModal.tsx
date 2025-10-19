@@ -290,7 +290,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
           <div className="flex items-center justify-end mt-4">
             <div className="flex items-center space-x-2">
               <Button onClick={() => setShowCreateForm(true)}>
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4" />
                 Nueva Cita
               </Button>
             </div>

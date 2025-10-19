@@ -61,7 +61,13 @@ export default function PaymentMethodsChart({ data }: PaymentMethodsChartProps) 
     ],
   };
 
-  const chartData = data || defaultData;
+  // Ensure data has the correct structure
+  const chartData = data && 
+    data.labels && 
+    Array.isArray(data.labels) && 
+    data.datasets && 
+    Array.isArray(data.datasets) && 
+    data.datasets.length > 0 ? data : defaultData;
 
   const options = {
     responsive: true,
@@ -123,9 +129,21 @@ export default function PaymentMethodsChart({ data }: PaymentMethodsChartProps) 
     },
   };
 
-  return (
-    <div className="h-64 w-full">
-      <Bar data={chartData} options={options} />
-    </div>
-  );
+  try {
+    return (
+      <div className="h-64 w-full">
+        <Bar data={chartData} options={options} />
+      </div>
+    );
+  } catch (error) {
+    console.error('Error rendering PaymentMethodsChart:', error);
+    return (
+      <div className="h-64 w-full flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500 dark:text-gray-400">Error al cargar el gráfico</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Intenta recargar la página</p>
+        </div>
+      </div>
+    );
+  }
 }

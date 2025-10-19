@@ -4,7 +4,7 @@ import { X, RefreshCw, Search, Filter, AlertCircle, Loader2, FileText } from 'lu
 import toast from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { SystemLog, SystemLogFilters } from '@/types';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectItem, SelectValue } from '@/components/ui/select';
@@ -110,11 +110,11 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-6 backdrop-blur-sm">
-      <div className="relative flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
-        <header className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+      <div className="relative flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl">
+        <header className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Logs del Sistema</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Logs del Sistema</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Monitorea los eventos críticos y operativos de la plataforma.
             </p>
           </div>
@@ -124,7 +124,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
               onClick={() => refetch()}
               isLoading={isFetching}
             >
-              <RefreshCw className="mr-2 h-4 w-4" />
+              <RefreshCw className="h-4 w-4" />
               Actualizar
             </Button>
             <Button
@@ -137,15 +137,15 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
         </header>
 
         <div className="grid flex-1 gap-6 overflow-hidden p-6 lg:grid-cols-[2fr_1fr]">
-          <section className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
-            <div className="border-b border-gray-200 bg-white px-5 py-4">
+          <section className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+            <div className="border-b border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-5 py-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <div className="md:col-span-2">
-                  <Label htmlFor="log-search" className="mb-1 block text-sm font-medium text-gray-700">
+                  <Label htmlFor="log-search" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Búsqueda
                   </Label>
                   <div className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                     <Input
                       id="log-search"
                       placeholder="Buscar por mensaje, requestId o contexto"
@@ -157,7 +157,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                 </div>
 
                 <div>
-                  <Label htmlFor="log-level" className="mb-1 block text-sm font-medium text-gray-700">
+                  <Label htmlFor="log-level" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Nivel
                   </Label>
                   <Select
@@ -175,7 +175,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                 </div>
 
                 <div>
-                  <Label htmlFor="log-service" className="mb-1 block text-sm font-medium text-gray-700">
+                  <Label htmlFor="log-service" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Servicio
                   </Label>
                   <Select
@@ -195,7 +195,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
 
               <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div>
-                  <Label htmlFor="date-from" className="mb-1 block text-sm font-medium text-gray-700">
+                  <Label htmlFor="date-from" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Desde
                   </Label>
                   <Input
@@ -206,7 +206,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                   />
                 </div>
                 <div>
-                  <Label htmlFor="date-to" className="mb-1 block text-sm font-medium text-gray-700">
+                  <Label htmlFor="date-to" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Hasta
                   </Label>
                   <Input
@@ -257,23 +257,23 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
               ) : (
                 <div className="h-full overflow-auto">
                   <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-white">
+                    <thead className="bg-white dark:bg-gray-800">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-300">
                           Timestamp
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-300">
                           Nivel
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-300">
                           Servicio
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-300">
                           Mensaje
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 bg-white">
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
                       {logs.map((log) => (
                         <tr
                           key={log.id}
@@ -305,7 +305,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
             </div>
 
             {pagination && pagination.totalPages > 1 && (
-              <div className="flex items-center justify-between border-t border-gray-200 bg-white px-5 py-3">
+              <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-5 py-3">
                 <div className="hidden text-sm text-gray-600 md:block">
                   Página {pagination.page} de {pagination.totalPages} · {pagination.total}{' '}
                   registros
@@ -330,7 +330,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
             )}
           </section>
 
-          <aside className="flex h-full flex-col rounded-xl border border-gray-200 bg-white">
+          <aside className="flex h-full flex-col rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <div className="flex items-center border-b border-gray-200 px-5 py-4">
               <Filter className="mr-3 h-5 w-5 text-blue-600" />
               <div>

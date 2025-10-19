@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, CreditCard, DollarSign, Save, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
+import { GlassModal } from '@/components/ui/GlassModal';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Payment, Appointment } from '@/types';
@@ -165,28 +166,25 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
   console.log('Form data:', formData);
   console.log('========================');
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
+    <GlassModal isOpen={isOpen} onClose={onClose} size="xl" variant="glass">
+      {/* Header */}
+      <div className="flex items-center justify-between p-6 border-b border-white/10 dark:border-white/5">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-full">
-              <CreditCard className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+              <CreditCard className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {isEditing ? 'Editar Pago' : 'Nuevo Pago'}
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 {isEditing ? 'Modifica la información del pago' : 'Crea un nuevo pago en el sistema'}
               </p>
             </div>
           </div>
           <Button variant="outline" onClick={onClose}>
-            <X className="w-4 h-4 mr-2" />
+            <X className="w-4 h-4" />
             Cerrar
           </Button>
         </div>
@@ -374,14 +372,13 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
                 </div>
               ) : (
                 <div className="flex items-center">
-                  <Save className="w-4 h-4 mr-2" />
+                  <Save className="w-4 h-4" />
                   {isEditing ? 'Actualizar Pago' : 'Crear Pago'}
                 </div>
               )}
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </GlassModal>
   );
 }

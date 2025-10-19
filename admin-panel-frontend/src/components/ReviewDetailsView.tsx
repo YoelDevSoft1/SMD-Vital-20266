@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, MessageSquare, Star, Calendar, Shield, Edit, Trash2, CheckCircle, XCircle, User, Stethoscope } from 'lucide-react';
 import { Button } from './ui/button';
+import { GlassModal } from './ui/GlassModal';
 import type { Review } from '@/types';
 
 interface ReviewDetailsViewProps {
@@ -36,22 +37,21 @@ export default function ReviewDetailsView({ review, onClose, onEdit }: ReviewDet
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
+    <GlassModal isOpen={true} onClose={onClose} size="lg" variant="glass">
+      {/* Header */}
+      <div className="flex justify-between items-center p-6 border-b border-white/10 dark:border-white/5">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-full">
-              <MessageSquare className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+              <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Detalles de la Reseña</h2>
-              <p className="text-sm text-gray-600">Información completa de la reseña</p>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Detalles de la Reseña</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Información completa de la reseña</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm" onClick={onEdit}>
-              <Edit className="w-4 h-4 mr-2" />
+              <Edit className="w-4 h-4" />
               Editar
             </Button>
             <Button variant="ghost" size="icon" onClick={onClose}>
@@ -64,7 +64,7 @@ export default function ReviewDetailsView({ review, onClose, onEdit }: ReviewDet
         <div className="p-6 space-y-6">
           {/* Rating */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Calificación</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Calificación</h3>
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
                 {getRatingStars(review.rating)}
@@ -203,11 +203,10 @@ export default function ReviewDetailsView({ review, onClose, onEdit }: ReviewDet
             Cerrar
           </Button>
           <Button onClick={onEdit}>
-            <Edit className="w-4 h-4 mr-2" />
+            <Edit className="w-4 h-4" />
             Editar Reseña
           </Button>
         </div>
-      </div>
-    </div>
+    </GlassModal>
   );
 }

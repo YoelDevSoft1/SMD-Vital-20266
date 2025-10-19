@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, MessageSquare, Filter, Search, Plus, Edit, Trash2, Eye, CheckCircle, XCircle, AlertCircle, Download, Calendar, Star, Shield, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from './ui/Button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select } from './ui/select';
@@ -161,13 +161,13 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
         {/* Modal Header */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-2xl font-bold text-gray-900">Todas las Reseñas</h2>
+        <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Todas las Reseñas</h2>
           <div className="flex items-center space-x-2">
             <Button onClick={() => setShowCreateForm(true)}>
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4" />
               Nueva Reseña
             </Button>
             <Button variant="ghost" size="icon" onClick={onClose}>
@@ -177,9 +177,9 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
         </div>
 
         {/* Filters and Search */}
-        <div className="p-6 border-b grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative col-span-full md:col-span-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
             <Input
               type="text"
               placeholder="Buscar por paciente, doctor, comentario..."
@@ -190,7 +190,7 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
           </div>
           
           <div>
-            <Label htmlFor="rating">Calificación</Label>
+            <Label htmlFor="rating" className="text-gray-700 dark:text-gray-300">Calificación</Label>
             <Select
               value={filters.rating || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value ? Number(e.target.value) : undefined, page: 1 }))}
@@ -205,7 +205,7 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
           </div>
 
           <div>
-            <Label htmlFor="status">Estado</Label>
+            <Label htmlFor="status" className="text-gray-700 dark:text-gray-300">Estado</Label>
             <Select
               value={filters.isVerified === undefined ? '' : filters.isVerified ? 'true' : 'false'}
               onChange={(e) => setFilters(prev => ({ 
@@ -317,7 +317,7 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {reviewsData?.data?.data?.data?.map((review: any) => (
                     <tr key={review.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">

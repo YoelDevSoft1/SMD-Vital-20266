@@ -166,7 +166,7 @@ export default function Appointments() {
                 onClick={() => refetch()}
                 className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
               >
-                <RefreshCw className="mr-2 h-4 w-4" />
+                <RefreshCw className="h-4 w-4" />
                 Reintentar
               </Button>
             </div>
@@ -202,11 +202,11 @@ export default function Appointments() {
             onClick={() => setShowModal(true)}
             className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
           >
-            <Calendar className="mr-2 h-4 w-4" />
+            <Calendar className="h-4 w-4" />
             Ver todas
           </Button>
           <Button onClick={() => setShowCreateForm(true)}>
-            <CalendarPlus className="mr-2 h-4 w-4" />
+            <CalendarPlus className="h-4 w-4" />
             Nueva cita
           </Button>
         </div>
@@ -286,7 +286,7 @@ export default function Appointments() {
               onClick={() => setShowFilters(!showFilters)}
               className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
             >
-              <Filter className="mr-2 h-4 w-4" />
+              <Filter className="h-4 w-4" />
               {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
             </Button>
           </div>
@@ -412,7 +412,7 @@ export default function Appointments() {
               </p>
               <div className="mt-6">
                 <Button onClick={() => setShowCreateForm(true)}>
-                  <CalendarPlus className="mr-2 h-4 w-4" />
+                  <CalendarPlus className="h-4 w-4" />
                   Crear primera cita
                 </Button>
               </div>
@@ -504,7 +504,7 @@ export default function Appointments() {
                           onClick={() => handleViewDetails(appointment)}
                           className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
                         >
-                          <Eye className="mr-1.5 h-3.5 w-3.5" />
+                          <Eye className="h-3.5 w-3.5" />
                           Ver detalles
                         </Button>
                         <Button
@@ -516,7 +516,7 @@ export default function Appointments() {
                           }}
                           className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
                         >
-                          <Edit2 className="mr-1.5 h-3.5 w-3.5" />
+                          <Edit2 className="h-3.5 w-3.5" />
                           Editar
                         </Button>
                         <Button
@@ -525,7 +525,7 @@ export default function Appointments() {
                           onClick={() => handleDeleteAppointment(appointment)}
                           className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-gray-600 dark:hover:bg-gray-700"
                         >
-                          <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                          <Trash2 className="h-3.5 w-3.5" />
                           Eliminar
                         </Button>
                       </div>

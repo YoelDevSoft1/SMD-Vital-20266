@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Activity, Database, Server, HardDrive, RefreshCw, Clock, AlertTriangle } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
@@ -101,15 +101,15 @@ export default function SystemHealth() {
   if (error) {
     return (
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900">Estado del Sistema</h1>
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Estado del Sistema</h1>
+        <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-1 h-5 w-5 text-red-600" />
+            <AlertTriangle className="mt-1 h-5 w-5 text-red-600 dark:text-red-400" />
             <div className="space-y-2">
-              <p className="font-medium text-red-700">
+              <p className="font-medium text-red-700 dark:text-red-300">
                 No se pudo obtener la información del sistema.
               </p>
-              <p className="text-sm text-red-600/80">
+              <p className="text-sm text-red-600/80 dark:text-red-400/80">
                 Verifica la conexión con el backend y vuelve a intentarlo.
               </p>
               <Button
@@ -129,8 +129,8 @@ export default function SystemHealth() {
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Estado del Sistema</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Estado del Sistema</h1>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
             Última actualización: {formatDateTime(health?.timestamp)}
           </p>
         </div>
@@ -140,7 +140,7 @@ export default function SystemHealth() {
             onClick={() => refetch()}
             isLoading={isFetching}
           >
-            <RefreshCw className="mr-2 h-4 w-4" />
+            <RefreshCw className="h-4 w-4" />
             Actualizar estado
           </Button>
           <Button onClick={() => setShowLogs(true)}>
@@ -164,39 +164,39 @@ export default function SystemHealth() {
             </span>
           </CardHeader>
           <CardContent className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+              <p className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Clock className="h-4 w-4 text-blue-500" />
                 Uptime
               </p>
-              <p className="mt-2 text-2xl font-semibold text-gray-900">
+              <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
                 {formatUptime(health?.uptime)}
               </p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Tiempo en línea desde el último reinicio
               </p>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+              <p className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Server className="h-4 w-4 text-purple-500" />
                 Plataforma
               </p>
-              <p className="mt-2 text-lg font-semibold text-gray-900">
+              <p className="mt-2 text-lg font-semibold text-gray-900 dark:text-white">
                 {health?.system.platform ?? 'Sin datos'}
               </p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Node {health?.system.nodeVersion ?? 'N/A'}
               </p>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+              <p className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <HardDrive className="h-4 w-4 text-emerald-500" />
                 Memoria externa
               </p>
-              <p className="mt-2 text-2xl font-semibold text-gray-900">
+              <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
                 {memory ? `${memory.external} ${memory.unit}` : 'Sin datos'}
               </p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Recursos adicionales disponibles
               </p>
             </div>
@@ -211,21 +211,21 @@ export default function SystemHealth() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div className="flex items-start gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
               <Database className="mt-1 h-5 w-5 text-indigo-500" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-900">Base de datos</p>
-                <p className="text-xs text-gray-500">Conectividad y salud de la base de datos principal.</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">Base de datos</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Conectividad y salud de la base de datos principal.</p>
               </div>
               <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusStyles(health?.services.database)}`}>
                 {health?.services.database ?? 'Sin datos'}
               </span>
             </div>
-            <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div className="flex items-start gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
               <Server className="mt-1 h-5 w-5 text-amber-500" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-900">Redis / Cache</p>
-                <p className="text-xs text-gray-500">Estado del servicio de cache y colas.</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">Redis / Cache</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Estado del servicio de cache y colas.</p>
               </div>
               <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusStyles(health?.services.redis)}`}>
                 {health?.services.redis ?? 'Sin datos'}
@@ -247,26 +247,26 @@ export default function SystemHealth() {
             {memory ? (
               <>
                 <div>
-                  <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
                     <span>Uso actual</span>
                     <span>{memoryUsage}%</span>
                   </div>
-                  <div className="mt-2 h-3 w-full rounded-full bg-gray-200">
+                  <div className="mt-2 h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700">
                     <div
                       className="h-3 rounded-full bg-blue-500 transition-all"
                       style={{ width: `${memoryUsage}%` }}
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
+                <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
                   <div>
-                    <p className="text-xs text-gray-500">Utilizada</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Utilizada</p>
                     <p className="font-semibold">
                       {memory.used} {memory.unit}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Total disponible</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Total disponible</p>
                     <p className="font-semibold">
                       {memory.total} {memory.unit}
                     </p>
@@ -274,7 +274,7 @@ export default function SystemHealth() {
                 </div>
               </>
             ) : (
-              <p className="text-sm text-gray-500">No hay información disponible.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">No hay información disponible.</p>
             )}
           </CardContent>
         </Card>
@@ -288,26 +288,26 @@ export default function SystemHealth() {
             {cpu ? (
               <>
                 <div>
-                  <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
                     <span>Uso del proceso</span>
                     <span>{cpuUsage}%</span>
                   </div>
-                  <div className="mt-2 h-3 w-full rounded-full bg-gray-200">
+                  <div className="mt-2 h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700">
                     <div
                       className="h-3 rounded-full bg-emerald-500 transition-all"
                       style={{ width: `${cpuUsage}%` }}
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
+                <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
                   <div>
-                    <p className="text-xs text-gray-500">Proceso (user)</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Proceso (user)</p>
                     <p className="font-semibold">
                       {cpu.user} {cpu.unit}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Sistema</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Sistema</p>
                     <p className="font-semibold">
                       {cpu.system} {cpu.unit}
                     </p>
@@ -315,7 +315,7 @@ export default function SystemHealth() {
                 </div>
               </>
             ) : (
-              <p className="text-sm text-gray-500">No hay información disponible.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">No hay información disponible.</p>
             )}
           </CardContent>
         </Card>

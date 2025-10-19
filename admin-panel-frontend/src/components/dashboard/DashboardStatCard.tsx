@@ -14,31 +14,37 @@ interface DashboardStatCardProps {
 
 const accentStyles: Record<
   NonNullable<DashboardStatCardProps['accent']>,
-  { icon: string; chip: string }
+  { icon: string; chip: string; blob: string }
 > = {
   blue: {
-    icon: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-300',
-    chip: 'text-blue-600 dark:text-blue-300',
+    icon: 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20',
+    chip: 'text-blue-600 dark:text-blue-400',
+    blob: 'bg-blue-400/30 dark:bg-blue-500/20',
   },
   green: {
-    icon: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-300',
-    chip: 'text-emerald-600 dark:text-emerald-300',
+    icon: 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30 dark:shadow-emerald-500/20',
+    chip: 'text-emerald-600 dark:text-emerald-400',
+    blob: 'bg-emerald-400/30 dark:bg-emerald-500/20',
   },
   purple: {
-    icon: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-300',
-    chip: 'text-purple-600 dark:text-purple-300',
+    icon: 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/30 dark:shadow-purple-500/20',
+    chip: 'text-purple-600 dark:text-purple-400',
+    blob: 'bg-purple-400/30 dark:bg-purple-500/20',
   },
   indigo: {
-    icon: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300',
-    chip: 'text-indigo-600 dark:text-indigo-300',
+    icon: 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 dark:shadow-indigo-500/20',
+    chip: 'text-indigo-600 dark:text-indigo-400',
+    blob: 'bg-indigo-400/30 dark:bg-indigo-500/20',
   },
   emerald: {
-    icon: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-300',
-    chip: 'text-emerald-600 dark:text-emerald-300',
+    icon: 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30 dark:shadow-emerald-500/20',
+    chip: 'text-emerald-600 dark:text-emerald-400',
+    blob: 'bg-emerald-400/30 dark:bg-emerald-500/20',
   },
   amber: {
-    icon: 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-300',
-    chip: 'text-amber-600 dark:text-amber-300',
+    icon: 'bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/30 dark:shadow-amber-500/20',
+    chip: 'text-amber-600 dark:text-amber-400',
+    blob: 'bg-amber-400/30 dark:bg-amber-500/20',
   },
 };
 
@@ -53,41 +59,50 @@ export function DashboardStatCard({
 }: DashboardStatCardProps) {
   const changeColor =
     change === undefined
-      ? 'text-gray-500 dark:text-gray-400'
+      ? 'text-slate-500 dark:text-slate-400'
       : change > 0
       ? 'text-emerald-600 dark:text-emerald-400'
       : change < 0
       ? 'text-red-600 dark:text-red-400'
-      : 'text-gray-500 dark:text-gray-400';
+      : 'text-slate-500 dark:text-slate-400';
+
+  const styles = accentStyles[accent] ?? accentStyles.blue;
 
   return (
-    <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-      <CardContent className="flex flex-col gap-4 p-6">
+    <Card
+      variant="glass"
+      className="group hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] hover:scale-[1.02] dark:hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] transition-all duration-300"
+    >
+      <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className={cn('absolute -right-12 -top-12 h-40 w-40 rounded-full blur-3xl', styles.blob)} />
+      </div>
+
+      <CardContent className="relative flex flex-col gap-4 p-6">
         <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
-            <p className="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">{value}</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{title}</p>
+            <p className="mt-2 text-3xl font-bold text-slate-900 dark:text-white truncate">{value}</p>
           </div>
           <div
             className={cn(
-              'rounded-xl p-3',
-              accentStyles[accent]?.icon ?? accentStyles.blue.icon
+              'rounded-2xl p-3.5 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3',
+              styles.icon
             )}
           >
-            <Icon className="h-5 w-5" />
+            <Icon className="h-6 w-6" strokeWidth={2.5} />
           </div>
         </div>
         {(change !== undefined || helperText) && (
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
             {change !== undefined && (
-              <span className={cn('inline-flex items-center font-medium', changeColor)}>
-                {change > 0 ? '▲' : change < 0 ? '▼' : '—'}{' '}
+              <span className={cn('inline-flex items-center gap-1 font-semibold', changeColor)}>
+                <span className="text-xs">{change > 0 ? '↗' : change < 0 ? '↘' : '→'}</span>
                 {Math.abs(change).toFixed(1)}%
               </span>
             )}
-            {changeLabel && <span className="text-gray-500 dark:text-gray-400">{changeLabel}</span>}
+            {changeLabel && <span className="text-slate-500 dark:text-slate-400">{changeLabel}</span>}
             {helperText && (
-              <span className={cn('ml-auto text-xs font-medium', accentStyles[accent]?.chip)}>
+              <span className={cn('ml-auto text-xs font-semibold', styles.chip)}>
                 {helperText}
               </span>
             )}

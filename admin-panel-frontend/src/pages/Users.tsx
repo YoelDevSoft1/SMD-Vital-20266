@@ -206,7 +206,7 @@ export default function Users() {
                 onClick={() => refetch()}
                 className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
               >
-                <RefreshCw className="mr-2 h-4 w-4" />
+                <RefreshCw className="h-4 w-4" />
                 Reintentar
               </Button>
             </div>
@@ -234,7 +234,7 @@ export default function Users() {
             disabled={isFetching}
             className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
           >
-            <RefreshCw className={cn("mr-2 h-4 w-4", isFetching && "animate-spin")} />
+            <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
             Actualizar
           </Button>
           <ExportUsersButton
@@ -242,7 +242,7 @@ export default function Users() {
             selectedUsers={selectedUsers}
           />
           <Button onClick={() => setShowCreateModal(true)}>
-            <UserPlus className="mr-2 h-4 w-4" />
+            <UserPlus className="h-4 w-4" />
             Crear usuario
           </Button>
         </div>
@@ -326,7 +326,7 @@ export default function Users() {
               onClick={() => setShowFilters(!showFilters)}
               className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
             >
-              <Filter className="mr-2 h-4 w-4" />
+              <Filter className="h-4 w-4" />
               {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
             </Button>
           </div>
@@ -419,7 +419,7 @@ export default function Users() {
                     }}
                     className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300"
                   >
-                    <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                    <CheckCircle2 className="h-3.5 w-3.5" />
                     Activar
                   </Button>
                   <Button
@@ -433,7 +433,7 @@ export default function Users() {
                     }}
                     className="bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-300"
                   >
-                    <XCircle className="mr-1 h-3.5 w-3.5" />
+                    <XCircle className="h-3.5 w-3.5" />
                     Desactivar
                   </Button>
                   <ExportUsersButton
@@ -605,7 +605,7 @@ export default function Users() {
                           }}
                           className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
                         >
-                          <Eye className="mr-1.5 h-3.5 w-3.5" />
+                          <Eye className="h-3.5 w-3.5" />
                           Ver detalles
                         </Button>
                         <Button
@@ -617,7 +617,7 @@ export default function Users() {
                           }}
                           className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
                         >
-                          <Edit2 className="mr-1.5 h-3.5 w-3.5" />
+                          <Edit2 className="h-3.5 w-3.5" />
                           Editar
                         </Button>
                         <Button
@@ -632,12 +632,12 @@ export default function Users() {
                         >
                           {user.isActive ? (
                             <>
-                              <XCircle className="mr-1.5 h-3.5 w-3.5" />
+                              <XCircle className="h-3.5 w-3.5" />
                               Desactivar
                             </>
                           ) : (
                             <>
-                              <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                              <CheckCircle2 className="h-3.5 w-3.5" />
                               Activar
                             </>
                           )}
@@ -650,7 +650,7 @@ export default function Users() {
                             disabled={verifyUserMutation.isPending}
                             className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 dark:border-gray-600 dark:hover:bg-gray-700"
                           >
-                            <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                            <CheckCircle2 className="h-3.5 w-3.5" />
                             Verificar
                           </Button>
                         )}
@@ -660,7 +660,7 @@ export default function Users() {
                           onClick={() => handleDeleteUser(user)}
                           className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-gray-600 dark:hover:bg-gray-700"
                         >
-                          <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                          <Trash2 className="h-3.5 w-3.5" />
                           Eliminar
                         </Button>
                       </div>

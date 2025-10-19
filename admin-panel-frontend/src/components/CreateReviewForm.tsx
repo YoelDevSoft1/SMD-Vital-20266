@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Switch } from './ui/switch';
+import { GlassModal } from './ui/GlassModal';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Review } from '@/types';
@@ -166,22 +167,19 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
     ));
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
+    <GlassModal isOpen={isOpen} onClose={onClose} size="lg" variant="glass">
+      {/* Header */}
+      <div className="flex justify-between items-center p-6 border-b border-white/10 dark:border-white/5">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-full">
-              <MessageSquare className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+              <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 {isEditing ? 'Editar Reseña' : 'Nueva Reseña'}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {isEditing ? 'Modifica los datos de la reseña' : 'Completa la información de la nueva reseña'}
               </p>
             </div>
@@ -308,13 +306,12 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
               {createMutation.isPending || updateMutation.isPending ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
               ) : (
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="w-4 h-4" />
               )}
               {isEditing ? 'Actualizar Reseña' : 'Crear Reseña'}
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </GlassModal>
   );
 }

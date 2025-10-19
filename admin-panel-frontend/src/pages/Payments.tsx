@@ -34,7 +34,7 @@ export default function Payments() {
   });
 
   // Fetch all payments data for statistics
-  const { data: allPaymentsData } = useQuery({
+  const { data: allPaymentsData, isLoading: allPaymentsLoading } = useQuery({
     queryKey: ['all-payments-stats'],
     queryFn: () => adminService.getPayments({ page: 1, limit: 1000 })
   });
@@ -73,6 +73,57 @@ export default function Payments() {
     .reduce((sum, p) => sum + (p.amount || 0), 0);
   
   const totalRevenue = dashboardData?.data?.data?.overview?.totalRevenue || calculatedRevenue;
+
+  // Process payment methods data for chart
+  const processPaymentMethodsData = () => {
+    if (!allPayments || allPayments.length === 0) {
+      return undefined; // Will use default data in component
+    }
+
+    // Count payments by method
+    const methodCounts = allPayments.reduce((acc: any, payment: any) => {
+      const method = payment.method || 'Otro';
+      acc[method] = (acc[method] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Convert to chart data format
+    const labels = Object.keys(methodCounts);
+    const data = Object.values(methodCounts) as number[];
+    
+    const colors = [
+      'rgba(59, 130, 246, 0.8)',
+      'rgba(34, 197, 94, 0.8)',
+      'rgba(168, 85, 247, 0.8)',
+      'rgba(249, 115, 22, 0.8)',
+      'rgba(239, 68, 68, 0.8)',
+      'rgba(107, 114, 128, 0.8)',
+    ];
+
+    const borderColors = [
+      'rgb(59, 130, 246)',
+      'rgb(34, 197, 94)',
+      'rgb(168, 85, 247)',
+      'rgb(249, 115, 22)',
+      'rgb(239, 68, 68)',
+      'rgb(107, 114, 128)',
+    ];
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Cantidad de Pagos',
+          data,
+          backgroundColor: colors.slice(0, labels.length),
+          borderColor: borderColors.slice(0, labels.length),
+          borderWidth: 1,
+        },
+      ],
+    };
+  };
+
+  const paymentMethodsData = processPaymentMethodsData();
 
   // Recent payments for display (first 5)
   const payments = recentPaymentsData?.data?.data?.data || [];
@@ -153,11 +204,11 @@ export default function Payments() {
         </div>
         <div className="flex items-center space-x-3">
           <Button variant="outline" onClick={handleViewAll}>
-            <Filter className="w-4 h-4 mr-2" />
+            <Filter className="w-4 h-4" />
             Ver Todos
           </Button>
           <Button onClick={handleCreateNew}>
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4" />
             Nuevo Pago
           </Button>
         </div>
@@ -173,9 +224,9 @@ export default function Payments() {
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
                 <div className="flex items-center mt-2">
                   {stat.changeType === 'positive' ? (
-                    <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+                    <TrendingUp className="w-4 h-4 text-green-500" />
                   ) : (
-                    <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
+                    <TrendingDown className="w-4 h-4 text-red-500" />
                   )}
                   <span className={`text-sm font-medium ${
                     stat.changeType === 'positive' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
@@ -219,7 +270,16 @@ export default function Payments() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Métodos de Pago</h3>
             <PieChart className="w-5 h-5 text-gray-400 dark:text-gray-500" />
           </div>
-          <PaymentMethodsChart data={(analyticsData as any)?.paymentMethods || []} />
+          {allPaymentsLoading ? (
+            <div className="h-64 flex items-center justify-center">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                <p className="text-gray-500 dark:text-gray-400">Cargando métodos de pago...</p>
+              </div>
+            </div>
+          ) : (
+            <PaymentMethodsChart data={paymentMethodsData} />
+          )}
         </div>
       </div>
 
@@ -240,7 +300,7 @@ export default function Payments() {
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay pagos</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">No se encontraron pagos recientes.</p>
               <Button onClick={handleCreateNew}>
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4" />
                 Crear Primer Pago
               </Button>
             </div>

@@ -34,7 +34,7 @@ type SidebarProps = {
 export default function Sidebar({ isOpen, isDesktop, onClose }: SidebarProps) {
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 w-72 transform overflow-hidden rounded-r-3xl bg-white/10 px-4 py-6 shadow-[0_40px_120px_-60px_rgba(56,189,248,0.45)] backdrop-blur-2xl transition-transform duration-300 ease-out dark:bg-slate-900/70 dark:shadow-[0_45px_140px_-65px_rgba(8,47,73,0.55)] lg:static lg:inset-auto lg:h-screen lg:w-80 lg:translate-x-0 lg:rounded-3xl lg:bg-white/12 lg:px-8 lg:py-10 lg:shadow-[0_50px_160px_-80px_rgba(59,130,246,0.35)] dark:lg:bg-slate-900/75 ${
+      className={`fixed inset-y-0 left-0 z-40 w-72 transform overflow-hidden bg-white/10 px-4 py-6 shadow-[0_40px_120px_-60px_rgba(56,189,248,0.45)] backdrop-blur-2xl transition-transform duration-300 ease-out dark:bg-slate-900/70 dark:shadow-[0_45px_140px_-65px_rgba(8,47,73,0.55)] lg:static lg:inset-auto lg:h-screen lg:w-80 lg:translate-x-0 lg:bg-white/12 lg:px-8 lg:py-10 lg:shadow-none dark:lg:bg-slate-900/75 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
       aria-label="Navegación principal"

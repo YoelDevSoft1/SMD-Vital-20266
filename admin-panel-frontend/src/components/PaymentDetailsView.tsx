@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, CreditCard, DollarSign, Calendar, User, Stethoscope, CheckCircle, XCircle, Clock, AlertCircle, Phone, Mail, Building, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { GlassModal } from '@/components/ui/GlassModal';
 import type { Payment } from '@/types';
 
 interface PaymentDetailsViewProps {
@@ -57,26 +58,25 @@ export default function PaymentDetailsView({ payment, onClose, onEdit }: Payment
   const StatusIcon = statusIcons[payment.status as keyof typeof statusIcons] || AlertCircle;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
+    <GlassModal isOpen={true} onClose={onClose} size="xl" variant="glass">
+      {/* Header */}
+      <div className="flex items-center justify-between p-6 border-b border-white/10 dark:border-white/5">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-full">
-              <CreditCard className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+              <CreditCard className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Detalles del Pago</h2>
-              <p className="text-gray-600">Información completa del pago</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Detalles del Pago</h2>
+              <p className="text-gray-600 dark:text-gray-400">Información completa del pago</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <Button variant="outline" onClick={onEdit}>
-              <FileText className="w-4 h-4 mr-2" />
+              <FileText className="w-4 h-4" />
               Editar
             </Button>
             <Button variant="outline" onClick={onClose}>
-              <X className="w-4 h-4 mr-2" />
+              <X className="w-4 h-4" />
               Cerrar
             </Button>
           </div>
@@ -301,7 +301,6 @@ export default function PaymentDetailsView({ payment, onClose, onEdit }: Payment
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </GlassModal>
   );
 }

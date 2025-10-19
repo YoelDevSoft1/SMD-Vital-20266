@@ -28,7 +28,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
     (user?.role && ROLE_LABELS[user.role]) ?? user?.role ?? 'Administrador';
 
   return (
-    <header className="relative z-20 flex h-20 items-center justify-between overflow-hidden border-b border-white/15 bg-white/12 px-4 shadow-[0_25px_90px_-45px_rgba(56,189,248,0.4)] backdrop-blur-2xl sm:px-6 lg:px-8 dark:border-white/5 dark:bg-slate-900/70 dark:shadow-[0_20px_80px_-40px_rgba(8,47,73,0.45)]">
+    <header className="relative z-20 flex h-20 items-center justify-between overflow-hidden border-b border-white/10 bg-white/12 px-4 backdrop-blur-2xl sm:px-6 lg:px-8 dark:border-white/5 dark:bg-slate-900/70">
       <div className="pointer-events-none absolute inset-0">
         <div className="glass-blob absolute -left-24 top-[-140%] h-72 w-72 rounded-full bg-cyan-400/25 blur-[140px] dark:bg-cyan-500/15" />
         <div className="glass-blob glass-blob--reverse absolute right-[-32%] bottom-[-150%] h-80 w-80 rounded-full bg-blue-500/20 blur-[170px] dark:bg-blue-500/15" />

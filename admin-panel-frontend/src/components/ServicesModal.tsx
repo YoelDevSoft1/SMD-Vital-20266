@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Stethoscope, Search, Plus, Edit, Trash2, Eye, AlertCircle } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from './ui/Button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { toast } from 'react-hot-toast';
@@ -193,25 +193,25 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-7xl h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-7xl h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-2xl font-bold text-gray-900">Gestión de Servicios</h2>
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Servicios</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
           >
             <X className="w-5 h-5" />
           </Button>
         </div>
 
         {/* Filters */}
-        <div className="p-6 border-b bg-gray-50">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <Label htmlFor="search">Buscar</Label>
+              <Label htmlFor="search" className="text-gray-700 dark:text-gray-300">Buscar</Label>
               <div className="flex">
                 <Input
                   id="search"
@@ -231,12 +231,12 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
             </div>
 
             <div>
-              <Label htmlFor="category">Categoría</Label>
+              <Label htmlFor="category" className="text-gray-700 dark:text-gray-300">Categoría</Label>
               <select
                 id="category"
                 value={filters.category || ''}
                 onChange={(e) => handleFilterChange('category', e.target.value || undefined)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               >
                 <option value="">Todas las categorías</option>
                 <option value="CONSULTATION">Consulta</option>
@@ -248,7 +248,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
             </div>
 
             <div>
-              <Label htmlFor="status">Estado</Label>
+              <Label htmlFor="status" className="text-gray-700 dark:text-gray-300">Estado</Label>
               <select
                 id="status"
                 value={filters.isActive === undefined ? '' : filters.isActive ? 'active' : 'inactive'}
@@ -256,7 +256,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
                   const isActive = e.target.value === '' ? undefined : e.target.value === 'active';
                   handleFilterChange('isActive', isActive);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               >
                 <option value="">Todos los estados</option>
                 <option value="active">Activos</option>
@@ -270,7 +270,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
                 className="w-full"
                 size="sm"
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4" />
                 Nuevo Servicio
               </Button>
             </div>
@@ -279,7 +279,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
           {/* Bulk Actions */}
           {selectedServices.length > 0 && (
             <div className="mt-4 flex items-center gap-2">
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 {selectedServices.length} servicios seleccionados
               </span>
               <Button
@@ -288,7 +288,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
                 onClick={handleBulkDelete}
                 disabled={bulkDeleteMutation.isPending}
               >
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 className="w-4 h-4" />
                 Eliminar Seleccionados
               </Button>
             </div>
@@ -305,132 +305,132 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                <p className="text-red-600">Error al cargar los servicios</p>
+                <p className="text-red-600 dark:text-red-400">Error al cargar los servicios</p>
               </div>
             </div>
           ) : !servicesData?.data?.data?.data?.length ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <Stethoscope className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No se encontraron servicios</p>
+                <Stethoscope className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <p className="text-gray-600 dark:text-gray-400">No se encontraron servicios</p>
               </div>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
                     <th className="px-6 py-3 text-left">
                       <input
                         type="checkbox"
                         checked={selectedServices.length === (servicesData?.data?.data?.data?.length || 0)}
                         onChange={handleSelectAll}
-                        className="rounded border-gray-300"
+                        className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-800"
                       />
                     </th>
                     <th 
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
                       onClick={() => handleSort('name')}
                     >
                       <div className="flex items-center space-x-1">
                         <span>Servicio</span>
-                        <span className="text-gray-400">{getSortIcon('name')}</span>
+                        <span className="text-gray-400 dark:text-gray-500">{getSortIcon('name')}</span>
                       </div>
                     </th>
                     <th 
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
                       onClick={() => handleSort('category')}
                     >
                       <div className="flex items-center space-x-1">
                         <span>Categoría</span>
-                        <span className="text-gray-400">{getSortIcon('category')}</span>
+                        <span className="text-gray-400 dark:text-gray-500">{getSortIcon('category')}</span>
                       </div>
                     </th>
                     <th 
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
                       onClick={() => handleSort('basePrice')}
                     >
                       <div className="flex items-center space-x-1">
                         <span>Precio</span>
-                        <span className="text-gray-400">{getSortIcon('basePrice')}</span>
+                        <span className="text-gray-400 dark:text-gray-500">{getSortIcon('basePrice')}</span>
                       </div>
                     </th>
                     <th 
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
                       onClick={() => handleSort('duration')}
                     >
                       <div className="flex items-center space-x-1">
                         <span>Duración</span>
-                        <span className="text-gray-400">{getSortIcon('duration')}</span>
+                        <span className="text-gray-400 dark:text-gray-500">{getSortIcon('duration')}</span>
                       </div>
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Estado
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Citas
                     </th>
                     <th 
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
                       onClick={() => handleSort('createdAt')}
                     >
                       <div className="flex items-center space-x-1">
                         <span>Fecha</span>
-                        <span className="text-gray-400">{getSortIcon('createdAt')}</span>
+                        <span className="text-gray-400 dark:text-gray-500">{getSortIcon('createdAt')}</span>
                       </div>
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Acciones
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {sortedServices.map((service: any) => (
-                    <tr key={service.id} className="hover:bg-gray-50">
+                    <tr key={service.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
                           type="checkbox"
                           checked={selectedServices.includes(service.id)}
                           onChange={() => handleSelectService(service.id)}
-                          className="rounded border-gray-300"
+                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-800"
                         />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
                               {service.name}
                             </div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
                               {service.description}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300">
                           {service.category}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         ${service.basePrice?.toLocaleString() || 0}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {service.duration} min
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           service.isActive 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
+                            ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' 
+                            : 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300'
                         }`}>
                           {service.isActive ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {service.appointmentCount || 0}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {new Date(service.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -439,7 +439,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleView(service)}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -447,7 +447,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEdit(service)}
-                            className="text-green-600 hover:text-green-900"
+                            className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -455,7 +455,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDelete(service.id)}
-                            className="text-red-600 hover:text-red-900"
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -471,9 +471,9 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
 
         {/* Pagination */}
         {servicesData?.data?.data?.pagination && servicesData.data.data.pagination.totalPages > 1 && (
-          <div className="border-t p-4">
+          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700">
+              <div className="text-sm text-gray-700 dark:text-gray-300">
                 Mostrando {((filters.page || 1) - 1) * (filters.limit || 10) + 1} a {Math.min((filters.page || 1) * (filters.limit || 10), servicesData.data.data.pagination.total)} de {servicesData.data.data.pagination.total} servicios
               </div>
               <div className="flex items-center space-x-2">
@@ -485,7 +485,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
                 >
                   Anterior
                 </Button>
-                <span className="text-sm text-gray-700">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
                   Página {filters.page || 1} de {servicesData.data.data.pagination.totalPages}
                 </span>
                 <Button

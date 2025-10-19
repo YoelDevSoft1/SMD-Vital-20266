@@ -205,19 +205,19 @@ export default function Dashboard() {
       
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Panel general</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Panel general</h1>
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             Visión rápida de la operación y los indicadores clave de SMD Vital.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={() => refetch()} isLoading={isFetching}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+          <Button variant="outline" size="md" onClick={() => refetch()} isLoading={isFetching}>
+            <RefreshCw className="h-4 w-4" />
             Actualizar
           </Button>
-          <Button onClick={() => navigate('/analytics')}>
+          <Button variant="primary" size="md" onClick={() => navigate('/analytics')}>
             Explorar analíticas
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -229,17 +229,17 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-3">
-        <Card className="xl:col-span-2 border border-gray-200 shadow-sm dark:border-gray-700">
+        <Card variant="elevated" className="xl:col-span-2">
           <CardHeader className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
                 Estado de las citas
               </CardTitle>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Distribución de todas las citas registradas ({formatNumber(appointmentTotals)}).
               </p>
             </div>
-            <div className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300">
+            <div className="rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300">
               Tasa de éxito {stats?.appointments?.completionRate?.toFixed(1) ?? 0}%
             </div>
           </CardHeader>
@@ -250,25 +250,25 @@ export default function Dashboard() {
               return (
                 <div key={item.key} className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-gray-700 dark:text-gray-300">{item.label}</span>
-                    <span className="text-gray-600 dark:text-gray-400">
+                    <span className="font-medium text-slate-700 dark:text-slate-300">{item.label}</span>
+                    <span className="text-slate-600 dark:text-slate-400">
                       {formatNumber(item.value)}{' '}
-                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                      <span className="text-xs text-slate-500 dark:text-slate-500">
                         ({percentage.toFixed(1)}%)
                       </span>
                     </span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div className="h-2.5 w-full rounded-full bg-slate-200/50 dark:bg-slate-700/50">
                     <div
-                      className={cn('h-2 rounded-full transition-all', item.bar)}
+                      className={cn('h-2.5 rounded-full transition-all duration-500 shadow-sm', item.bar)}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
                 </div>
               );
             })}
-            <div className="flex items-center gap-3 rounded-xl bg-indigo-50 p-4 text-sm text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300">
-              <ShieldCheck className="h-5 w-5" />
+            <div className="flex items-center gap-3 rounded-xl bg-indigo-50/80 p-4 text-sm font-medium text-indigo-700 border border-indigo-100/50 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800/50">
+              <ShieldCheck className="h-5 w-5 flex-shrink-0" />
               <span>
                 {formatNumber(stats?.appointments?.completed || 0)} citas exitosas sobre{' '}
                 {formatNumber(appointmentTotals)} totales generan la tasa de éxito mostrada.
@@ -277,26 +277,26 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <Card variant="elevated">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
               Resumen financiero
             </CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Ingresos acumulados y facturación del mes en curso.
             </p>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Ingresos totales</p>
-              <p className="text-3xl font-semibold text-gray-900 dark:text-white">
+              <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Ingresos totales</p>
+              <p className="text-3xl font-bold text-slate-900 dark:text-white">
                 {formatCurrency(stats?.overview?.totalRevenue || 0)}
               </p>
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
                 <span>Mes actual</span>
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-semibold text-slate-900 dark:text-white">
                   {formatCurrency(stats?.overview?.monthlyRevenue || 0)}
                 </span>
               </div>
@@ -305,8 +305,8 @@ export default function Dashboard() {
                 monthly={stats?.overview?.monthlyRevenue || 0}
               />
             </div>
-            <div className="flex items-center gap-3 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300">
-              <Star className="h-5 w-5" />
+            <div className="flex items-center gap-3 rounded-xl bg-emerald-50/80 p-4 text-sm font-medium text-emerald-700 border border-emerald-100/50 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800/50">
+              <Star className="h-5 w-5 flex-shrink-0" />
               <span>
                 Calificación promedio del servicio:{' '}
                 <strong>{stats?.overview?.averageRating?.toFixed(1) ?? '0.0'} / 5</strong>
@@ -317,12 +317,12 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <Card variant="elevated">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
               Citas recientes
             </CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Últimas interacciones registradas junto al estado actual.
             </p>
           </CardHeader>
@@ -366,12 +366,12 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <Card variant="elevated">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
               Nuevos usuarios
             </CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Cuentas creadas recientemente con su estado actual.
             </p>
           </CardHeader>
@@ -425,12 +425,12 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <Card variant="elevated">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
               Doctores destacados
             </CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Profesionales mejor valorados y con mayor volumen de citas.
             </p>
           </CardHeader>
@@ -464,12 +464,12 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <Card variant="elevated">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
               Servicios más demandados
             </CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Procedimientos o especialidades con mayor número de citas.
             </p>
           </CardHeader>

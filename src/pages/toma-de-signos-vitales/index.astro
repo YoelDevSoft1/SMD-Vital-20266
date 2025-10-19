@@ -331,9 +331,9 @@ const howToSchema = {
       image: {
         '@type': 'ImageObject',
         url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        caption: 'Medición de presión arterial con tensiómetro digital profesional'
+        caption: 'Medición de presión arterial con tensiómetro digital profesional',
       },
-      url: SITE.site + '/toma-de-signos-vitales/#procedimiento'
+      url: SITE.site + '/toma-de-signos-vitales/#procedimiento',
     },
     {
       '@type': 'HowToStep',
@@ -343,9 +343,9 @@ const howToSchema = {
       image: {
         '@type': 'ImageObject',
         url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        caption: 'Monitoreo de frecuencia cardíaca con oxímetro de pulso'
+        caption: 'Monitoreo de frecuencia cardíaca con oxímetro de pulso',
       },
-      url: SITE.site + '/toma-de-signos-vitales/#procedimiento'
+      url: SITE.site + '/toma-de-signos-vitales/#procedimiento',
     },
     {
       '@type': 'HowToStep',
@@ -355,9 +355,9 @@ const howToSchema = {
       image: {
         '@type': 'ImageObject',
         url: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        caption: 'Registro y evaluación de signos vitales para monitoreo completo'
+        caption: 'Registro y evaluación de signos vitales para monitoreo completo',
       },
-      url: SITE.site + '/toma-de-signos-vitales/#procedimiento'
+      url: SITE.site + '/toma-de-signos-vitales/#procedimiento',
     }
   ],
   author: {
@@ -368,7 +368,7 @@ const howToSchema = {
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Bogotá',
-      addressCountry: 'CO'
+      addressCountry: 'CO',
     }
   },
   publisher: {
@@ -377,11 +377,11 @@ const howToSchema = {
     url: SITE.site,
     logo: {
       '@type': 'ImageObject',
-      url: SITE.site + '/images/hero-image.png'
+      url: SITE.site + '/images/hero-image.png',
     }
   },
   datePublished: '2024-01-01',
-  dateModified: new Date().toISOString().split('T')[0]
+  dateModified: new Date().toISOString().split('T')[0],
 };
 
 ---
@@ -393,7 +393,7 @@ const howToSchema = {
     <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
     <script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
   </Fragment>
-
+||||||||||
   <Fragment slot="header">
     <Header
       {...headerData}

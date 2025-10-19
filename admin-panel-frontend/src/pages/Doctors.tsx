@@ -218,7 +218,7 @@ export default function Doctors() {
             </div>
             <div>
               <Button variant="outline" onClick={() => refetch()} className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700">
-                <RefreshCw className="mr-2 h-4 w-4" />
+                <RefreshCw className="h-4 w-4" />
                 Reintentar
               </Button>
             </div>
@@ -254,7 +254,7 @@ export default function Doctors() {
             selectedDoctors={selectedDoctors}
           />
           <Button onClick={() => setShowCreateModal(true)}>
-            <UserPlus className="mr-2 h-4 w-4" />
+            <UserPlus className="h-4 w-4" />
             Crear doctor
           </Button>
         </div>
@@ -334,7 +334,7 @@ export default function Doctors() {
               onClick={() => setShowFilters(!showFilters)}
               className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
             >
-              <Filter className="mr-2 h-4 w-4" />
+              <Filter className="h-4 w-4" />
               {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
             </Button>
           </div>
@@ -430,7 +430,7 @@ export default function Doctors() {
                     }}
                     className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800"
                   >
-                    <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                    <CheckCircle2 className="h-3.5 w-3.5" />
                     Activar
                   </Button>
                   <Button
@@ -444,7 +444,7 @@ export default function Doctors() {
                     }}
                     className="bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-300 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800"
                   >
-                    <XCircle className="mr-1 h-3.5 w-3.5" />
+                    <XCircle className="h-3.5 w-3.5" />
                     Desactivar
                   </Button>
                   <ExportDoctorsButton
@@ -620,7 +620,7 @@ export default function Doctors() {
                           }}
                           className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
                         >
-                          <Eye className="mr-1.5 h-3.5 w-3.5" />
+                          <Eye className="h-3.5 w-3.5" />
                           Ver detalles
                         </Button>
                         <Button
@@ -632,7 +632,7 @@ export default function Doctors() {
                           }}
                           className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
                         >
-                          <Edit2 className="mr-1.5 h-3.5 w-3.5" />
+                          <Edit2 className="h-3.5 w-3.5" />
                           Editar
                         </Button>
                         <Button
@@ -647,12 +647,12 @@ export default function Doctors() {
                         >
                           {doctor.isAvailable ? (
                             <>
-                              <XCircle className="mr-1.5 h-3.5 w-3.5" />
+                              <XCircle className="h-3.5 w-3.5" />
                               Desactivar
                             </>
                           ) : (
                             <>
-                              <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                              <CheckCircle2 className="h-3.5 w-3.5" />
                               Activar
                             </>
                           )}
@@ -663,7 +663,7 @@ export default function Doctors() {
                           onClick={() => handleDeleteDoctor(doctor)}
                           className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-gray-600 dark:hover:bg-gray-700"
                         >
-                          <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                          <Trash2 className="h-3.5 w-3.5" />
                           Eliminar
                         </Button>
                       </div>
