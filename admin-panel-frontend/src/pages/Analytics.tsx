@@ -19,7 +19,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card';
+} from '@/components/ui/card';
 import AnalyticsTrendChart from '@/components/AnalyticsTrendChart';
 import AnalyticsInsightsModal from '@/components/AnalyticsInsightsModal';
 
