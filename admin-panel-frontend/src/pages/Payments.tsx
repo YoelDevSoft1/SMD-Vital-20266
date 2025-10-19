@@ -217,86 +217,77 @@ export default function Payments() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
-          <Card
-            key={index}
-            variant="glass"
-            withBlob
-            className="group hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] hover:scale-[1.02] transition-all duration-300"
-          >
+          <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{stat.title}</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{stat.value}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.title}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
                 <div className="flex items-center mt-2">
                   {stat.changeType === 'positive' ? (
                     <TrendingUp className="w-4 h-4 text-green-500" />
                   ) : (
                     <TrendingDown className="w-4 h-4 text-red-500" />
                   )}
-                  <span className={`text-sm font-medium ml-1 ${
+                  <span className={`text-sm font-medium ${
                     stat.changeType === 'positive' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                   }`}>
                     {stat.change}
                   </span>
-                  <span className="text-sm text-slate-500 dark:text-slate-400 ml-1">vs mes anterior</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">vs mes anterior</span>
                 </div>
               </div>
-              <div className={`p-3 rounded-xl ${stat.bgColor} shadow-lg`}>
+              <div className={`p-3 rounded-full ${stat.bgColor}`}>
                 <stat.icon className={`w-6 h-6 ${stat.color}`} />
               </div>
             </div>
-          </Card>
+          </div>
         ))}
       </div>
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Chart */}
-        <Card variant="glass" withBlob className="group hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Ingresos por Mes</h3>
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg shadow-blue-500/30">
-              <BarChart3 className="w-5 h-5 text-white" />
-            </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Ingresos por Mes</h3>
+            <BarChart3 className="w-5 h-5 text-gray-400 dark:text-gray-500" />
           </div>
           {revenueLoading ? (
             <div className="h-64 flex items-center justify-center">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                <p className="text-slate-500 dark:text-slate-400">Cargando datos de ingresos...</p>
+                <p className="text-gray-500 dark:text-gray-400">Cargando datos de ingresos...</p>
               </div>
             </div>
           ) : (
             <RevenueChart data={(analyticsData as any)?.revenue || []} />
           )}
-        </Card>
+        </div>
 
         {/* Payment Methods */}
-        <Card variant="glass" withBlob className="group hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Métodos de Pago</h3>
-            <div className="p-2 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg shadow-purple-500/30">
-              <PieChart className="w-5 h-5 text-white" />
-            </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Métodos de Pago</h3>
+            <PieChart className="w-5 h-5 text-gray-400 dark:text-gray-500" />
           </div>
           {allPaymentsLoading ? (
             <div className="h-64 flex items-center justify-center">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                <p className="text-slate-500 dark:text-slate-400">Cargando métodos de pago...</p>
+                <p className="text-gray-500 dark:text-gray-400">Cargando métodos de pago...</p>
               </div>
             </div>
           ) : (
             <PaymentMethodsChart data={paymentMethodsData} />
           )}
-        </Card>
+        </div>
       </div>
 
       {/* Recent Payments */}
-      <Card variant="glass" withBlob>
-        <div className="p-6 border-b border-white/10 dark:border-white/5">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Pagos Recientes</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Pagos Recientes</h2>
             <Button variant="outline" onClick={handleViewAll}>
               Ver todos los pagos
             </Button>
@@ -305,35 +296,30 @@ export default function Payments() {
         <div className="p-6">
           {payments.length === 0 ? (
             <div className="text-center py-12">
-              <div className="p-4 bg-slate-100 dark:bg-slate-800/50 rounded-full inline-block mb-4">
-                <CreditCard className="w-12 h-12 text-slate-400 dark:text-slate-500" />
-              </div>
-              <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No hay pagos</h3>
-              <p className="text-slate-600 dark:text-slate-400 mb-4">No se encontraron pagos recientes.</p>
+              <CreditCard className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay pagos</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">No se encontraron pagos recientes.</p>
               <Button onClick={handleCreateNew}>
                 <Plus className="w-4 h-4" />
                 Crear Primer Pago
               </Button>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {payments.slice(0, 5).map((payment: any) => (
-                <div
-                  key={payment.id}
-                  className="flex items-center justify-between p-4 bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm border border-white/60 dark:border-white/10 rounded-xl hover:shadow-lg hover:scale-[1.01] transition-all duration-200"
-                >
+                <div key={payment.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow bg-white dark:bg-gray-800">
                   <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/30">
-                      <CreditCard className="w-5 h-5 text-white" />
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+                      <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <p className="font-semibold text-slate-900 dark:text-white">
+                      <p className="font-medium text-gray-900 dark:text-white">
                         {payment.appointment?.patient?.user?.firstName} {payment.appointment?.patient?.user?.lastName}
                       </p>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         {payment.appointment?.service?.name}
                       </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {new Date(payment.createdAt).toLocaleDateString('es-ES', {
                           year: 'numeric',
                           month: 'long',
@@ -346,20 +332,20 @@ export default function Payments() {
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="text-right">
-                      <p className="font-bold text-lg text-slate-900 dark:text-white">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {new Intl.NumberFormat('es-CO', {
                           style: 'currency',
                           currency: 'COP'
                         }).format(payment.amount)}
                       </p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">{payment.method}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{payment.method}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                        payment.status === 'COMPLETED' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
-                        payment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                        payment.status === 'FAILED' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
-                        'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
+                    <div className="flex items-center space-x-2">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        payment.status === 'COMPLETED' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' :
+                        payment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300' :
+                        payment.status === 'FAILED' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                       }`}>
                         {payment.status === 'COMPLETED' ? 'Completado' :
                          payment.status === 'PENDING' ? 'Pendiente' :
@@ -380,7 +366,7 @@ export default function Payments() {
             </div>
           )}
         </div>
-      </Card>
+      </div>
 
       {/* Modals */}
       <PaymentsModal

@@ -17,7 +17,7 @@ import type { DashboardStats } from '@/types';
 import { DashboardStatCard } from '@/components/dashboard/DashboardStatCard';
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { cn } from '@/utils/cn';
 
 const statusStyles: Record<string, string> = {
