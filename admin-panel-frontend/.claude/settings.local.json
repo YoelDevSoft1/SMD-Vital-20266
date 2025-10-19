@@ -2,7 +2,17 @@
   "permissions": {
     "allow": [
       "Read(//c/Users/Administrator/Desktop/SMD-Vital-2026/**)",
-      "Bash(git push origin main)"
+      "Bash(git push origin main)",
+      "Bash(git fetch origin)",
+      "Bash(git pull origin main)",
+      "Bash(git commit --allow-empty -m \"Trigger Vercel redeploy with latest changes\")",
+      "Bash(git add src/components/ui/input.tsx src/components/ui/label.tsx src/components/ui/Select.tsx src/components/ui/Switch.tsx)",
+      "Bash(git mv src/components/ui/Input.tsx src/components/ui/input-temp.tsx)",
+      "Bash(git mv src/components/ui/input-temp.tsx src/components/ui/input.tsx)",
+      "Bash(git mv src/components/ui/Label.tsx src/components/ui/label-temp.tsx)",
+      "Bash(git mv src/components/ui/label-temp.tsx src/components/ui/label.tsx)",
+      "Bash(git add -A)",
+      "Bash(git commit -m \"Fix case-sensitivity for input.tsx and label.tsx\")"
     ],
     "deny": [],
     "ask": []
