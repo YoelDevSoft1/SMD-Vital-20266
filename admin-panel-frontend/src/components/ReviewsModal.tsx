@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, MessageSquare, Filter, Search, Plus, Edit, Trash2, Eye, CheckCircle, XCircle, AlertCircle, Download, Calendar, Star, Shield, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from './ui/Button';
-import { Input } from './ui/input';
+import { Input } from './ui/Input';
 import { Label } from './ui/label';
 import { Select } from './ui/select';
 import { Switch } from './ui/switch';
@@ -51,7 +51,7 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
     mutationFn: (id: string) => adminService.deleteReview(id),
     onSuccess: () => {
       toast.success('Reseña eliminada correctamente');
-      queryClient.invalidateQueries(['reviews']);
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
       setSelectedReviews([]);
     },
     onError: (err: any) => {
@@ -63,7 +63,7 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
     mutationFn: (id: string) => adminService.verifyReview(id),
     onSuccess: () => {
       toast.success('Reseña verificada correctamente');
-      queryClient.invalidateQueries(['reviews']);
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
     },
     onError: (err: any) => {
       toast.error(`Error al verificar reseña: ${err.message}`);
@@ -170,7 +170,7 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
               <Plus className="w-4 h-4" />
               Nueva Reseña
             </Button>
-            <Button variant="ghost" size="icon" onClick={onClose}>
+            <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="w-5 h-5" />
             </Button>
           </div>

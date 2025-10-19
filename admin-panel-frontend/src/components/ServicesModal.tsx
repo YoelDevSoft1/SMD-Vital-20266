@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Stethoscope, Search, Plus, Edit, Trash2, Eye, AlertCircle } from 'lucide-react';
 import { Button } from './ui/Button';
-import { Input } from './ui/input';
+import { Input } from './ui/Input';
 import { Label } from './ui/label';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';

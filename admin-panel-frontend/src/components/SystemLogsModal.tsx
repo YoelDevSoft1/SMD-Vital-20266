@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { SystemLog, SystemLogFilters } from '@/types';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectItem, SelectValue } from '@/components/ui/select';
 

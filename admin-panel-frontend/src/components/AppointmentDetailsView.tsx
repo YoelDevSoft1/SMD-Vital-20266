@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Calendar, Clock, User, Stethoscope, MapPin, DollarSign, FileText, AlertCircle, CheckCircle, XCircle, RefreshCw, Phone, Mail, Building } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import type { Appointment } from '@/types';
 
 interface AppointmentDetailsViewProps {

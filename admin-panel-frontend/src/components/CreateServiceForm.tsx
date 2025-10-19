@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Stethoscope, DollarSign, Clock, FileText, Save } from 'lucide-react';
 import { Button } from './ui/Button';
-import { Input } from './ui/input';
+import { Input } from './ui/Input';
 import { Label } from './ui/label';
 import { Select } from './ui/select';
 import { Switch } from './ui/switch';
@@ -85,7 +85,7 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
     mutationFn: (data: any) => adminService.createService(data),
     onSuccess: () => {
       toast.success('Servicio creado correctamente');
-      queryClient.invalidateQueries(['services']);
+      queryClient.invalidateQueries({ queryKey: ['services'] });
       onClose();
     },
     onError: (err: any) => {
@@ -97,7 +97,7 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
     mutationFn: (data: any) => adminService.updateService(service!.id, data),
     onSuccess: () => {
       toast.success('Servicio actualizado correctamente');
-      queryClient.invalidateQueries(['services']);
+      queryClient.invalidateQueries({ queryKey: ['services'] });
       onClose();
     },
     onError: (err: any) => {
@@ -163,7 +163,7 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-5 h-5" />
           </Button>
         </div>

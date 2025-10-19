@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { X, MessageSquare, Star, Save } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
 import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 import { GlassModal } from './ui/GlassModal';
@@ -106,7 +106,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
     mutationFn: (data: any) => adminService.createReview(data),
     onSuccess: () => {
       toast.success('Reseña creada correctamente');
-      queryClient.invalidateQueries(['reviews']);
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
       onClose();
     },
     onError: (err: any) => {
@@ -118,7 +118,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
     mutationFn: (data: any) => adminService.updateReview(review!.id, data),
     onSuccess: () => {
       toast.success('Reseña actualizada correctamente');
-      queryClient.invalidateQueries(['reviews']);
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
       onClose();
     },
     onError: (err: any) => {
@@ -184,7 +184,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-5 h-5" />
           </Button>
         </div>

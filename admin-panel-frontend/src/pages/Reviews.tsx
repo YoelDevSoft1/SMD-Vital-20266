@@ -24,8 +24,8 @@ import {
   ThumbsUp,
   ThumbsDown
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -67,7 +67,7 @@ export default function Reviews() {
   };
 
   // Calculate review statistics
-  const reviews = (reviewsData?.data?.data?.data as Review[]) || [];
+  const reviews = (reviewsData?.data?.data?.data as any[]) || [];
   const totalReviews = reviewsData?.data?.data?.pagination?.total || 0;
   const verifiedReviews = reviews.filter((r: any) => r.isVerified).length || 0;
   const unverifiedReviews = reviews.filter((r: any) => !r.isVerified).length || 0;

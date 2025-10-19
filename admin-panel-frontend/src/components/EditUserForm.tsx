@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
 import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 import { adminService } from '../services/admin.service';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, MessageSquare, Star, Calendar, Shield, Edit, Trash2, CheckCircle, XCircle, User, Stethoscope } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from './ui/Button';
 import { GlassModal } from './ui/GlassModal';
 import type { Review } from '@/types';
 
@@ -54,7 +54,7 @@ export default function ReviewDetailsView({ review, onClose, onEdit }: ReviewDet
               <Edit className="w-4 h-4" />
               Editar
             </Button>
-            <Button variant="ghost" size="icon" onClick={onClose}>
+            <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="w-5 h-5" />
             </Button>
           </div>

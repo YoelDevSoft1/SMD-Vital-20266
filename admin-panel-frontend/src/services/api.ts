@@ -41,7 +41,7 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    if (import.meta.env?.DEV) {
+    if (import.meta.env.DEV) {
       console.error('API error:', {
         status: error.response?.status,
         data: error.response?.data,

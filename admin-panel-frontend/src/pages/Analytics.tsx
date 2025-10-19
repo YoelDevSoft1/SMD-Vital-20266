@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
 import type { AnalyticsMetric } from '@/types';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
