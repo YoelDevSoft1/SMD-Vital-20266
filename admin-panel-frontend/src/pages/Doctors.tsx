@@ -24,7 +24,7 @@ import { adminService } from '@/services/admin.service';
 import { Doctor, DoctorFilters } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import CreateDoctorForm from '@/components/CreateDoctorForm';
 import DoctorDetailsView from '@/components/DoctorDetailsView';
 import { EditDoctorForm } from '@/components/EditDoctorForm';

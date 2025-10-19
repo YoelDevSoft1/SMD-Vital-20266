@@ -22,7 +22,7 @@ import {
 import { adminService } from '@/services/admin.service';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import AppointmentsModal from '@/components/AppointmentsModal';
 import CreateAppointmentForm from '@/components/CreateAppointmentForm';
 import AppointmentDetailsView from '@/components/AppointmentDetailsView';
