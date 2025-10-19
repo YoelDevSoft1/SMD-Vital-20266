@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Administrator/Desktop/SMD-Vital-2026/**)",
+      "Bash(git push origin main)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
