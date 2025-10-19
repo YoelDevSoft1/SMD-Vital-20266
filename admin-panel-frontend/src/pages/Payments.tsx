@@ -14,7 +14,6 @@ import {
   PieChart
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/card';
 import { adminService } from '@/services/admin.service';
 import PaymentsModal from '@/components/PaymentsModal';
 import PaymentDetailsView from '@/components/PaymentDetailsView';
