@@ -18,8 +18,8 @@ import { adminService } from '@/services/admin.service';
 import type { AnalyticsData, AnalyticsFilters, AnalyticsMetric } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectItem } from '@/components/ui/select';
+import { Label } from '@/components/ui/Label';
+import { Select, SelectItem } from '@/components/ui/Select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import AnalyticsTrendChart from '@/components/AnalyticsTrendChart';
 

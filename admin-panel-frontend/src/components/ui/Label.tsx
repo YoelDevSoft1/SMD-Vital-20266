@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { cn } from '@/utils/cn';
 
 interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
@@ -6,7 +6,7 @@ interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
   required?: boolean;
 }
 
-export const Label: React.FC<LabelProps> = ({ children, required, className, ...props }) => {
+export function Label({ children, required, className, ...props }: LabelProps) {
   return (
     <label
       className={cn(
@@ -20,4 +20,4 @@ export const Label: React.FC<LabelProps> = ({ children, required, className, ...
       {required && <span className="ml-1 text-red-500 dark:text-red-400">*</span>}
     </label>
   );
-};
+}
