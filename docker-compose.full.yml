@@ -1,11 +1,6 @@
-# Docker Compose para SMD Vital Backend
+# Docker Compose completo para SMD Vital
+# Incluye Backend + Panel de Administración
 # Configuración optimizada para evitar conflictos con otros proyectos Docker
-
-x-common-variables: &common-variables
-  POSTGRES_DB: ${POSTGRES_DB:-smd_vital_db}
-  POSTGRES_USER: ${POSTGRES_USER:-smd_vital_user}
-  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smd_vital_password}
-  REDIS_PASSWORD: ${REDIS_PASSWORD:-smd_vital_redis_password}
 
 services:
   # PostgreSQL Database
@@ -13,11 +8,13 @@ services:
     image: postgres:15-alpine
     container_name: smdvital-postgres
     environment:
-      <<: *common-variables
+      POSTGRES_DB: ${POSTGRES_DB:-smd_vital_db}
+      POSTGRES_USER: ${POSTGRES_USER:-smd_vital_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smd_vital_password}
       POSTGRES_INITDB_ARGS: "-E UTF8 --locale=es_CO.UTF-8"
     volumes:
       - smdvital_postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+      - ./smd-vital-backend/scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
     ports:
       - "${POSTGRES_EXTERNAL_PORT:-5433}:5432"
     networks:
@@ -31,7 +28,7 @@ services:
       start_period: 10s
     labels:
       - "com.smdvital.service=postgres"
-      - "com.smdvital.project=smd-vital-backend"
+      - "com.smdvital.project=smd-vital"
 
   # Redis Cache
   redis:
@@ -58,18 +55,17 @@ services:
       start_period: 10s
     labels:
       - "com.smdvital.service=redis"
-      - "com.smdvital.project=smd-vital-backend"
+      - "com.smdvital.project=smd-vital"
 
   # SMD Vital Backend
   backend:
     build:
-      context: .
+      context: ./smd-vital-backend
       dockerfile: Dockerfile
       args:
         NODE_ENV: ${NODE_ENV:-production}
     container_name: smdvital-backend
     environment:
-      <<: *common-variables
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${BACKEND_PORT:-3000}
       DATABASE_URL: postgresql://${POSTGRES_USER:-smd_vital_user}:${POSTGRES_PASSWORD:-smd_vital_password}@postgres:5432/${POSTGRES_DB:-smd_vital_db}
@@ -78,7 +74,7 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-smd-vital-refresh-secret-change-in-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4322}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173,http://localhost:5174,http://localhost:4322}
       CORS_CREDENTIALS: ${CORS_CREDENTIALS:-true}
       RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
       RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-100}
@@ -112,8 +108,8 @@ services:
         condition: service_healthy
     restart: unless-stopped
     volumes:
-      - ./logs:/app/logs
-      - ./uploads:/app/uploads
+      - ./smd-vital-backend/logs:/app/logs
+      - ./smd-vital-backend/uploads:/app/uploads
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       interval: 30s
@@ -122,16 +118,41 @@ services:
       start_period: 40s
     labels:
       - "com.smdvital.service=backend"
-      - "com.smdvital.project=smd-vital-backend"
+      - "com.smdvital.project=smd-vital"
+
+  # Panel de Administración Frontend
+  admin-panel:
+    build:
+      context: ./admin-panel-frontend
+      dockerfile: Dockerfile
+    container_name: smdvital-admin-panel
+    ports:
+      - "${ADMIN_PANEL_PORT:-5174}:80"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - smdvital_network
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.smdvital.service=admin-panel"
+      - "com.smdvital.project=smd-vital"
 
   # Prisma Studio (Solo para desarrollo)
   prisma-studio:
     build:
-      context: .
+      context: ./smd-vital-backend
       dockerfile: Dockerfile.prisma
     container_name: smdvital-prisma-studio
     environment:
-      <<: *common-variables
       DATABASE_URL: postgresql://${POSTGRES_USER:-smd_vital_user}:${POSTGRES_PASSWORD:-smd_vital_password}@postgres:5432/${POSTGRES_DB:-smd_vital_db}
     ports:
       - "${PRISMA_STUDIO_EXTERNAL_PORT:-5556}:5555"
@@ -153,140 +174,7 @@ services:
       retries: 3
     labels:
       - "com.smdvital.service=prisma-studio"
-      - "com.smdvital.project=smd-vital-backend"
-
-  # Nginx Reverse Proxy (Opcional)
-  nginx:
-    image: nginx:alpine
-    container_name: smdvital-nginx
-    ports:
-      - "${NGINX_HTTP_PORT:-8080}:80"
-      - "${NGINX_HTTPS_PORT:-8443}:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-    networks:
-      - smdvital_network
-    depends_on:
-      - backend
-    restart: unless-stopped
-    profiles:
-      - production
-      - nginx
-    labels:
-      - "com.smdvital.service=nginx"
-      - "com.smdvital.project=smd-vital-backend"
-
-  # Prometheus Monitoring (Opcional)
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: smdvital-prometheus
-    ports:
-      - "${PROMETHEUS_EXTERNAL_PORT:-9091}:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - smdvital_prometheus_data:/prometheus
-    networks:
-      - smdvital_network
-    restart: unless-stopped
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
-    profiles:
-      - monitoring
-      - production
-    labels:
-      - "com.smdvital.service=prometheus"
-      - "com.smdvital.project=smd-vital-backend"
-
-  # Node Exporter (Opcional)
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: smdvital-node-exporter
-    ports:
-      - "${NODE_EXPORTER_EXTERNAL_PORT:-9101}:9100"
-    networks:
-      - smdvital_network
-    restart: unless-stopped
-    command:
-      - '--path.rootfs=/host'
-    volumes:
-      - '/:/host:ro,rslave'
-    profiles:
-      - monitoring
-      - production
-    labels:
-      - "com.smdvital.service=node-exporter"
-      - "com.smdvital.project=smd-vital-backend"
-
-  # Redis Exporter (Opcional)
-  redis-exporter:
-    image: oliver006/redis_exporter:latest
-    container_name: smdvital-redis-exporter
-    ports:
-      - "${REDIS_EXPORTER_EXTERNAL_PORT:-9122}:9121"
-    environment:
-      REDIS_ADDR: redis://redis:6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-smd_vital_redis_password}
-    networks:
-      - smdvital_network
-    depends_on:
-      - redis
-    restart: unless-stopped
-    profiles:
-      - monitoring
-      - production
-    labels:
-      - "com.smdvital.service=redis-exporter"
-      - "com.smdvital.project=smd-vital-backend"
-
-  # PostgreSQL Exporter (Opcional)
-  postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:latest
-    container_name: smdvital-postgres-exporter
-    ports:
-      - "${POSTGRES_EXPORTER_EXTERNAL_PORT:-9188}:9187"
-    environment:
-      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER:-smd_vital_user}:${POSTGRES_PASSWORD:-smd_vital_password}@postgres:5432/${POSTGRES_DB:-smd_vital_db}?sslmode=disable"
-    networks:
-      - smdvital_network
-    depends_on:
-      - postgres
-    restart: unless-stopped
-    profiles:
-      - monitoring
-      - production
-    labels:
-      - "com.smdvital.service=postgres-exporter"
-      - "com.smdvital.project=smd-vital-backend"
-
-  # Grafana Dashboard (Opcional)
-  grafana:
-    image: grafana/grafana:latest
-    container_name: smdvital-grafana
-    ports:
-      - "${GRAFANA_EXTERNAL_PORT:-3002}:3000"
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin_smdvital_2026}
-      GF_SERVER_ROOT_URL: http://localhost:${GRAFANA_EXTERNAL_PORT:-3002}
-      GF_INSTALL_PLUGINS: ""
-    volumes:
-      - smdvital_grafana_data:/var/lib/grafana
-    networks:
-      - smdvital_network
-    depends_on:
-      - prometheus
-    restart: unless-stopped
-    profiles:
-      - monitoring
-      - production
-    labels:
-      - "com.smdvital.service=grafana"
-      - "com.smdvital.project=smd-vital-backend"
+      - "com.smdvital.project=smd-vital"
 
 volumes:
   smdvital_postgres_data:
@@ -295,12 +183,6 @@ volumes:
   smdvital_redis_data:
     driver: local
     name: smdvital_redis_data
-  smdvital_prometheus_data:
-    driver: local
-    name: smdvital_prometheus_data
-  smdvital_grafana_data:
-    driver: local
-    name: smdvital_grafana_data
 
 networks:
   smdvital_network:
@@ -309,3 +191,4 @@ networks:
     ipam:
       config:
         - subnet: 172.28.0.0/16
+

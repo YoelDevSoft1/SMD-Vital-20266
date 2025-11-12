@@ -1,46 +1,73 @@
-# Use Node.js 18 LTS as base image
-FROM node:18-alpine
+# Multi-stage build para optimizar el tamaño de la imagen
+FROM node:18-alpine AS builder
 
-# Set working directory
+# Instalar dependencias del sistema necesarias para compilar
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    openssl \
+    libc6-compat
+
+# Establecer directorio de trabajo
 WORKDIR /app
 
-# Install system dependencies
+# Copiar archivos de configuración de dependencias
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Instalar todas las dependencias (incluyendo devDependencies para el build)
+RUN npm ci && npm cache clean --force
+
+# Copiar código fuente
+COPY . .
+
+# Generar cliente de Prisma
+RUN npx prisma generate
+
+# Compilar TypeScript
+RUN npm run build
+
+# Etapa de producción
+FROM node:18-alpine AS production
+
+# Instalar solo dependencias de runtime
 RUN apk add --no-cache \
     dumb-init \
     openssl \
     && addgroup -g 1001 -S nodejs \
     && adduser -S nodejs -u 1001
 
-# Copy package files
-COPY package*.json ./
+# Establecer directorio de trabajo
+WORKDIR /app
 
-# Install dependencies
+# Copiar archivos de configuración
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Instalar solo dependencias de producción
 RUN npm ci --only=production && npm cache clean --force
 
-# Copy source code
-COPY . .
+# Copiar artefactos construidos desde la etapa builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-# Build the application
-RUN npm run build
+# Crear directorios necesarios
+RUN mkdir -p logs uploads && \
+    chown -R nodejs:nodejs /app
 
-# Create logs directory
-RUN mkdir -p logs && chown -R nodejs:nodejs logs
-
-# Change ownership of the app directory
-RUN chown -R nodejs:nodejs /app
-
-# Switch to non-root user
+# Cambiar a usuario no root
 USER nodejs
 
-# Expose port
+# Exponer puerto
 EXPOSE 3000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
-# Start the application
+# Usar dumb-init para manejar señales correctamente
 ENTRYPOINT ["dumb-init", "--"]
+
+# Comando de inicio
 CMD ["node", "dist/index.js"]
-
-

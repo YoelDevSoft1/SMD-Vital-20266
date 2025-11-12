@@ -392,6 +392,60 @@ export class RedisService {
   }
 
   /**
+   * Flush all keys (alias for flushall with camelCase)
+   */
+  public static async flushAll(): Promise<void> {
+    return this.flushall();
+  }
+
+  /**
+   * Delete keys matching a pattern
+   * WARNING: This uses KEYS which can be slow in production with many keys
+   * Consider using SCAN for production environments with large datasets
+   */
+  public static async deletePattern(pattern: string): Promise<number> {
+    try {
+      const keys = await this.keys(pattern);
+      if (keys.length === 0) {
+        return 0;
+      }
+
+      // Delete keys in batches to avoid blocking
+      const batchSize = 100;
+      let deletedCount = 0;
+
+      for (let i = 0; i < keys.length; i += batchSize) {
+        const batch = keys.slice(i, i + batchSize);
+        const result = await this.client.del(...batch);
+        deletedCount += result;
+      }
+
+      logger.debug(`Deleted ${deletedCount} keys matching pattern: ${pattern}`);
+      return deletedCount;
+    } catch (error: any) {
+      logger.error('Redis deletePattern error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete multiple keys
+   */
+  public static async deleteKeys(keys: string[]): Promise<number> {
+    try {
+      if (keys.length === 0) {
+        return 0;
+      }
+
+      const result = await this.client.del(...keys);
+      return result;
+    } catch (error: any) {
+      logger.error('Redis deleteKeys error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get Redis info
    */
   public static async info(): Promise<string> {

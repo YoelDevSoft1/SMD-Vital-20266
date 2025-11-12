@@ -6,6 +6,8 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger.config';
 
 // Import configurations
 import { config } from './config/config';
@@ -35,6 +37,7 @@ import { MetricsService } from './services/metrics.service';
 
 // Import middleware
 import { metricsMiddleware } from './middleware/metrics.middleware';
+import { securityMiddleware } from './middleware/sanitize.middleware';
 
 class SMDVitalServer {
   private app: express.Application;
@@ -46,9 +49,14 @@ class SMDVitalServer {
   constructor() {
     this.app = express();
     this.server = createServer(this.app);
+    // Parse CORS origins for Socket.IO
+    const socketOrigins = typeof config.cors.origin === 'string' 
+      ? config.cors.origin.split(',').map(origin => origin.trim())
+      : config.cors.origin;
+    
     this.io = new SocketIOServer(this.server, {
       cors: {
-        origin: config.cors.origin,
+        origin: socketOrigins,
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: config.cors.credentials
       }
@@ -76,11 +84,31 @@ class SMDVitalServer {
     }));
 
     // CORS configuration
+    // Parse CORS_ORIGIN - puede ser string simple o múltiples orígenes separados por coma
+    const corsOrigins = typeof config.cors.origin === 'string' 
+      ? config.cors.origin.split(',').map(origin => origin.trim())
+      : config.cors.origin;
+    
     this.app.use(cors({
-      origin: config.cors.origin,
+      origin: (origin, callback) => {
+        // Permitir requests sin origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+        
+        // Si es un array, verificar si el origin está en la lista
+        if (Array.isArray(corsOrigins)) {
+          if (corsOrigins.includes(origin)) {
+            return callback(null, true);
+          }
+        } else if (corsOrigins === '*' || corsOrigins === origin) {
+          return callback(null, true);
+        }
+        
+        // Si no coincide, denegar
+        callback(new Error('Not allowed by CORS'));
+      },
       credentials: config.cors.credentials,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Request-ID']
     }));
 
     // Serve static files
@@ -102,6 +130,9 @@ class SMDVitalServer {
     // Body parsing middleware
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+    // Security middleware (sanitization, XSS prevention, NoSQL injection prevention)
+    this.app.use(securityMiddleware);
 
     // Compression middleware
     this.app.use(compression());
@@ -161,24 +192,23 @@ class SMDVitalServer {
     this.app.use('/api/v1/admin', adminRoutes);
     this.app.use('/api/v1/admin-panel', adminPanelRoutes);
 
-    // API documentation
-    this.app.get('/api/docs', (_req, res) => {
-      res.json({
-        message: 'SMD Vital API Documentation',
-        version: '1.0.0',
-        endpoints: {
-          auth: '/api/v1/auth',
-          users: '/api/v1/users',
-          patients: '/api/v1/patients',
-          doctors: '/api/v1/doctors',
-          appointments: '/api/v1/appointments',
-          services: '/api/v1/services',
-          payments: '/api/v1/payments',
-          reviews: '/api/v1/reviews',
-          notifications: '/api/v1/notifications',
-          admin: '/api/v1/admin'
-        }
-      });
+    // Swagger API Documentation
+    this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+      customCss: '.swagger-ui .topbar { display: none }',
+      customSiteTitle: 'SMD Vital API Documentation',
+      customfavIcon: '/favicon.ico',
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        tryItOutEnabled: true
+      }
+    }));
+
+    // Swagger JSON endpoint
+    this.app.get('/api/docs.json', (_req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(swaggerSpec);
     });
   }
 
@@ -227,8 +257,13 @@ class SMDVitalServer {
       this.server.listen(config.port, () => {
         logger.info(`🚀 SMD Vital Backend running on port ${config.port}`);
         logger.info(`📚 API Documentation: http://localhost:${config.port}/api/docs`);
+        logger.info(`📄 Swagger JSON: http://localhost:${config.port}/api/docs.json`);
         logger.info(`🏥 Health Check: http://localhost:${config.port}/health`);
+        logger.info(`📊 Metrics: http://localhost:${config.port}/metrics`);
         logger.info(`🌍 Environment: ${config.nodeEnv}`);
+        logger.info(`✅ Caché Redis: Habilitado`);
+        logger.info(`🛡️ Seguridad: Sanitización activa`);
+        logger.info(`⚡ Rate Limiting: Configurado`);
       });
 
       // Graceful shutdown

@@ -1,0 +1,66 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+.pnp
+.pnp.js
+
+# Testing
+coverage
+.nyc_output
+
+# Production
+dist
+build
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+docs
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp
+temp
+*.tmp
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Other
+.eslintcache
+.prettierignore
+.editorconfig
+

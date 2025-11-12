@@ -1,50 +1,31 @@
-# Dockerfile específico para Prisma Studio
+# Dockerfile para Prisma Studio
 FROM node:18-alpine
 
-# Set working directory
+# Instalar dependencias del sistema
+RUN apk add --no-cache \
+    openssl \
+    libc6-compat \
+    wget
+
+# Establecer directorio de trabajo
 WORKDIR /app
 
-# Install system dependencies
-RUN apk add --no-cache \
-    dumb-init \
-    openssl \
-    && addgroup -g 1001 -S nodejs \
-    && adduser -S nodejs -u 1001
-
-# Copy package files
+# Copiar archivos de configuración
 COPY package*.json ./
+COPY prisma ./prisma/
 
-# Install dependencies (including dev dependencies for Prisma)
+# Instalar dependencias
 RUN npm ci && npm cache clean --force
 
-# Copy Prisma schema and related files
-COPY prisma ./prisma/
-COPY .env ./
-
-# Generate Prisma client
+# Generar cliente de Prisma
 RUN npx prisma generate
 
-# Create logs directory
-RUN mkdir -p logs && chown -R nodejs:nodejs logs
-
-# Change ownership of the app directory
-RUN chown -R nodejs:nodejs /app
-
-# Switch to non-root user
-USER nodejs
-
-# Expose Prisma Studio port
+# Exponer puerto de Prisma Studio
 EXPOSE 5555
 
-# Health check for Prisma Studio
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:5555 || exit 1
 
-# Start Prisma Studio
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["npx", "prisma", "studio", "--port", "5555", "--browser", "none"]
-
-
-
-
-
+# Comando para iniciar Prisma Studio
+CMD ["npx", "prisma", "studio", "--host", "0.0.0.0", "--port", "5555"]

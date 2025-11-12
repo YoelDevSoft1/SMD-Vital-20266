@@ -1,0 +1,45 @@
+# Archivo de ejemplo para docker-compose.override.yml
+# Copia este archivo a docker-compose.override.yml y personaliza los puertos
+# según tus necesidades para evitar conflictos con otros proyectos
+
+version: '3.8'
+
+# Este archivo permite sobrescribir configuraciones del docker-compose.yml principal
+# sin modificar el archivo original. Docker Compose carga automáticamente este archivo
+# si existe en el mismo directorio.
+
+services:
+  # Ejemplo: Cambiar puertos para evitar conflictos
+  postgres:
+    ports:
+      - "5433:5432"  # Cambiar 5433 por el puerto que necesites
+
+  redis:
+    ports:
+      - "6380:6379"  # Cambiar 6380 por el puerto que necesites
+
+  backend:
+    ports:
+      - "3000:3000"  # Cambiar 3000 por el puerto que necesites
+    environment:
+      # Sobrescribir variables de entorno si es necesario
+      # NODE_ENV: development
+      # LOG_LEVEL: debug
+
+  prisma-studio:
+    ports:
+      - "5556:5555"  # Cambiar 5556 por el puerto que necesites
+
+  # Ejemplo: Deshabilitar servicios opcionales
+  # nginx:
+  #   profiles:
+  #     - disabled
+
+  # prometheus:
+  #   profiles:
+  #     - disabled
+
+  # grafana:
+  #   profiles:
+  #     - disabled
+

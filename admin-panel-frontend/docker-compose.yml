@@ -1,0 +1,35 @@
+# Docker Compose para SMD Vital Admin Panel
+# Configuración optimizada para evitar conflictos con otros proyectos Docker
+
+services:
+  # Panel de Administración Frontend
+  admin-panel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smdvital-admin-panel
+    ports:
+      - "${ADMIN_PANEL_PORT:-5174}:80"
+    environment:
+      - NODE_ENV=production
+      # La URL del backend se configura mediante proxy de Nginx
+    networks:
+      - smdvital_network
+    depends_on:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.smdvital.service=admin-panel"
+      - "com.smdvital.project=smd-vital-admin-panel"
+
+networks:
+  smdvital_network:
+    external: true
+    name: smdvital_network
+
