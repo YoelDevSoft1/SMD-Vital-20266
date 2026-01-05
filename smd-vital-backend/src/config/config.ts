@@ -44,6 +44,8 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   FROM_EMAIL: z.string().email().optional(),
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM_EMAIL: z.string().email().optional(),
 
   // SMS (Twilio)
   TWILIO_ACCOUNT_SID: z.string().optional(),
@@ -159,6 +161,8 @@ export const config = {
       pass: env.SMTP_PASS,
     },
     from: env.FROM_EMAIL,
+    resendApiKey: env.RESEND_API_KEY,
+    resendFrom: env.RESEND_FROM_EMAIL,
   },
 
   // SMS configuration (Twilio)

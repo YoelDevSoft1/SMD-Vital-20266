@@ -118,6 +118,9 @@ export class QueueService {
           case 'payment-confirmation':
             await emailService.sendPaymentConfirmation(to, data.firstName, data.payment);
             break;
+          case 'clinical-documents':
+            await emailService.sendClinicalDocuments(to, data.firstName, data.appointment, data.documents);
+            break;
           default:
             throw new Error(`Unknown email template: ${template}`);
         }
@@ -260,6 +263,27 @@ export class QueueService {
       logger.error('Failed to add email job:', error);
       throw error;
     }
+  }
+
+  /**
+   * Add clinical documents email job to queue
+   */
+  public static async addClinicalDocumentsJob(data: {
+    to: string;
+    firstName: string;
+    appointment: any;
+    documents: Array<{ fileName: string; filePath: string }>;
+  }, options?: Bull.JobOptions): Promise<Bull.Job> {
+    return this.addEmailJob({
+      to: data.to,
+      subject: 'Documentos clinicos de tu cita - SMD Vital',
+      template: 'clinical-documents',
+      data: {
+        firstName: data.firstName,
+        appointment: data.appointment,
+        documents: data.documents
+      }
+    }, options);
   }
 
   /**

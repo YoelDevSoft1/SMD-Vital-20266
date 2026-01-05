@@ -72,6 +72,9 @@ export const adminService = {
       isAvailable,
     }),
 
+  updateDoctorMedia: (id: string, data: { logoPath?: string; signaturePath?: string }) =>
+    api.patch<ApiResponse<Doctor>>(`/admin-panel/doctors/${id}/media`, data),
+
   deleteDoctor: (id: string) =>
     api.delete<ApiResponse<null>>(`/admin-panel/doctors/${id}`),
 

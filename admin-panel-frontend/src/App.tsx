@@ -12,10 +12,31 @@ import Services from './pages/Services';
 import Reviews from './pages/Reviews';
 import Analytics from './pages/Analytics';
 import SystemHealth from './pages/SystemHealth';
+import DoctorDashboard from './pages/DoctorDashboard';
+import DoctorAppointments from './pages/DoctorAppointments';
+import PatientDashboard from './pages/PatientDashboard';
+import PatientHistory from './pages/PatientHistory';
+import type { UserRole } from './types';
+import { getHomePath } from './utils/roles';
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuthStore();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+function RoleRoute({
+  children,
+  allowedRoles,
+}: {
+  children: React.ReactNode;
+  allowedRoles: UserRole[];
+}) {
+  const { isAuthenticated, user } = useAuthStore();
+
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to={getHomePath(user.role)} replace />;
+  }
+
+  return <>{children}</>;
 }
 
 export default function App() {
@@ -26,9 +47,9 @@ export default function App() {
       <Route
         path="/"
         element={
-          <PrivateRoute>
+          <RoleRoute allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
             <DashboardLayout />
-          </PrivateRoute>
+          </RoleRoute>
         }
       >
         <Route index element={<Dashboard />} />
@@ -41,6 +62,32 @@ export default function App() {
         <Route path="analytics" element={<Analytics />} />
         <Route path="system" element={<SystemHealth />} />
       </Route>
+
+      <Route
+        path="/doctor"
+        element={
+          <RoleRoute allowedRoles={['DOCTOR', 'NURSE']}>
+            <DashboardLayout />
+          </RoleRoute>
+        }
+      >
+        <Route index element={<DoctorDashboard />} />
+        <Route path="appointments" element={<DoctorAppointments />} />
+      </Route>
+
+      <Route
+        path="/patient"
+        element={
+          <RoleRoute allowedRoles={['PATIENT']}>
+            <DashboardLayout />
+          </RoleRoute>
+        }
+      >
+        <Route index element={<PatientDashboard />} />
+        <Route path="history" element={<PatientHistory />} />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

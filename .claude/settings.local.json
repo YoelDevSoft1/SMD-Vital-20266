@@ -12,7 +12,10 @@
       "Bash(curl:*)",
       "Bash(node:*)",
       "Read(//c/**)",
-      "Bash(npm run db:seed:*)"
+      "Bash(npm run db:seed:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker logs:*)"
     ],
     "deny": [],
     "ask": []

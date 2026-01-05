@@ -5,6 +5,7 @@ import {
   Briefcase,
   Calendar,
   CreditCard,
+  FileText,
   LayoutDashboard,
   LifeBuoy,
   Star,
@@ -12,8 +13,17 @@ import {
   Users,
   X,
 } from 'lucide-react';
+import { useAuthStore } from '@/store/auth.store';
+import type { UserRole } from '@/types';
 
-const navItems = [
+type NavItem = {
+  to: string;
+  icon: typeof LayoutDashboard;
+  label: string;
+  description: string;
+};
+
+const adminNavItems: NavItem[] = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', description: 'Resumen general y métricas clave' },
   { to: '/users', icon: Users, label: 'Usuarios', description: 'Gestión de pacientes y administradores' },
   { to: '/doctors', icon: Stethoscope, label: 'Doctores', description: 'Control de profesionales activos' },
@@ -25,6 +35,46 @@ const navItems = [
   { to: '/system', icon: Activity, label: 'Sistema', description: 'Salud de la plataforma' },
 ];
 
+const doctorNavItems: NavItem[] = [
+  { to: '/doctor', icon: LayoutDashboard, label: 'Panel clinico', description: 'Resumen de tu jornada' },
+  { to: '/doctor/appointments', icon: Calendar, label: 'Citas asignadas', description: 'Agenda y atenciones activas' },
+];
+
+const patientNavItems: NavItem[] = [
+  { to: '/patient', icon: LayoutDashboard, label: 'Mi resumen', description: 'Citas y recordatorios' },
+  { to: '/patient/history', icon: FileText, label: 'Mi historial', description: 'Documentos y recetas' },
+];
+
+type SidebarConfig = {
+  title: string;
+  subtitle: string;
+  navItems: NavItem[];
+};
+
+const getSidebarConfig = (role?: UserRole | null): SidebarConfig => {
+  if (role === 'DOCTOR' || role === 'NURSE') {
+    return {
+      title: 'Panel Clinico',
+      subtitle: 'Gestiona tus atenciones y registros clinicos',
+      navItems: doctorNavItems,
+    };
+  }
+
+  if (role === 'PATIENT') {
+    return {
+      title: 'Portal del paciente',
+      subtitle: 'Consulta tus citas y documentos clinicos',
+      navItems: patientNavItems,
+    };
+  }
+
+  return {
+    title: 'Panel Medico',
+    subtitle: 'Controla la operacion clinica en tiempo real',
+    navItems: adminNavItems,
+  };
+};
+
 type SidebarProps = {
   isOpen: boolean;
   isDesktop: boolean;
@@ -32,6 +82,10 @@ type SidebarProps = {
 };
 
 export default function Sidebar({ isOpen, isDesktop, onClose }: SidebarProps) {
+  const { user } = useAuthStore();
+  const { title, subtitle, navItems } = getSidebarConfig(user?.role);
+  const rootPaths = new Set(['/', '/doctor', '/patient']);
+
   return (
     <aside
       className={`fixed inset-y-0 left-0 z-40 w-72 transform overflow-hidden bg-white/10 px-4 py-6 shadow-[0_40px_120px_-60px_rgba(56,189,248,0.45)] backdrop-blur-2xl transition-transform duration-300 ease-out dark:bg-slate-900/70 dark:shadow-[0_45px_140px_-65px_rgba(8,47,73,0.55)] lg:static lg:inset-auto lg:h-screen lg:w-80 lg:translate-x-0 lg:bg-white/12 lg:px-8 lg:py-10 lg:shadow-none dark:lg:bg-slate-900/75 ${
@@ -51,9 +105,9 @@ export default function Sidebar({ isOpen, isDesktop, onClose }: SidebarProps) {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-100 lg:text-blue-500 dark:text-cyan-200">
               SMD Vital
             </p>
-            <h1 className="mt-2 text-2xl font-semibold text-white lg:text-slate-900 dark:text-white">Panel Médico</h1>
+            <h1 className="mt-2 text-2xl font-semibold text-white lg:text-slate-900 dark:text-white">{title}</h1>
             <p className="mt-1 text-sm text-white/70 lg:text-slate-600 dark:text-slate-300">
-              Controla la operación clínica en tiempo real
+              {subtitle}
             </p>
           </div>
           {!isDesktop && (
@@ -73,7 +127,7 @@ export default function Sidebar({ isOpen, isDesktop, onClose }: SidebarProps) {
             <NavLink
               key={to}
               to={to}
-              end={to === '/'}
+              end={rootPaths.has(to)}
               onClick={() => {
                 if (!isDesktop) {
                   onClose();

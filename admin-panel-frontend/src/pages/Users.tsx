@@ -20,7 +20,7 @@ import {
 import { adminService } from '@/services/admin.service';
 import { User, UserFilters, UserRole } from '@/types';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CreateUserForm from '@/components/CreateUserForm';
 import UserDetailsView from '@/components/UserDetailsView';

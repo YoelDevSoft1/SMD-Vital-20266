@@ -7,7 +7,6 @@ export interface RegisterCredentials {
   firstName: string;
   lastName: string;
   phone?: string;
-  role: 'ADMIN' | 'SUPER_ADMIN';
 }
 
 export const authService = {

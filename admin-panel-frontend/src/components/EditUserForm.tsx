@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from './ui/Button';
-import { Input } from './ui/Input';
+import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Switch } from './ui/switch';
+import { Switch } from './ui/Switch';
 import { adminService } from '../services/admin.service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';

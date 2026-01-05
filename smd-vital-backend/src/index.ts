@@ -28,6 +28,7 @@ import reviewRoutes from './routes/review.routes';
 import notificationRoutes from './routes/notification.routes';
 import adminRoutes from './routes/admin.routes';
 import adminPanelRoutes from './routes/admin-panel.routes';
+import clinicalRoutes from './routes/clinical.routes';
 
 // Import services
 import { SocketService } from './services/socket.service';
@@ -191,6 +192,7 @@ class SMDVitalServer {
     this.app.use('/api/v1/notifications', notificationRoutes);
     this.app.use('/api/v1/admin', adminRoutes);
     this.app.use('/api/v1/admin-panel', adminPanelRoutes);
+    this.app.use('/api/v1/clinical', clinicalRoutes);
 
     // Swagger API Documentation
     this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {

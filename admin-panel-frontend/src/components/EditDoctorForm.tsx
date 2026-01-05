@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from './ui/Button';
-import { Input } from './ui/Input';
+import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { adminService } from '../services/admin.service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+import { Upload, Image as ImageIcon } from 'lucide-react';
 import { Doctor } from '@/types';
 
 interface EditDoctorFormProps {
@@ -45,7 +46,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
     phone: doctor.user.phone || '',
     isActive: doctor.user.isActive,
     isVerified: doctor.user.isVerified,
-    
+
     // Doctor specific data
     licenseNumber: doctor.licenseNumber,
     specialty: doctor.specialty,
@@ -53,9 +54,17 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
     consultationFee: doctor.consultationFee,
     bio: doctor.bio || '',
     isAvailable: doctor.isAvailable,
+    logoPath: doctor.logoPath || '',
+    signaturePath: doctor.signaturePath || '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [signatureFile, setSignatureFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const signatureInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   const updateDoctorMutation = useMutation({
@@ -70,11 +79,54 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
     },
   });
 
+  const uploadMediaMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await fetch(`/api/v1/admin-panel/doctors/${doctor.id}/upload-media`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al subir archivos');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['doctors'] });
+      toast.success('Archivos subidos exitosamente');
+      setLogoFile(null);
+      setSignatureFile(null);
+      setLogoPreview(null);
+      setSignaturePreview(null);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Error al subir archivos');
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      // First, upload files if any
+      if (logoFile || signatureFile) {
+        const formData = new FormData();
+        if (logoFile) {
+          formData.append('logo', logoFile);
+        }
+        if (signatureFile) {
+          formData.append('signature', signatureFile);
+        }
+        await uploadMediaMutation.mutateAsync(formData);
+      }
+
+      // Then update doctor data
       await updateDoctorMutation.mutateAsync(formData);
     } catch (error) {
       console.error('Error updating doctor:', error);
@@ -88,6 +140,30 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSignatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSignatureFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSignaturePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -204,6 +280,128 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
           disabled={isSubmitting}
           placeholder="Breve descripción profesional..."
         />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="logo">Logo del Doctor</Label>
+          <div className="mt-2">
+            <input
+              ref={logoInputRef}
+              type="file"
+              id="logo"
+              accept="image/*"
+              onChange={handleLogoChange}
+              disabled={isSubmitting}
+              className="hidden"
+            />
+            {logoPreview || formData.logoPath ? (
+              <div className="space-y-2">
+                <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
+                  {logoPreview ? (
+                    <img
+                      src={logoPreview}
+                      alt="Logo preview"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-gray-50">
+                      <ImageIcon className="h-12 w-12 text-gray-400" />
+                    </div>
+                  )}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => logoInputRef.current?.click()}
+                  disabled={isSubmitting}
+                  className="w-full"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Cambiar Logo
+                </Button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => logoInputRef.current?.click()}
+                disabled={isSubmitting}
+                className="w-full h-32 border-2 border-dashed"
+              >
+                <div className="flex flex-col items-center">
+                  <Upload className="h-8 w-8 mb-2 text-gray-400" />
+                  <span className="text-sm text-gray-600">Subir Logo</span>
+                  <span className="text-xs text-gray-400 mt-1">PNG, JPG hasta 10MB</span>
+                </div>
+              </Button>
+            )}
+            {formData.logoPath && !logoPreview && (
+              <p className="text-xs text-gray-500 mt-1">Actual: {formData.logoPath}</p>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="signature">Firma del Doctor</Label>
+          <div className="mt-2">
+            <input
+              ref={signatureInputRef}
+              type="file"
+              id="signature"
+              accept="image/*"
+              onChange={handleSignatureChange}
+              disabled={isSubmitting}
+              className="hidden"
+            />
+            {signaturePreview || formData.signaturePath ? (
+              <div className="space-y-2">
+                <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
+                  {signaturePreview ? (
+                    <img
+                      src={signaturePreview}
+                      alt="Signature preview"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-gray-50">
+                      <ImageIcon className="h-12 w-12 text-gray-400" />
+                    </div>
+                  )}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => signatureInputRef.current?.click()}
+                  disabled={isSubmitting}
+                  className="w-full"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Cambiar Firma
+                </Button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => signatureInputRef.current?.click()}
+                disabled={isSubmitting}
+                className="w-full h-32 border-2 border-dashed"
+              >
+                <div className="flex flex-col items-center">
+                  <Upload className="h-8 w-8 mb-2 text-gray-400" />
+                  <span className="text-sm text-gray-600">Subir Firma</span>
+                  <span className="text-xs text-gray-400 mt-1">PNG, JPG hasta 10MB</span>
+                </div>
+              </Button>
+            )}
+            {formData.signaturePath && !signaturePreview && (
+              <p className="text-xs text-gray-500 mt-1">Actual: {formData.signaturePath}</p>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="space-y-4">

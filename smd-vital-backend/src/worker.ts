@@ -58,7 +58,7 @@ class Worker {
         logger.info('✅ All queues closed');
 
         // Close Redis connection
-        await RedisService.quit();
+        await RedisService.disconnect();
         logger.info('✅ Redis connection closed');
 
         // Close Prisma connection

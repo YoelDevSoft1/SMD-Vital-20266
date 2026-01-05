@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { authService, RegisterCredentials } from '@/services/auth.service';
 import { useAuthStore } from '@/store/auth.store';
+import { getHomePath } from '@/utils/roles';
 import toast from 'react-hot-toast';
 import {
   Eye,
@@ -13,7 +14,6 @@ import {
   Stethoscope,
   UserPlus,
   Users,
-  ChevronDown,
 } from 'lucide-react';
 
 export default function Register() {
@@ -23,7 +23,6 @@ export default function Register() {
     firstName: '',
     lastName: '',
     phone: '',
-    role: 'ADMIN',
   });
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -38,8 +37,8 @@ export default function Register() {
     onSuccess: (response) => {
       const { user, accessToken } = response.data.data;
       setAuth(user, accessToken);
-      toast.success('Registro exitoso. Bienvenido al panel de administración.');
-      navigate('/');
+      toast.success('Registro exitoso. Bienvenido a SMD Vital.');
+      navigate(getHomePath(user.role));
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al crear la cuenta';
@@ -51,18 +50,18 @@ export default function Register() {
     () => [
       {
         icon: ShieldCheck,
-        title: 'Accesos verificados',
-        description: 'Roles y permisos granulares para resguardar la información clínica crítica.',
+        title: 'Acceso seguro',
+        description: 'Protege tu informacion clinica con una cuenta verificada.',
       },
       {
         icon: Users,
-        title: 'Colaboración coordinada',
-        description: 'Asigna tareas y monitorea el rendimiento del equipo desde un mismo panel.',
+        title: 'Atencion conectada',
+        description: 'Mantente al dia con el equipo medico y tus citas.',
       },
       {
         icon: Sparkles,
-        title: 'Experiencia intuitiva',
-        description: 'Flujos guiados y métricas claras para tomar decisiones con rapidez.',
+        title: 'Historial centralizado',
+        description: 'Accede a tus registros y documentos clinicos en un solo lugar.',
       },
     ],
     []
@@ -100,10 +99,6 @@ export default function Register() {
       newErrors.confirmPassword = 'Las contraseñas no coinciden';
     }
 
-    if (!formData.role) {
-      newErrors.role = 'Selecciona un rol';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -139,17 +134,16 @@ export default function Register() {
             <div className="inline-flex w-full max-w-xs items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur">
               <UserPlus className="h-5 w-5 text-cyan-300" />
               <span className="text-sm tracking-wide text-white/80">
-                Convierte a tu equipo en administradores confiables
+                Crea tu cuenta de paciente en minutos
               </span>
             </div>
 
             <div className="space-y-4">
               <h1 className="text-3xl font-semibold leading-tight text-white sm:text-4xl lg:text-5xl">
-                Suma talento a un panel administrativo transparente y seguro
+                Tu salud organizada en un solo panel
               </h1>
               <p className="text-base text-white/70 sm:text-lg">
-                Establece accesos de alto nivel, ejecuta operaciones críticas y brinda seguimiento
-                oportuno a tus pacientes desde una experiencia unificada.
+                Registra tu cuenta para ver tus citas, resultados y documentos clinicos.
               </p>
             </div>
 
@@ -199,11 +193,10 @@ export default function Register() {
                       <Stethoscope className="relative h-9 w-9 text-cyan-200" />
                     </div>
                     <h2 className="mt-6 text-3xl font-semibold text-white sm:text-3xl">
-                      Crear cuenta administrativa
+                      Crear cuenta de paciente
                     </h2>
                     <p className="mt-2 max-w-sm text-sm text-white/60">
-                      Acceso exclusivo para perfiles autorizados. Configura permisos avanzados desde
-                      el primer inicio.
+                      Completa tus datos y accede a tus servicios de salud.
                     </p>
                   </div>
 
@@ -248,7 +241,7 @@ export default function Register() {
 
                     <div className="space-y-2">
                       <label htmlFor="email" className="text-sm font-medium text-white/80">
-                        Correo corporativo
+                        Correo electronico
                       </label>
                       <div className="group relative rounded-2xl border border-white/10 bg-slate-950/60">
                         <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/15 via-cyan-400/10 to-transparent opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100" />
@@ -258,56 +251,28 @@ export default function Register() {
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
                           className="relative z-10 w-full rounded-2xl bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-0"
-                          placeholder="admin@smdvital.com"
+                          placeholder="paciente@smdvital.com"
                           autoComplete="email"
                         />
                       </div>
                       {errors.email && <p className="text-xs text-rose-300">{errors.email}</p>}
                     </div>
 
-                    <div className="grid gap-4 sm:grid-cols-[1.1fr,0.9fr]">
-                      <div className="space-y-2">
-                        <label htmlFor="phone" className="text-sm font-medium text-white/80">
-                          Teléfono (opcional)
-                        </label>
-                        <div className="group relative rounded-2xl border border-white/10 bg-slate-950/60">
-                          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/15 via-cyan-400/10 to-transparent opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100" />
-                          <input
-                            id="phone"
-                            type="tel"
-                            value={formData.phone}
-                            onChange={(e) => handleInputChange('phone', e.target.value)}
-                            className="relative z-10 w-full rounded-2xl bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-0"
-                            placeholder="+57 300 123 4567"
-                            autoComplete="tel"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label htmlFor="role" className="text-sm font-medium text-white/80">
-                          Rol asignado
-                        </label>
-                        <div className="group relative rounded-2xl border border-white/10 bg-slate-950/60">
-                          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/15 via-blue-400/10 to-transparent opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100" />
-                          <select
-                            id="role"
-                            value={formData.role}
-                            onChange={(e) =>
-                              handleInputChange('role', e.target.value as 'ADMIN' | 'SUPER_ADMIN')
-                            }
-                            className="relative z-10 w-full appearance-none rounded-2xl bg-transparent px-4 py-3 pr-10 text-white focus:outline-none focus-visible:ring-0"
-                          >
-                            <option className="bg-slate-900 text-white" value="ADMIN">
-                              Administrador
-                            </option>
-                            <option className="bg-slate-900 text-white" value="SUPER_ADMIN">
-                              Super Administrador
-                            </option>
-                          </select>
-                          <ChevronDown className="pointer-events-none absolute right-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-white/60 transition group-focus-within:text-white" />
-                        </div>
-                        {errors.role && <p className="text-xs text-rose-300">{errors.role}</p>}
+                    <div className="space-y-2">
+                      <label htmlFor="phone" className="text-sm font-medium text-white/80">
+                        Telefono (opcional)
+                      </label>
+                      <div className="group relative rounded-2xl border border-white/10 bg-slate-950/60">
+                        <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/15 via-cyan-400/10 to-transparent opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100" />
+                        <input
+                          id="phone"
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => handleInputChange('phone', e.target.value)}
+                          className="relative z-10 w-full rounded-2xl bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-0"
+                          placeholder="+57 300 123 4567"
+                          autoComplete="tel"
+                        />
                       </div>
                     </div>
 

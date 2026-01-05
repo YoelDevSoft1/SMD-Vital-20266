@@ -23,7 +23,7 @@ import {
 import { adminService } from '@/services/admin.service';
 import { Doctor, DoctorFilters } from '@/types';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CreateDoctorForm from '@/components/CreateDoctorForm';
 import DoctorDetailsView from '@/components/DoctorDetailsView';

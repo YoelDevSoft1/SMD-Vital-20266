@@ -58,6 +58,7 @@ export const authMiddleware = async (
         role: true,
         isActive: true,
         isVerified: true,
+        isPlaceholder: true,
         avatar: true,
         createdAt: true,
         updatedAt: true
@@ -168,6 +169,7 @@ export const optionalAuth = async (
         role: true,
         isActive: true,
         isVerified: true,
+        isPlaceholder: true,
         avatar: true,
         createdAt: true,
         updatedAt: true

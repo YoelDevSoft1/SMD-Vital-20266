@@ -2,16 +2,41 @@ import { Bell, LogOut, Menu, Sparkles, User, Moon, Sun } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/context/theme';
+import type { UserRole } from '@/types';
 
 type HeaderProps = {
   onToggleSidebar: () => void;
 };
 
-const ROLE_LABELS: Record<string, string> = {
+const ROLE_LABELS: Record<UserRole, string> = {
   SUPER_ADMIN: 'Super Administrador',
   ADMIN: 'Administrador',
-  ANALYST: 'Analista',
-  SUPPORT: 'Soporte',
+  DOCTOR: 'Medico',
+  NURSE: 'Enfermeria',
+  PATIENT: 'Paciente',
+};
+
+const HEADER_COPY: Record<UserRole, { badge: string; subtitle: string }> = {
+  SUPER_ADMIN: {
+    badge: 'Panel Operativo',
+    subtitle: 'Controla la operacion medica con insights en tiempo real',
+  },
+  ADMIN: {
+    badge: 'Panel Operativo',
+    subtitle: 'Controla la operacion medica con insights en tiempo real',
+  },
+  DOCTOR: {
+    badge: 'Panel Clinico',
+    subtitle: 'Organiza tu agenda y registra atenciones clinicas',
+  },
+  NURSE: {
+    badge: 'Panel Clinico',
+    subtitle: 'Registra signos vitales y soporte clinico',
+  },
+  PATIENT: {
+    badge: 'Mi salud',
+    subtitle: 'Revisa tus citas y documentos clinicos',
+  },
 };
 
 export default function Header({ onToggleSidebar }: HeaderProps) {
@@ -25,7 +50,8 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
   };
 
   const roleLabel =
-    (user?.role && ROLE_LABELS[user.role]) ?? user?.role ?? 'Administrador';
+    (user?.role && ROLE_LABELS[user.role]) ?? user?.role ?? 'Usuario';
+  const headerCopy = user?.role ? HEADER_COPY[user.role] : HEADER_COPY.ADMIN;
 
   return (
     <header className="relative z-20 flex h-20 items-center justify-between overflow-hidden border-b border-white/10 bg-white/12 px-4 backdrop-blur-2xl sm:px-6 lg:px-8 dark:border-white/5 dark:bg-slate-900/70">
@@ -48,13 +74,13 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         <div className="hidden sm:flex sm:flex-col">
           <span className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-white/80 lg:text-cyan-500">
             <Sparkles className="h-3.5 w-3.5" />
-            Panel Operativo
+            {headerCopy.badge}
           </span>
           <h2 className="text-lg font-semibold text-white lg:text-slate-900 dark:text-white">
-            Bienvenido{user?.firstName ? `, ${user.firstName}` : ''} 👋
+            Bienvenido{user?.firstName ? `, ${user.firstName}` : ''}
           </h2>
           <p className="text-xs text-white/70 lg:text-slate-500 dark:text-slate-300">
-            Controla tu operación médica con insights en tiempo real
+            {headerCopy.subtitle}
           </p>
         </div>
       </div>

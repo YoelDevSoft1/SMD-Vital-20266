@@ -480,6 +480,121 @@ export class AdminPanelController {
   };
 
   /**
+   * @desc    Update doctor media (logo and signature)
+   * @route   PATCH /api/v1/admin-panel/doctors/:id/media
+   * @access  Private/Admin
+   */
+  public updateDoctorMedia = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { logoPath, signaturePath } = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Doctor ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const doctor = await this.adminService.updateDoctorMedia(id, { logoPath, signaturePath });
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Doctor media updated successfully',
+        data: doctor,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error updating doctor media:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error updating doctor media',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Upload doctor media files (logo and signature)
+   * @route   POST /api/v1/admin-panel/doctors/:id/upload-media
+   * @access  Private/Admin
+   */
+  public uploadDoctorMediaFiles = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Doctor ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const updateData: { logoPath?: string; signaturePath?: string } = {};
+
+      // Process uploaded logo
+      if (files['logo'] && files['logo'][0]) {
+        const logoFile = files['logo'][0];
+        // Store relative path from uploads directory
+        updateData.logoPath = `doctors/logos/${logoFile.filename}`;
+      }
+
+      // Process uploaded signature
+      if (files['signature'] && files['signature'][0]) {
+        const signatureFile = files['signature'][0];
+        // Store relative path from uploads directory
+        updateData.signaturePath = `doctors/signatures/${signatureFile.filename}`;
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        res.status(400).json({
+          success: false,
+          message: 'No files uploaded. Please provide logo or signature file',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const doctor = await this.adminService.updateDoctorMedia(id, updateData);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Doctor media files uploaded successfully',
+        data: {
+          doctor,
+          uploadedFiles: updateData
+        },
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error uploading doctor media files:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error uploading doctor media files',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
    * @desc    Delete doctor
    * @route   DELETE /api/v1/admin-panel/doctors/:id
    * @access  Private/Admin
@@ -1204,6 +1319,259 @@ export class AdminPanelController {
       res.status(500).json({
         success: false,
         message: 'Error fetching services',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Get service details by ID
+   * @route   GET /api/v1/admin-panel/services/:id
+   * @access  Private/Admin
+   */
+  public getServiceDetails = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Service ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const service = await this.adminService.getServiceDetails(id);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Service details retrieved successfully',
+        data: service,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching service details:', error);
+      res.status(404).json({
+        success: false,
+        message: error.message || 'Service not found',
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Create new service
+   * @route   POST /api/v1/admin-panel/services
+   * @access  Private/Admin
+   */
+  public createService = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { name, description, category, basePrice, duration, isActive, requirements } = req.body;
+
+      if (!name || !description || !category) {
+        res.status(400).json({
+          success: false,
+          message: 'Name, description, and category are required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const parsedBasePrice = Number(basePrice);
+      const parsedDuration = Number(duration);
+
+      if (!Number.isFinite(parsedBasePrice) || parsedBasePrice <= 0) {
+        res.status(400).json({
+          success: false,
+          message: 'Base price must be a positive number',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      if (!Number.isFinite(parsedDuration) || parsedDuration <= 0) {
+        res.status(400).json({
+          success: false,
+          message: 'Duration must be a positive number',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const service = await this.adminService.createService({
+        name,
+        description,
+        category,
+        basePrice: parsedBasePrice,
+        duration: parsedDuration,
+        isActive: isActive !== undefined ? isActive : true,
+        requirements: requirements ?? null
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Service created successfully',
+        data: service,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(201).json(response);
+    } catch (error: any) {
+      logger.error('Error creating service:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error creating service',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Update service
+   * @route   PUT /api/v1/admin-panel/services/:id
+   * @access  Private/Admin
+   */
+  public updateService = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { name, description, category, basePrice, duration, isActive, requirements } = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Service ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const updateData: {
+        name?: string;
+        description?: string;
+        category?: string;
+        basePrice?: number;
+        duration?: number;
+        isActive?: boolean;
+        requirements?: string | null;
+      } = {};
+
+      if (name !== undefined) updateData.name = name;
+      if (description !== undefined) updateData.description = description;
+      if (category !== undefined) updateData.category = category;
+      if (isActive !== undefined) updateData.isActive = isActive;
+      if (requirements !== undefined) updateData.requirements = requirements ?? null;
+
+      if (basePrice !== undefined) {
+        const parsedBasePrice = Number(basePrice);
+        if (!Number.isFinite(parsedBasePrice) || parsedBasePrice <= 0) {
+          res.status(400).json({
+            success: false,
+            message: 'Base price must be a positive number',
+            timestamp: new Date().toISOString(),
+            requestId: req.id || 'unknown'
+          });
+          return;
+        }
+        updateData.basePrice = parsedBasePrice;
+      }
+
+      if (duration !== undefined) {
+        const parsedDuration = Number(duration);
+        if (!Number.isFinite(parsedDuration) || parsedDuration <= 0) {
+          res.status(400).json({
+            success: false,
+            message: 'Duration must be a positive number',
+            timestamp: new Date().toISOString(),
+            requestId: req.id || 'unknown'
+          });
+          return;
+        }
+        updateData.duration = parsedDuration;
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        res.status(400).json({
+          success: false,
+          message: 'No valid fields provided to update',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const service = await this.adminService.updateService(id, updateData);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Service updated successfully',
+        data: service,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error updating service:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error updating service',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  /**
+   * @desc    Delete service
+   * @route   DELETE /api/v1/admin-panel/services/:id
+   * @access  Private/Admin
+   */
+  public deleteService = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Service ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      await this.adminService.deleteService(id);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Service deleted successfully',
+        data: null,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error deleting service:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Error deleting service',
         error: error.message,
         timestamp: new Date().toISOString(),
         requestId: req.id || 'unknown'

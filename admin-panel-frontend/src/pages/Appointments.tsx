@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppointmentsModal from '@/components/AppointmentsModal';
 import CreateAppointmentForm from '@/components/CreateAppointmentForm';

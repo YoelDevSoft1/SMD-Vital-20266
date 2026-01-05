@@ -23,11 +23,16 @@ export class AuthService {
     try {
       // Check if user already exists
       const existingUser = await prisma.user.findUnique({
-        where: { email: data.email }
+        where: { email: data.email },
+        include: { patient: true }
       });
 
-      if (existingUser) {
+      if (existingUser && !existingUser.isPlaceholder) {
         throw new Error('User with this email already exists');
+      }
+
+      if (existingUser && existingUser.role !== 'PATIENT') {
+        throw new Error('Email is already associated with another account type');
       }
 
       // Check if phone is provided and unique
@@ -36,7 +41,7 @@ export class AuthService {
           where: { phone: data.phone }
         });
 
-        if (existingPhone) {
+        if (existingPhone && existingPhone.id !== existingUser?.id) {
           throw new Error('User with this phone number already exists');
         }
       }
@@ -44,29 +49,80 @@ export class AuthService {
       // Hash password
       const hashedPassword = await bcrypt.hash(data.password, config.security.bcryptRounds);
 
-      // Create user
-      const user = await prisma.user.create({
-        data: {
-          email: data.email,
-          password: hashedPassword,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phone: data.phone || null,
-          role: data.role || 'PATIENT'
-        },
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-          phone: true,
-          role: true,
-          isActive: true,
-          isVerified: true,
-          avatar: true,
-          createdAt: true,
-          updatedAt: true
+      // Create or claim placeholder user (public registration always creates PATIENT users)
+      const user = await prisma.$transaction(async (tx) => {
+        if (existingUser && existingUser.isPlaceholder) {
+          const updatedUser = await tx.user.update({
+            where: { id: existingUser.id },
+            data: {
+              email: data.email,
+              password: hashedPassword,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              phone: data.phone ?? existingUser.phone ?? null,
+              role: 'PATIENT',
+              isActive: true,
+              isPlaceholder: false
+            },
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+              phone: true,
+              role: true,
+              isActive: true,
+              isVerified: true,
+              isPlaceholder: true,
+              avatar: true,
+              createdAt: true,
+              updatedAt: true
+            }
+          });
+
+          if (!existingUser.patient) {
+            await tx.patient.create({
+              data: {
+                userId: existingUser.id
+              }
+            });
+          }
+
+          return updatedUser;
         }
+
+        const createdUser = await tx.user.create({
+          data: {
+            email: data.email,
+            password: hashedPassword,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phone: data.phone || null,
+            role: 'PATIENT'
+          },
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            role: true,
+            isActive: true,
+            isVerified: true,
+            isPlaceholder: true,
+            avatar: true,
+            createdAt: true,
+            updatedAt: true
+          }
+        });
+
+        await tx.patient.create({
+          data: {
+            userId: createdUser.id
+          }
+        });
+
+        return createdUser;
       });
 
       // Generate tokens
@@ -139,6 +195,7 @@ export class AuthService {
           role: user.role,
           isActive: user.isActive,
           isVerified: user.isVerified,
+          isPlaceholder: user.isPlaceholder,
           avatar: user.avatar,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
@@ -177,6 +234,7 @@ export class AuthService {
           role: true,
           isActive: true,
           isVerified: true,
+          isPlaceholder: true,
           avatar: true,
           createdAt: true,
           updatedAt: true
@@ -233,6 +291,7 @@ export class AuthService {
           role: true,
           isActive: true,
           isVerified: true,
+          isPlaceholder: true,
           avatar: true,
           createdAt: true,
           updatedAt: true,
@@ -307,6 +366,7 @@ export class AuthService {
           role: true,
           isActive: true,
           isVerified: true,
+          isPlaceholder: true,
           avatar: true,
           createdAt: true,
           updatedAt: true

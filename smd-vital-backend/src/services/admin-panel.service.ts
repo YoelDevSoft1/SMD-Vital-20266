@@ -800,6 +800,46 @@ export class AdminPanelService {
   }
 
   /**
+   * Update doctor media (logo and signature)
+   */
+  public async updateDoctorMedia(id: string, mediaData: {
+    logoPath?: string;
+    signaturePath?: string;
+  }) {
+    try {
+      const updateData: any = {};
+
+      if (mediaData.logoPath !== undefined) {
+        updateData.logoPath = mediaData.logoPath;
+      }
+
+      if (mediaData.signaturePath !== undefined) {
+        updateData.signaturePath = mediaData.signaturePath;
+      }
+
+      const doctor = await prisma.doctor.update({
+        where: { id },
+        data: updateData,
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+            }
+          }
+        }
+      });
+
+      return doctor;
+    } catch (error) {
+      logger.error('Error updating doctor media:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Delete doctor
    */
   public async deleteDoctor(id: string) {
@@ -1039,6 +1079,15 @@ export class AdminPanelService {
                 }
               }
             },
+            assignedNurse: {
+              select: {
+                id: true,
+                email: true,
+                firstName: true,
+                lastName: true,
+                phone: true
+              }
+            },
             service: true,
             payments: true
           }
@@ -1074,7 +1123,8 @@ export class AdminPanelService {
           patient: { include: { user: true } },
           doctor: { include: { user: true } },
           service: true,
-          payments: true
+          payments: true,
+          assignedNurse: true
         }
       });
 
@@ -1108,12 +1158,14 @@ export class AdminPanelService {
           totalPrice: data.totalPrice,
           address: data.address,
           city: data.city,
-          coordinates: data.coordinates ?? null
+          coordinates: data.coordinates ?? null,
+          assignedNurseId: data.assignedNurseId ?? null
         },
         include: {
           patient: { include: { user: true } },
           doctor: { include: { user: true } },
-          service: true
+          service: true,
+          assignedNurse: true
         }
       });
 
@@ -1144,6 +1196,7 @@ export class AdminPanelService {
       if (data.address !== undefined) updateData.address = data.address;
       if (data.city !== undefined) updateData.city = data.city;
       if (data.coordinates !== undefined) updateData.coordinates = data.coordinates ?? null;
+      if (data.assignedNurseId !== undefined) updateData.assignedNurseId = data.assignedNurseId ?? null;
 
       // For relationship fields, we need to use connect
       if (data.patientId !== undefined) {
@@ -1162,7 +1215,8 @@ export class AdminPanelService {
         include: {
           patient: { include: { user: true } },
           doctor: { include: { user: true } },
-          service: true
+          service: true,
+          assignedNurse: true
         }
       });
 
@@ -1680,6 +1734,141 @@ export class AdminPanelService {
       };
     } catch (error) {
       logger.error('Error getting services:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get service details by ID
+   */
+  public async getServiceDetails(serviceId: string) {
+    try {
+      const service = await prisma.service.findUnique({
+        where: { id: serviceId },
+        include: {
+          _count: {
+            select: {
+              appointments: true,
+              doctorServices: true
+            }
+          }
+        }
+      });
+
+      if (!service) {
+        throw new Error('Service not found');
+      }
+
+      return service;
+    } catch (error) {
+      logger.error('Error fetching service details:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create new service
+   */
+  public async createService(data: {
+    name: string;
+    description: string;
+    category: string;
+    basePrice: number;
+    duration: number;
+    isActive?: boolean;
+    requirements?: string | null;
+  }) {
+    try {
+      const service = await prisma.service.create({
+        data: {
+          name: data.name,
+          description: data.description,
+          category: data.category as any,
+          basePrice: data.basePrice,
+          duration: data.duration,
+          isActive: data.isActive ?? true,
+          requirements: data.requirements ?? null
+        },
+        include: {
+          _count: {
+            select: {
+              appointments: true,
+              doctorServices: true
+            }
+          }
+        }
+      });
+
+      logger.info(`Service created: ${service.id}`);
+
+      return service;
+    } catch (error) {
+      logger.error('Error creating service:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update service
+   */
+  public async updateService(serviceId: string, data: {
+    name?: string;
+    description?: string;
+    category?: string;
+    basePrice?: number;
+    duration?: number;
+    isActive?: boolean;
+    requirements?: string | null;
+  }) {
+    try {
+      const updateData: any = {};
+
+      if (data.name !== undefined) updateData.name = data.name;
+      if (data.description !== undefined) updateData.description = data.description;
+      if (data.category !== undefined) updateData.category = data.category as any;
+      if (data.basePrice !== undefined) updateData.basePrice = data.basePrice;
+      if (data.duration !== undefined) updateData.duration = data.duration;
+      if (data.isActive !== undefined) updateData.isActive = data.isActive;
+      if (data.requirements !== undefined) {
+        updateData.requirements = data.requirements ? data.requirements : null;
+      }
+
+      const service = await prisma.service.update({
+        where: { id: serviceId },
+        data: updateData,
+        include: {
+          _count: {
+            select: {
+              appointments: true,
+              doctorServices: true
+            }
+          }
+        }
+      });
+
+      logger.info(`Service updated: ${serviceId}`);
+
+      return service;
+    } catch (error) {
+      logger.error('Error updating service:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete service
+   */
+  public async deleteService(serviceId: string) {
+    try {
+      await prisma.service.delete({
+        where: { id: serviceId }
+      });
+
+      logger.info(`Service deleted: ${serviceId}`);
+
+      return true;
+    } catch (error) {
+      logger.error('Error deleting service:', error);
       throw error;
     }
   }

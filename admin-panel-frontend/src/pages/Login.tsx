@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '@/services/auth.service';
 import { useAuthStore } from '@/store/auth.store';
+import { getHomePath } from '@/utils/roles';
 import toast from 'react-hot-toast';
 import {
   Loader2,
@@ -36,7 +37,7 @@ export default function Login() {
 
       setAuth(user, accessToken);
       toast.success('¡Bienvenido de nuevo!');
-      navigate('/');
+      navigate(getHomePath(user.role));
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Credenciales inválidas');

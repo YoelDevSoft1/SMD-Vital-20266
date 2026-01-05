@@ -32,6 +32,7 @@ export interface User {
   role: UserRole;
   isActive: boolean;
   isVerified: boolean;
+  isPlaceholder?: boolean;
   avatar?: string;
   createdAt: string | Date;
   updatedAt: string | Date;
@@ -144,6 +145,75 @@ export interface Appointment {
   payments?: Payment[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface VitalSign {
+  id: string;
+  recordedAt: string;
+  bpSys?: number | null;
+  bpDia?: number | null;
+  heartRate?: number | null;
+  respiratoryRate?: number | null;
+  temperature?: number | null;
+  spo2?: number | null;
+  weight?: number | null;
+  height?: number | null;
+  notes?: string | null;
+}
+
+export interface Encounter {
+  id: string;
+  status: string;
+  summary?: string | null;
+  finishedAt?: string | null;
+  vitals?: VitalSign[];
+}
+
+export interface MedicalRecord {
+  id: string;
+  title: string;
+  description: string;
+  type?: string | null;
+  doctorNotes?: string | null;
+  pdfPath?: string | null;
+  createdAt: string;
+  doctor?: {
+    user?: User;
+  };
+}
+
+export interface PrescriptionItem {
+  id: string;
+  medication: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  instructions?: string | null;
+}
+
+export interface Prescription {
+  id: string;
+  notes?: string | null;
+  status?: string | null;
+  pdfPath?: string | null;
+  createdAt: string;
+  doctor?: {
+    user?: User;
+  };
+  items?: PrescriptionItem[];
+}
+
+export interface ClinicalAppointment extends Appointment {
+  assignedNurse?: User | null;
+  encounter?: Encounter | null;
+}
+
+export interface PatientHistory {
+  id: string;
+  userId: string;
+  medicalRecords: MedicalRecord[];
+  prescriptions: Prescription[];
+  appointments: Appointment[];
 }
 
 // Service types

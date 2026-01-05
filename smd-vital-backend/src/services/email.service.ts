@@ -1,19 +1,84 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
+import fs from 'fs/promises';
+import path from 'path';
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
 
 export class EmailService {
-  private transporter: nodemailer.Transporter;
+  private transporter?: nodemailer.Transporter;
+  private resend?: Resend;
 
   constructor() {
-    this.transporter = nodemailer.createTransport({
-      host: config.email.smtp.host,
-      port: config.email.smtp.port,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: config.email.smtp.user,
-        pass: config.email.smtp.pass,
-      },
+    if (config.email.smtp.host && config.email.smtp.user && config.email.smtp.pass) {
+      this.transporter = nodemailer.createTransport({
+        host: config.email.smtp.host,
+        port: config.email.smtp.port,
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: config.email.smtp.user,
+          pass: config.email.smtp.pass,
+        },
+      });
+    }
+
+    if (config.email.resendApiKey) {
+      this.resend = new Resend(config.email.resendApiKey);
+    }
+
+    if (!this.transporter && !this.resend) {
+      logger.warn('Email service not configured - missing SMTP or Resend credentials');
+    }
+  }
+
+  private async sendEmail(options: {
+    to: string;
+    subject: string;
+    html: string;
+    attachments?: Array<{ filename: string; content: Buffer; contentType?: string }>;
+  }): Promise<void> {
+    const fromAddress = config.email.resendFrom || config.email.from;
+    if (!fromAddress) {
+      throw new Error('FROM_EMAIL or RESEND_FROM_EMAIL is required');
+    }
+
+    if (this.resend) {
+      const resendAttachments = options.attachments?.map((attachment) => {
+        const item: { filename: string; content: string; content_type?: string } = {
+          filename: attachment.filename,
+          content: attachment.content.toString('base64')
+        };
+        if (attachment.contentType) {
+          item.content_type = attachment.contentType;
+        }
+        return item;
+      });
+
+      const payload: Parameters<Resend['emails']['send']>[0] = {
+        from: fromAddress,
+        to: options.to,
+        subject: options.subject,
+        html: options.html
+      };
+
+      if (resendAttachments && resendAttachments.length > 0) {
+        payload.attachments = resendAttachments;
+      }
+
+      await this.resend.emails.send(payload);
+      return;
+    }
+
+    if (!this.transporter) {
+      throw new Error('Email service not configured');
+    }
+
+    await this.transporter.sendMail({
+      from: fromAddress,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      attachments: options.attachments,
     });
   }
 
@@ -22,14 +87,11 @@ export class EmailService {
    */
   public async sendVerificationEmail(email: string, firstName: string): Promise<void> {
     try {
-      const mailOptions = {
-        from: config.email.from,
+      await this.sendEmail({
         to: email,
         subject: 'Verifica tu cuenta - SMD Vital',
         html: this.getVerificationEmailTemplate(firstName)
-      };
-
-      await this.transporter.sendMail(mailOptions);
+      });
       logger.info('Verification email sent', { email });
     } catch (error: any) {
       logger.error('Failed to send verification email:', error);
@@ -51,7 +113,7 @@ export class EmailService {
         html: this.getPasswordResetEmailTemplate(firstName, resetUrl)
       };
 
-      await this.transporter.sendMail(mailOptions);
+      await this.sendEmail({ to: email, subject: mailOptions.subject, html: mailOptions.html });
       logger.info('Password reset email sent', { email });
     } catch (error: any) {
       logger.error('Failed to send password reset email:', error);
@@ -71,7 +133,7 @@ export class EmailService {
         html: this.getAppointmentConfirmationTemplate(firstName, appointmentData)
       };
 
-      await this.transporter.sendMail(mailOptions);
+      await this.sendEmail({ to: email, subject: mailOptions.subject, html: mailOptions.html });
       logger.info('Appointment confirmation email sent', { email, appointmentId: appointmentData.id });
     } catch (error: any) {
       logger.error('Failed to send appointment confirmation email:', error);
@@ -91,7 +153,7 @@ export class EmailService {
         html: this.getAppointmentReminderTemplate(firstName, appointmentData)
       };
 
-      await this.transporter.sendMail(mailOptions);
+      await this.sendEmail({ to: email, subject: mailOptions.subject, html: mailOptions.html });
       logger.info('Appointment reminder email sent', { email, appointmentId: appointmentData.id });
     } catch (error: any) {
       logger.error('Failed to send appointment reminder email:', error);
@@ -111,10 +173,63 @@ export class EmailService {
         html: this.getPaymentConfirmationTemplate(firstName, paymentData)
       };
 
-      await this.transporter.sendMail(mailOptions);
+      await this.sendEmail({ to: email, subject: mailOptions.subject, html: mailOptions.html });
       logger.info('Payment confirmation email sent', { email, paymentId: paymentData.id });
     } catch (error: any) {
       logger.error('Failed to send payment confirmation email:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Send clinical documents email
+   */
+  public async sendClinicalDocuments(
+    email: string,
+    firstName: string,
+    appointmentData: any,
+    documents: Array<{ fileName: string; filePath: string }>
+  ): Promise<void> {
+    try {
+      if (!documents.length) {
+        throw new Error('Clinical documents are required');
+      }
+
+      const basePath = path.resolve(process.cwd(), config.upload.uploadPath);
+      const attachments = await Promise.all(
+        documents.map(async (document) => {
+          const absolutePath = path.resolve(basePath, document.filePath);
+          const content = await fs.readFile(absolutePath);
+          return {
+            filename: document.fileName,
+            content,
+            contentType: 'application/pdf'
+          };
+        })
+      );
+
+      const appointmentDate = appointmentData?.scheduledAt
+        ? new Date(appointmentData.scheduledAt).toLocaleString('es-CO')
+        : 'No disponible';
+      const serviceName = appointmentData?.service?.name || 'Consulta';
+      const doctorName = appointmentData?.doctor?.user
+        ? `${appointmentData.doctor.user.firstName} ${appointmentData.doctor.user.lastName}`
+        : 'No asignado';
+
+      await this.sendEmail({
+        to: email,
+        subject: 'Documentos clinicos de tu cita - SMD Vital',
+        html: this.getClinicalDocumentsTemplate(firstName, {
+          appointmentDate,
+          serviceName,
+          doctorName
+        }),
+        attachments
+      });
+
+      logger.info('Clinical documents email sent', { email });
+    } catch (error: any) {
+      logger.error('Failed to send clinical documents email:', error);
       throw error;
     }
   }
@@ -346,6 +461,55 @@ export class EmailService {
           <div class="footer">
             <p>SMD Vital - Atención médica profesional a domicilio en Bogotá</p>
             <p>© 2024 SMD Vital. Todos los derechos reservados.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  /**
+   * Get clinical documents email template
+   */
+  private getClinicalDocumentsTemplate(
+    firstName: string,
+    summary: { appointmentDate: string; serviceName: string; doctorName: string }
+  ): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Documentos clinicos - SMD Vital</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #2c5aa0; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background: #f9f9f9; }
+          .appointment-details { background: white; padding: 15px; border-radius: 5px; margin: 15px 0; }
+          .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>SMD Vital</h1>
+            <p>Medico a Domicilio en Bogota</p>
+          </div>
+          <div class="content">
+            <h2>Hola ${firstName}!</h2>
+            <p>Adjuntamos la historia clinica y la formula medica de tu cita.</p>
+            <div class="appointment-details">
+              <h3>Detalles de la cita:</h3>
+              <p><strong>Fecha y hora:</strong> ${summary.appointmentDate}</p>
+              <p><strong>Servicio:</strong> ${summary.serviceName}</p>
+              <p><strong>Doctor:</strong> ${summary.doctorName}</p>
+            </div>
+            <p>Si necesitas aclaraciones o seguimiento, responde a este correo.</p>
+          </div>
+          <div class="footer">
+            <p>SMD Vital - Atencion medica profesional a domicilio en Bogota</p>
+            <p>2024 SMD Vital. Todos los derechos reservados.</p>
           </div>
         </div>
       </body>

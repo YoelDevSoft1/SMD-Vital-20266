@@ -80,6 +80,11 @@ export const createDoctorSchema = z.object({
 
 export const updateDoctorSchema = createDoctorSchema.partial().omit({ userId: true });
 
+export const updateDoctorMediaSchema = z.object({
+  logoPath: z.string().optional(),
+  signaturePath: z.string().optional(),
+});
+
 export const doctorAvailabilitySchema = z.object({
   doctorId: z.string().cuid('Invalid doctor ID'),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
@@ -123,6 +128,77 @@ export const appointmentQuerySchema = z.object({
   patientId: z.string().cuid('Invalid patient ID').optional(),
   startDate: z.string().datetime('Invalid start date format').optional(),
   endDate: z.string().datetime('Invalid end date format').optional(),
+});
+
+// Clinical validation schemas
+export const clinicalVitalsSchema = z.object({
+  bpSys: z.number().int().positive().optional(),
+  bpDia: z.number().int().positive().optional(),
+  heartRate: z.number().int().positive().optional(),
+  respiratoryRate: z.number().int().positive().optional(),
+  temperature: z.number().optional(),
+  spo2: z.number().int().optional(),
+  weight: z.number().optional(),
+  height: z.number().optional(),
+  notes: z.string().optional(),
+}).refine((data) => Object.values(data).some((value) => value !== undefined), {
+  message: 'At least one vital sign value is required'
+});
+
+export const encounterNotesSchema = z.object({
+  summary: z.string().min(2).optional(),
+  payload: z.record(z.any()).optional(),
+  templateVersion: z.string().optional()
+});
+
+const prescriptionItemSchema = z.object({
+  medication: z.string().min(1),
+  dosage: z.string().min(1),
+  frequency: z.string().min(1),
+  duration: z.string().min(1),
+  instructions: z.string().optional(),
+});
+
+export const clinicalFinishSchema = z.object({
+  encounterSummary: z.string().min(2).optional(),
+  encounterPayload: z.record(z.any()).optional(),
+  medicalRecord: z.object({
+    title: z.string().min(2),
+    description: z.string().min(2),
+    type: z.enum(['LAB_RESULT', 'IMAGING', 'PRESCRIPTION', 'VACCINATION', 'ALLERGY', 'DIAGNOSIS', 'OTHER']).optional(),
+    payload: z.record(z.any()).optional(),
+    doctorNotes: z.string().optional(),
+    templateVersion: z.string().optional()
+  }),
+  prescription: z.object({
+    notes: z.string().optional(),
+    templateVersion: z.string().optional(),
+    items: z.array(prescriptionItemSchema).min(1)
+  }).optional()
+});
+
+export const clinicalRecordByEmailSchema = z.object({
+  patientEmail: z.string().email('Invalid email format'),
+  patientFirstName: z.string().min(2).optional(),
+  patientLastName: z.string().min(2).optional(),
+  patientDateOfBirth: z.string().optional(),
+  patientGender: z.enum(['MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY']).optional(),
+  serviceName: z.string().min(2).optional(),
+  sendEmail: z.boolean().optional().default(true),
+  vitals: clinicalVitalsSchema.optional(),
+  medicalRecord: z.object({
+    title: z.string().min(2),
+    description: z.string().min(2),
+    type: z.enum(['LAB_RESULT', 'IMAGING', 'PRESCRIPTION', 'VACCINATION', 'ALLERGY', 'DIAGNOSIS', 'OTHER']).optional(),
+    payload: z.record(z.any()).optional(),
+    doctorNotes: z.string().optional(),
+    templateVersion: z.string().optional()
+  }),
+  prescription: z.object({
+    notes: z.string().optional(),
+    templateVersion: z.string().optional(),
+    items: z.array(prescriptionItemSchema).min(1)
+  }).optional()
 });
 
 // Service validation schemas
@@ -284,6 +360,10 @@ export const validationSchemas = {
   createAppointment: createAppointmentSchema,
   updateAppointment: updateAppointmentSchema,
   appointmentQuery: appointmentQuerySchema,
+  clinicalVitals: clinicalVitalsSchema,
+  encounterNotes: encounterNotesSchema,
+  clinicalFinish: clinicalFinishSchema,
+  clinicalRecordByEmail: clinicalRecordByEmailSchema,
   
   // Service
   createService: createServiceSchema,

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { AdminPanelController } from '../controllers/admin-panel.controller';
 import { authMiddleware, requireRole } from '../middleware/auth.middleware';
+import { uploadDoctorMedia } from '../middleware/upload.middleware';
 
 const router = Router();
 const adminPanelController = new AdminPanelController();
@@ -99,6 +100,22 @@ router
  * @access  Private/Admin
  */
 router.patch('/doctors/:id/availability', adminPanelController.updateDoctorAvailability);
+
+/**
+ * @route   PATCH /api/v1/admin-panel/doctors/:id/media
+ * @desc    Update doctor media (logo and signature)
+ * @body    { logoPath?: string, signaturePath?: string }
+ * @access  Private/Admin
+ */
+router.patch('/doctors/:id/media', adminPanelController.updateDoctorMedia);
+
+/**
+ * @route   POST /api/v1/admin-panel/doctors/:id/upload-media
+ * @desc    Upload doctor media files (logo and signature)
+ * @body    FormData with 'logo' and/or 'signature' files
+ * @access  Private/Admin
+ */
+router.post('/doctors/:id/upload-media', uploadDoctorMedia, adminPanelController.uploadDoctorMediaFiles);
 
 
 // ========================================
@@ -226,7 +243,16 @@ router.get('/analytics/revenue', adminPanelController.getRevenueAnalytics);
  * @query   page, limit, category, isActive
  * @access  Private/Admin
  */
-router.get('/services', adminPanelController.getServices);
+router
+  .route('/services')
+  .get(adminPanelController.getServices)
+  .post(adminPanelController.createService);
+
+router
+  .route('/services/:id')
+  .get(adminPanelController.getServiceDetails)
+  .put(adminPanelController.updateService)
+  .delete(adminPanelController.deleteService);
 
 /**
  * @route   PATCH /api/v1/admin-panel/services/:id/status
