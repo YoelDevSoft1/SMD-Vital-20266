@@ -92,6 +92,56 @@ export interface Doctor {
   };
 }
 
+export interface DoctorAvailability {
+  id: string;
+  doctorId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  isActive: boolean;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AvailabilitySlot {
+  startTime: string;
+  endTime: string;
+  isAvailable: boolean;
+  reason?: string;
+}
+
+export interface DoctorAvailabilityResponse {
+  doctor: Doctor;
+  date: string;
+  availability: DoctorAvailability[];
+  appointments: Appointment[];
+  slots: AvailabilitySlot[];
+}
+
+export interface RouteStop {
+  appointment: Appointment;
+  order: number;
+  coordinates: { lat: number; lng: number } | null;
+}
+
+export interface RouteSegment {
+  fromAppointmentId?: string;
+  toAppointmentId?: string;
+  distanceKm: number | null;
+  estimatedTravelMinutes: number | null;
+  availableMinutes: number | null;
+  status: 'OK' | 'RISK' | 'CONFLICT' | 'MISSING_COORDINATES';
+}
+
+export interface DoctorRouteResponse {
+  doctor?: Doctor;
+  date: string;
+  appointments: Appointment[];
+  stops: RouteStop[];
+  segments: RouteSegment[];
+}
+
 // Appointment types
 export type AppointmentStatus =
   | 'PENDING'

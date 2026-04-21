@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { formatDateTime } from '@/utils/dateFormat';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, FileText, Activity, AlertCircle } from 'lucide-react';
@@ -176,12 +177,3 @@ export default function PatientDashboard() {
   );
 }
 
-function formatDateTime(dateString: string) {
-  return new Intl.DateTimeFormat('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(dateString));
-}

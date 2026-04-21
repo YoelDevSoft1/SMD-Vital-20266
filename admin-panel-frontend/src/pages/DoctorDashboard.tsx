@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { formatDateTime } from '@/utils/dateFormat';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, CheckCircle2, Activity, AlertCircle, Upload, ImageIcon } from 'lucide-react';
+import { Calendar, CheckCircle2, Activity, AlertCircle, Upload, ImageIcon, Plus, Save, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { clinicalService } from '@/services/clinical.service';
 import { adminService } from '@/services/admin.service';
+import DailyRouteMap from '@/components/DailyRouteMap';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
@@ -36,6 +38,12 @@ const statusColors: Record<string, string> = {
 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const today = new Date().toISOString().slice(0, 10);
+  const [availabilityDate, setAvailabilityDate] = useState(today);
+  const [availabilityBlocks, setAvailabilityBlocks] = useState<Array<{ startTime: string; endTime: string; notes?: string }>>([
+    { startTime: '08:00', endTime: '12:00' },
+  ]);
 
   const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ['clinical-appointments', { page: 1, limit: 5 }],
@@ -45,6 +53,44 @@ export default function DoctorDashboard() {
 
   const payload = data?.data?.data as PaginatedResponse<ClinicalAppointment> | undefined;
   const appointments = payload?.data ?? [];
+
+  const { data: availabilityData, isFetching: isFetchingAvailability } = useQuery({
+    queryKey: ['doctor-my-availability', availabilityDate],
+    queryFn: () => clinicalService.getMyAvailability(availabilityDate, 60),
+    staleTime: 15_000,
+  });
+
+  const { data: routeData, isFetching: isFetchingRoute } = useQuery({
+    queryKey: ['doctor-my-route', availabilityDate],
+    queryFn: () => clinicalService.getMyRoute(availabilityDate),
+    staleTime: 15_000,
+  });
+
+  const availabilityMutation = useMutation({
+    mutationFn: () => clinicalService.setMyAvailability(availabilityDate, availabilityBlocks),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['doctor-my-availability'] });
+      toast.success('Disponibilidad guardada');
+    },
+    onError: (mutationError: any) => {
+      toast.error(mutationError.response?.data?.message || 'No se pudo guardar la disponibilidad');
+    },
+  });
+
+  useEffect(() => {
+    const blocks = availabilityData?.data?.data?.availability;
+    if (blocks) {
+      setAvailabilityBlocks(
+        blocks.length
+          ? blocks.map((block) => ({
+              startTime: block.startTime,
+              endTime: block.endTime,
+              notes: block.notes ?? undefined,
+            }))
+          : [{ startTime: '08:00', endTime: '12:00' }]
+      );
+    }
+  }, [availabilityData]);
 
   const stats = useMemo(() => {
     return {
@@ -109,6 +155,139 @@ export default function DoctorDashboard() {
           Ver agenda
         </Button>
       </div>
+
+      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+              Disponibilidad diaria
+            </CardTitle>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Define los rangos que administracion puede usar para agendarte.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Input
+              type="date"
+              value={availabilityDate}
+              onChange={(event) => setAvailabilityDate(event.target.value)}
+              className="w-40"
+            />
+            <Button
+              onClick={() => availabilityMutation.mutate()}
+              isLoading={availabilityMutation.isPending}
+              disabled={isFetchingAvailability || availabilityMutation.isPending}
+            >
+              <Save className="h-4 w-4" />
+              Guardar
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {availabilityBlocks.map((block, index) => (
+            <div key={`${index}-${block.startTime}-${block.endTime}`} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+              <div>
+                <Label>Desde</Label>
+                <Input
+                  type="time"
+                  value={block.startTime}
+                  onChange={(event) =>
+                    setAvailabilityBlocks((current) =>
+                      current.map((item, itemIndex) =>
+                        itemIndex === index ? { ...item, startTime: event.target.value } : item
+                      )
+                    )
+                  }
+                />
+              </div>
+              <div>
+                <Label>Hasta</Label>
+                <Input
+                  type="time"
+                  value={block.endTime}
+                  onChange={(event) =>
+                    setAvailabilityBlocks((current) =>
+                      current.map((item, itemIndex) =>
+                        itemIndex === index ? { ...item, endTime: event.target.value } : item
+                      )
+                    )
+                  }
+                />
+              </div>
+              <div className="flex items-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    setAvailabilityBlocks((current) =>
+                      current.length === 1 ? current : current.filter((_, itemIndex) => itemIndex !== index)
+                    )
+                  }
+                  disabled={availabilityBlocks.length === 1}
+                  className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              setAvailabilityBlocks((current) => [...current, { startTime: '14:00', endTime: '18:00' }])
+            }
+            className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+          >
+            <Plus className="h-4 w-4" />
+            Agregar rango
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            Ruta del dia
+          </CardTitle>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Citas ordenadas por hora y tiempos estimados de traslado.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <DailyRouteMap route={routeData?.data?.data} />
+          {isFetchingRoute ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">Cargando ruta...</p>
+          ) : routeData?.data?.data?.segments?.length ? (
+            <div className="grid gap-2 md:grid-cols-2">
+              {routeData.data.data.segments.map((segment) => (
+                <div
+                  key={`${segment.fromAppointmentId}-${segment.toAppointmentId}`}
+                  className={cn(
+                    'rounded-md border p-3 text-sm',
+                    segment.status === 'OK' && 'border-emerald-200 bg-emerald-50 text-emerald-800',
+                    segment.status === 'RISK' && 'border-amber-200 bg-amber-50 text-amber-800',
+                    segment.status === 'CONFLICT' && 'border-red-200 bg-red-50 text-red-800',
+                    segment.status === 'MISSING_COORDINATES' && 'border-gray-200 bg-gray-50 text-gray-700'
+                  )}
+                >
+                  <div className="font-medium">
+                    {segment.status === 'OK' ? 'Traslado viable' : segment.status === 'RISK' ? 'Riesgo de retraso' : segment.status === 'CONFLICT' ? 'Choque de agenda' : 'Faltan coordenadas'}
+                  </div>
+                  <div>
+                    {segment.distanceKm ?? '-'} km - {segment.estimatedTravelMinutes ?? '-'} min estimados
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Aun no hay suficientes citas con coordenadas para calcular la ruta.
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
@@ -230,12 +409,3 @@ export default function DoctorDashboard() {
   );
 }
 
-function formatDateTime(dateString: string) {
-  return new Intl.DateTimeFormat('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(dateString));
-}

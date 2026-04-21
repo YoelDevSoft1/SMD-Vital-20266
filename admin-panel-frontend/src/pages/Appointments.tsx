@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { formatDateTime, formatTime } from '@/utils/dateFormat';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Calendar,
@@ -26,9 +27,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppointmentsModal from '@/components/AppointmentsModal';
 import CreateAppointmentForm from '@/components/CreateAppointmentForm';
 import AppointmentDetailsView from '@/components/AppointmentDetailsView';
+import DailyRouteMap from '@/components/DailyRouteMap';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
-import type { AppointmentFilters, AppointmentStatus } from '@/types';
+import type { AppointmentFilters, AppointmentStatus, Doctor } from '@/types';
 
 const statusTranslations: Record<AppointmentStatus, string> = {
   PENDING: 'Pendiente',
@@ -64,6 +66,8 @@ export default function Appointments() {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedAppointments, setSelectedAppointments] = useState<string[]>([]);
+  const [routeDoctorId, setRouteDoctorId] = useState('');
+  const [routeDate, setRouteDate] = useState(new Date().toISOString().slice(0, 10));
 
   // Fetch appointments
   const { data: appointmentsData, isLoading, isFetching, error, refetch } = useQuery({
@@ -76,6 +80,19 @@ export default function Appointments() {
   const { data: dashboardData } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => adminService.getDashboard(),
+  });
+
+  const { data: doctorsData } = useQuery({
+    queryKey: ['doctors-for-route'],
+    queryFn: () => adminService.getDoctors({ page: 1, limit: 100 }),
+    staleTime: 60_000,
+  });
+
+  const { data: routeData, isFetching: isFetchingRoute } = useQuery({
+    queryKey: ['doctor-daily-route', routeDoctorId, routeDate],
+    queryFn: () => adminService.getDoctorDailyRoute(routeDoctorId, routeDate),
+    enabled: Boolean(routeDoctorId && routeDate),
+    staleTime: 15_000,
   });
 
   // Delete appointment mutation
@@ -132,6 +149,8 @@ export default function Appointments() {
   const pendientes = stats?.appointments?.pending || 0;
   const completadas = stats?.appointments?.completed || 0;
   const tasaExito = stats?.appointments?.completionRate || 0;
+  const doctors = (doctorsData?.data?.data?.data as Doctor[]) ?? [];
+  const route = routeData?.data?.data;
 
   // Debug logging
   console.log('Appointments Debug:', {
@@ -205,12 +224,105 @@ export default function Appointments() {
             <Calendar className="h-4 w-4" />
             Ver todas
           </Button>
-          <Button onClick={() => setShowCreateForm(true)}>
+          <Button
+            onClick={() => {
+              setSelectedAppointment(null);
+              setShowCreateForm(true);
+            }}
+          >
             <CalendarPlus className="h-4 w-4" />
             Nueva cita
           </Button>
         </div>
       </div>
+
+      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+              <MapPin className="h-5 w-5 text-blue-600" />
+              Mapa diario de traslados
+            </CardTitle>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Revisa las citas del medico por hora y los tramos con riesgo antes de agendar.
+            </p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-[220px_160px]">
+            <select
+              value={routeDoctorId}
+              onChange={(event) => setRouteDoctorId(event.target.value)}
+              className="rounded-md border border-gray-300 bg-white p-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+            >
+              <option value="">Selecciona medico</option>
+              {doctors.map((doctor) => (
+                <option key={doctor.id} value={doctor.id}>
+                  {doctor.user?.firstName} {doctor.user?.lastName}
+                </option>
+              ))}
+            </select>
+            <Input
+              type="date"
+              value={routeDate}
+              onChange={(event) => setRouteDate(event.target.value)}
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <DailyRouteMap route={route} />
+
+          {isFetchingRoute ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">Cargando ruta...</p>
+          ) : routeDoctorId && route ? (
+            <div className="grid gap-3 lg:grid-cols-[1fr_1fr]">
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Citas del dia</h3>
+                {route.stops.length === 0 ? (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">No hay citas para este medico en la fecha seleccionada.</p>
+                ) : (
+                  route.stops.map((stop) => (
+                    <div key={stop.appointment.id} className="rounded-md border border-gray-200 p-3 text-sm dark:border-gray-700">
+                      <div className="font-medium text-gray-900 dark:text-white">
+                        #{stop.order} {formatTime(stop.appointment.scheduledAt)} - {stop.appointment.patient?.user?.firstName} {stop.appointment.patient?.user?.lastName}
+                      </div>
+                      <div className="text-gray-500 dark:text-gray-400">{stop.appointment.address}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Tramos</h3>
+                {route.segments.length === 0 ? (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Se necesitan al menos dos citas con coordenadas para calcular traslados.</p>
+                ) : (
+                  route.segments.map((segment) => (
+                    <div
+                      key={`${segment.fromAppointmentId}-${segment.toAppointmentId}`}
+                      className={cn(
+                        'rounded-md border p-3 text-sm',
+                        segment.status === 'OK' && 'border-emerald-200 bg-emerald-50 text-emerald-800',
+                        segment.status === 'RISK' && 'border-amber-200 bg-amber-50 text-amber-800',
+                        segment.status === 'CONFLICT' && 'border-red-200 bg-red-50 text-red-800',
+                        segment.status === 'MISSING_COORDINATES' && 'border-gray-200 bg-gray-50 text-gray-700'
+                      )}
+                    >
+                      <div className="font-medium">
+                        {segment.status === 'OK' ? 'Traslado viable' : segment.status === 'RISK' ? 'Riesgo de retraso' : segment.status === 'CONFLICT' ? 'Choque de agenda' : 'Faltan coordenadas'}
+                      </div>
+                      <div>
+                        {segment.distanceKm ?? '-'} km - {segment.estimatedTravelMinutes ?? '-'} min estimados - {segment.availableMinutes ?? '-'} min disponibles
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Selecciona un medico para ver su ruta diaria.
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -411,7 +523,12 @@ export default function Appointments() {
                 No se encontraron citas con los filtros aplicados.
               </p>
               <div className="mt-6">
-                <Button onClick={() => setShowCreateForm(true)}>
+                <Button
+                  onClick={() => {
+                    setSelectedAppointment(null);
+                    setShowCreateForm(true);
+                  }}
+                >
                   <CalendarPlus className="h-4 w-4" />
                   Crear primera cita
                 </Button>
@@ -614,6 +731,7 @@ export default function Appointments() {
       {showCreateForm && (
         <CreateAppointmentForm
           isOpen={showCreateForm}
+          appointment={selectedAppointment}
           onClose={() => {
             setShowCreateForm(false);
             setSelectedAppointment(null);
@@ -636,16 +754,6 @@ export default function Appointments() {
       )}
     </div>
   );
-}
-
-function formatDateTime(dateString: string) {
-  return new Intl.DateTimeFormat('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(dateString));
 }
 
 function formatCurrency(value: number) {

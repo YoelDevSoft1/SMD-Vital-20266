@@ -3,6 +3,17 @@ import { RedisService } from './redis.service';
 import fs from 'fs';
 import path from 'path';
 import prismaClient from '../utils/prisma';
+import {
+  appointmentTimeToMinutes,
+  buildSlots,
+  extractCoordinates,
+  formatDateOnly,
+  getDayRange,
+  hasAppointmentConflict,
+  haversineDistanceKm,
+  isInsideAvailability,
+  validateTimeRange
+} from '../utils/scheduling';
 
 const prisma = prismaClient;
 
@@ -799,6 +810,126 @@ export class AdminPanelService {
     }
   }
 
+  public async getDoctorDailyAvailability(doctorId: string, date: string, duration = 60) {
+    try {
+      const { start, end, dateOnly } = getDayRange(date);
+      const [doctor, availability, appointments] = await Promise.all([
+        prisma.doctor.findUnique({
+          where: { id: doctorId },
+          include: { user: true }
+        }),
+        prisma.doctorAvailability.findMany({
+          where: {
+            doctorId,
+            date: dateOnly,
+            isActive: true
+          },
+          orderBy: { startTime: 'asc' }
+        }),
+        prisma.appointment.findMany({
+          where: {
+            doctorId,
+            scheduledAt: { gte: start, lt: end },
+            status: { notIn: ['CANCELLED', 'NO_SHOW', 'RESCHEDULED'] }
+          },
+          orderBy: { scheduledAt: 'asc' },
+          include: {
+            patient: { include: { user: true } },
+            service: true
+          }
+        })
+      ]);
+
+      if (!doctor) {
+        throw new Error('Doctor not found');
+      }
+
+      const slots = buildSlots(availability, appointments, duration);
+
+      return {
+        doctor,
+        date: formatDateOnly(dateOnly),
+        availability,
+        appointments,
+        slots
+      };
+    } catch (error) {
+      logger.error('Error getting doctor daily availability:', error);
+      throw error;
+    }
+  }
+
+  public async getDoctorDailyRoute(doctorId: string, date: string) {
+    try {
+      const { start, end, dateOnly } = getDayRange(date);
+      const appointments = await prisma.appointment.findMany({
+        where: {
+          doctorId,
+          scheduledAt: { gte: start, lt: end },
+          status: { notIn: ['CANCELLED', 'NO_SHOW', 'RESCHEDULED'] }
+        },
+        orderBy: { scheduledAt: 'asc' },
+        include: {
+          patient: { include: { user: true } },
+          doctor: { include: { user: true } },
+          service: true
+        }
+      });
+
+      const stops = appointments.map((appointment, index) => ({
+        appointment,
+        order: index + 1,
+        coordinates: extractCoordinates(appointment.coordinates)
+      }));
+
+      const segments = [];
+      for (let index = 0; index < stops.length - 1; index += 1) {
+        const current = stops[index];
+        const next = stops[index + 1];
+        if (!current?.coordinates || !next?.coordinates) {
+          segments.push({
+            fromAppointmentId: current?.appointment.id,
+            toAppointmentId: next?.appointment.id,
+            distanceKm: null,
+            estimatedTravelMinutes: null,
+            availableMinutes: null,
+            status: 'MISSING_COORDINATES'
+          });
+          continue;
+        }
+
+        const distanceKm = haversineDistanceKm(current.coordinates, next.coordinates);
+        const estimatedTravelMinutes = Math.ceil((distanceKm / 25) * 60) + 10;
+        const currentEnd = current.appointment.scheduledAt.getTime() + current.appointment.duration * 60 * 1000;
+        const availableMinutes = Math.floor((next.appointment.scheduledAt.getTime() - currentEnd) / 60000);
+        const status = availableMinutes < 0
+          ? 'CONFLICT'
+          : availableMinutes < estimatedTravelMinutes
+            ? 'RISK'
+            : 'OK';
+
+        segments.push({
+          fromAppointmentId: current.appointment.id,
+          toAppointmentId: next.appointment.id,
+          distanceKm: Number(distanceKm.toFixed(2)),
+          estimatedTravelMinutes,
+          availableMinutes,
+          status
+        });
+      }
+
+      return {
+        date: formatDateOnly(dateOnly),
+        appointments,
+        stops,
+        segments
+      };
+    } catch (error) {
+      logger.error('Error getting doctor daily route:', error);
+      throw error;
+    }
+  }
+
   /**
    * Update doctor media (logo and signature)
    */
@@ -1144,6 +1275,12 @@ export class AdminPanelService {
    */
   public async createAppointment(data: any) {
     try {
+      await this.ensureAppointmentCanBeScheduled({
+        doctorId: data.doctorId,
+        scheduledAt: new Date(data.scheduledAt),
+        duration: data.duration
+      });
+
       const appointment = await prisma.appointment.create({
         data: {
           patientId: data.patientId,
@@ -1183,6 +1320,21 @@ export class AdminPanelService {
    */
   public async updateAppointment(appointmentId: string, data: any) {
     try {
+      const currentAppointment = await prisma.appointment.findUnique({
+        where: { id: appointmentId }
+      });
+
+      if (!currentAppointment) {
+        throw new Error('Appointment not found');
+      }
+
+      await this.ensureAppointmentCanBeScheduled({
+        doctorId: data.doctorId ?? currentAppointment.doctorId,
+        scheduledAt: data.scheduledAt !== undefined ? new Date(data.scheduledAt) : currentAppointment.scheduledAt,
+        duration: data.duration ?? currentAppointment.duration,
+        ignoreAppointmentId: appointmentId
+      });
+
       const updateData: any = {};
 
       // Only update fields that are allowed to be updated
@@ -1267,6 +1419,43 @@ export class AdminPanelService {
       logger.error('Error deleting appointment:', error);
       throw error;
     }
+  }
+
+  public async createQuickPatient(data: {
+    firstName: string;
+    lastName: string;
+    documentId: string;
+    phone: string;
+  }) {
+    const bcrypt = require('bcryptjs');
+    const placeholderEmail = `${data.documentId.toLowerCase().replace(/\s+/g, '')}@paciente.smdvital.temp`;
+    const hashedPassword = await bcrypt.hash(data.documentId, 12);
+
+    const existingPatient = await prisma.patient.findFirst({
+      where: { user: { email: placeholderEmail } },
+      include: { user: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } } },
+    });
+    if (existingPatient) return existingPatient;
+
+    return prisma.patient.create({
+      data: {
+        insuranceNumber: data.documentId,
+        user: {
+          create: {
+            email: placeholderEmail,
+            password: hashedPassword,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phone: data.phone || null,
+            role: 'PATIENT',
+            isActive: true,
+            isVerified: false,
+            isPlaceholder: true,
+          },
+        },
+      },
+      include: { user: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } } },
+    });
   }
 
   /**
@@ -2418,5 +2607,64 @@ export class AdminPanelService {
     });
 
     return Object.values(grouped);
+  }
+
+  private async ensureAppointmentCanBeScheduled(input: {
+    doctorId: string;
+    scheduledAt: Date;
+    duration: number;
+    ignoreAppointmentId?: string;
+  }): Promise<void> {
+    if (!input.doctorId) {
+      throw new Error('Doctor is required');
+    }
+
+    if (Number.isNaN(input.scheduledAt.getTime())) {
+      throw new Error('Invalid appointment date');
+    }
+
+    if (!input.duration || input.duration <= 0) {
+      throw new Error('Appointment duration must be greater than zero');
+    }
+
+    const { start, end, dateOnly } = getDayRange(input.scheduledAt);
+    const [availability, appointments] = await Promise.all([
+      prisma.doctorAvailability.findMany({
+        where: {
+          doctorId: input.doctorId,
+          date: dateOnly,
+          isActive: true
+        }
+      }),
+      prisma.appointment.findMany({
+        where: {
+          doctorId: input.doctorId,
+          scheduledAt: { gte: start, lt: end },
+          status: { notIn: ['CANCELLED', 'NO_SHOW', 'RESCHEDULED'] }
+        },
+        select: {
+          id: true,
+          scheduledAt: true,
+          duration: true,
+          status: true
+        }
+      })
+    ]);
+
+    if (availability.length === 0) {
+      throw new Error('El medico no tiene disponibilidad registrada para ese dia');
+    }
+
+    availability.forEach(validateTimeRange);
+    const appointmentStart = appointmentTimeToMinutes(input.scheduledAt);
+    const appointmentEnd = appointmentStart + input.duration;
+
+    if (!isInsideAvailability(appointmentStart, appointmentEnd, availability)) {
+      throw new Error('La cita esta fuera del rango disponible del medico');
+    }
+
+    if (hasAppointmentConflict(appointmentStart, appointmentEnd, appointments, input.ignoreAppointmentId)) {
+      throw new Error('El medico ya tiene una cita en ese horario');
+    }
   }
 }

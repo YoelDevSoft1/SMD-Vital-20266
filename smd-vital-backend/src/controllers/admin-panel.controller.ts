@@ -479,6 +479,86 @@ export class AdminPanelController {
     }
   };
 
+  public getDoctorDailyAvailability = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { date, duration = '60' } = req.query;
+
+      if (!id || typeof date !== 'string') {
+        res.status(400).json({
+          success: false,
+          message: 'Doctor ID and date are required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const result = await this.adminService.getDoctorDailyAvailability(
+        id,
+        date,
+        parseInt(duration as string, 10)
+      );
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Doctor availability retrieved successfully',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching doctor availability:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching doctor availability',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  public getDoctorDailyRoute = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { date } = req.query;
+
+      if (!id || typeof date !== 'string') {
+        res.status(400).json({
+          success: false,
+          message: 'Doctor ID and date are required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const result = await this.adminService.getDoctorDailyRoute(id, date);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Doctor route retrieved successfully',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching doctor route:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching doctor route',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
   /**
    * @desc    Update doctor media (logo and signature)
    * @route   PATCH /api/v1/admin-panel/doctors/:id/media
@@ -842,9 +922,10 @@ export class AdminPanelController {
       res.status(200).json(response);
     } catch (error: any) {
       logger.error('Error fetching appointment details:', error);
-      res.status(500).json({
+      const isNotFound = error.message === 'Appointment not found';
+      res.status(isNotFound ? 404 : 500).json({
         success: false,
-        message: 'Error fetching appointment details',
+        message: isNotFound ? 'Appointment not found' : 'Error fetching appointment details',
         error: error.message,
         timestamp: new Date().toISOString(),
         requestId: req.id || 'unknown'
@@ -1016,6 +1097,21 @@ export class AdminPanelController {
    * @route   GET /api/v1/admin-panel/patients
    * @access  Private/Admin
    */
+  public createQuickPatient = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { firstName, lastName, documentId, phone } = req.body;
+      if (!firstName || !lastName || !documentId) {
+        res.status(400).json({ success: false, message: 'firstName, lastName y documentId son requeridos' });
+        return;
+      }
+      const patient = await this.adminService.createQuickPatient({ firstName, lastName, documentId, phone });
+      res.status(201).json({ success: true, message: 'Paciente creado', data: patient });
+    } catch (error: any) {
+      logger.error('Error creating quick patient:', error);
+      res.status(500).json({ success: false, message: 'Error creando paciente', error: error.message });
+    }
+  };
+
   public getPatients = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = '1', limit = '10', search, isActive, isVerified } = req.query;

@@ -101,6 +101,10 @@ router
  */
 router.patch('/doctors/:id/availability', adminPanelController.updateDoctorAvailability);
 
+router.get('/doctors/:id/daily-availability', adminPanelController.getDoctorDailyAvailability);
+
+router.get('/doctors/:id/daily-route', adminPanelController.getDoctorDailyRoute);
+
 /**
  * @route   PATCH /api/v1/admin-panel/doctors/:id/media
  * @desc    Update doctor media (logo and signature)
@@ -174,6 +178,7 @@ router.delete('/appointments/:id', adminPanelController.deleteAppointment);
  * @query   page, limit, search, isActive, isVerified
  * @access  Private/Admin
  */
+router.post('/patients/quick', adminPanelController.createQuickPatient);
 router.get('/patients', adminPanelController.getPatients);
 
 // ========================================

@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { X, Calendar, Clock, User, Stethoscope, MapPin, DollarSign, FileText } from 'lucide-react';
+import { localInputToColombiaISO, utcToColombiaInputValue } from '@/utils/dateFormat';
+import { X, Calendar, Clock, User, Stethoscope, MapPin, DollarSign, FileText, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
-import type { Doctor, Patient, Service } from '@/types';
+import type { AvailabilitySlot, Doctor, Patient, Service } from '@/types';
 
 interface CreateAppointmentFormProps {
   isOpen: boolean;
@@ -54,8 +54,47 @@ const durationOptions = [
   { value: 120, label: '2 horas' }
 ];
 
+const bogotaLocalities = [
+  'Usaquén',
+  'Chapinero',
+  'Santa Fe',
+  'San Cristóbal',
+  'Usme',
+  'Tunjuelito',
+  'Bosa',
+  'Kennedy',
+  'Fontibón',
+  'Engativá',
+  'Suba',
+  'Barrios Unidos',
+  'Teusaquillo',
+  'Los Mártires',
+  'Antonio Nariño',
+  'Puente Aranda',
+  'La Candelaria',
+  'Rafael Uribe Uribe',
+  'Ciudad Bolívar',
+  'Sumapaz',
+];
+
+interface NewPatientData {
+  firstName: string;
+  lastName: string;
+  documentId: string;
+  phone: string;
+}
+
 export default function CreateAppointmentForm({ isOpen, onClose, appointment }: CreateAppointmentFormProps) {
   const queryClient = useQueryClient();
+  const [isNewPatient, setIsNewPatient] = useState(false);
+  const [newPatientData, setNewPatientData] = useState<NewPatientData>({
+    firstName: '',
+    lastName: '',
+    documentId: '',
+    phone: '',
+  });
+  const [newPatientErrors, setNewPatientErrors] = useState<Partial<NewPatientData>>({});
+
   const [formData, setFormData] = useState<AppointmentFormData>({
     patientId: '',
     doctorId: '',
@@ -73,6 +112,9 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [geocodeStatus, setGeocodeStatus] = useState('');
+  const selectedDate = formData.scheduledAt ? formData.scheduledAt.slice(0, 10) : '';
 
   // Fetch data for dropdowns
   const { data: doctorsData } = useQuery({
@@ -90,9 +132,32 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
     queryFn: () => adminService.getServices({ page: 1, limit: 100 })
   });
 
+  const { data: availabilityData, isFetching: isFetchingAvailability } = useQuery({
+    queryKey: ['doctor-daily-availability', formData.doctorId, selectedDate, formData.duration],
+    queryFn: () => adminService.getDoctorDailyAvailability(
+      formData.doctorId,
+      selectedDate,
+      formData.duration
+    ),
+    enabled: Boolean(formData.doctorId && selectedDate),
+    staleTime: 15_000,
+  });
+
+  const availability = availabilityData?.data?.data;
+  const availableSlots = availability?.slots ?? [];
+  const selectedService = useMemo(() => {
+    return (servicesData?.data?.data?.data as Service[] | undefined)?.find(
+      (service) => service.id === formData.serviceId
+    );
+  }, [formData.serviceId, servicesData]);
+
+  const quickPatientMutation = useMutation({
+    mutationFn: (data: NewPatientData) => adminService.createQuickPatient(data),
+  });
+
   // Create/Update mutation
   const appointmentMutation = useMutation({
-    mutationFn: (data: AppointmentFormData) => {
+    mutationFn: (data: any) => {
       if (appointment) {
         return adminService.updateAppointment(appointment.id, data);
       } else {
@@ -127,7 +192,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
         patientId: appointment.patientId || '',
         doctorId: appointment.doctorId || '',
         serviceId: appointment.serviceId || '',
-        scheduledAt: appointment.scheduledAt ? new Date(appointment.scheduledAt).toISOString().slice(0, 16) : '',
+        scheduledAt: appointment.scheduledAt ? utcToColombiaInputValue(appointment.scheduledAt) : '',
         duration: appointment.duration || 30,
         notes: appointment.notes || '',
         diagnosis: appointment.diagnosis || '',
@@ -164,26 +229,160 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
     }
   };
 
+  const handleServiceChange = (serviceId: string) => {
+    const service = (servicesData?.data?.data?.data as Service[] | undefined)?.find(
+      (item) => item.id === serviceId
+    );
+
+    setFormData(prev => ({
+      ...prev,
+      serviceId,
+      duration: service?.duration ?? prev.duration,
+      totalPrice: service?.basePrice ?? prev.totalPrice,
+    }));
+    if (errors.serviceId) {
+      setErrors(prev => ({ ...prev, serviceId: '' }));
+    }
+  };
+
+  const handleDateChange = (date: string) => {
+    if (!date) {
+      handleInputChange('scheduledAt', '');
+      return;
+    }
+    const currentTime = formData.scheduledAt?.slice(11, 16) || '';
+    handleInputChange('scheduledAt', currentTime ? `${date}T${currentTime}` : `${date}T`);
+  };
+
+  const handleSlotSelect = (slot: AvailabilitySlot) => {
+    if (!selectedDate || !slot.isAvailable) return;
+    handleInputChange('scheduledAt', `${selectedDate}T${slot.startTime}`);
+  };
+
+  const geocodeAddress = async (showToast = false) => {
+    if (!formData.address.trim() || !formData.city.trim()) {
+      if (showToast) {
+        toast.error('Completa direccion y localidad para ubicar en el mapa');
+      }
+      return;
+    }
+
+    setIsGeocoding(true);
+    setGeocodeStatus('Buscando coordenadas...');
+
+    try {
+      const query = `${formData.address}, ${formData.city}, Bogotá, Colombia`;
+      const params = new URLSearchParams({
+        q: query,
+        format: 'json',
+        addressdetails: '1',
+        limit: '1',
+        countrycodes: 'co',
+      });
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('No se pudo consultar el geocodificador');
+      }
+
+      const results = await response.json() as Array<{ lat: string; lon: string; display_name?: string }>;
+      const firstResult = results[0];
+      if (!firstResult) {
+        setGeocodeStatus('No se encontraron coordenadas para esa direccion.');
+        if (showToast) toast.error('No encontre esa direccion. Ajusta direccion/localidad.');
+        return;
+      }
+
+      const lat = Number(firstResult.lat);
+      const lng = Number(firstResult.lon);
+      if (Number.isNaN(lat) || Number.isNaN(lng)) {
+        throw new Error('Respuesta de coordenadas invalida');
+      }
+
+      handleInputChange('coordinates', { lat, lng });
+      setGeocodeStatus(firstResult.display_name ? `Ubicado: ${firstResult.display_name}` : 'Coordenadas encontradas');
+      if (showToast) toast.success('Coordenadas encontradas');
+    } catch (error) {
+      setGeocodeStatus('No se pudieron obtener coordenadas.');
+      if (showToast) toast.error('No se pudieron obtener coordenadas');
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!formData.address.trim() || !formData.city.trim()) {
+      setGeocodeStatus('');
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      geocodeAddress(false);
+    }, 900);
+
+    return () => window.clearTimeout(timeout);
+  }, [formData.address, formData.city]);
+
+  const validateNewPatient = (): boolean => {
+    const errors: Partial<NewPatientData> = {};
+    if (!newPatientData.firstName.trim()) errors.firstName = 'Requerido';
+    if (!newPatientData.lastName.trim()) errors.lastName = 'Requerido';
+    if (!newPatientData.documentId.trim()) errors.documentId = 'Requerido';
+    if (!newPatientData.phone.trim()) errors.phone = 'Requerido';
+    setNewPatientErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.patientId) newErrors.patientId = 'Selecciona un paciente';
+    if (!isNewPatient && !formData.patientId) newErrors.patientId = 'Selecciona un paciente';
     if (!formData.doctorId) newErrors.doctorId = 'Selecciona un doctor';
     if (!formData.serviceId) newErrors.serviceId = 'Selecciona un servicio';
-    if (!formData.scheduledAt) newErrors.scheduledAt = 'Selecciona una fecha y hora';
+    if (!formData.scheduledAt || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(formData.scheduledAt)) {
+      newErrors.scheduledAt = 'Selecciona una fecha y una hora disponible';
+    }
     if (!formData.address) newErrors.address = 'Ingresa la dirección';
-    if (!formData.city) newErrors.city = 'Ingresa la ciudad';
+    if (!formData.city) newErrors.city = 'Ingresa la localidad';
     if (formData.totalPrice <= 0) newErrors.totalPrice = 'El precio debe ser mayor a 0';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      appointmentMutation.mutate(formData);
+    if (isNewPatient && !validateNewPatient()) return;
+    if (!validateForm()) return;
+
+    let patientId = formData.patientId;
+
+    if (isNewPatient) {
+      try {
+        const result = await quickPatientMutation.mutateAsync(newPatientData);
+        patientId = result.data?.data?.id;
+        if (!patientId) {
+          toast.error('No se pudo crear el paciente');
+          return;
+        }
+        queryClient.invalidateQueries({ queryKey: ['patients-for-appointment'] });
+      } catch {
+        toast.error('Error creando el paciente');
+        return;
+      }
     }
+
+    const hasCoordinates = formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0;
+    appointmentMutation.mutate({
+      ...formData,
+      patientId,
+      scheduledAt: localInputToColombiaISO(formData.scheduledAt),
+      coordinates: hasCoordinates ? formData.coordinates : null,
+    });
   };
 
   const handleClose = () => {
@@ -203,14 +402,17 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
       coordinates: { lat: 0, lng: 0 }
     });
     setErrors({});
+    setIsNewPatient(false);
+    setNewPatientData({ firstName: '', lastName: '', documentId: '', phone: '' });
+    setNewPatientErrors({});
     onClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div className="relative z-[1201] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-900">
             {appointment ? 'Editar Cita' : 'Nueva Cita'}
@@ -223,27 +425,96 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Paciente */}
-            <div>
-              <Label htmlFor="patientId" className="flex items-center space-x-2">
-                <User className="w-4 h-4" />
-                <span>Paciente *</span>
-              </Label>
-              <select
-                id="patientId"
-                value={formData.patientId}
-                onChange={(e) => handleInputChange('patientId', e.target.value)}
-                className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.patientId ? 'border-red-500' : 'border-gray-300'
-                }`}
-              >
-                <option value="">Selecciona un paciente</option>
-                {(patientsData?.data?.data?.data as Patient[])?.map((patient: Patient) => (
-                  <option key={patient.id} value={patient.id}>
-                    {patient?.user?.firstName} {patient?.user?.lastName} - {patient?.user?.email}
-                  </option>
-                )) || []}
-              </select>
-              {errors.patientId && <p className="text-red-500 text-sm mt-1">{errors.patientId}</p>}
+            <div className="md:col-span-2">
+              <div className="flex items-center justify-between mb-2">
+                <Label className="flex items-center space-x-2">
+                  <User className="w-4 h-4" />
+                  <span>Paciente *</span>
+                </Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsNewPatient(!isNewPatient);
+                    setNewPatientErrors({});
+                  }}
+                  className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${
+                    isNewPatient
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
+                  }`}
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  {isNewPatient ? 'Cancelar nuevo' : 'Nuevo paciente'}
+                </button>
+              </div>
+
+              {isNewPatient ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div>
+                    <Label htmlFor="np-firstName" className="text-xs">Nombre *</Label>
+                    <Input
+                      id="np-firstName"
+                      value={newPatientData.firstName}
+                      onChange={(e) => setNewPatientData(prev => ({ ...prev, firstName: e.target.value }))}
+                      placeholder="Nombre"
+                      className={newPatientErrors.firstName ? 'border-red-500' : ''}
+                    />
+                    {newPatientErrors.firstName && <p className="text-red-500 text-xs mt-0.5">{newPatientErrors.firstName}</p>}
+                  </div>
+                  <div>
+                    <Label htmlFor="np-lastName" className="text-xs">Apellido *</Label>
+                    <Input
+                      id="np-lastName"
+                      value={newPatientData.lastName}
+                      onChange={(e) => setNewPatientData(prev => ({ ...prev, lastName: e.target.value }))}
+                      placeholder="Apellido"
+                      className={newPatientErrors.lastName ? 'border-red-500' : ''}
+                    />
+                    {newPatientErrors.lastName && <p className="text-red-500 text-xs mt-0.5">{newPatientErrors.lastName}</p>}
+                  </div>
+                  <div>
+                    <Label htmlFor="np-documentId" className="text-xs">Cédula *</Label>
+                    <Input
+                      id="np-documentId"
+                      value={newPatientData.documentId}
+                      onChange={(e) => setNewPatientData(prev => ({ ...prev, documentId: e.target.value }))}
+                      placeholder="Número de cédula"
+                      className={newPatientErrors.documentId ? 'border-red-500' : ''}
+                    />
+                    {newPatientErrors.documentId && <p className="text-red-500 text-xs mt-0.5">{newPatientErrors.documentId}</p>}
+                  </div>
+                  <div>
+                    <Label htmlFor="np-phone" className="text-xs">Teléfono *</Label>
+                    <Input
+                      id="np-phone"
+                      value={newPatientData.phone}
+                      onChange={(e) => setNewPatientData(prev => ({ ...prev, phone: e.target.value }))}
+                      placeholder="+57 300 000 0000"
+                      className={newPatientErrors.phone ? 'border-red-500' : ''}
+                    />
+                    {newPatientErrors.phone && <p className="text-red-500 text-xs mt-0.5">{newPatientErrors.phone}</p>}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <select
+                    id="patientId"
+                    value={formData.patientId}
+                    onChange={(e) => handleInputChange('patientId', e.target.value)}
+                    className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.patientId ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  >
+                    <option value="">Selecciona un paciente</option>
+                    {(patientsData?.data?.data?.data as Patient[])?.map((patient: Patient) => (
+                      <option key={patient.id} value={patient.id}>
+                        {patient?.user?.firstName} {patient?.user?.lastName} - {patient?.user?.phone || patient?.user?.email}
+                      </option>
+                    )) || []}
+                  </select>
+                  {errors.patientId && <p className="text-red-500 text-sm mt-1">{errors.patientId}</p>}
+                </>
+              )}
             </div>
 
             {/* Doctor */}
@@ -279,7 +550,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               <select
                 id="serviceId"
                 value={formData.serviceId}
-                onChange={(e) => handleInputChange('serviceId', e.target.value)}
+                onChange={(e) => handleServiceChange(e.target.value)}
                 className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.serviceId ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -292,19 +563,24 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                 )) || []}
               </select>
               {errors.serviceId && <p className="text-red-500 text-sm mt-1">{errors.serviceId}</p>}
+              {selectedService && (
+                <p className="mt-1 text-xs text-gray-500">
+                  Duracion sugerida: {selectedService.duration} min - Precio base: ${selectedService.basePrice}
+                </p>
+              )}
             </div>
 
-            {/* Fecha y Hora */}
+            {/* Fecha */}
             <div>
-              <Label htmlFor="scheduledAt" className="flex items-center space-x-2">
+              <Label htmlFor="appointmentDate" className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" />
-                <span>Fecha y Hora *</span>
+                <span>Fecha *</span>
               </Label>
               <Input
-                id="scheduledAt"
-                type="datetime-local"
-                value={formData.scheduledAt}
-                onChange={(e) => handleInputChange('scheduledAt', e.target.value)}
+                id="appointmentDate"
+                type="date"
+                value={selectedDate}
+                onChange={(e) => handleDateChange(e.target.value)}
                 className={errors.scheduledAt ? 'border-red-500' : ''}
               />
               {errors.scheduledAt && <p className="text-red-500 text-sm mt-1">{errors.scheduledAt}</p>}
@@ -365,18 +641,147 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
             </div>
 
-            {/* Ciudad */}
+            {/* Localidad */}
             <div>
-              <Label htmlFor="city">Ciudad *</Label>
+              <Label htmlFor="city">Localidad *</Label>
               <Input
                 id="city"
+                list="bogota-localities"
                 value={formData.city}
                 onChange={(e) => handleInputChange('city', e.target.value)}
                 className={errors.city ? 'border-red-500' : ''}
-                placeholder="Bogotá"
+                placeholder="Chapinero, Suba, Kennedy..."
               />
+              <datalist id="bogota-localities">
+                {bogotaLocalities.map((locality) => (
+                  <option key={locality} value={locality} />
+                ))}
+              </datalist>
               {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
             </div>
+
+            <div>
+              <Label htmlFor="latitude">Latitud para mapa</Label>
+              <Input
+                id="latitude"
+                type="number"
+                step="0.000001"
+                value={formData.coordinates.lat}
+                onChange={(e) =>
+                  handleInputChange('coordinates', {
+                    ...formData.coordinates,
+                    lat: parseFloat(e.target.value) || 0,
+                  })
+                }
+                placeholder="4.711000"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="longitude">Longitud para mapa</Label>
+              <Input
+                id="longitude"
+                type="number"
+                step="0.000001"
+                value={formData.coordinates.lng}
+                onChange={(e) =>
+                  handleInputChange('coordinates', {
+                    ...formData.coordinates,
+                    lng: parseFloat(e.target.value) || 0,
+                  })
+                }
+                placeholder="-74.072100"
+              />
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Ubicacion en mapa</h3>
+                <p className="text-xs text-gray-600">
+                  Se calcula automaticamente con direccion y localidad. Puedes reintentar si corriges la direccion.
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => geocodeAddress(true)}
+                disabled={isGeocoding || !formData.address || !formData.city}
+              >
+                <MapPin className="h-4 w-4" />
+                {isGeocoding ? 'Ubicando...' : 'Ubicar'}
+              </Button>
+            </div>
+            {(geocodeStatus || formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0) && (
+              <div className="mt-3 text-xs text-gray-700">
+                <p>{geocodeStatus || 'Coordenadas listas.'}</p>
+                <p className="mt-1 font-medium">
+                  {formData.coordinates.lat.toFixed(6)}, {formData.coordinates.lng.toFixed(6)}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Horas disponibles del medico</h3>
+                <p className="text-xs text-gray-600">
+                  Selecciona medico, servicio y fecha para reservar un horario disponible.
+                </p>
+              </div>
+              {isFetchingAvailability && <span className="text-xs text-blue-700">Cargando...</span>}
+            </div>
+
+            {availability?.availability?.length ? (
+              <div className="mb-3 flex flex-wrap gap-2">
+                {availability.availability.map((block) => (
+                  <span
+                    key={block.id}
+                    className="rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-medium text-blue-800"
+                  >
+                    {block.startTime} - {block.endTime}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="mb-3 text-xs text-amber-700">
+                {formData.doctorId && selectedDate
+                  ? 'Este medico aun no registro disponibilidad para este dia.'
+                  : 'Pendiente seleccionar medico y fecha.'}
+              </p>
+            )}
+
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-6">
+              {availableSlots.map((slot) => {
+                const selected = formData.scheduledAt.endsWith(`T${slot.startTime}`);
+                return (
+                  <button
+                    key={`${slot.startTime}-${slot.endTime}`}
+                    type="button"
+                    disabled={!slot.isAvailable}
+                    onClick={() => handleSlotSelect(slot)}
+                    className={`rounded-md border px-3 py-2 text-xs font-medium transition ${
+                      selected
+                        ? 'border-blue-600 bg-blue-600 text-white'
+                        : slot.isAvailable
+                          ? 'border-gray-200 bg-white text-gray-800 hover:border-blue-400 hover:text-blue-700'
+                          : 'border-gray-100 bg-gray-100 text-gray-400'
+                    }`}
+                    title={slot.reason}
+                  >
+                    {slot.startTime}
+                  </button>
+                );
+              })}
+            </div>
+
+            {formData.scheduledAt && (
+              <p className="mt-3 text-xs font-medium text-gray-700">
+                Hora seleccionada: {formData.scheduledAt.replace('T', ' ')}
+              </p>
+            )}
           </div>
 
           {/* Notas */}

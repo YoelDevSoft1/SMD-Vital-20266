@@ -7,6 +7,10 @@ const clinicalController = new ClinicalController();
 
 router.use(authMiddleware);
 
+router.get('/availability', requireRole(['DOCTOR']), clinicalController.getMyAvailability);
+router.put('/availability', requireRole(['DOCTOR']), clinicalController.setMyAvailability);
+router.get('/route', requireRole(['DOCTOR']), clinicalController.getMyRoute);
+
 router.get('/appointments', requireRole(['DOCTOR', 'NURSE']), clinicalController.getAssignedAppointments);
 router.get('/appointments/:id', requireRole(['DOCTOR', 'NURSE']), clinicalController.getAppointmentDetails);
 router.post('/appointments/:id/start', requireRole(['DOCTOR', 'NURSE']), clinicalController.startEncounter);

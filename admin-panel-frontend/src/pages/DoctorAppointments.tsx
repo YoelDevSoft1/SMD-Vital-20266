@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { formatDateTime } from '@/utils/dateFormat';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Calendar,
@@ -1418,12 +1419,3 @@ export default function DoctorAppointments() {
   );
 }
 
-function formatDateTime(dateString: string) {
-  return new Intl.DateTimeFormat('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(dateString));
-}

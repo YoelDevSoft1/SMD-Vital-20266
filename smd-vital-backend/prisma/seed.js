@@ -89,6 +89,23 @@ async function main() {
             },
         },
     });
+    await prisma.user.create({
+        data: {
+            email: 'asistente@smdvital.com',
+            password: hashedPassword,
+            firstName: 'Asistente',
+            lastName: 'Agenda',
+            phone: '+573000000001',
+            role: 'ADMIN',
+            isActive: true,
+            isVerified: true,
+            admin: {
+                create: {
+                    level: 'ADMIN',
+                },
+            },
+        },
+    });
     const doctorsData = [
         {
             email: 'maria.garcia@smdvital.com',
@@ -593,7 +610,7 @@ async function main() {
     console.log(`✅ Creadas ${settings.length} configuraciones`);
     console.log('\n✨ ¡Seed completado exitosamente!\n');
     console.log('📊 Resumen:');
-    console.log(`   👥 Usuarios: 12 (2 admins, 5 doctores, 3 pacientes + usuarios previos)`);
+    console.log(`   👥 Usuarios: 13 (3 admins/asistentes, 5 doctores, 3 pacientes + usuarios previos)`);
     console.log(`   🏥 Servicios: ${services.length}`);
     console.log(`   📅 Horarios médicos: ${scheduleCount}`);
     console.log(`   🔗 Servicios médicos: ${doctorServiceCount}`);

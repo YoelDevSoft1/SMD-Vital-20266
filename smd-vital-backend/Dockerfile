@@ -51,6 +51,11 @@ RUN npm ci --only=production && npm cache clean --force
 # Copiar artefactos construidos desde la etapa builder
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/prisma ./prisma
+
+# Copiar script de inicio
+COPY --chown=nodejs:nodejs start.sh ./start.sh
+RUN chmod +x start.sh
 
 # Crear directorios necesarios
 RUN mkdir -p logs uploads && \
@@ -69,5 +74,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # Usar dumb-init para manejar señales correctamente
 ENTRYPOINT ["dumb-init", "--"]
 
-# Comando de inicio
-CMD ["node", "dist/index.js"]
+# Comando de inicio (corre migraciones y luego arranca el servidor)
+CMD ["sh", "start.sh"]

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatDate } from '@/utils/dateFormat';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Calendar, Clock, User, Stethoscope, MapPin, Filter, Search, Plus, Edit, Trash2, Eye, CheckCircle, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -149,15 +150,6 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
     setShowEditForm(true);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CO', {
@@ -484,6 +476,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
           isOpen={showCreateForm}
           onClose={() => {
             setShowCreateForm(false);
+            setSelectedAppointment(null);
           }}
         />
       )}

@@ -1,5 +1,12 @@
 import api from './api';
-import type { ApiResponse, ClinicalAppointment, PaginatedResponse, PatientHistory } from '@/types';
+import type {
+  ApiResponse,
+  ClinicalAppointment,
+  DoctorAvailabilityResponse,
+  DoctorRouteResponse,
+  PaginatedResponse,
+  PatientHistory,
+} from '@/types';
 
 export interface ClinicalAppointmentFilters {
   page?: number;
@@ -82,7 +89,30 @@ export interface CreateRecordByEmailPayload {
   };
 }
 
+export interface DoctorAvailabilityBlockPayload {
+  startTime: string;
+  endTime: string;
+  notes?: string;
+  isActive?: boolean;
+}
+
 export const clinicalService = {
+  getMyAvailability: (date: string, duration?: number) =>
+    api.get<ApiResponse<DoctorAvailabilityResponse>>('/clinical/availability', {
+      params: { date, duration },
+    }),
+
+  setMyAvailability: (date: string, blocks: DoctorAvailabilityBlockPayload[]) =>
+    api.put<ApiResponse<DoctorAvailabilityResponse>>('/clinical/availability', {
+      date,
+      blocks,
+    }),
+
+  getMyRoute: (date: string) =>
+    api.get<ApiResponse<DoctorRouteResponse>>('/clinical/route', {
+      params: { date },
+    }),
+
   getAssignedAppointments: (filters: ClinicalAppointmentFilters) =>
     api.get<ApiResponse<PaginatedResponse<ClinicalAppointment>>>('/clinical/appointments', {
       params: filters,

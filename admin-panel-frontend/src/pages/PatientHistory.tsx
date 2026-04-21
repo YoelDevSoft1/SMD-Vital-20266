@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { formatDateTime, formatDate } from '@/utils/dateFormat';
 import { useQuery } from '@tanstack/react-query';
 import { AlertCircle, FileDown, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -264,20 +265,3 @@ function getFileNameFromHeader(headerValue?: string) {
   return match?.[1] ?? null;
 }
 
-function formatDateTime(dateString: string) {
-  return new Intl.DateTimeFormat('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(dateString));
-}
-
-function formatDate(dateString: string) {
-  return new Intl.DateTimeFormat('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }).format(new Date(dateString));
-}

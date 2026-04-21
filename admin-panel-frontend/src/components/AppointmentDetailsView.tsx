@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatDate } from '@/utils/dateFormat';
 import { X, Calendar, Clock, User, Stethoscope, MapPin, DollarSign, FileText, AlertCircle, CheckCircle, XCircle, RefreshCw, Phone, Mail, Building } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import type { Appointment } from '@/types';
@@ -30,15 +31,6 @@ const statusColors = {
 };
 
 export default function AppointmentDetailsView({ appointment, onClose, onEdit }: AppointmentDetailsViewProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CO', {

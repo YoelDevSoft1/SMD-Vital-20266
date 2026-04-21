@@ -115,6 +115,7 @@ model Doctor {
   appointments Appointment[]
   reviews      Review[]
   schedules    DoctorSchedule[]
+  availabilities DoctorAvailability[]
   services     DoctorService[]
   prescriptions Prescription[]
   encounters   Encounter[]
@@ -384,6 +385,23 @@ model DoctorSchedule {
   doctor    Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@map("doctor_schedules")
+}
+
+model DoctorAvailability {
+  id        String   @id @default(cuid())
+  doctorId  String
+  date      DateTime
+  startTime String
+  endTime   String
+  isActive  Boolean  @default(true)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doctor    Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@index([doctorId, date])
+  @@map("doctor_availabilities")
 }
 
 // Payments

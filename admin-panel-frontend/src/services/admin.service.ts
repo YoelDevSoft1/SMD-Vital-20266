@@ -7,7 +7,9 @@ import type {
   AppointmentFilters,
   DashboardStats,
   Doctor,
+  DoctorAvailabilityResponse,
   DoctorFilters,
+  DoctorRouteResponse,
   PaginatedResponse,
   Payment,
   PaymentFilters,
@@ -72,6 +74,18 @@ export const adminService = {
       isAvailable,
     }),
 
+  getDoctorDailyAvailability: (id: string, date: string, duration?: number) =>
+    api.get<ApiResponse<DoctorAvailabilityResponse>>(
+      `/admin-panel/doctors/${id}/daily-availability`,
+      { params: { date, duration } },
+    ),
+
+  getDoctorDailyRoute: (id: string, date: string) =>
+    api.get<ApiResponse<DoctorRouteResponse>>(
+      `/admin-panel/doctors/${id}/daily-route`,
+      { params: { date } },
+    ),
+
   updateDoctorMedia: (id: string, data: { logoPath?: string; signaturePath?: string }) =>
     api.patch<ApiResponse<Doctor>>(`/admin-panel/doctors/${id}/media`, data),
 
@@ -110,6 +124,9 @@ export const adminService = {
     api.get<ApiResponse<PaginatedResponse<User>>>('/admin-panel/patients', {
       params: filters,
     }),
+
+  createQuickPatient: (data: { firstName: string; lastName: string; documentId: string; phone: string }) =>
+    api.post<ApiResponse<any>>('/admin-panel/patients/quick', data),
 
   // Payments
   getPayments: (filters: PaymentFilters) =>

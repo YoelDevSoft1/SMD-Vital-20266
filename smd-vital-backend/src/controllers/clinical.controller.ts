@@ -280,6 +280,94 @@ export class ClinicalController {
     }
   };
 
+  public getMyAvailability = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { date, duration = '60' } = req.query;
+      if (typeof date !== 'string') {
+        res.status(400).json({
+          success: false,
+          message: 'Date is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const result = await this.clinicalService.getMyAvailability(
+        req.userId!,
+        date,
+        parseInt(duration as string, 10)
+      );
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Availability retrieved successfully',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+      res.status(200).json(response);
+    } catch (error: any) {
+      this.handleError(res, error, 'Error fetching availability', req);
+    }
+  };
+
+  public setMyAvailability = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { date, blocks } = req.body;
+      if (typeof date !== 'string' || !Array.isArray(blocks)) {
+        res.status(400).json({
+          success: false,
+          message: 'Date and blocks are required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const result = await this.clinicalService.setMyAvailability(req.userId!, date, blocks);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Availability updated successfully',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+      res.status(200).json(response);
+    } catch (error: any) {
+      this.handleError(res, error, 'Error updating availability', req);
+    }
+  };
+
+  public getMyRoute = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { date } = req.query;
+      if (typeof date !== 'string') {
+        res.status(400).json({
+          success: false,
+          message: 'Date is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const result = await this.clinicalService.getMyRoute(req.userId!, date);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Route retrieved successfully',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+      res.status(200).json(response);
+    } catch (error: any) {
+      this.handleError(res, error, 'Error fetching route', req);
+    }
+  };
+
   public downloadMedicalRecord = async (req: Request, res: Response): Promise<void> => {
     try {
       const recordId = this.requireParam(req, 'id');
