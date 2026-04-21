@@ -175,18 +175,6 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
   });
 
   useEffect(() => {
-    // Debug logging
-    console.log('=== CREATE APPOINTMENT FORM DEBUG ===');
-    console.log('Is editing:', !!appointment);
-    console.log('Appointment data:', appointment);
-    console.log('Has doctorsData:', !!doctorsData);
-    console.log('Has patientsData:', !!patientsData);
-    console.log('Has servicesData:', !!servicesData);
-    console.log('Doctors data structure:', doctorsData ? Object.keys(doctorsData) : []);
-    console.log('Patients data structure:', patientsData ? Object.keys(patientsData) : []);
-    console.log('Services data structure:', servicesData ? Object.keys(servicesData) : []);
-    console.log('========================');
-
     if (appointment) {
       setFormData({
         patientId: appointment.patientId || '',
@@ -411,19 +399,20 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="relative z-[1201] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg bg-white shadow-xl">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-2xl font-bold text-gray-900">
+    <div className="fixed inset-0 z-[1200] flex items-end justify-center bg-black/55 p-0 sm:items-center sm:p-4">
+      <div className="relative z-[1201] flex h-[100dvh] w-full flex-col overflow-hidden bg-white shadow-xl sm:h-auto sm:max-h-[92vh] sm:max-w-4xl sm:rounded-lg">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-4 py-4 sm:p-6">
+          <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
             {appointment ? 'Editar Cita' : 'Nueva Cita'}
           </h2>
-          <Button variant="ghost" onClick={handleClose}>
+          <Button variant="ghost" onClick={handleClose} className="h-10 w-10 p-0">
             <X className="w-6 h-6" />
           </Button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4 sm:space-y-6 sm:p-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
             {/* Paciente */}
             <div className="md:col-span-2">
               <div className="flex items-center justify-between mb-2">
@@ -437,7 +426,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                     setIsNewPatient(!isNewPatient);
                     setNewPatientErrors({});
                   }}
-                  className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${
+                  className={`flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     isNewPatient
                       ? 'bg-blue-600 text-white border-blue-600'
                       : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
@@ -449,7 +438,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               </div>
 
               {isNewPatient ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="grid grid-cols-1 gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 sm:grid-cols-2 sm:p-4">
                   <div>
                     <Label htmlFor="np-firstName" className="text-xs">Nombre *</Label>
                     <Input
@@ -695,7 +684,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 sm:p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h3 className="text-sm font-semibold text-gray-900">Ubicacion en mapa</h3>
@@ -708,6 +697,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                 variant="outline"
                 onClick={() => geocodeAddress(true)}
                 disabled={isGeocoding || !formData.address || !formData.city}
+                className="w-full sm:w-auto"
               >
                 <MapPin className="h-4 w-4" />
                 {isGeocoding ? 'Ubicando...' : 'Ubicar'}
@@ -723,8 +713,8 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
             )}
           </div>
 
-          <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-4">
-            <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-3 sm:p-4">
+            <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
               <div>
                 <h3 className="text-sm font-semibold text-gray-900">Horas disponibles del medico</h3>
                 <p className="text-xs text-gray-600">
@@ -753,7 +743,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               </p>
             )}
 
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-6">
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
               {availableSlots.map((slot) => {
                 const selected = formData.scheduledAt.endsWith(`T${slot.startTime}`);
                 return (
@@ -762,7 +752,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                     type="button"
                     disabled={!slot.isAvailable}
                     onClick={() => handleSlotSelect(slot)}
-                    className={`rounded-md border px-3 py-2 text-xs font-medium transition ${
+                    className={`min-h-11 rounded-md border px-2 py-2 text-xs font-medium transition ${
                       selected
                         ? 'border-blue-600 bg-blue-600 text-white'
                         : slot.isAvailable
@@ -791,7 +781,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               id="notes"
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="min-h-24 w-full rounded-md border border-gray-300 p-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
               rows={3}
               placeholder="Notas adicionales sobre la cita..."
             />
@@ -804,7 +794,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               id="diagnosis"
               value={formData.diagnosis}
               onChange={(e) => handleInputChange('diagnosis', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="min-h-24 w-full rounded-md border border-gray-300 p-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
               rows={3}
               placeholder="Diagnóstico médico..."
             />
@@ -817,7 +807,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               id="prescription"
               value={formData.prescription}
               onChange={(e) => handleInputChange('prescription', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="min-h-24 w-full rounded-md border border-gray-300 p-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
               rows={3}
               placeholder="Medicamentos y tratamientos prescritos..."
             />
@@ -833,12 +823,14 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
             <Label htmlFor="isUrgent">Cita urgente</Label>
           </div>
 
+          </div>
+
           {/* Botones */}
-          <div className="flex items-center justify-end space-x-4 pt-6 border-t">
-            <Button type="button" variant="outline" onClick={handleClose}>
+          <div className="sticky bottom-0 z-10 flex flex-col-reverse gap-3 border-t bg-white/95 px-4 py-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur sm:flex-row sm:justify-end sm:p-6 sm:shadow-none">
+            <Button type="button" variant="outline" onClick={handleClose} className="w-full sm:w-auto">
               Cancelar
             </Button>
-            <Button type="submit" disabled={appointmentMutation.isPending}>
+            <Button type="submit" disabled={appointmentMutation.isPending} className="w-full sm:w-auto">
               {appointmentMutation.isPending ? 'Guardando...' : (appointment ? 'Actualizar' : 'Crear')}
             </Button>
           </div>

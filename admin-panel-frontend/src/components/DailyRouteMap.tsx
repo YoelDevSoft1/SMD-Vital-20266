@@ -14,7 +14,12 @@ export default function DailyRouteMap({ route }: DailyRouteMapProps) {
 
   return (
     <div className="relative z-0 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-      <MapContainer center={center} zoom={positions.length ? 12 : 11} className="relative z-0 h-80 w-full">
+      {!positions.length && (
+        <div className="absolute inset-x-3 top-3 z-[500] rounded-md border border-amber-200 bg-white/95 px-3 py-2 text-xs font-medium text-amber-800 shadow-sm">
+          Sin coordenadas para pintar la ruta. Completa dirección y localidad al crear o editar la cita.
+        </div>
+      )}
+      <MapContainer center={center} zoom={positions.length ? 12 : 11} className="relative z-0 h-64 w-full sm:h-80">
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -152,21 +152,11 @@ export default function Appointments() {
   const doctors = (doctorsData?.data?.data?.data as Doctor[]) ?? [];
   const route = routeData?.data?.data;
 
-  // Debug logging
-  console.log('Appointments Debug:', {
-    hasDashboardData: !!dashboardData,
-    stats: stats,
-    totalCitas: totalCitas,
-    pendientes: pendientes,
-    completadas: completadas,
-    tasaExito: tasaExito
-  });
-
   if (error) {
     return (
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de citas</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Gestión de citas</h1>
         </div>
         <Card className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
           <CardContent className="flex flex-col gap-4 p-6 text-sm">
@@ -200,18 +190,18 @@ export default function Appointments() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de citas</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Gestión de citas</h1>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             Administra todas las citas médicas del sistema SMD Vital
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
           <Button
             variant="outline"
             onClick={() => refetch()}
             isLoading={isFetching}
             disabled={isFetching}
-            className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+            className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
           >
             <RefreshCw className={cn("mr-2 h-4 w-4", isFetching && "animate-spin")} />
             Actualizar
@@ -219,7 +209,7 @@ export default function Appointments() {
           <Button 
             variant="outline" 
             onClick={() => setShowModal(true)}
-            className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+            className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
           >
             <Calendar className="h-4 w-4" />
             Ver todas
@@ -229,6 +219,7 @@ export default function Appointments() {
               setSelectedAppointment(null);
               setShowCreateForm(true);
             }}
+            className="col-span-2 w-full sm:col-span-1 sm:w-auto"
           >
             <CalendarPlus className="h-4 w-4" />
             Nueva cita
@@ -237,7 +228,7 @@ export default function Appointments() {
       </div>
 
       <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <CardHeader className="flex flex-col gap-3 p-4 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
               <MapPin className="h-5 w-5 text-blue-600" />
@@ -267,7 +258,7 @@ export default function Appointments() {
             />
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-4 sm:p-6">
           <DailyRouteMap route={route} />
 
           {isFetchingRoute ? (
@@ -327,7 +318,7 @@ export default function Appointments() {
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total citas</p>
@@ -341,7 +332,7 @@ export default function Appointments() {
         </Card>
 
         <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Pendientes</p>
@@ -355,7 +346,7 @@ export default function Appointments() {
         </Card>
 
         <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Completadas</p>
@@ -369,7 +360,7 @@ export default function Appointments() {
         </Card>
 
         <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Tasa de éxito</p>
@@ -387,8 +378,8 @@ export default function Appointments() {
 
       {/* Filters */}
       <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader>
-          <div className="flex items-center justify-between">
+        <CardHeader className="p-4 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
               Filtros de búsqueda
             </CardTitle>
@@ -396,7 +387,7 @@ export default function Appointments() {
               variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+              className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
             >
               <Filter className="h-4 w-4" />
               {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
@@ -404,7 +395,7 @@ export default function Appointments() {
           </div>
         </CardHeader>
         {showFilters && (
-          <CardContent className="pt-0">
+          <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -484,7 +475,7 @@ export default function Appointments() {
 
       {/* Appointments Grid */}
       <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
               Lista de citas
@@ -494,7 +485,7 @@ export default function Appointments() {
             </p>
           </div>
           {!isLoading && appointments.length > 0 && (
-            <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={selectedAppointments.length === appointments.length && appointments.length > 0}
@@ -502,7 +493,7 @@ export default function Appointments() {
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
               />
               <span className="text-sm text-gray-600 dark:text-gray-400">Seleccionar todas</span>
-            </div>
+            </label>
           )}
         </CardHeader>
         <CardContent className="p-0">
@@ -539,9 +530,9 @@ export default function Appointments() {
               {appointments.map((appointment: any) => (
                 <div
                   key={appointment.id}
-                  className="p-6 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors"
+                  className="p-4 transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-700/50 sm:p-6"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3 sm:gap-4">
                     {/* Checkbox */}
                     <input
                       type="checkbox"
@@ -551,17 +542,17 @@ export default function Appointments() {
                     />
 
                     {/* Icon */}
-                    <div className="flex-shrink-0">
-                      <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center ring-2 ring-gray-100 dark:ring-gray-600">
+                    <div className="hidden flex-shrink-0 sm:block">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 ring-2 ring-gray-100 dark:ring-gray-600">
                         <Calendar className="h-6 w-6 text-white" />
                       </div>
                     </div>
 
                     {/* Appointment Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                               {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName}
                             </h3>
@@ -614,12 +605,12 @@ export default function Appointments() {
                       </div>
 
                       {/* Actions */}
-                      <div className="mt-4 flex flex-wrap gap-2">
+                      <div className="mt-4 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => handleViewDetails(appointment)}
-                          className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                          className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           Ver detalles
@@ -631,7 +622,7 @@ export default function Appointments() {
                             setSelectedAppointment(appointment);
                             setShowCreateForm(true);
                           }}
-                          className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                          className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
                         >
                           <Edit2 className="h-3.5 w-3.5" />
                           Editar
@@ -640,7 +631,7 @@ export default function Appointments() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleDeleteAppointment(appointment)}
-                          className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                          className="w-full text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Eliminar
@@ -656,8 +647,8 @@ export default function Appointments() {
 
         {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-6 py-4">
-            <div className="flex items-center justify-between">
+          <div className="border-t border-gray-200 bg-gray-50 px-4 py-4 dark:border-gray-700 dark:bg-gray-800 sm:px-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-sm text-gray-600 dark:text-gray-400">
                 Mostrando{' '}
                 <span className="font-medium text-gray-900 dark:text-white">
@@ -671,7 +662,7 @@ export default function Appointments() {
                 <span className="font-medium text-gray-900 dark:text-white">{pagination.total}</span>
                 {' '}resultados
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
                   size="sm"

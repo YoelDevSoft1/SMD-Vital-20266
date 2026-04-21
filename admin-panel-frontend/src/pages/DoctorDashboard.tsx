@@ -107,10 +107,10 @@ export default function DoctorDashboard() {
     return (
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Panel clinico</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Panel clinico</h1>
         </div>
         <Card className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
-          <CardContent className="flex flex-col gap-4 p-6 text-sm">
+          <CardContent className="flex flex-col gap-4 p-4 text-sm sm:p-6">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
               <div>
@@ -141,7 +141,7 @@ export default function DoctorDashboard() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Panel clinico</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Panel clinico</h1>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             Resumen de tus citas asignadas y estado actual.
           </p>
@@ -150,14 +150,14 @@ export default function DoctorDashboard() {
           variant="outline"
           onClick={() => navigate('/doctor/appointments')}
           isLoading={isFetching}
-          className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+          className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
         >
           Ver agenda
         </Button>
       </div>
 
       <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
               Disponibilidad diaria
@@ -166,12 +166,12 @@ export default function DoctorDashboard() {
               Define los rangos que administracion puede usar para agendarte.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-[1fr_auto] gap-2 sm:flex sm:items-center">
             <Input
               type="date"
               value={availabilityDate}
               onChange={(event) => setAvailabilityDate(event.target.value)}
-              className="w-40"
+              className="w-full sm:w-40"
             />
             <Button
               onClick={() => availabilityMutation.mutate()}
@@ -183,9 +183,9 @@ export default function DoctorDashboard() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 p-4 sm:p-6">
           {availabilityBlocks.map((block, index) => (
-            <div key={`${index}-${block.startTime}-${block.endTime}`} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+            <div key={`${index}-${block.startTime}-${block.endTime}`} className="grid grid-cols-[1fr_1fr_auto] gap-2 sm:gap-3">
               <div>
                 <Label>Desde</Label>
                 <Input
@@ -224,7 +224,7 @@ export default function DoctorDashboard() {
                     )
                   }
                   disabled={availabilityBlocks.length === 1}
-                  className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                  className="h-11 w-11 p-0 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -238,7 +238,7 @@ export default function DoctorDashboard() {
             onClick={() =>
               setAvailabilityBlocks((current) => [...current, { startTime: '14:00', endTime: '18:00' }])
             }
-            className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+            className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
           >
             <Plus className="h-4 w-4" />
             Agregar rango
@@ -247,7 +247,7 @@ export default function DoctorDashboard() {
       </Card>
 
       <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader>
+        <CardHeader className="p-4 sm:p-6">
           <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
             Ruta del dia
           </CardTitle>
@@ -255,7 +255,7 @@ export default function DoctorDashboard() {
             Citas ordenadas por hora y tiempos estimados de traslado.
           </p>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-4 sm:p-6">
           <DailyRouteMap route={routeData?.data?.data} />
           {isFetchingRoute ? (
             <p className="text-sm text-gray-500 dark:text-gray-400">Cargando ruta...</p>
@@ -291,7 +291,7 @@ export default function DoctorDashboard() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Citas totales</p>
@@ -307,7 +307,7 @@ export default function DoctorDashboard() {
         </Card>
 
         <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Pendientes</p>
@@ -323,7 +323,7 @@ export default function DoctorDashboard() {
         </Card>
 
         <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">En progreso</p>
@@ -339,7 +339,7 @@ export default function DoctorDashboard() {
         </Card>
 
         <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Completadas</p>
@@ -356,7 +356,7 @@ export default function DoctorDashboard() {
       </div>
 
       <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
               Proximas citas
@@ -368,11 +368,11 @@ export default function DoctorDashboard() {
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-8 text-center text-sm text-gray-500 dark:text-gray-400 sm:p-12">
               Cargando citas...
             </div>
           ) : appointments.length === 0 ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-8 text-center text-sm text-gray-500 dark:text-gray-400 sm:p-12">
               No hay citas asignadas.
             </div>
           ) : (
@@ -380,7 +380,7 @@ export default function DoctorDashboard() {
               {appointments.map((appointment) => (
                 <div
                   key={appointment.id}
-                  className="flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6"
                 >
                   <div>
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -408,4 +408,3 @@ export default function DoctorDashboard() {
     </div>
   );
 }
-
