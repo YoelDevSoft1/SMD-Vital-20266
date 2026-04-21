@@ -49,6 +49,7 @@ class SMDVitalServer {
 
   constructor() {
     this.app = express();
+    this.app.set('trust proxy', 1);
     this.server = createServer(this.app);
     // Parse CORS origins for Socket.IO
     const socketOrigins = typeof config.cors.origin === 'string' 
