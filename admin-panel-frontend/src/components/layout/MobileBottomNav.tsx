@@ -7,6 +7,7 @@ const priorityPaths = new Set([
   '/appointments',
   '/doctors',
   '/users',
+  '/services',
   '/doctor',
   '/doctor/appointments',
   '/patient',
@@ -20,12 +21,17 @@ export default function MobileBottomNav() {
   const { navItems } = getSidebarConfig(user?.role);
   const items = navItems.filter((item) => priorityPaths.has(item.to)).slice(0, 5);
 
+  if (!items.length) return null;
+
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200/80 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.35rem)] pt-2 shadow-[0_-18px_50px_-32px_rgba(15,23,42,0.45)] backdrop-blur-xl lg:hidden dark:border-slate-700/80 dark:bg-slate-950/95"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200/80 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.45rem)] pt-2 shadow-[0_-18px_50px_-32px_rgba(15,23,42,0.45)] backdrop-blur-xl [transform:translateZ(0)] lg:hidden dark:border-slate-700/80 dark:bg-slate-950/95"
       aria-label="Navegacion movil"
     >
-      <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+      <div
+        className="mx-auto grid w-full max-w-[min(28rem,calc(100vw-1rem))] gap-1"
+        style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
+      >
         {items.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
