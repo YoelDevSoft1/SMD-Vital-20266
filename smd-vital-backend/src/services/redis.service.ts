@@ -3,36 +3,40 @@ import { config } from '../config/config';
 import { logger } from '../utils/logger';
 
 export class RedisService {
-  private static client: Redis;
+  private static client: Redis | null = null;
+  private static available = false;
 
   /**
-   * Initialize Redis connection
+   * Initialize Redis connection — non-fatal if Redis is unavailable
    */
   public static async initialize(): Promise<void> {
-    if (this.client) {
-      logger.info('Redis client already initialized');
+    if (!config.redis.url || config.redis.url === 'redis://localhost:6379') {
+      logger.warn('Redis URL not configured — running without cache');
       return;
     }
 
     try {
       this.client = new Redis(config.redis.url, {
-        maxRetriesPerRequest: 3,
+        maxRetriesPerRequest: 1,
         lazyConnect: true,
         keepAlive: 30000,
-        connectTimeout: 10000,
-        commandTimeout: 5000,
+        connectTimeout: 5000,
+        commandTimeout: 3000,
+        enableOfflineQueue: false,
       });
 
-      // Handle connection events
       this.client.on('connect', () => {
+        this.available = true;
         logger.info('Redis connected successfully');
       });
 
       this.client.on('error', (error) => {
+        this.available = false;
         logger.error('Redis connection error:', error);
       });
 
       this.client.on('close', () => {
+        this.available = false;
         logger.warn('Redis connection closed');
       });
 
@@ -40,454 +44,337 @@ export class RedisService {
         logger.info('Redis reconnecting...');
       });
 
-      // Test connection
       await this.client.ping();
+      this.available = true;
       logger.info('Redis connection test successful');
     } catch (error: any) {
-      logger.error('Failed to initialize Redis:', error);
-      throw error;
+      this.available = false;
+      this.client = null;
+      logger.warn('Redis unavailable — running without cache:', error.message);
+      // Non-fatal: server continues without Redis
     }
   }
 
-  /**
-   * Get value by key
-   */
+  private static isReady(): boolean {
+    return this.available && this.client !== null;
+  }
+
   public static async get(key: string): Promise<string | null> {
+    if (!this.isReady()) return null;
     try {
-      return await this.client.get(key);
-    } catch (error: any) {
-      logger.error('Redis GET error:', error);
-      throw error;
+      return await this.client!.get(key);
+    } catch {
+      return null;
     }
   }
 
-  /**
-   * Set key-value pair
-   */
   public static async set(key: string, value: string): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.set(key, value);
-    } catch (error: any) {
-      logger.error('Redis SET error:', error);
-      throw error;
+      await this.client!.set(key, value);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Set key-value pair with expiration
-   */
   public static async setex(key: string, seconds: number, value: string): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.setex(key, seconds, value);
-    } catch (error: any) {
-      logger.error('Redis SETEX error:', error);
-      throw error;
+      await this.client!.setex(key, seconds, value);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Delete key
-   */
   public static async del(key: string): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.del(key);
-    } catch (error: any) {
-      logger.error('Redis DEL error:', error);
-      throw error;
+      await this.client!.del(key);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Check if key exists
-   */
   public static async exists(key: string): Promise<boolean> {
+    if (!this.isReady()) return false;
     try {
-      const result = await this.client.exists(key);
-      return result === 1;
-    } catch (error: any) {
-      logger.error('Redis EXISTS error:', error);
-      throw error;
+      return (await this.client!.exists(key)) === 1;
+    } catch {
+      return false;
     }
   }
 
-  /**
-   * Set expiration for key
-   */
   public static async expire(key: string, seconds: number): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.expire(key, seconds);
-    } catch (error: any) {
-      logger.error('Redis EXPIRE error:', error);
-      throw error;
+      await this.client!.expire(key, seconds);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Get TTL for key
-   */
   public static async ttl(key: string): Promise<number> {
+    if (!this.isReady()) return -1;
     try {
-      return await this.client.ttl(key);
-    } catch (error: any) {
-      logger.error('Redis TTL error:', error);
-      throw error;
+      return await this.client!.ttl(key);
+    } catch {
+      return -1;
     }
   }
 
-  /**
-   * Increment value
-   */
   public static async incr(key: string): Promise<number> {
+    if (!this.isReady()) return 0;
     try {
-      return await this.client.incr(key);
-    } catch (error: any) {
-      logger.error('Redis INCR error:', error);
-      throw error;
+      return await this.client!.incr(key);
+    } catch {
+      return 0;
     }
   }
 
-  /**
-   * Increment value by amount
-   */
   public static async incrby(key: string, increment: number): Promise<number> {
+    if (!this.isReady()) return 0;
     try {
-      return await this.client.incrby(key, increment);
-    } catch (error: any) {
-      logger.error('Redis INCRBY error:', error);
-      throw error;
+      return await this.client!.incrby(key, increment);
+    } catch {
+      return 0;
     }
   }
 
-  /**
-   * Decrement value
-   */
   public static async decr(key: string): Promise<number> {
+    if (!this.isReady()) return 0;
     try {
-      return await this.client.decr(key);
-    } catch (error: any) {
-      logger.error('Redis DECR error:', error);
-      throw error;
+      return await this.client!.decr(key);
+    } catch {
+      return 0;
     }
   }
 
-  /**
-   * Decrement value by amount
-   */
   public static async decrby(key: string, decrement: number): Promise<number> {
+    if (!this.isReady()) return 0;
     try {
-      return await this.client.decrby(key, decrement);
-    } catch (error: any) {
-      logger.error('Redis DECRBY error:', error);
-      throw error;
+      return await this.client!.decrby(key, decrement);
+    } catch {
+      return 0;
     }
   }
 
-  /**
-   * Get multiple keys
-   */
   public static async mget(keys: string[]): Promise<(string | null)[]> {
+    if (!this.isReady()) return keys.map(() => null);
     try {
-      return await this.client.mget(...keys);
-    } catch (error: any) {
-      logger.error('Redis MGET error:', error);
-      throw error;
+      return await this.client!.mget(...keys);
+    } catch {
+      return keys.map(() => null);
     }
   }
 
-  /**
-   * Set multiple key-value pairs
-   */
   public static async mset(keyValuePairs: Record<string, string>): Promise<void> {
+    if (!this.isReady()) return;
     try {
       const args: string[] = [];
       for (const [key, value] of Object.entries(keyValuePairs)) {
         args.push(key, value);
       }
-      await this.client.mset(...args);
-    } catch (error: any) {
-      logger.error('Redis MSET error:', error);
-      throw error;
+      await this.client!.mset(...args);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Get hash field
-   */
   public static async hget(key: string, field: string): Promise<string | null> {
+    if (!this.isReady()) return null;
     try {
-      return await this.client.hget(key, field);
-    } catch (error: any) {
-      logger.error('Redis HGET error:', error);
-      throw error;
+      return await this.client!.hget(key, field);
+    } catch {
+      return null;
     }
   }
 
-  /**
-   * Set hash field
-   */
   public static async hset(key: string, field: string, value: string): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.hset(key, field, value);
-    } catch (error: any) {
-      logger.error('Redis HSET error:', error);
-      throw error;
+      await this.client!.hset(key, field, value);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Get all hash fields
-   */
   public static async hgetall(key: string): Promise<Record<string, string>> {
+    if (!this.isReady()) return {};
     try {
-      return await this.client.hgetall(key);
-    } catch (error: any) {
-      logger.error('Redis HGETALL error:', error);
-      throw error;
+      return await this.client!.hgetall(key);
+    } catch {
+      return {};
     }
   }
 
-  /**
-   * Delete hash field
-   */
   public static async hdel(key: string, field: string): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.hdel(key, field);
-    } catch (error: any) {
-      logger.error('Redis HDEL error:', error);
-      throw error;
+      await this.client!.hdel(key, field);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Add to set
-   */
   public static async sadd(key: string, member: string): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.sadd(key, member);
-    } catch (error: any) {
-      logger.error('Redis SADD error:', error);
-      throw error;
+      await this.client!.sadd(key, member);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Get set members
-   */
   public static async smembers(key: string): Promise<string[]> {
+    if (!this.isReady()) return [];
     try {
-      return await this.client.smembers(key);
-    } catch (error: any) {
-      logger.error('Redis SMEMBERS error:', error);
-      throw error;
+      return await this.client!.smembers(key);
+    } catch {
+      return [];
     }
   }
 
-  /**
-   * Remove from set
-   */
   public static async srem(key: string, member: string): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.srem(key, member);
-    } catch (error: any) {
-      logger.error('Redis SREM error:', error);
-      throw error;
+      await this.client!.srem(key, member);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Check if member exists in set
-   */
   public static async sismember(key: string, member: string): Promise<boolean> {
+    if (!this.isReady()) return false;
     try {
-      const result = await this.client.sismember(key, member);
-      return result === 1;
-    } catch (error: any) {
-      logger.error('Redis SISMEMBER error:', error);
-      throw error;
+      return (await this.client!.sismember(key, member)) === 1;
+    } catch {
+      return false;
     }
   }
 
-  /**
-   * Add to list (left)
-   */
   public static async lpush(key: string, value: string): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.lpush(key, value);
-    } catch (error: any) {
-      logger.error('Redis LPUSH error:', error);
-      throw error;
+      await this.client!.lpush(key, value);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Add to list (right)
-   */
   public static async rpush(key: string, value: string): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.rpush(key, value);
-    } catch (error: any) {
-      logger.error('Redis RPUSH error:', error);
-      throw error;
+      await this.client!.rpush(key, value);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Get list range
-   */
   public static async lrange(key: string, start: number, stop: number): Promise<string[]> {
+    if (!this.isReady()) return [];
     try {
-      return await this.client.lrange(key, start, stop);
-    } catch (error: any) {
-      logger.error('Redis LRANGE error:', error);
-      throw error;
+      return await this.client!.lrange(key, start, stop);
+    } catch {
+      return [];
     }
   }
 
-  /**
-   * Get list length
-   */
   public static async llen(key: string): Promise<number> {
+    if (!this.isReady()) return 0;
     try {
-      return await this.client.llen(key);
-    } catch (error: any) {
-      logger.error('Redis LLEN error:', error);
-      throw error;
+      return await this.client!.llen(key);
+    } catch {
+      return 0;
     }
   }
 
-  /**
-   * Remove from list
-   */
   public static async lrem(key: string, count: number, value: string): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.lrem(key, count, value);
-    } catch (error: any) {
-      logger.error('Redis LREM error:', error);
-      throw error;
+      await this.client!.lrem(key, count, value);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Get keys by pattern
-   */
   public static async keys(pattern: string): Promise<string[]> {
+    if (!this.isReady()) return [];
     try {
-      return await this.client.keys(pattern);
-    } catch (error: any) {
-      logger.error('Redis KEYS error:', error);
-      throw error;
+      return await this.client!.keys(pattern);
+    } catch {
+      return [];
     }
   }
 
-  /**
-   * Flush all keys
-   */
   public static async flushall(): Promise<void> {
+    if (!this.isReady()) return;
     try {
-      await this.client.flushall();
-    } catch (error: any) {
-      logger.error('Redis FLUSHALL error:', error);
-      throw error;
+      await this.client!.flushall();
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Flush all keys (alias for flushall with camelCase)
-   */
   public static async flushAll(): Promise<void> {
     return this.flushall();
   }
 
-  /**
-   * Delete keys matching a pattern
-   * WARNING: This uses KEYS which can be slow in production with many keys
-   * Consider using SCAN for production environments with large datasets
-   */
   public static async deletePattern(pattern: string): Promise<number> {
+    if (!this.isReady()) return 0;
     try {
       const keys = await this.keys(pattern);
-      if (keys.length === 0) {
-        return 0;
-      }
-
-      // Delete keys in batches to avoid blocking
+      if (keys.length === 0) return 0;
       const batchSize = 100;
       let deletedCount = 0;
-
       for (let i = 0; i < keys.length; i += batchSize) {
         const batch = keys.slice(i, i + batchSize);
-        const result = await this.client.del(...batch);
-        deletedCount += result;
+        deletedCount += await this.client!.del(...batch);
       }
-
-      logger.debug(`Deleted ${deletedCount} keys matching pattern: ${pattern}`);
       return deletedCount;
-    } catch (error: any) {
-      logger.error('Redis deletePattern error:', error);
-      throw error;
+    } catch {
+      return 0;
     }
   }
 
-  /**
-   * Delete multiple keys
-   */
   public static async deleteKeys(keys: string[]): Promise<number> {
+    if (!this.isReady() || keys.length === 0) return 0;
     try {
-      if (keys.length === 0) {
-        return 0;
-      }
-
-      const result = await this.client.del(...keys);
-      return result;
-    } catch (error: any) {
-      logger.error('Redis deleteKeys error:', error);
-      throw error;
+      return await this.client!.del(...keys);
+    } catch {
+      return 0;
     }
   }
 
-  /**
-   * Get Redis info
-   */
   public static async info(): Promise<string> {
+    if (!this.isReady()) return 'Redis not available';
     try {
-      return await this.client.info();
-    } catch (error: any) {
-      logger.error('Redis INFO error:', error);
-      throw error;
+      return await this.client!.info();
+    } catch {
+      return 'Redis not available';
     }
   }
 
-  /**
-   * Ping Redis
-   */
   public static async ping(): Promise<string> {
+    if (!this.isReady()) return 'PONG (offline)';
     try {
-      return await this.client.ping();
-    } catch (error: any) {
-      logger.error('Redis PING error:', error);
-      throw error;
+      return await this.client!.ping();
+    } catch {
+      return 'PONG (offline)';
     }
   }
 
-  /**
-   * Disconnect from Redis
-   */
   public static async disconnect(): Promise<void> {
+    if (!this.client) return;
     try {
-      if (this.client) {
-        await this.client.quit();
-        this.client = undefined as unknown as Redis;
-        logger.info('Redis disconnected successfully');
-      }
-    } catch (error: any) {
-      logger.error('Failed to disconnect from Redis:', error);
-      throw error;
+      await this.client.quit();
+    } catch {
+      // ignore
+    } finally {
+      this.client = null;
+      this.available = false;
     }
   }
 
-  /**
-   * Get Redis client instance
-   */
   public static getClient(): Redis {
     if (!this.client) {
       throw new Error('Redis client not initialized');
@@ -495,4 +382,3 @@ export class RedisService {
     return this.client;
   }
 }
-

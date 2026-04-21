@@ -24,6 +24,8 @@ services:
         fromDatabase:
           name: smd-vital-db
           property: connectionString
+      - key: REDIS_URL
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
