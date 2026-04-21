@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SMD Vital">
+  <rect width="512" height="512" rx="112" fill="#0f172a"/>
+  <path d="M128 262c0-77 51-134 128-134s128 57 128 134-51 134-128 134-128-57-128-134Z" fill="#0ea5e9"/>
+  <path d="M251 164h26v76h76v26h-76v76h-26v-76h-76v-26h76v-76Z" fill="#ecfeff"/>
+  <path d="M150 392h212" stroke="#67e8f9" stroke-width="20" stroke-linecap="round"/>
+</svg>

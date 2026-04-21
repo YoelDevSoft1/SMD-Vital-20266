@@ -56,6 +56,23 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 /* Custom scrollbar */

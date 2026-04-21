@@ -51,7 +51,7 @@ type SidebarConfig = {
   navItems: NavItem[];
 };
 
-const getSidebarConfig = (role?: UserRole | null): SidebarConfig => {
+export const getSidebarConfig = (role?: UserRole | null): SidebarConfig => {
   if (role === 'DOCTOR' || role === 'NURSE') {
     return {
       title: 'Panel Clinico',
