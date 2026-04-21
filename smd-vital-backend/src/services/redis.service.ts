@@ -59,6 +59,10 @@ export class RedisService {
     return this.available && this.client !== null;
   }
 
+  public static isAvailable(): boolean {
+    return this.isReady();
+  }
+
   public static async get(key: string): Promise<string | null> {
     if (!this.isReady()) return null;
     try {

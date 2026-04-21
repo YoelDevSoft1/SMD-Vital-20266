@@ -4,18 +4,26 @@ import { logger } from '../utils/logger';
 import { EmailService } from './email.service';
 import { SMSService } from './sms.service';
 import { NotificationService } from './notification.service';
+import { RedisService } from './redis.service';
 
 export class QueueService {
-  private static emailQueue: Bull.Queue;
-  private static smsQueue: Bull.Queue;
-  private static notificationQueue: Bull.Queue;
-  private static appointmentQueue: Bull.Queue;
-  private static paymentQueue: Bull.Queue;
+  private static emailQueue: Bull.Queue | null = null;
+  private static smsQueue: Bull.Queue | null = null;
+  private static notificationQueue: Bull.Queue | null = null;
+  private static appointmentQueue: Bull.Queue | null = null;
+  private static paymentQueue: Bull.Queue | null = null;
+  private static available = false;
 
   /**
    * Initialize all queues
    */
   public static async initialize(): Promise<void> {
+    if (!RedisService.isAvailable()) {
+      this.available = false;
+      logger.warn('Queue service disabled because Redis is unavailable');
+      return;
+    }
+
     try {
       // Initialize email queue
       this.emailQueue = new Bull('email', config.redis.url, {
@@ -85,11 +93,23 @@ export class QueueService {
       // Set up queue processors
       await this.setupProcessors();
 
+      this.available = true;
       logger.info('All queues initialized successfully');
     } catch (error: any) {
+      this.available = false;
+      await this.closeAllQueues();
       logger.error('Failed to initialize queues:', error);
       throw error;
     }
+  }
+
+  public static isAvailable(): boolean {
+    return this.available;
+  }
+
+  private static offlineJob(jobName: string): null {
+    logger.warn(`${jobName} skipped because queue service is unavailable`);
+    return null;
   }
 
   /**
@@ -97,7 +117,7 @@ export class QueueService {
    */
   private static async setupProcessors(): Promise<void> {
     // Email queue processor
-    this.emailQueue.process('send-email', async (job) => {
+    this.emailQueue!.process('send-email', async (job) => {
       const { to, template, data } = job.data;
       const emailService = new EmailService();
       
@@ -133,7 +153,7 @@ export class QueueService {
     });
 
     // SMS queue processor
-    this.smsQueue.process('send-sms', async (job) => {
+    this.smsQueue!.process('send-sms', async (job) => {
       const { to, message } = job.data;
       const smsService = new SMSService();
       
@@ -147,7 +167,7 @@ export class QueueService {
     });
 
     // Notification queue processor
-    this.notificationQueue.process('send-notification', async (job) => {
+    this.notificationQueue!.process('send-notification', async (job) => {
       const { userId, title, message, type, data } = job.data;
       const notificationService = new NotificationService();
       
@@ -167,7 +187,7 @@ export class QueueService {
     });
 
     // Appointment queue processor
-    this.appointmentQueue.process('appointment-reminder', async (job) => {
+    this.appointmentQueue!.process('appointment-reminder', async (job) => {
       const { appointmentId, reminderType } = job.data;
       
       try {
@@ -180,7 +200,7 @@ export class QueueService {
     });
 
     // Payment queue processor
-    this.paymentQueue.process('process-payment', async (job) => {
+    this.paymentQueue!.process('process-payment', async (job) => {
       const { paymentId } = job.data;
       
       try {
@@ -201,47 +221,47 @@ export class QueueService {
    */
   private static setupQueueEventListeners(): void {
     // Email queue events
-    this.emailQueue.on('completed', (job) => {
+    this.emailQueue!.on('completed', (job) => {
       logger.info('Email job completed', { jobId: job.id, jobName: job.name });
     });
 
-    this.emailQueue.on('failed', (job, err) => {
+    this.emailQueue!.on('failed', (job, err) => {
       logger.error('Email job failed', { jobId: job.id, jobName: job.name, error: err.message });
     });
 
     // SMS queue events
-    this.smsQueue.on('completed', (job) => {
+    this.smsQueue!.on('completed', (job) => {
       logger.info('SMS job completed', { jobId: job.id, jobName: job.name });
     });
 
-    this.smsQueue.on('failed', (job, err) => {
+    this.smsQueue!.on('failed', (job, err) => {
       logger.error('SMS job failed', { jobId: job.id, jobName: job.name, error: err.message });
     });
 
     // Notification queue events
-    this.notificationQueue.on('completed', (job) => {
+    this.notificationQueue!.on('completed', (job) => {
       logger.info('Notification job completed', { jobId: job.id, jobName: job.name });
     });
 
-    this.notificationQueue.on('failed', (job, err) => {
+    this.notificationQueue!.on('failed', (job, err) => {
       logger.error('Notification job failed', { jobId: job.id, jobName: job.name, error: err.message });
     });
 
     // Appointment queue events
-    this.appointmentQueue.on('completed', (job) => {
+    this.appointmentQueue!.on('completed', (job) => {
       logger.info('Appointment job completed', { jobId: job.id, jobName: job.name });
     });
 
-    this.appointmentQueue.on('failed', (job, err) => {
+    this.appointmentQueue!.on('failed', (job, err) => {
       logger.error('Appointment job failed', { jobId: job.id, jobName: job.name, error: err.message });
     });
 
     // Payment queue events
-    this.paymentQueue.on('completed', (job) => {
+    this.paymentQueue!.on('completed', (job) => {
       logger.info('Payment job completed', { jobId: job.id, jobName: job.name });
     });
 
-    this.paymentQueue.on('failed', (job, err) => {
+    this.paymentQueue!.on('failed', (job, err) => {
       logger.error('Payment job failed', { jobId: job.id, jobName: job.name, error: err.message });
     });
   }
@@ -254,7 +274,9 @@ export class QueueService {
     subject: string;
     template: string;
     data: any;
-  }, options?: Bull.JobOptions): Promise<Bull.Job> {
+  }, options?: Bull.JobOptions): Promise<Bull.Job | null> {
+    if (!this.available || !this.emailQueue) return this.offlineJob('Email job');
+
     try {
       const job = await this.emailQueue.add('send-email', data, options);
       logger.info('Email job added to queue', { jobId: job.id, to: data.to, template: data.template });
@@ -273,7 +295,7 @@ export class QueueService {
     firstName: string;
     appointment: any;
     documents: Array<{ fileName: string; filePath: string }>;
-  }, options?: Bull.JobOptions): Promise<Bull.Job> {
+  }, options?: Bull.JobOptions): Promise<Bull.Job | null> {
     return this.addEmailJob({
       to: data.to,
       subject: 'Documentos clinicos de tu cita - SMD Vital',
@@ -292,7 +314,9 @@ export class QueueService {
   public static async addSMSJob(data: {
     to: string;
     message: string;
-  }, options?: Bull.JobOptions): Promise<Bull.Job> {
+  }, options?: Bull.JobOptions): Promise<Bull.Job | null> {
+    if (!this.available || !this.smsQueue) return this.offlineJob('SMS job');
+
     try {
       const job = await this.smsQueue.add('send-sms', data, options);
       logger.info('SMS job added to queue', { jobId: job.id, to: data.to });
@@ -312,7 +336,9 @@ export class QueueService {
     message: string;
     type: string;
     data?: any;
-  }, options?: Bull.JobOptions): Promise<Bull.Job> {
+  }, options?: Bull.JobOptions): Promise<Bull.Job | null> {
+    if (!this.available || !this.notificationQueue) return this.offlineJob('Notification job');
+
     try {
       const job = await this.notificationQueue.add('send-notification', data, options);
       logger.info('Notification job added to queue', { jobId: job.id, userId: data.userId, type: data.type });
@@ -329,7 +355,9 @@ export class QueueService {
   public static async addAppointmentJob(data: {
     appointmentId: string;
     reminderType: string;
-  }, options?: Bull.JobOptions): Promise<Bull.Job> {
+  }, options?: Bull.JobOptions): Promise<Bull.Job | null> {
+    if (!this.available || !this.appointmentQueue) return this.offlineJob('Appointment job');
+
     try {
       const job = await this.appointmentQueue.add('appointment-reminder', data, options);
       logger.info('Appointment job added to queue', { jobId: job.id, appointmentId: data.appointmentId });
@@ -346,7 +374,9 @@ export class QueueService {
   public static async addPaymentJob(data: {
     paymentId: string;
     paymentData: any;
-  }, options?: Bull.JobOptions): Promise<Bull.Job> {
+  }, options?: Bull.JobOptions): Promise<Bull.Job | null> {
+    if (!this.available || !this.paymentQueue) return this.offlineJob('Payment job');
+
     try {
       const job = await this.paymentQueue.add('process-payment', data, options);
       logger.info('Payment job added to queue', { jobId: job.id, paymentId: data.paymentId });
@@ -361,37 +391,47 @@ export class QueueService {
    * Get queue statistics
    */
   public static async getQueueStats(): Promise<any> {
+    if (!this.available) {
+      return {
+        email: { waiting: [], active: [], completed: [], failed: [] },
+        sms: { waiting: [], active: [], completed: [], failed: [] },
+        notification: { waiting: [], active: [], completed: [], failed: [] },
+        appointment: { waiting: [], active: [], completed: [], failed: [] },
+        payment: { waiting: [], active: [], completed: [], failed: [] },
+      };
+    }
+
     try {
       const stats = {
         email: {
-          waiting: await this.emailQueue.getWaiting(),
-          active: await this.emailQueue.getActive(),
-          completed: await this.emailQueue.getCompleted(),
-          failed: await this.emailQueue.getFailed(),
+          waiting: await this.emailQueue!.getWaiting(),
+          active: await this.emailQueue!.getActive(),
+          completed: await this.emailQueue!.getCompleted(),
+          failed: await this.emailQueue!.getFailed(),
         },
         sms: {
-          waiting: await this.smsQueue.getWaiting(),
-          active: await this.smsQueue.getActive(),
-          completed: await this.smsQueue.getCompleted(),
-          failed: await this.smsQueue.getFailed(),
+          waiting: await this.smsQueue!.getWaiting(),
+          active: await this.smsQueue!.getActive(),
+          completed: await this.smsQueue!.getCompleted(),
+          failed: await this.smsQueue!.getFailed(),
         },
         notification: {
-          waiting: await this.notificationQueue.getWaiting(),
-          active: await this.notificationQueue.getActive(),
-          completed: await this.notificationQueue.getCompleted(),
-          failed: await this.notificationQueue.getFailed(),
+          waiting: await this.notificationQueue!.getWaiting(),
+          active: await this.notificationQueue!.getActive(),
+          completed: await this.notificationQueue!.getCompleted(),
+          failed: await this.notificationQueue!.getFailed(),
         },
         appointment: {
-          waiting: await this.appointmentQueue.getWaiting(),
-          active: await this.appointmentQueue.getActive(),
-          completed: await this.appointmentQueue.getCompleted(),
-          failed: await this.appointmentQueue.getFailed(),
+          waiting: await this.appointmentQueue!.getWaiting(),
+          active: await this.appointmentQueue!.getActive(),
+          completed: await this.appointmentQueue!.getCompleted(),
+          failed: await this.appointmentQueue!.getFailed(),
         },
         payment: {
-          waiting: await this.paymentQueue.getWaiting(),
-          active: await this.paymentQueue.getActive(),
-          completed: await this.paymentQueue.getCompleted(),
-          failed: await this.paymentQueue.getFailed(),
+          waiting: await this.paymentQueue!.getWaiting(),
+          active: await this.paymentQueue!.getActive(),
+          completed: await this.paymentQueue!.getCompleted(),
+          failed: await this.paymentQueue!.getFailed(),
         },
       };
 
@@ -406,13 +446,15 @@ export class QueueService {
    * Clean completed jobs
    */
   public static async cleanCompletedJobs(): Promise<void> {
+    if (!this.available) return;
+
     try {
       await Promise.all([
-        this.emailQueue.clean(24 * 60 * 60 * 1000, 'completed'), // 24 hours
-        this.smsQueue.clean(24 * 60 * 60 * 1000, 'completed'),
-        this.notificationQueue.clean(24 * 60 * 60 * 1000, 'completed'),
-        this.appointmentQueue.clean(24 * 60 * 60 * 1000, 'completed'),
-        this.paymentQueue.clean(24 * 60 * 60 * 1000, 'completed'),
+        this.emailQueue!.clean(24 * 60 * 60 * 1000, 'completed'), // 24 hours
+        this.smsQueue!.clean(24 * 60 * 60 * 1000, 'completed'),
+        this.notificationQueue!.clean(24 * 60 * 60 * 1000, 'completed'),
+        this.appointmentQueue!.clean(24 * 60 * 60 * 1000, 'completed'),
+        this.paymentQueue!.clean(24 * 60 * 60 * 1000, 'completed'),
       ]);
 
       logger.info('Completed jobs cleaned successfully');
@@ -426,13 +468,15 @@ export class QueueService {
    * Pause all queues
    */
   public static async pauseAllQueues(): Promise<void> {
+    if (!this.available) return;
+
     try {
       await Promise.all([
-        this.emailQueue.pause(),
-        this.smsQueue.pause(),
-        this.notificationQueue.pause(),
-        this.appointmentQueue.pause(),
-        this.paymentQueue.pause(),
+        this.emailQueue!.pause(),
+        this.smsQueue!.pause(),
+        this.notificationQueue!.pause(),
+        this.appointmentQueue!.pause(),
+        this.paymentQueue!.pause(),
       ]);
 
       logger.info('All queues paused successfully');
@@ -446,13 +490,15 @@ export class QueueService {
    * Resume all queues
    */
   public static async resumeAllQueues(): Promise<void> {
+    if (!this.available) return;
+
     try {
       await Promise.all([
-        this.emailQueue.resume(),
-        this.smsQueue.resume(),
-        this.notificationQueue.resume(),
-        this.appointmentQueue.resume(),
-        this.paymentQueue.resume(),
+        this.emailQueue!.resume(),
+        this.smsQueue!.resume(),
+        this.notificationQueue!.resume(),
+        this.appointmentQueue!.resume(),
+        this.paymentQueue!.resume(),
       ]);
 
       logger.info('All queues resumed successfully');
@@ -467,13 +513,24 @@ export class QueueService {
    */
   public static async closeAllQueues(): Promise<void> {
     try {
-      await Promise.all([
-        this.emailQueue.close(),
-        this.smsQueue.close(),
-        this.notificationQueue.close(),
-        this.appointmentQueue.close(),
-        this.paymentQueue.close(),
-      ]);
+      const queues = [
+        this.emailQueue,
+        this.smsQueue,
+        this.notificationQueue,
+        this.appointmentQueue,
+        this.paymentQueue,
+      ].filter((queue): queue is Bull.Queue => queue !== null);
+
+      if (queues.length === 0) return;
+
+      await Promise.all(queues.map((queue) => queue.close()));
+
+      this.emailQueue = null;
+      this.smsQueue = null;
+      this.notificationQueue = null;
+      this.appointmentQueue = null;
+      this.paymentQueue = null;
+      this.available = false;
 
       logger.info('All queues closed successfully');
     } catch (error: any) {
