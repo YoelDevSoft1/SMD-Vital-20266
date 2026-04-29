@@ -12,9 +12,11 @@ router.put('/availability', requireRole(['DOCTOR']), clinicalController.setMyAva
 router.get('/route', requireRole(['DOCTOR']), clinicalController.getMyRoute);
 
 router.get('/appointments', requireRole(['DOCTOR', 'NURSE']), clinicalController.getAssignedAppointments);
+router.get('/appointments/:id/timeline', requireRole(['DOCTOR', 'NURSE']), clinicalController.getAppointmentTimeline);
 router.get('/appointments/:id', requireRole(['DOCTOR', 'NURSE']), clinicalController.getAppointmentDetails);
 router.post('/appointments/:id/start', requireRole(['DOCTOR', 'NURSE']), clinicalController.startEncounter);
 router.post('/appointments/:id/finish', requireRole(['DOCTOR', 'NURSE']), clinicalController.finishEncounter);
+router.post('/appointments/:id/send-documents', requireRole(['DOCTOR', 'NURSE']), clinicalController.sendAppointmentDocuments);
 
 router.post('/encounters/:id/vitals', requireRole(['NURSE']), clinicalController.recordVitals);
 router.post('/encounters/:id/notes', requireRole(['DOCTOR']), clinicalController.addEncounterNotes);

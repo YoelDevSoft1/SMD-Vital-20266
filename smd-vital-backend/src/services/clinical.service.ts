@@ -6,6 +6,7 @@ import prismaClient from '../utils/prisma';
 import { DocumentService, ClinicalDocumentContext, DocumentFile } from './document.service';
 import { QueueService } from './queue.service';
 import { logger } from '../utils/logger';
+import { AppointmentRealtimeEvent, SocketService } from './socket.service';
 import {
   buildSlots,
   extractCoordinates,
@@ -42,6 +43,7 @@ export interface VitalSignInput {
 export interface FinishEncounterInput {
   encounterSummary?: string | undefined;
   encounterPayload?: Record<string, unknown> | undefined;
+  emailConsentAccepted?: boolean | undefined;
   medicalRecord: {
     title: string;
     description: string;
@@ -71,6 +73,7 @@ export interface CreateMedicalRecordByEmailInput {
   patientGender?: string | undefined;
   serviceName?: string | undefined;
   sendEmail?: boolean | undefined;
+  emailConsentAccepted?: boolean | undefined;
   vitals?: {
     bpSys?: number | undefined;
     bpDia?: number | undefined;
@@ -101,6 +104,11 @@ export interface CreateMedicalRecordByEmailInput {
     }>;
   } | undefined;
 }
+
+type ClinicalDocumentToSend = {
+  fileName: string;
+  filePath: string;
+};
 
 export interface DoctorAvailabilityBlockInput {
   startTime: string;
@@ -290,12 +298,57 @@ export class ClinicalService {
     return appointment;
   }
 
+  public async getAppointmentTimeline(userId: string, role: UserRole, appointmentId: string) {
+    await this.getAppointmentDetails(userId, role, appointmentId);
+
+    const traces = await this.prisma.serviceTrace.findMany({
+      where: { appointmentId },
+      orderBy: { createdAt: 'asc' },
+      include: {
+        actor: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            role: true
+          }
+        },
+        encounter: {
+          select: {
+            id: true,
+            status: true,
+            startedAt: true,
+            finishedAt: true
+          }
+        }
+      }
+    });
+
+    return {
+      appointmentId,
+      items: traces.map((trace) => ({
+        id: trace.id,
+        source: 'service_trace',
+        action: trace.action,
+        actorRole: trace.actorRole,
+        actor: trace.actor,
+        payload: trace.payload,
+        encounter: trace.encounter,
+        createdAt: trace.createdAt
+      }))
+    };
+  }
+
   public async startEncounter(userId: string, role: UserRole, appointmentId: string) {
     const appointment = await this.prisma.appointment.findFirst({
       where: this.buildAppointmentWhere(userId, role, undefined, appointmentId),
       include: {
         encounter: true,
-        service: true
+        service: true,
+        patient: { select: { userId: true } },
+        doctor: { select: { userId: true } },
+        assignedNurse: true
       }
     });
 
@@ -309,7 +362,7 @@ export class ClinicalService {
 
     const nurseId = appointment.assignedNurseId || (role === 'NURSE' ? userId : null);
 
-    return this.prisma.$transaction(async (tx) => {
+    const encounter = await this.prisma.$transaction(async (tx) => {
       const encounterUpdate: Prisma.EncounterUpdateInput = {
         status: 'IN_PROGRESS'
       };
@@ -367,13 +420,30 @@ export class ClinicalService {
 
       return encounter;
     });
+
+    this.emitAppointmentRealtime(
+      'encounter_started',
+      appointment,
+      userId,
+      role,
+      'IN_PROGRESS',
+      appointment.status
+    );
+
+    return encounter;
   }
 
   public async recordVitals(userId: string, encounterId: string, payload: VitalSignInput) {
     const encounter = await this.prisma.encounter.findUnique({
       where: { id: encounterId },
       include: {
-        appointment: true
+        appointment: {
+          include: {
+            patient: { select: { userId: true } },
+            doctor: { select: { userId: true } },
+            assignedNurse: true
+          }
+        }
       }
     });
 
@@ -389,7 +459,7 @@ export class ClinicalService {
       throw this.createHttpError(403, 'Not assigned to this encounter');
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const vitalSign = await this.prisma.$transaction(async (tx) => {
       if (!encounter.nurseId) {
         await tx.encounter.update({
           where: { id: encounter.id },
@@ -437,13 +507,31 @@ export class ClinicalService {
 
       return vitalSign;
     });
+
+    this.emitAppointmentRealtime(
+      'vitals_recorded',
+      encounter.appointment,
+      userId,
+      'NURSE',
+      encounter.appointment.status,
+      encounter.appointment.status,
+      { encounterId: encounter.id, vitalsId: vitalSign.id }
+    );
+
+    return vitalSign;
   }
 
   public async addEncounterNotes(userId: string, encounterId: string, data: EncounterNoteInput) {
     const encounter = await this.prisma.encounter.findUnique({
       where: { id: encounterId },
       include: {
-        appointment: { include: { doctor: { include: { user: true } } } }
+        appointment: {
+          include: {
+            patient: { select: { userId: true } },
+            doctor: { include: { user: true } },
+            assignedNurse: true
+          }
+        }
       }
     });
 
@@ -458,7 +546,7 @@ export class ClinicalService {
     const currentPayload = (encounter.payload as Record<string, unknown> | null) ?? {};
     const nextPayload = data.payload ? { ...currentPayload, ...data.payload } : currentPayload;
 
-    return this.prisma.$transaction(async (tx) => {
+    const updatedEncounter = await this.prisma.$transaction(async (tx) => {
       const updatedEncounter = await tx.encounter.update({
         where: { id: encounter.id },
         data: {
@@ -492,6 +580,18 @@ export class ClinicalService {
 
       return updatedEncounter;
     });
+
+    this.emitAppointmentRealtime(
+      'note_added',
+      encounter.appointment,
+      userId,
+      'DOCTOR',
+      encounter.appointment.status,
+      encounter.appointment.status,
+      { encounterId: encounter.id }
+    );
+
+    return updatedEncounter;
   }
 
   public async finishEncounter(userId: string, role: UserRole, appointmentId: string, payload: FinishEncounterInput) {
@@ -790,26 +890,21 @@ export class ClinicalService {
       });
     }
 
-    const patientEmail = appointment.patient.user.email;
-    let emailQueued = false;
+    const deliveryResult = await this.queueClinicalDocuments({
+      patientId: appointment.patientId,
+      appointmentId: appointment.id,
+      medicalRecordId: transactionResult.medicalRecord.id,
+      prescriptionId: transactionResult.prescription?.id ?? null,
+      patientEmail: appointment.patient.user.email,
+      firstName: appointment.patient.user.firstName,
+      appointment,
+      documents: documentsToSend,
+      emailConsentAccepted: payload.emailConsentAccepted === true,
+      consentSource: 'FINISH_ENCOUNTER'
+    });
+    const emailQueued = deliveryResult.emailQueued;
 
-    if (patientEmail) {
-      try {
-        await QueueService.addClinicalDocumentsJob({
-          to: patientEmail,
-          firstName: appointment.patient.user.firstName,
-          appointment,
-          documents: documentsToSend
-        });
-        emailQueued = true;
-      } catch (error: any) {
-        logger.error('Failed to queue clinical documents email:', error);
-      }
-    } else {
-      logger.warn('Patient email missing, skipping clinical documents email', { appointmentId });
-    }
-
-    if (emailQueued) {
+    if (deliveryResult.delivery) {
       await this.prisma.$transaction([
         this.prisma.serviceTrace.create({
           data: {
@@ -818,7 +913,11 @@ export class ClinicalService {
             actorId: userId,
             actorRole: role,
             action: 'DOCUMENT_SENT',
-            payload: { documents: documentsToSend }
+            payload: {
+              documents: documentsToSend,
+              deliveryId: deliveryResult.delivery.id,
+              deliveryStatus: deliveryResult.delivery.status
+            }
           }
         }),
         this.prisma.auditLog.create({
@@ -828,10 +927,41 @@ export class ClinicalService {
             entity: 'APPOINTMENT',
             entityId: appointment.id,
             action: 'SEND_EMAIL',
-            payload: { documents: documentsToSend }
+            payload: {
+              documents: documentsToSend,
+              deliveryId: deliveryResult.delivery.id,
+              deliveryStatus: deliveryResult.delivery.status
+            }
           }
         })
       ]);
+    }
+
+    this.emitAppointmentRealtime(
+      'encounter_finished',
+      appointment,
+      userId,
+      role,
+      'COMPLETED',
+      appointment.status,
+      {
+        encounterId: transactionResult.encounter.id,
+        medicalRecordId: transactionResult.medicalRecord.id,
+        prescriptionId: transactionResult.prescription?.id ?? null,
+        emailQueued
+      }
+    );
+
+    if (emailQueued) {
+      this.emitAppointmentRealtime(
+        'documents_sent',
+        appointment,
+        userId,
+        role,
+        'COMPLETED',
+        'COMPLETED',
+        { documents: documentsToSend }
+      );
     }
 
     return {
@@ -840,6 +970,7 @@ export class ClinicalService {
       medicalRecord: transactionResult.medicalRecord,
       prescription: transactionResult.prescription,
       documents: documentsToSend,
+      documentDelivery: deliveryResult.delivery,
       emailQueued
     };
   }
@@ -1117,23 +1248,23 @@ export class ClinicalService {
     };
 
     const shouldSendEmail = payload.sendEmail !== false;
-    let emailQueued = false;
-
-    if (shouldSendEmail && patientResult.user.email) {
-      try {
-        await QueueService.addClinicalDocumentsJob({
-          to: patientResult.user.email,
+    const deliveryResult = shouldSendEmail
+      ? await this.queueClinicalDocuments({
+          patientId: patientResult.patient.id,
+          appointmentId: null,
+          medicalRecordId: transactionResult.medicalRecord.id,
+          prescriptionId: transactionResult.prescription?.id ?? null,
+          patientEmail: patientResult.user.email,
           firstName: patientResult.user.firstName,
           appointment: appointmentSnapshot,
-          documents: documentsToSend
-        });
-        emailQueued = true;
-      } catch (error: any) {
-        logger.error('Failed to queue clinical documents email:', error);
-      }
-    }
+          documents: documentsToSend,
+          emailConsentAccepted: payload.emailConsentAccepted === true,
+          consentSource: 'STAFF_RECORD_BY_EMAIL'
+        })
+      : { emailQueued: false, delivery: null };
+    const emailQueued = deliveryResult.emailQueued;
 
-    if (emailQueued) {
+    if (deliveryResult.delivery) {
       await this.prisma.auditLog.create({
         data: {
           actorId: userId,
@@ -1141,7 +1272,12 @@ export class ClinicalService {
           entity: 'MEDICAL_RECORD',
           entityId: transactionResult.medicalRecord.id,
           action: 'SEND_EMAIL',
-          payload: this.toJson({ documents: documentsToSend, patientEmail }),
+          payload: this.toJson({
+            documents: documentsToSend,
+            patientEmail,
+            deliveryId: deliveryResult.delivery.id,
+            deliveryStatus: deliveryResult.delivery.status
+          }),
           createdAt: now
         }
       });
@@ -1151,11 +1287,147 @@ export class ClinicalService {
       medicalRecord: transactionResult.medicalRecord,
       prescription: transactionResult.prescription,
       documents: documentsToSend,
+      documentDelivery: deliveryResult.delivery,
       emailQueued,
       patient: {
         id: patientResult.patient.id,
         email: patientResult.user.email
       }
+    };
+  }
+
+  public async sendAppointmentDocuments(
+    userId: string,
+    role: UserRole,
+    appointmentId: string,
+    options: { emailConsentAccepted?: boolean | undefined } = {}
+  ) {
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id: appointmentId },
+      include: {
+        patient: { include: { user: true } },
+        doctor: { include: { user: true } },
+        service: true,
+        assignedNurse: true,
+        encounter: true,
+        medicalRecords: {
+          where: { pdfPath: { not: null } },
+          orderBy: { createdAt: this.sortDesc },
+          take: 1
+        },
+        prescriptions: {
+          where: { pdfPath: { not: null } },
+          orderBy: { createdAt: this.sortDesc },
+          take: 1
+        }
+      }
+    });
+
+    if (!appointment) {
+      throw this.createHttpError(404, 'Appointment not found');
+    }
+
+    if (role === 'DOCTOR' && appointment.doctor.userId !== userId) {
+      throw this.createHttpError(403, 'Not assigned to this appointment');
+    }
+
+    if (role === 'NURSE') {
+      const allowedByCategory = appointment.service?.category === 'NURSING';
+      const assigned = appointment.assignedNurseId === userId;
+      if (!assigned && !allowedByCategory) {
+        throw this.createHttpError(403, 'Not assigned to this appointment');
+      }
+    }
+
+    const medicalRecord = appointment.medicalRecords[0] ?? null;
+    const prescription = appointment.prescriptions[0] ?? null;
+    const documentsToSend: ClinicalDocumentToSend[] = [];
+
+    if (medicalRecord?.pdfPath) {
+      documentsToSend.push({
+        fileName: medicalRecord.pdfPath.split('/').pop() || 'medical-record.pdf',
+        filePath: medicalRecord.pdfPath
+      });
+    }
+
+    if (prescription?.pdfPath) {
+      documentsToSend.push({
+        fileName: prescription.pdfPath.split('/').pop() || 'prescription.pdf',
+        filePath: prescription.pdfPath
+      });
+    }
+
+    if (!documentsToSend.length) {
+      throw this.createHttpError(404, 'No clinical documents available for this appointment');
+    }
+
+    const deliveryResult = await this.queueClinicalDocuments({
+      patientId: appointment.patientId,
+      appointmentId: appointment.id,
+      medicalRecordId: medicalRecord?.id ?? null,
+      prescriptionId: prescription?.id ?? null,
+      patientEmail: appointment.patient.user.email,
+      firstName: appointment.patient.user.firstName,
+      appointment,
+      documents: documentsToSend,
+      emailConsentAccepted: options.emailConsentAccepted === true,
+      consentSource: 'STAFF_DOCUMENT_RESEND'
+    });
+
+    if (deliveryResult.delivery) {
+      await this.prisma.$transaction([
+        this.prisma.serviceTrace.create({
+          data: {
+            appointmentId: appointment.id,
+            encounterId: appointment.encounter?.id ?? null,
+            actorId: userId,
+            actorRole: role,
+            action: 'DOCUMENT_SENT',
+            payload: this.toJson({
+              documents: documentsToSend,
+              deliveryId: deliveryResult.delivery.id,
+              deliveryStatus: deliveryResult.delivery.status,
+              resent: true
+            })
+          }
+        }),
+        this.prisma.auditLog.create({
+          data: {
+            actorId: userId,
+            actorRole: role,
+            entity: 'APPOINTMENT',
+            entityId: appointment.id,
+            action: 'SEND_EMAIL',
+            payload: this.toJson({
+              documents: documentsToSend,
+              deliveryId: deliveryResult.delivery.id,
+              deliveryStatus: deliveryResult.delivery.status,
+              resent: true
+            })
+          }
+        })
+      ]);
+    }
+
+    this.emitAppointmentRealtime(
+      'documents_sent',
+      appointment,
+      userId,
+      role,
+      appointment.status,
+      appointment.status,
+      {
+        documents: documentsToSend,
+        deliveryId: deliveryResult.delivery?.id ?? null,
+        emailQueued: deliveryResult.emailQueued
+      }
+    );
+
+    return {
+      appointmentId: appointment.id,
+      documents: documentsToSend,
+      documentDelivery: deliveryResult.delivery,
+      emailQueued: deliveryResult.emailQueued
     };
   }
 
@@ -1233,6 +1505,13 @@ export class ClinicalService {
         appointments: {
           include: { doctor: { include: { user: true } }, service: true },
           orderBy: { scheduledAt: 'desc' }
+        },
+        consents: {
+          orderBy: { acceptedAt: 'desc' }
+        },
+        documentDeliveries: {
+          orderBy: { createdAt: 'desc' },
+          take: 25
         }
       }
     });
@@ -1250,6 +1529,17 @@ export class ClinicalService {
       throw this.createHttpError(404, 'Medical record PDF not available');
     }
 
+    await this.prisma.auditLog.create({
+      data: {
+        actorId: userId,
+        actorRole: role,
+        entity: 'MEDICAL_RECORD',
+        entityId: record.id,
+        action: 'DOWNLOAD',
+        payload: this.toJson({ filePath: record.pdfPath })
+      }
+    });
+
     return {
       filePath: record.pdfPath,
       fileName: record.pdfPath.split('/').pop() || 'medical-record.pdf'
@@ -1262,10 +1552,177 @@ export class ClinicalService {
       throw this.createHttpError(404, 'Prescription PDF not available');
     }
 
+    await this.prisma.auditLog.create({
+      data: {
+        actorId: userId,
+        actorRole: role,
+        entity: 'PRESCRIPTION',
+        entityId: prescription.id,
+        action: 'DOWNLOAD',
+        payload: this.toJson({ filePath: prescription.pdfPath })
+      }
+    });
+
     return {
       filePath: prescription.pdfPath,
       fileName: prescription.pdfPath.split('/').pop() || 'prescription.pdf'
     };
+  }
+
+  private async queueClinicalDocuments(input: {
+    patientId: string;
+    appointmentId: string | null;
+    medicalRecordId: string | null;
+    prescriptionId: string | null;
+    patientEmail: string | null;
+    firstName: string;
+    appointment: any;
+    documents: ClinicalDocumentToSend[];
+    emailConsentAccepted: boolean;
+    consentSource: string;
+  }) {
+    if (!input.patientEmail) {
+      logger.warn('Patient email missing, skipping clinical documents email', {
+        patientId: input.patientId,
+        appointmentId: input.appointmentId
+      });
+      return { emailQueued: false, delivery: null };
+    }
+
+    const delivery = await this.prisma.documentDelivery.create({
+      data: {
+        patientId: input.patientId,
+        appointmentId: input.appointmentId,
+        medicalRecordId: input.medicalRecordId,
+        prescriptionId: input.prescriptionId,
+        email: input.patientEmail,
+        status: 'QUEUED',
+        documents: this.toJson(input.documents)
+      }
+    });
+
+    if (!input.emailConsentAccepted) {
+      const skippedDelivery = await this.prisma.documentDelivery.update({
+        where: { id: delivery.id },
+        data: {
+          status: 'SKIPPED',
+          lastError: 'Email delivery consent not confirmed'
+        }
+      });
+
+      logger.warn('Clinical documents email skipped because consent was not confirmed', {
+        patientId: input.patientId,
+        appointmentId: input.appointmentId,
+        deliveryId: skippedDelivery.id
+      });
+
+      return { emailQueued: false, delivery: skippedDelivery };
+    }
+
+    await this.ensureOperationalConsents(input.patientId, input.consentSource);
+
+    try {
+      const job = await QueueService.addClinicalDocumentsJob({
+        to: input.patientEmail,
+        firstName: input.firstName,
+        appointment: input.appointment,
+        documents: input.documents,
+        deliveryId: delivery.id
+      });
+
+      if (!job) {
+        const skippedDelivery = await this.prisma.documentDelivery.update({
+          where: { id: delivery.id },
+          data: {
+            status: 'SKIPPED',
+            lastError: 'Queue service unavailable'
+          }
+        });
+        return { emailQueued: false, delivery: skippedDelivery };
+      }
+
+      return { emailQueued: true, delivery };
+    } catch (error: any) {
+      const failedDelivery = await this.prisma.documentDelivery.update({
+        where: { id: delivery.id },
+        data: {
+          status: 'FAILED',
+          failedAt: new Date(),
+          lastError: error.message || 'Failed to queue clinical documents email'
+        }
+      });
+
+      logger.error('Failed to queue clinical documents email:', error);
+      return { emailQueued: false, delivery: failedDelivery };
+    }
+  }
+
+  private async ensureOperationalConsents(patientId: string, source: string): Promise<void> {
+    await this.prisma.patientConsent.createMany({
+      data: [
+        {
+          patientId,
+          type: 'DATA_PROCESSING',
+          version: '2026-04',
+          source
+        },
+        {
+          patientId,
+          type: 'EMAIL_DELIVERY',
+          version: '2026-04',
+          source
+        },
+        {
+          patientId,
+          type: 'CLINICAL_HISTORY',
+          version: '2026-04',
+          source
+        }
+      ],
+      skipDuplicates: true
+    });
+  }
+
+  private emitAppointmentRealtime(
+    action: AppointmentRealtimeEvent['action'],
+    appointment: any,
+    actorId: string,
+    actorRole: UserRole,
+    status: string,
+    previousStatus: string | null,
+    trace?: unknown
+  ): void {
+    const event: AppointmentRealtimeEvent = {
+      appointmentId: appointment.id,
+      action,
+      status,
+      previousStatus,
+      appointment,
+      actor: {
+        id: actorId,
+        role: actorRole
+      }
+    };
+
+    if (trace !== undefined) {
+      event.trace = trace;
+    }
+
+    SocketService.emitAppointmentEvent(
+      event,
+      {
+        userIds: [
+          actorId,
+          appointment.patient?.userId,
+          appointment.patient?.user?.id,
+          appointment.doctor?.userId,
+          appointment.doctor?.user?.id,
+          appointment.assignedNurseId,
+          appointment.assignedNurse?.id
+        ],
+        roles: ['ADMIN', 'SUPER_ADMIN']
+      }
+    );
   }
 
   private buildAppointmentWhere(

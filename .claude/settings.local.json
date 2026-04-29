@@ -15,7 +15,11 @@
       "Bash(npm run db:seed:*)",
       "Bash(docker-compose:*)",
       "Bash(docker exec:*)",
-      "Bash(docker logs:*)"
+      "Bash(docker logs:*)",
+      "Bash(grep -E \"\\\\.\\(ts|js|json\\)$\")",
+      "Bash(docker compose *)",
+      "Bash(npx jest *)",
+      "Bash(git config *)"
     ],
     "deny": [],
     "ask": []

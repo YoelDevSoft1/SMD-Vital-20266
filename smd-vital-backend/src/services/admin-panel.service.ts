@@ -1,8 +1,10 @@
+import { Prisma, UserRole } from '@prisma/client';
 import { logger } from '../utils/logger';
 import { RedisService } from './redis.service';
 import fs from 'fs';
 import path from 'path';
 import prismaClient from '../utils/prisma';
+import { AppointmentRealtimeEvent, SocketService } from './socket.service';
 import {
   appointmentTimeToMinutes,
   buildSlots,
@@ -16,6 +18,11 @@ import {
 } from '../utils/scheduling';
 
 const prisma = prismaClient;
+
+interface ActionContext {
+  actorId?: string;
+  actorRole?: UserRole;
+}
 
 export class AdminPanelService {
   /**
@@ -1270,10 +1277,98 @@ export class AdminPanelService {
     }
   }
 
+  public async getAppointmentTimeline(appointmentId: string) {
+    try {
+      const appointment = await prisma.appointment.findUnique({
+        where: { id: appointmentId },
+        select: { id: true }
+      });
+
+      if (!appointment) {
+        throw new Error('Appointment not found');
+      }
+
+      const [traces, auditLogs] = await Promise.all([
+        prisma.serviceTrace.findMany({
+          where: { appointmentId },
+          orderBy: { createdAt: 'asc' },
+          include: {
+            actor: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                role: true
+              }
+            },
+            encounter: {
+              select: {
+                id: true,
+                status: true,
+                startedAt: true,
+                finishedAt: true
+              }
+            }
+          }
+        }),
+        prisma.auditLog.findMany({
+          where: {
+            entity: 'APPOINTMENT',
+            entityId: appointmentId
+          },
+          orderBy: { createdAt: 'asc' },
+          include: {
+            actor: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                role: true
+              }
+            }
+          }
+        })
+      ]);
+
+      const items = [
+        ...traces.map((trace) => ({
+          id: trace.id,
+          source: 'service_trace',
+          action: trace.action,
+          actorRole: trace.actorRole,
+          actor: trace.actor,
+          payload: trace.payload,
+          encounter: trace.encounter,
+          createdAt: trace.createdAt
+        })),
+        ...auditLogs.map((auditLog) => ({
+          id: auditLog.id,
+          source: 'audit_log',
+          action: auditLog.action,
+          actorRole: auditLog.actorRole,
+          actor: auditLog.actor,
+          payload: auditLog.payload,
+          entity: auditLog.entity,
+          createdAt: auditLog.createdAt
+        }))
+      ].sort((left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime());
+
+      return {
+        appointmentId,
+        items
+      };
+    } catch (error) {
+      logger.error('Error getting appointment timeline:', error);
+      throw error;
+    }
+  }
+
   /**
    * Create new appointment
    */
-  public async createAppointment(data: any) {
+  public async createAppointment(data: any, context: ActionContext = {}) {
     try {
       await this.ensureAppointmentCanBeScheduled({
         doctorId: data.doctorId,
@@ -1281,32 +1376,67 @@ export class AdminPanelService {
         duration: data.duration
       });
 
-      const appointment = await prisma.appointment.create({
-        data: {
-          patientId: data.patientId,
-          doctorId: data.doctorId,
-          serviceId: data.serviceId,
-          status: data.status || 'PENDING',
-          scheduledAt: new Date(data.scheduledAt),
-          duration: data.duration,
-          notes: data.notes ?? null,
-          diagnosis: data.diagnosis ?? null,
-          prescription: data.prescription ?? null,
-          totalPrice: data.totalPrice,
-          address: data.address,
-          city: data.city,
-          coordinates: data.coordinates ?? null,
-          assignedNurseId: data.assignedNurseId ?? null
-        },
-        include: {
-          patient: { include: { user: true } },
-          doctor: { include: { user: true } },
-          service: true,
-          assignedNurse: true
+      const appointment = await prisma.$transaction(async (tx) => {
+        const createdAppointment = await tx.appointment.create({
+          data: {
+            patientId: data.patientId,
+            doctorId: data.doctorId,
+            serviceId: data.serviceId,
+            status: data.status || 'PENDING',
+            scheduledAt: new Date(data.scheduledAt),
+            duration: data.duration,
+            notes: data.notes ?? null,
+            diagnosis: data.diagnosis ?? null,
+            prescription: data.prescription ?? null,
+            totalPrice: data.totalPrice,
+            address: data.address,
+            city: data.city,
+            coordinates: data.coordinates ?? null,
+            assignedNurseId: data.assignedNurseId ?? null
+          },
+          include: {
+            patient: { include: { user: true } },
+            doctor: { include: { user: true } },
+            service: true,
+            assignedNurse: true
+          }
+        });
+
+        if (context.actorId && context.actorRole) {
+          await tx.serviceTrace.create({
+            data: {
+              appointmentId: createdAppointment.id,
+              actorId: context.actorId,
+              actorRole: context.actorRole,
+              action: 'STATUS_CHANGED',
+              payload: {
+                reason: 'appointment_created',
+                from: null,
+                to: createdAppointment.status
+              }
+            }
+          });
+
+          await tx.auditLog.create({
+            data: {
+              actorId: context.actorId,
+              actorRole: context.actorRole,
+              entity: 'APPOINTMENT',
+              entityId: createdAppointment.id,
+              action: 'CREATE',
+              payload: {
+                status: createdAppointment.status,
+                scheduledAt: createdAppointment.scheduledAt
+              }
+            }
+          });
         }
+
+        return createdAppointment;
       });
 
       logger.info(`Appointment created: ${appointment.id}`);
+      this.emitAppointmentRealtime('created', appointment, context, null);
 
       return appointment;
     } catch (error) {
@@ -1318,7 +1448,7 @@ export class AdminPanelService {
   /**
    * Update appointment
    */
-  public async updateAppointment(appointmentId: string, data: any) {
+  public async updateAppointment(appointmentId: string, data: any, context: ActionContext = {}) {
     try {
       const currentAppointment = await prisma.appointment.findUnique({
         where: { id: appointmentId }
@@ -1361,18 +1491,59 @@ export class AdminPanelService {
         updateData.service = { connect: { id: data.serviceId } };
       }
 
-      const appointment = await prisma.appointment.update({
-        where: { id: appointmentId },
-        data: updateData,
-        include: {
-          patient: { include: { user: true } },
-          doctor: { include: { user: true } },
-          service: true,
-          assignedNurse: true
+      const appointment = await prisma.$transaction(async (tx) => {
+        const updatedAppointment = await tx.appointment.update({
+          where: { id: appointmentId },
+          data: updateData,
+          include: {
+            patient: { include: { user: true } },
+            doctor: { include: { user: true } },
+            service: true,
+            assignedNurse: true
+          }
+        });
+
+        if (context.actorId && context.actorRole) {
+          await tx.serviceTrace.create({
+            data: {
+              appointmentId,
+              actorId: context.actorId,
+              actorRole: context.actorRole,
+              action: currentAppointment.status !== updatedAppointment.status ? 'STATUS_CHANGED' : 'UPDATED',
+              payload: {
+                changedFields: Object.keys(data),
+                previousStatus: currentAppointment.status,
+                status: updatedAppointment.status
+              }
+            }
+          });
+
+          await tx.auditLog.create({
+            data: {
+              actorId: context.actorId,
+              actorRole: context.actorRole,
+              entity: 'APPOINTMENT',
+              entityId: appointmentId,
+              action: 'UPDATE',
+              payload: {
+                changedFields: Object.keys(data),
+                previousStatus: currentAppointment.status,
+                status: updatedAppointment.status
+              }
+            }
+          });
         }
+
+        return updatedAppointment;
       });
 
       logger.info(`Appointment updated: ${appointmentId}`);
+      this.emitAppointmentRealtime(
+        currentAppointment.status !== appointment.status ? 'status_changed' : 'updated',
+        appointment,
+        context,
+        currentAppointment.status
+      );
 
       return appointment;
     } catch (error) {
@@ -1384,19 +1555,62 @@ export class AdminPanelService {
   /**
    * Update appointment status
    */
-  public async updateAppointmentStatus(appointmentId: string, status: string) {
+  public async updateAppointmentStatus(appointmentId: string, status: string, context: ActionContext = {}) {
     try {
-      const appointment = await prisma.appointment.update({
-        where: { id: appointmentId },
-        data: { status: status as any },
-        include: {
-          patient: { include: { user: true } },
-          doctor: { include: { user: true } },
-          service: true
+      const currentAppointment = await prisma.appointment.findUnique({
+        where: { id: appointmentId }
+      });
+
+      if (!currentAppointment) {
+        throw new Error('Appointment not found');
+      }
+
+      const appointment = await prisma.$transaction(async (tx) => {
+        const updatedAppointment = await tx.appointment.update({
+          where: { id: appointmentId },
+          data: { status: status as any },
+          include: {
+            patient: { include: { user: true } },
+            doctor: { include: { user: true } },
+            service: true,
+            assignedNurse: true
+          }
+        });
+
+        if (context.actorId && context.actorRole) {
+          await tx.serviceTrace.create({
+            data: {
+              appointmentId,
+              actorId: context.actorId,
+              actorRole: context.actorRole,
+              action: 'STATUS_CHANGED',
+              payload: {
+                from: currentAppointment.status,
+                to: updatedAppointment.status
+              }
+            }
+          });
+
+          await tx.auditLog.create({
+            data: {
+              actorId: context.actorId,
+              actorRole: context.actorRole,
+              entity: 'APPOINTMENT',
+              entityId: appointmentId,
+              action: 'UPDATE',
+              payload: {
+                from: currentAppointment.status,
+                to: updatedAppointment.status
+              }
+            }
+          });
         }
+
+        return updatedAppointment;
       });
 
       logger.info(`Appointment ${appointmentId} status updated to ${status}`);
+      this.emitAppointmentRealtime('status_changed', appointment, context, currentAppointment.status);
 
       return appointment;
     } catch (error) {
@@ -1408,13 +1622,46 @@ export class AdminPanelService {
   /**
    * Delete appointment
    */
-  public async deleteAppointment(appointmentId: string) {
+  public async deleteAppointment(appointmentId: string, context: ActionContext = {}) {
     try {
-      await prisma.appointment.delete({
-        where: { id: appointmentId }
+      const appointment = await prisma.appointment.findUnique({
+        where: { id: appointmentId },
+        include: {
+          patient: { include: { user: true } },
+          doctor: { include: { user: true } },
+          service: true,
+          assignedNurse: true
+        }
+      });
+
+      if (!appointment) {
+        throw new Error('Appointment not found');
+      }
+
+      await prisma.$transaction(async (tx) => {
+        if (context.actorId && context.actorRole) {
+          await tx.auditLog.create({
+            data: {
+              actorId: context.actorId,
+              actorRole: context.actorRole,
+              entity: 'APPOINTMENT',
+              entityId: appointmentId,
+              action: 'DELETE',
+              payload: {
+                status: appointment.status,
+                scheduledAt: appointment.scheduledAt
+              }
+            }
+          });
+        }
+
+        await tx.appointment.delete({
+          where: { id: appointmentId }
+        });
       });
 
       logger.info(`Appointment deleted: ${appointmentId}`);
+      this.emitAppointmentRealtime('deleted', appointment, context, appointment.status);
     } catch (error) {
       logger.error('Error deleting appointment:', error);
       throw error;
@@ -1538,6 +1785,7 @@ export class AdminPanelService {
   public async getPayments(filters: {
     page: number;
     limit: number;
+    search?: string;
     status?: string;
     method?: string;
     dateFrom?: string;
@@ -1549,6 +1797,18 @@ export class AdminPanelService {
 
       if (filters.status) where.status = filters.status;
       if (filters.method) where.method = filters.method;
+
+      if (filters.search) {
+        where.OR = [
+          { transactionId: { contains: filters.search, mode: 'insensitive' } },
+          { appointment: { patient: { user: { firstName: { contains: filters.search, mode: 'insensitive' } } } } },
+          { appointment: { patient: { user: { lastName: { contains: filters.search, mode: 'insensitive' } } } } },
+          { appointment: { patient: { user: { email: { contains: filters.search, mode: 'insensitive' } } } } },
+          { appointment: { doctor: { user: { firstName: { contains: filters.search, mode: 'insensitive' } } } } },
+          { appointment: { doctor: { user: { lastName: { contains: filters.search, mode: 'insensitive' } } } } },
+          { appointment: { service: { name: { contains: filters.search, mode: 'insensitive' } } } }
+        ];
+      }
 
       if (filters.dateFrom || filters.dateTo) {
         where.createdAt = {};
@@ -2424,27 +2684,57 @@ export class AdminPanelService {
    * Get system logs
    */
   public async getSystemLogs(filters: {
+    page?: number;
     level?: string;
+    service?: string;
+    search?: string;
     limit: number;
     startDate?: string;
     endDate?: string;
   }) {
     try {
       const logsPath = path.join(process.cwd(), 'logs', 'combined.log');
+      const page = filters.page && filters.page > 0 ? filters.page : 1;
+      const limit = filters.limit && filters.limit > 0 ? filters.limit : 100;
 
       if (!fs.existsSync(logsPath)) {
-        return { logs: [], message: 'No logs available' };
+        return {
+          data: [],
+          pagination: {
+            page,
+            limit,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false
+          }
+        };
       }
 
       const logsContent = fs.readFileSync(logsPath, 'utf-8');
       const logLines = logsContent.split('\n').filter(line => line.trim());
 
-      let filteredLogs = logLines;
+      let filteredLogs = logLines.map((line, index) => this.parseSystemLogLine(line, index));
 
       // Filter by level
       if (filters.level) {
-        filteredLogs = filteredLogs.filter(line =>
-          line.toLowerCase().includes(filters.level!.toLowerCase())
+        filteredLogs = filteredLogs.filter(log =>
+          log.level.toLowerCase() === filters.level!.toLowerCase()
+        );
+      }
+
+      if (filters.service) {
+        filteredLogs = filteredLogs.filter(log =>
+          log.service.toLowerCase().includes(filters.service!.toLowerCase())
+        );
+      }
+
+      if (filters.search) {
+        const search = filters.search.toLowerCase();
+        filteredLogs = filteredLogs.filter(log =>
+          log.message.toLowerCase().includes(search) ||
+          log.requestId?.toLowerCase().includes(search) ||
+          JSON.stringify(log.context ?? {}).toLowerCase().includes(search)
         );
       }
 
@@ -2453,28 +2743,357 @@ export class AdminPanelService {
         const start = filters.startDate ? new Date(filters.startDate) : new Date(0);
         const end = filters.endDate ? new Date(filters.endDate) : new Date();
 
-        filteredLogs = filteredLogs.filter(line => {
-          const match = line.match(/\d{4}-\d{2}-\d{2}/);
-          if (match) {
-            const logDate = new Date(match[0]);
-            return logDate >= start && logDate <= end;
-          }
-          return false;
+        filteredLogs = filteredLogs.filter(log => {
+          const logDate = new Date(log.timestamp);
+          return logDate >= start && logDate <= end;
         });
       }
 
-      // Limit results
-      const limitedLogs = filteredLogs.slice(-filters.limit);
+      const total = filteredLogs.length;
+      const totalPages = Math.ceil(total / limit);
+      const startIndex = (page - 1) * limit;
+      const paginatedLogs = filteredLogs
+        .slice()
+        .reverse()
+        .slice(startIndex, startIndex + limit);
 
       return {
-        logs: limitedLogs.reverse(),
-        total: filteredLogs.length,
-        limit: filters.limit
+        data: paginatedLogs,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasNext: page < totalPages,
+          hasPrev: page > 1
+        }
       };
     } catch (error) {
       logger.error('Error getting system logs:', error);
       throw error;
     }
+  }
+
+  private parseSystemLogLine(line: string, index: number) {
+    const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) \[([A-Z]+)\]: (.*)$/);
+    const timestamp = match?.[1]
+      ? new Date(match[1].replace(' ', 'T')).toISOString()
+      : new Date().toISOString();
+    const level = match?.[2] ?? 'INFO';
+    const rawMessage = match?.[3] ?? line;
+    const jsonStart = rawMessage.lastIndexOf(' {');
+    let message = rawMessage;
+    let context: Record<string, unknown> = {};
+
+    if (jsonStart >= 0) {
+      const possibleJson = rawMessage.slice(jsonStart + 1);
+      try {
+        context = JSON.parse(possibleJson);
+        message = rawMessage.slice(0, jsonStart).trim();
+      } catch (_error) {
+        context = {};
+      }
+    }
+
+    const service = typeof context['service'] === 'string' ? context['service'] : 'smd-vital-backend';
+    const environment = typeof context['environment'] === 'string' ? context['environment'] : undefined;
+    const requestId = typeof context['requestId'] === 'string' ? context['requestId'] : undefined;
+
+    return {
+      id: `${index}-${timestamp}`,
+      level,
+      service,
+      message,
+      timestamp,
+      environment,
+      requestId,
+      context
+    };
+  }
+
+  /**
+   * Get audit logs
+   */
+  public async getAuditLogs(filters: {
+    page?: number;
+    limit?: number;
+    actorId?: string;
+    actorRole?: string;
+    entity?: string;
+    action?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+  }) {
+    try {
+      const page = filters.page ?? 1;
+      const limit = filters.limit ?? 50;
+      const skip = (page - 1) * limit;
+      const where: any = {};
+
+      if (filters.actorId) where.actorId = filters.actorId;
+      if (filters.actorRole) where.actorRole = filters.actorRole;
+      if (filters.entity) where.entity = filters.entity;
+      if (filters.action) where.action = filters.action;
+
+      if (filters.startDate || filters.endDate) {
+        where.createdAt = {};
+        if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);
+        if (filters.endDate) where.createdAt.lte = new Date(filters.endDate);
+      }
+
+      if (filters.search) {
+        where.OR = [
+          { entityId: { contains: filters.search, mode: 'insensitive' } },
+          { actor: { firstName: { contains: filters.search, mode: 'insensitive' } } },
+          { actor: { lastName: { contains: filters.search, mode: 'insensitive' } } },
+          { actor: { email: { contains: filters.search, mode: 'insensitive' } } }
+        ];
+      }
+
+      const [data, total] = await prisma.$transaction([
+        prisma.auditLog.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            actor: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                role: true
+              }
+            }
+          }
+        }),
+        prisma.auditLog.count({ where })
+      ]);
+
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+          hasNext: page * limit < total,
+          hasPrev: page > 1
+        }
+      };
+    } catch (error) {
+      logger.error('Error getting audit logs:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get RIPS draft records. Drafts are generated from completed appointments and stored locally only.
+   */
+  public async getRipsDrafts(filters: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+  }) {
+    try {
+      await this.syncRipsDrafts(filters);
+
+      const page = filters.page ?? 1;
+      const limit = filters.limit ?? 50;
+      const skip = (page - 1) * limit;
+      const where: any = {};
+
+      if (filters.status) where.status = filters.status;
+      if (filters.startDate || filters.endDate) {
+        where.generatedAt = {};
+        if (filters.startDate) where.generatedAt.gte = new Date(filters.startDate);
+        if (filters.endDate) where.generatedAt.lte = new Date(filters.endDate);
+      }
+
+      const [data, total] = await prisma.$transaction([
+        prisma.ripsDraft.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { generatedAt: 'desc' },
+          include: {
+            appointment: {
+              include: {
+                patient: { include: { user: true } },
+                doctor: { include: { user: true } },
+                service: true
+              }
+            }
+          }
+        }),
+        prisma.ripsDraft.count({ where })
+      ]);
+
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+          hasNext: page * limit < total,
+          hasPrev: page > 1
+        }
+      };
+    } catch (error) {
+      logger.error('Error getting RIPS drafts:', error);
+      throw error;
+    }
+  }
+
+  public async exportRipsDrafts(filters: {
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+  }) {
+    const result = await this.getRipsDrafts({
+      ...filters,
+      page: 1,
+      limit: filters.limit ?? 500
+    });
+    const draftIds = result.data.map((draft: any) => draft.id);
+    const exportedAt = new Date();
+
+    if (draftIds.length > 0) {
+      await prisma.ripsDraft.updateMany({
+        where: { id: { in: draftIds } },
+        data: {
+          status: 'EXPORTED',
+          exportedAt
+        }
+      });
+    }
+
+    return {
+      type: 'rips-drafts',
+      format: 'json',
+      count: result.data.length,
+      exportedAt: exportedAt.toISOString(),
+      data: result.data.map((draft: any) => draft.payload)
+    };
+  }
+
+  private async syncRipsDrafts(filters: { startDate?: string; endDate?: string }) {
+    const where: any = { status: 'COMPLETED' };
+    if (filters.startDate || filters.endDate) {
+      where.scheduledAt = {};
+      if (filters.startDate) where.scheduledAt.gte = new Date(filters.startDate);
+      if (filters.endDate) where.scheduledAt.lte = new Date(filters.endDate);
+    }
+
+    const appointments = await prisma.appointment.findMany({
+      where,
+      take: 100,
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        patient: { include: { user: true } },
+        doctor: { include: { user: true } },
+        service: true,
+        encounter: true,
+        medicalRecords: { orderBy: { createdAt: 'desc' }, take: 1 },
+        prescriptions: { orderBy: { createdAt: 'desc' }, take: 1, include: { items: true } },
+        payments: true
+      }
+    });
+
+    for (const appointment of appointments) {
+      const existing = await prisma.ripsDraft.findUnique({
+        where: { appointmentId: appointment.id },
+        select: { status: true }
+      });
+
+      if (existing?.status === 'EXPORTED') {
+        continue;
+      }
+
+      const { payload, errors } = this.buildRipsPayload(appointment);
+      await prisma.ripsDraft.upsert({
+        where: { appointmentId: appointment.id },
+        create: {
+          appointmentId: appointment.id,
+          payload,
+          errors: errors.length ? errors : Prisma.DbNull,
+          status: errors.length ? 'DRAFT' : 'VALIDATED'
+        },
+        update: {
+          payload,
+          errors: errors.length ? errors : Prisma.DbNull,
+          status: errors.length ? 'DRAFT' : 'VALIDATED',
+          generatedAt: new Date()
+        }
+      });
+    }
+  }
+
+  private buildRipsPayload(appointment: any) {
+    const errors: string[] = [];
+    if (!appointment.patient?.user) errors.push('patient_required');
+    if (!appointment.doctor?.user) errors.push('doctor_required');
+    if (!appointment.service) errors.push('service_required');
+    if (!appointment.medicalRecords?.[0]) errors.push('medical_record_required');
+
+    const payload = {
+      schema: 'SMDVITAL_RIPS_DRAFT_V1',
+      generatedAt: new Date().toISOString(),
+      appointment: {
+        id: appointment.id,
+        status: appointment.status,
+        scheduledAt: appointment.scheduledAt?.toISOString?.() ?? null,
+        finishedAt: appointment.finishedAt?.toISOString?.() ?? null,
+        city: appointment.city,
+        address: appointment.address,
+        totalPrice: appointment.totalPrice
+      },
+      patient: {
+        id: appointment.patient?.id,
+        documentId: appointment.patient?.insuranceNumber,
+        name: appointment.patient?.user
+          ? `${appointment.patient.user.firstName} ${appointment.patient.user.lastName}`
+          : null,
+        email: appointment.patient?.user?.email,
+        dateOfBirth: appointment.patient?.dateOfBirth?.toISOString?.() ?? null,
+        gender: appointment.patient?.gender
+      },
+      provider: {
+        doctorId: appointment.doctor?.id,
+        name: appointment.doctor?.user
+          ? `${appointment.doctor.user.firstName} ${appointment.doctor.user.lastName}`
+          : null,
+        specialty: appointment.doctor?.specialty,
+        licenseNumber: appointment.doctor?.licenseNumber
+      },
+      service: {
+        id: appointment.service?.id,
+        name: appointment.service?.name,
+        category: appointment.service?.category,
+        duration: appointment.duration
+      },
+      clinical: {
+        encounterId: appointment.encounter?.id,
+        encounterSummary: appointment.encounter?.summary,
+        medicalRecordId: appointment.medicalRecords?.[0]?.id,
+        prescriptionId: appointment.prescriptions?.[0]?.id
+      },
+      payments: appointment.payments.map((payment: any) => ({
+        id: payment.id,
+        amount: payment.amount,
+        currency: payment.currency,
+        method: payment.method,
+        status: payment.status
+      }))
+    };
+
+    return { payload, errors };
   }
 
   /**
@@ -2607,6 +3226,43 @@ export class AdminPanelService {
     });
 
     return Object.values(grouped);
+  }
+
+  private emitAppointmentRealtime(
+    action: AppointmentRealtimeEvent['action'],
+    appointment: any,
+    context: ActionContext,
+    previousStatus: string | null
+  ): void {
+    const event: AppointmentRealtimeEvent = {
+      appointmentId: appointment.id,
+      action,
+      status: appointment.status,
+      previousStatus,
+      appointment
+    };
+
+    if (context.actorId && context.actorRole) {
+      event.actor = {
+        id: context.actorId,
+        role: context.actorRole
+      };
+    }
+
+    SocketService.emitAppointmentEvent(
+      event,
+      {
+        userIds: [
+          appointment.patient?.userId,
+          appointment.patient?.user?.id,
+          appointment.doctor?.userId,
+          appointment.doctor?.user?.id,
+          appointment.assignedNurseId,
+          appointment.assignedNurse?.id
+        ],
+        roles: ['ADMIN', 'SUPER_ADMIN']
+      }
+    );
   }
 
   private async ensureAppointmentCanBeScheduled(input: {

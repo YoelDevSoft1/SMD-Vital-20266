@@ -11,6 +11,7 @@ import { adminService } from '@/services/admin.service';
 import type { Review, ReviewFilters } from '@/types';
 import ReviewDetailsView from './ReviewDetailsView';
 import CreateReviewForm from './CreateReviewForm';
+import { ConfirmDialog } from './ui/ConfirmDialog';
 
 interface ReviewsModalProps {
   isOpen: boolean;
@@ -37,6 +38,10 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{
+    type: 'delete' | 'verify' | 'bulkVerify';
+    reviewId?: string;
+  } | null>(null);
 
   // Fetch reviews
   const { data: reviewsData, isLoading, error } = useQuery({
@@ -81,15 +86,11 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
   };
 
   const handleDelete = (reviewId: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta reseña?')) {
-      deleteMutation.mutate(reviewId);
-    }
+    setConfirmAction({ type: 'delete', reviewId });
   };
 
   const handleVerify = (reviewId: string) => {
-    if (window.confirm('¿Estás seguro de que quieres verificar esta reseña?')) {
-      verifyMutation.mutate(reviewId);
-    }
+    setConfirmAction({ type: 'verify', reviewId });
   };
 
   const handleSelectReview = (reviewId: string) => {
@@ -108,12 +109,7 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
   };
 
   const handleBulkVerify = () => {
-    if (window.confirm(`¿Estás seguro de que quieres verificar ${selectedReviews.length} reseñas?`)) {
-      selectedReviews.forEach(id => {
-        verifyMutation.mutate(id);
-      });
-    }
-    setSelectedReviews([]);
+    setConfirmAction({ type: 'bulkVerify' });
   };
   
   const handleExport = (format: 'csv' | 'json') => {
@@ -145,17 +141,6 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
     if (rating >= 2.5) return 'Regular';
     return 'Malo';
   };
-
-  // Debug logging
-  console.log('=== REVIEWS MODAL DEBUG ===');
-  console.log('Has reviewsData:', !!reviewsData);
-  console.log('Reviews data structure:', reviewsData ? Object.keys(reviewsData) : []);
-  console.log('Data structure:', reviewsData?.data ? Object.keys(reviewsData.data) : []);
-  console.log('Data.data structure:', reviewsData?.data?.data ? Object.keys(reviewsData.data.data) : []);
-  console.log('Reviews array length:', reviewsData?.data?.data?.data?.length || 0);
-  console.log('Is loading:', isLoading);
-  console.log('Error:', error);
-  console.log('========================');
 
   if (!isOpen) return null;
 
@@ -490,6 +475,41 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
           }}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={Boolean(confirmAction)}
+        title={
+          confirmAction?.type === 'delete'
+            ? 'Eliminar resena'
+            : confirmAction?.type === 'bulkVerify'
+              ? 'Verificar resenas'
+              : 'Verificar resena'
+        }
+        message={
+          confirmAction?.type === 'delete'
+            ? 'Esta accion eliminara la resena seleccionada y no se podra deshacer.'
+            : confirmAction?.type === 'bulkVerify'
+              ? `Se verificaran ${selectedReviews.length} resenas seleccionadas.`
+              : 'La resena quedara marcada como verificada.'
+        }
+        confirmLabel={confirmAction?.type === 'delete' ? 'Eliminar' : 'Verificar'}
+        isDanger={confirmAction?.type === 'delete'}
+        isLoading={deleteMutation.isPending || verifyMutation.isPending}
+        onCancel={() => setConfirmAction(null)}
+        onConfirm={() => {
+          if (confirmAction?.type === 'delete' && confirmAction.reviewId) {
+            deleteMutation.mutate(confirmAction.reviewId);
+          }
+          if (confirmAction?.type === 'verify' && confirmAction.reviewId) {
+            verifyMutation.mutate(confirmAction.reviewId);
+          }
+          if (confirmAction?.type === 'bulkVerify') {
+            selectedReviews.forEach((id) => verifyMutation.mutate(id));
+            setSelectedReviews([]);
+          }
+          setConfirmAction(null);
+        }}
+      />
     </div>
   );
 }

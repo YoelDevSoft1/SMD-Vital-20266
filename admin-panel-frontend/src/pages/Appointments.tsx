@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { formatDateTime, formatTime } from '@/utils/dateFormat';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -19,6 +19,10 @@ import {
   Activity,
   TrendingUp,
   CalendarCheck,
+  Radio,
+  Route,
+  ShieldAlert,
+  ListChecks,
 } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
 import { Button } from '@/components/ui/Button';
@@ -30,7 +34,7 @@ import AppointmentDetailsView from '@/components/AppointmentDetailsView';
 import DailyRouteMap from '@/components/DailyRouteMap';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
-import type { AppointmentFilters, AppointmentStatus, Doctor } from '@/types';
+import type { Appointment, AppointmentFilters, AppointmentStatus, AppointmentTimelineItem, Doctor } from '@/types';
 
 const statusTranslations: Record<AppointmentStatus, string> = {
   PENDING: 'Pendiente',
@@ -64,6 +68,7 @@ export default function Appointments() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [selectedTimelineAppointment, setSelectedTimelineAppointment] = useState<Appointment | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedAppointments, setSelectedAppointments] = useState<string[]>([]);
   const [routeDoctorId, setRouteDoctorId] = useState('');
@@ -93,6 +98,13 @@ export default function Appointments() {
     queryFn: () => adminService.getDoctorDailyRoute(routeDoctorId, routeDate),
     enabled: Boolean(routeDoctorId && routeDate),
     staleTime: 15_000,
+  });
+
+  const { data: timelineData, isFetching: isFetchingTimeline } = useQuery({
+    queryKey: ['appointment-timeline', selectedTimelineAppointment?.id],
+    queryFn: () => adminService.getAppointmentTimeline(selectedTimelineAppointment!.id),
+    enabled: Boolean(selectedTimelineAppointment?.id),
+    staleTime: 10_000,
   });
 
   // Delete appointment mutation
@@ -139,7 +151,7 @@ export default function Appointments() {
     setSelectedAppointments(selectedAppointments.length === allIds.length ? [] : allIds);
   };
 
-  const appointments = (appointmentsData?.data?.data as any)?.data || [];
+  const appointments = ((appointmentsData?.data?.data as any)?.data || []) as Appointment[];
   const pagination = (appointmentsData?.data?.data as any)?.pagination;
   const totalAppointments = pagination?.total || 0;
 
@@ -151,6 +163,9 @@ export default function Appointments() {
   const tasaExito = stats?.appointments?.completionRate || 0;
   const doctors = (doctorsData?.data?.data?.data as Doctor[]) ?? [];
   const route = routeData?.data?.data;
+  const timeline = timelineData?.data?.data?.items ?? [];
+  const liveStats = useMemo(() => buildLiveStats(appointments, route), [appointments, route]);
+  const timelineAppointment = selectedTimelineAppointment;
 
   if (error) {
     return (
@@ -226,6 +241,200 @@ export default function Appointments() {
           </Button>
         </div>
       </div>
+
+      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+              <Radio className="h-5 w-5 text-emerald-600" />
+              Torre de control operativa
+            </CardTitle>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Estado vivo de agenda, riesgos y trazabilidad del equipo.
+            </p>
+          </div>
+          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            Sincronizado en tiempo real
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {liveStats.statusCards.map((item) => (
+              <button
+                key={item.status}
+                type="button"
+                onClick={() => handleFilterChange('status', item.status)}
+                className={cn(
+                  'rounded-md border p-4 text-left transition hover:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60',
+                  item.className,
+                  filters.status === item.status && 'ring-2 ring-blue-500/40'
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-normal">{item.label}</p>
+                    <p className="mt-2 text-2xl font-semibold">{item.count}</p>
+                  </div>
+                  <Activity className="h-4 w-4 shrink-0" />
+                </div>
+                <p className="mt-2 text-xs opacity-80">{item.description}</p>
+              </button>
+            ))}
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
+            <div className="grid gap-4 lg:grid-cols-2">
+              <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                      <ShieldAlert className="h-4 w-4 text-amber-600" />
+                      Alertas de operacion
+                    </h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Prioriza retrasos, coordenadas y choques de ruta.</p>
+                  </div>
+                  <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    {liveStats.alerts.length}
+                  </span>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  {liveStats.alerts.length === 0 ? (
+                    <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300">
+                      <div className="flex items-center gap-2 font-medium">
+                        <CheckCircle2 className="h-4 w-4" />
+                        Operacion estable
+                      </div>
+                      <p className="mt-1 text-xs">No hay riesgos visibles en la pagina actual.</p>
+                    </div>
+                  ) : (
+                    liveStats.alerts.map((alert) => (
+                      <button
+                        key={alert.id}
+                        type="button"
+                        onClick={() => alert.status && handleFilterChange('status', alert.status)}
+                        className={cn(
+                          'w-full rounded-md border p-3 text-left text-sm transition hover:shadow-sm',
+                          alert.tone === 'danger' && 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300',
+                          alert.tone === 'warning' && 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300',
+                          alert.tone === 'info' && 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300'
+                        )}
+                      >
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                          <div>
+                            <p className="font-semibold">{alert.title}</p>
+                            <p className="mt-1 text-xs opacity-80">{alert.description}</p>
+                          </div>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </section>
+
+              <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                      <Route className="h-4 w-4 text-blue-600" />
+                      Cola prioritaria
+                    </h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Siguientes citas que requieren seguimiento.</p>
+                  </div>
+                  <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    {liveStats.priorityAppointments.length}
+                  </span>
+                </div>
+
+                <div className="mt-4 space-y-2">
+                  {liveStats.priorityAppointments.length === 0 ? (
+                    <p className="rounded-md border border-gray-200 p-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                      No hay citas activas en la pagina actual.
+                    </p>
+                  ) : (
+                    liveStats.priorityAppointments.map((appointment) => (
+                      <button
+                        key={appointment.id}
+                        type="button"
+                        onClick={() => setSelectedTimelineAppointment(appointment)}
+                        className={cn(
+                          'w-full rounded-md border border-gray-200 p-3 text-left transition hover:border-blue-300 hover:bg-blue-50 dark:border-gray-700 dark:hover:border-blue-800 dark:hover:bg-blue-900/20',
+                          selectedTimelineAppointment?.id === appointment.id && 'border-blue-400 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20'
+                        )}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
+                              {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName}
+                            </p>
+                            <p className="mt-1 truncate text-xs text-gray-500 dark:text-gray-400">
+                              {formatTime(appointment.scheduledAt)} - Dr. {appointment.doctor?.user?.firstName} {appointment.doctor?.user?.lastName}
+                            </p>
+                          </div>
+                          <span className={cn('shrink-0 rounded-full border px-2 py-0.5 text-[11px] font-semibold', statusColors[appointment.status])}>
+                            {statusTranslations[appointment.status]}
+                          </span>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </section>
+            </div>
+
+            <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                    <ListChecks className="h-4 w-4 text-indigo-600" />
+                    Trazabilidad activa
+                  </h2>
+                  {timelineAppointment ? (
+                    <p className="mt-1 truncate text-xs text-gray-500 dark:text-gray-400">
+                      {timelineAppointment.patient?.user?.firstName} {timelineAppointment.patient?.user?.lastName} - {formatTime(timelineAppointment.scheduledAt)}
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Selecciona una cita para ver sus eventos.</p>
+                  )}
+                </div>
+                {isFetchingTimeline && <RefreshCw className="h-4 w-4 animate-spin text-indigo-600" />}
+              </div>
+
+              <div className="mt-4 max-h-[360px] space-y-3 overflow-y-auto pr-1">
+                {!timelineAppointment ? (
+                  <p className="rounded-md border border-gray-200 p-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                    Usa el boton Trazabilidad en una cita o selecciona una de la cola prioritaria.
+                  </p>
+                ) : timeline.length === 0 ? (
+                  <p className="rounded-md border border-gray-200 p-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                    Todavia no hay eventos registrados para esta cita.
+                  </p>
+                ) : (
+                  timeline.slice(0, 8).map((item: AppointmentTimelineItem) => (
+                    <div key={`${item.source}-${item.id}`} className="relative rounded-md border border-gray-200 p-3 dark:border-gray-700">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {getTimelineActionLabel(item.action)}
+                          </p>
+                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {getTimelineActor(item)} - {formatDateTime(item.createdAt)}
+                          </p>
+                        </div>
+                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                          {item.actorRole}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </section>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
         <CardHeader className="flex flex-col gap-3 p-4 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
@@ -618,6 +827,15 @@ export default function Appointments() {
                         <Button
                           size="sm"
                           variant="outline"
+                          onClick={() => setSelectedTimelineAppointment(appointment)}
+                          className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+                        >
+                          <ListChecks className="h-3.5 w-3.5" />
+                          Trazabilidad
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
                           onClick={() => {
                             setSelectedAppointment(appointment);
                             setShowCreateForm(true);
@@ -754,4 +972,130 @@ function formatCurrency(value: number) {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+function buildLiveStats(
+  appointments: Appointment[],
+  route?: { segments?: Array<{ status: string }> } | null
+) {
+  const activeStatuses: AppointmentStatus[] = ['PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED'];
+  const statusCards = activeStatuses.map((status) => ({
+    status,
+    label: statusTranslations[status],
+    count: appointments.filter((appointment) => appointment.status === status).length,
+    description: getStatusDescription(status),
+    className: statusColors[status],
+  }));
+
+  const now = Date.now();
+  const overdue = appointments.filter((appointment) => (
+    ['PENDING', 'CONFIRMED'].includes(appointment.status)
+    && Number.isFinite(new Date(appointment.scheduledAt).getTime())
+    && new Date(appointment.scheduledAt).getTime() < now
+  ));
+  const inProgress = appointments.filter((appointment) => appointment.status === 'IN_PROGRESS');
+  const missingCoordinates = appointments.filter((appointment) => !appointment.coordinates);
+  const routeRisks = route?.segments?.filter((segment) => (
+    segment.status === 'RISK' || segment.status === 'CONFLICT'
+  )) ?? [];
+
+  const alerts: Array<{
+    id: string;
+    title: string;
+    description: string;
+    tone: 'danger' | 'warning' | 'info';
+    status?: AppointmentStatus;
+  }> = [];
+
+  if (overdue.length > 0) {
+    alerts.push({
+      id: 'overdue',
+      title: `${overdue.length} cita${overdue.length === 1 ? '' : 's'} fuera de hora`,
+      description: 'Hay citas pendientes o confirmadas con hora vencida.',
+      tone: 'danger',
+      status: 'PENDING',
+    });
+  }
+
+  if (missingCoordinates.length > 0) {
+    alerts.push({
+      id: 'missing-coordinates',
+      title: `${missingCoordinates.length} cita${missingCoordinates.length === 1 ? '' : 's'} sin coordenadas`,
+      description: 'Completa direccion y coordenadas para calcular traslados.',
+      tone: 'warning',
+    });
+  }
+
+  if (routeRisks.length > 0) {
+    alerts.push({
+      id: 'route-risks',
+      title: `${routeRisks.length} tramo${routeRisks.length === 1 ? '' : 's'} con riesgo`,
+      description: 'La ruta seleccionada tiene retrasos probables o choques de agenda.',
+      tone: 'warning',
+    });
+  }
+
+  if (inProgress.length > 0) {
+    alerts.push({
+      id: 'in-progress',
+      title: `${inProgress.length} atencion${inProgress.length === 1 ? '' : 'es'} en curso`,
+      description: 'Da seguimiento clinico y operativo hasta cierre de documentos.',
+      tone: 'info',
+      status: 'IN_PROGRESS',
+    });
+  }
+
+  const priorityAppointments = appointments
+    .filter((appointment) => ['PENDING', 'CONFIRMED', 'IN_PROGRESS'].includes(appointment.status))
+    .sort((left, right) => getAppointmentTimestamp(left) - getAppointmentTimestamp(right))
+    .slice(0, 6);
+
+  return {
+    statusCards,
+    alerts,
+    priorityAppointments,
+  };
+}
+
+function getStatusDescription(status: AppointmentStatus) {
+  const descriptions: Record<AppointmentStatus, string> = {
+    PENDING: 'Por confirmar con paciente o equipo.',
+    CONFIRMED: 'Lista para ejecucion operativa.',
+    IN_PROGRESS: 'Atencion activa en terreno o clinica.',
+    COMPLETED: 'Cerrada con servicio finalizado.',
+    CANCELLED: 'Fuera de la agenda activa.',
+    NO_SHOW: 'Paciente no asistio.',
+    RESCHEDULED: 'Movida a otra fecha u hora.',
+  };
+
+  return descriptions[status];
+}
+
+function getAppointmentTimestamp(appointment: Appointment) {
+  const timestamp = new Date(appointment.scheduledAt).getTime();
+  return Number.isFinite(timestamp) ? timestamp : Number.MAX_SAFE_INTEGER;
+}
+
+function getTimelineActionLabel(action: string) {
+  const labels: Record<string, string> = {
+    appointment_created: 'Cita creada',
+    appointment_updated: 'Cita actualizada',
+    appointment_deleted: 'Cita eliminada',
+    appointment_status_changed: 'Estado actualizado',
+    encounter_started: 'Atencion iniciada',
+    vitals_recorded: 'Signos vitales registrados',
+    note_added: 'Nota clinica agregada',
+    encounter_finished: 'Atencion finalizada',
+    documents_sent: 'Documentos enviados',
+  };
+
+  return labels[action] ?? action.replace(/_/g, ' ');
+}
+
+function getTimelineActor(item: AppointmentTimelineItem) {
+  if (!item.actor) {
+    return 'Sistema';
+  }
+
+  return `${item.actor.firstName} ${item.actor.lastName}`.trim() || item.actor.email || 'Usuario';
 }

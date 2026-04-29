@@ -85,6 +85,8 @@ export interface Doctor {
   isAvailable: boolean;
   consultationFee: number;
   bio?: string;
+  logoPath?: string | null;
+  signaturePath?: string | null;
   user: User;
   _count?: {
     appointments: number;
@@ -185,6 +187,7 @@ export interface Appointment {
   notes?: string;
   diagnosis?: string;
   prescription?: string;
+  isUrgent?: boolean;
   coordinates?: {
     lat: number;
     lng: number;
@@ -258,12 +261,164 @@ export interface ClinicalAppointment extends Appointment {
   encounter?: Encounter | null;
 }
 
+export interface AppointmentTimelineActor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: UserRole;
+}
+
+export interface AppointmentTimelineItem {
+  id: string;
+  source: 'service_trace' | 'audit_log';
+  action: string;
+  actorRole: UserRole;
+  actor?: AppointmentTimelineActor;
+  payload?: Record<string, unknown> | null;
+  encounter?: {
+    id: string;
+    status: string;
+    startedAt?: string | null;
+    finishedAt?: string | null;
+  } | null;
+  entity?: string;
+  createdAt: string;
+}
+
+export interface AppointmentTimeline {
+  appointmentId: string;
+  items: AppointmentTimelineItem[];
+}
+
+export interface AppointmentRealtimeEvent {
+  appointmentId: string;
+  action:
+    | 'created'
+    | 'updated'
+    | 'deleted'
+    | 'status_changed'
+    | 'encounter_started'
+    | 'vitals_recorded'
+    | 'note_added'
+    | 'encounter_finished'
+    | 'documents_sent';
+  status?: AppointmentStatus | string;
+  previousStatus?: AppointmentStatus | string | null;
+  appointment?: Appointment;
+  trace?: Record<string, unknown>;
+  actor?: {
+    id: string;
+    role: UserRole;
+  };
+  timestamp: string;
+}
+
 export interface PatientHistory {
   id: string;
   userId: string;
   medicalRecords: MedicalRecord[];
   prescriptions: Prescription[];
   appointments: Appointment[];
+  consents?: PatientConsent[];
+  documentDeliveries?: DocumentDelivery[];
+}
+
+export type PatientConsentType =
+  | 'DATA_PROCESSING'
+  | 'EMAIL_DELIVERY'
+  | 'CLINICAL_HISTORY'
+  | 'TELEMEDICINE';
+
+export interface PatientConsent {
+  id: string;
+  patientId: string;
+  type: PatientConsentType;
+  version: string;
+  acceptedAt: string;
+  source: string;
+}
+
+export type DocumentDeliveryStatus = 'QUEUED' | 'SENT' | 'FAILED' | 'SKIPPED';
+
+export interface DocumentDelivery {
+  id: string;
+  patientId: string;
+  appointmentId?: string | null;
+  medicalRecordId?: string | null;
+  prescriptionId?: string | null;
+  email: string;
+  status: DocumentDeliveryStatus;
+  attempts: number;
+  lastError?: string | null;
+  documents?: Array<{ fileName: string; filePath: string }> | null;
+  queuedAt: string;
+  sentAt?: string | null;
+  failedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SendDocumentsResult {
+  appointmentId: string;
+  documents: Array<{ fileName: string; filePath: string }>;
+  documentDelivery?: DocumentDelivery | null;
+  emailQueued: boolean;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  actorId: string;
+  actorRole: UserRole;
+  entity: string;
+  entityId: string;
+  action: string;
+  payload?: Record<string, unknown> | null;
+  createdAt: string;
+  actor?: Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role'>;
+}
+
+export interface AuditLogFilters {
+  page?: number;
+  limit?: number;
+  actorId?: string;
+  actorRole?: UserRole | '';
+  entity?: string;
+  action?: string;
+  search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export type RipsDraftStatus = 'DRAFT' | 'VALIDATED' | 'EXPORTED' | 'FAILED';
+
+export interface RipsDraft {
+  id: string;
+  appointmentId: string;
+  payload: Record<string, unknown>;
+  status: RipsDraftStatus;
+  errors?: string[] | null;
+  generatedAt: string;
+  exportedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  appointment?: Appointment;
+}
+
+export interface RipsDraftFilters {
+  page?: number;
+  limit?: number;
+  status?: RipsDraftStatus | '';
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export interface RipsExportResponse {
+  type: 'rips-drafts';
+  format: 'json';
+  count: number;
+  exportedAt: string;
+  data: Record<string, unknown>[];
 }
 
 // Service types
@@ -285,6 +440,7 @@ export interface Service {
   basePrice: number;
   duration: number;
   isActive: boolean;
+  requirements?: string | null;
   _count?: {
     appointments: number;
     doctorServices: number;
@@ -305,6 +461,7 @@ export interface Payment {
   status: PaymentStatus;
   method: PaymentMethod;
   transactionId?: string;
+  stripePaymentIntentId?: string | null;
   appointment?: Appointment;
   createdAt: string;
   updatedAt: string;
@@ -443,7 +600,7 @@ export interface AppointmentFilters {
   page?: number;
   limit?: number;
   search?: string;
-  status?: AppointmentStatus;
+  status?: AppointmentStatus | '';
   dateFrom?: string;
   dateTo?: string;
   doctorId?: string;
@@ -454,8 +611,9 @@ export interface AppointmentFilters {
 export interface PaymentFilters {
   page?: number;
   limit?: number;
-  status?: PaymentStatus;
-  method?: PaymentMethod;
+  search?: string;
+  status?: PaymentStatus | '';
+  method?: PaymentMethod | '';
   dateFrom?: string;
   dateTo?: string;
 }

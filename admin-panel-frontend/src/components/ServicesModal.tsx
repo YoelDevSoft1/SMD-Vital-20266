@@ -9,6 +9,7 @@ import { adminService } from '@/services/admin.service';
 import type { Service, ServiceFilters } from '@/types';
 import ServiceDetailsView from './ServiceDetailsView';
 import CreateServiceForm from './CreateServiceForm';
+import { ConfirmDialog } from './ui/ConfirmDialog';
 
 interface ServicesModalProps {
   isOpen: boolean;
@@ -38,6 +39,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ type: 'delete' | 'bulkDelete'; serviceId?: string } | null>(null);
 
   // Fetch services
   const { data: servicesData, isLoading, error } = useQuery({
@@ -147,16 +149,12 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este servicio?')) {
-      deleteServiceMutation.mutate(id);
-    }
+    setConfirmAction({ type: 'delete', serviceId: id });
   };
 
   const handleBulkDelete = () => {
     if (selectedServices.length === 0) return;
-    if (window.confirm(`¿Estás seguro de que quieres eliminar ${selectedServices.length} servicios?`)) {
-      bulkDeleteMutation.mutate(selectedServices);
-    }
+    setConfirmAction({ type: 'bulkDelete' });
   };
 
   const handleEdit = (service: Service) => {
@@ -177,17 +175,6 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
     setSelectedServices([]);
     onClose();
   };
-
-  // Debug logging
-  console.log('=== SERVICES MODAL DEBUG ===');
-  console.log('Has servicesData:', !!servicesData);
-  console.log('Services data structure:', servicesData ? Object.keys(servicesData) : []);
-  console.log('Data structure:', servicesData?.data ? Object.keys(servicesData.data) : []);
-  console.log('Data.data structure:', servicesData?.data?.data ? Object.keys(servicesData.data.data) : []);
-  console.log('Services array length:', servicesData?.data?.data?.data?.length || 0);
-  console.log('Is loading:', isLoading);
-  console.log('Error:', error);
-  console.log('========================');
 
   if (!isOpen) return null;
 
@@ -528,6 +515,29 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
           }}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={Boolean(confirmAction)}
+        title={confirmAction?.type === 'bulkDelete' ? 'Eliminar servicios' : 'Eliminar servicio'}
+        message={
+          confirmAction?.type === 'bulkDelete'
+            ? `Esta accion eliminara ${selectedServices.length} servicios seleccionados y no se podra deshacer.`
+            : 'Esta accion eliminara el servicio seleccionado y no se podra deshacer.'
+        }
+        confirmLabel="Eliminar"
+        isDanger
+        isLoading={deleteServiceMutation.isPending || bulkDeleteMutation.isPending}
+        onCancel={() => setConfirmAction(null)}
+        onConfirm={() => {
+          if (confirmAction?.type === 'delete' && confirmAction.serviceId) {
+            deleteServiceMutation.mutate(confirmAction.serviceId);
+          }
+          if (confirmAction?.type === 'bulkDelete') {
+            bulkDeleteMutation.mutate(selectedServices);
+          }
+          setConfirmAction(null);
+        }}
+      />
     </div>
   );
 }

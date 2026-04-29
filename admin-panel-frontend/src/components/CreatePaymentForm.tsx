@@ -154,18 +154,6 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
     (apt: Appointment) => apt.id === formData.appointmentId
   );
 
-  // Debug logging
-  console.log('=== CREATE PAYMENT FORM DEBUG ===');
-  console.log('Is editing:', isEditing);
-  console.log('Payment:', payment);
-  console.log('Has appointmentsData:', !!appointmentsData);
-  console.log('Appointments data structure:', appointmentsData ? Object.keys(appointmentsData) : []);
-  console.log('Data structure:', appointmentsData?.data ? Object.keys(appointmentsData.data) : []);
-  console.log('Data.data structure:', appointmentsData?.data?.data ? Object.keys(appointmentsData.data.data) : []);
-  console.log('Appointments array length:', appointmentsData?.data?.data?.data?.length || 0);
-  console.log('Form data:', formData);
-  console.log('========================');
-
   return (
     <GlassModal isOpen={isOpen} onClose={onClose} size="xl" variant="glass">
       {/* Header */}

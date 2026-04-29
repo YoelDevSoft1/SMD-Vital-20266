@@ -19,10 +19,37 @@ const queryClient = new QueryClient({
 });
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  let reloadingForUpdate = false;
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloadingForUpdate) {
+      return;
+    }
+
+    reloadingForUpdate = true;
+    window.location.reload();
+  });
+
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {
-      // PWA registration is best effort; the app must keep working without it.
-    });
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((registration) => {
+        registration.addEventListener('updatefound', () => {
+          const installingWorker = registration.installing;
+
+          installingWorker?.addEventListener('statechange', () => {
+            if (
+              installingWorker.state === 'installed' &&
+              navigator.serviceWorker.controller
+            ) {
+              installingWorker.postMessage({ type: 'SKIP_WAITING' });
+            }
+          });
+        });
+      })
+      .catch(() => {
+        // PWA registration is best effort; the app must keep working without it.
+      });
   });
 }
 

@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import { AdminPanelService } from '../services/admin-panel.service';
 import { ApiResponse } from '../types';
+import {
+  createAppointmentSchema,
+  updateAppointmentSchema
+} from '../types/validation';
 import { logger } from '../utils/logger';
 
 export class AdminPanelController {
@@ -933,6 +937,44 @@ export class AdminPanelController {
     }
   };
 
+  public getAppointmentTimeline = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'Appointment ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const timeline = await this.adminService.getAppointmentTimeline(id);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Appointment timeline retrieved successfully',
+        data: timeline,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching appointment timeline:', error);
+      const isNotFound = error.message === 'Appointment not found';
+      res.status(isNotFound ? 404 : 500).json({
+        success: false,
+        message: isNotFound ? 'Appointment not found' : 'Error fetching appointment timeline',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
   /**
    * @desc    Create new appointment
    * @route   POST /api/v1/admin-panel/appointments
@@ -940,9 +982,22 @@ export class AdminPanelController {
    */
   public createAppointment = async (req: Request, res: Response): Promise<void> => {
     try {
-      const appointmentData = req.body;
+      const parsed = createAppointmentSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid appointment payload',
+          error: parsed.error.flatten(),
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
 
-      const appointment = await this.adminService.createAppointment(appointmentData);
+      const appointment = await this.adminService.createAppointment(parsed.data, {
+        actorId: req.userId!,
+        actorRole: req.userRole!
+      });
 
       const response: ApiResponse = {
         success: true,
@@ -973,7 +1028,6 @@ export class AdminPanelController {
   public updateAppointment = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const appointmentData = req.body;
 
       if (!id) {
         res.status(400).json({
@@ -985,7 +1039,22 @@ export class AdminPanelController {
         return;
       }
 
-      const appointment = await this.adminService.updateAppointment(id, appointmentData);
+      const parsed = updateAppointmentSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid appointment payload',
+          error: parsed.error.flatten(),
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const appointment = await this.adminService.updateAppointment(id, parsed.data, {
+        actorId: req.userId!,
+        actorRole: req.userRole!
+      });
 
       const response: ApiResponse = {
         success: true,
@@ -1028,7 +1097,10 @@ export class AdminPanelController {
         return;
       }
 
-      const appointment = await this.adminService.updateAppointmentStatus(id, status);
+      const appointment = await this.adminService.updateAppointmentStatus(id, status, {
+        actorId: req.userId!,
+        actorRole: req.userRole!
+      });
 
       const response: ApiResponse = {
         success: true,
@@ -1070,7 +1142,10 @@ export class AdminPanelController {
         return;
       }
 
-      await this.adminService.deleteAppointment(id);
+      await this.adminService.deleteAppointment(id, {
+        actorId: req.userId!,
+        actorRole: req.userRole!
+      });
 
       const response: ApiResponse = {
         success: true,
@@ -1152,11 +1227,12 @@ export class AdminPanelController {
    */
   public getPayments = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { page = '1', limit = '10', status, method, dateFrom, dateTo } = req.query;
+      const { page = '1', limit = '10', search, status, method, dateFrom, dateTo } = req.query;
 
       const result = await this.adminService.getPayments({
         page: parseInt(page as string),
         limit: parseInt(limit as string),
+        search: search as string,
         status: status as string,
         method: method as string,
         dateFrom: dateFrom as string,
@@ -2026,13 +2102,26 @@ export class AdminPanelController {
    */
   public getSystemLogs = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { level, limit = '100', startDate, endDate } = req.query;
+      const {
+        page = '1',
+        limit = '100',
+        level,
+        service,
+        search,
+        startDate,
+        endDate,
+        dateFrom,
+        dateTo
+      } = req.query;
 
       const logs = await this.adminService.getSystemLogs({
+        page: parseInt(page as string),
         level: level as string,
+        service: service as string,
+        search: search as string,
         limit: parseInt(limit as string),
-        startDate: startDate as string,
-        endDate: endDate as string
+        startDate: (startDate || dateFrom) as string,
+        endDate: (endDate || dateTo) as string
       });
 
       const response: ApiResponse = {
@@ -2049,6 +2138,118 @@ export class AdminPanelController {
       res.status(500).json({
         success: false,
         message: 'Error fetching system logs',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  public getAuditLogs = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const {
+        page = '1',
+        limit = '50',
+        actorId,
+        actorRole,
+        entity,
+        action,
+        search,
+        startDate,
+        endDate,
+        dateFrom,
+        dateTo
+      } = req.query;
+
+      const audit = await this.adminService.getAuditLogs({
+        page: parseInt(page as string, 10),
+        limit: parseInt(limit as string, 10),
+        actorId: actorId as string,
+        actorRole: actorRole as string,
+        entity: entity as string,
+        action: action as string,
+        search: search as string,
+        startDate: (startDate || dateFrom) as string,
+        endDate: (endDate || dateTo) as string
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Audit logs retrieved successfully',
+        data: audit,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching audit logs:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching audit logs',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  public getRipsDrafts = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { page = '1', limit = '50', status, startDate, endDate, dateFrom, dateTo } = req.query;
+      const drafts = await this.adminService.getRipsDrafts({
+        page: parseInt(page as string, 10),
+        limit: parseInt(limit as string, 10),
+        status: status as string,
+        startDate: (startDate || dateFrom) as string,
+        endDate: (endDate || dateTo) as string
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'RIPS drafts retrieved successfully',
+        data: drafts,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error fetching RIPS drafts:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching RIPS drafts',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
+  public exportRipsDrafts = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { status, startDate, endDate, dateFrom, dateTo, limit } = req.body || {};
+      const exported = await this.adminService.exportRipsDrafts({
+        status,
+        startDate: startDate || dateFrom,
+        endDate: endDate || dateTo,
+        limit
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'RIPS drafts exported successfully',
+        data: exported,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error exporting RIPS drafts:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error exporting RIPS drafts',
         error: error.message,
         timestamp: new Date().toISOString(),
         requestId: req.id || 'unknown'

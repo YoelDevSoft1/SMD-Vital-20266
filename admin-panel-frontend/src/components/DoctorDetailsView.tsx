@@ -5,16 +5,6 @@ interface DoctorDetailsViewProps {
 }
 
 export default function DoctorDetailsView({ doctor }: DoctorDetailsViewProps) {
-  // Debug: Log the doctor data to see the date format
-  console.log('Doctor data for dates:', {
-    createdAt: doctor.user.createdAt,
-    updatedAt: doctor.user.updatedAt,
-    createdAtType: typeof doctor.user.createdAt,
-    updatedAtType: typeof doctor.user.updatedAt,
-    userKeys: Object.keys(doctor.user),
-    userValues: Object.values(doctor.user)
-  });
-
   const getSpecialtyBadgeColor = (specialty: string) => {
     const colors = {
       'Medicina General': 'bg-blue-100 text-blue-800',

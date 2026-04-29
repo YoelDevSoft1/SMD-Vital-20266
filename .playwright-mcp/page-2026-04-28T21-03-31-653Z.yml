@@ -1,0 +1,53 @@
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - img [ref=e8]
+      - generic [ref=e12]: Plataforma médica inteligente y segura
+    - generic [ref=e13]:
+      - heading "Gestión clínica intuitiva para equipos comprometidos" [level=1] [ref=e14]
+      - paragraph [ref=e15]: Monitorea productividad, coordina citas y toma decisiones confiables con un panel diseñado para profesionales de la salud.
+    - generic [ref=e16]:
+      - generic [ref=e18]:
+        - img [ref=e20]
+        - generic [ref=e23]:
+          - term [ref=e24]: Acceso Seguro
+          - definition [ref=e25]: Autenticación robusta para proteger los datos sensibles de tus pacientes.
+      - generic [ref=e27]:
+        - img [ref=e29]
+        - generic [ref=e32]:
+          - term [ref=e33]: Gestión Integral
+          - definition [ref=e34]: Administra servicios, doctores y citas desde un panel centralizado.
+      - generic [ref=e36]:
+        - img [ref=e38]
+        - generic [ref=e40]:
+          - term [ref=e41]: Experiencia Renovada
+          - definition [ref=e42]: Interfaz moderna y clara para tomar decisiones rápidas en tu operación médica.
+  - generic [ref=e47]:
+    - generic [ref=e48]:
+      - img [ref=e50]
+      - heading "SMD Vital" [level=2] [ref=e54]
+      - paragraph [ref=e55]: Panel de administración clínico con experiencia inmersiva y visualmente refinada.
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - text: Correo electrónico
+        - textbox "Correo electrónico" [ref=e59]:
+          - /placeholder: admin@smdvital.com
+      - generic [ref=e60]:
+        - text: Contraseña
+        - generic [ref=e61]:
+          - textbox "Contraseña" [ref=e62]:
+            - /placeholder: Ingresa tu contraseña
+          - button "Mostrar contraseña" [ref=e63] [cursor=pointer]:
+            - img [ref=e64]
+      - generic [ref=e67]:
+        - generic [ref=e68]: Sistema operativo estable
+        - link "Crear cuenta" [ref=e70] [cursor=pointer]:
+          - /url: /register
+      - button "Acceder al panel" [ref=e71] [cursor=pointer]: Acceder al panel
+    - generic [ref=e74]:
+      - paragraph [ref=e75]: Acceso exclusivo para personal autorizado de SMD Vital.
+      - paragraph [ref=e76]:
+        - text: "Soporte prioritario:"
+        - link "soporte@smdvital.com" [ref=e77] [cursor=pointer]:
+          - /url: mailto:soporte@smdvital.com
+      - paragraph [ref=e78]: SMD Vital · Médico a Domicilio · © 2026

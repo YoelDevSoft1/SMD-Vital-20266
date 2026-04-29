@@ -38,7 +38,6 @@ export default function CreateUserForm({ onSuccess, onCancel }: CreateUserFormPr
   // Create user mutation
   const createUserMutation = useMutation({
     mutationFn: async (userData: CreateUserData) => {
-      console.log('Creating user with data:', userData);
       const response = await fetch('/api/v1/admin-panel/users', {
         method: 'POST',
         headers: {
@@ -48,9 +47,7 @@ export default function CreateUserForm({ onSuccess, onCancel }: CreateUserFormPr
         body: JSON.stringify(userData),
       });
 
-      console.log('Response status:', response.status);
       const responseData = await response.json();
-      console.log('Response data:', responseData);
 
       if (!response.ok) {
         throw new Error(responseData.message || 'Error al crear usuario');
@@ -58,8 +55,7 @@ export default function CreateUserForm({ onSuccess, onCancel }: CreateUserFormPr
 
       return responseData;
     },
-    onSuccess: (data) => {
-      console.log('User created successfully:', data);
+    onSuccess: () => {
       toast.success('Usuario creado exitosamente');
       onSuccess();
     },

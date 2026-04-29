@@ -68,21 +68,6 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
     setErrors({});
   }, [review, isOpen]);
 
-  // Debug logging
-  console.log('=== CREATE REVIEW FORM DEBUG ===');
-  console.log('Is editing:', isEditing);
-  console.log('Review:', review);
-  console.log('Has patientsData:', !!patientsData);
-  console.log('Patients data structure:', patientsData ? Object.keys(patientsData) : []);
-  console.log('Data structure:', patientsData?.data ? Object.keys(patientsData.data) : []);
-  console.log('Data.data structure:', patientsData?.data?.data ? Object.keys(patientsData.data.data) : []);
-  console.log('Patients array length:', patientsData?.data?.data?.data?.length || 0);
-  console.log('Has doctorsData:', !!doctorsData);
-  console.log('Doctors data structure:', doctorsData ? Object.keys(doctorsData) : []);
-  console.log('Doctors array length:', doctorsData?.data?.data?.data?.length || 0);
-  console.log('Form data:', formData);
-  console.log('========================');
-
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 

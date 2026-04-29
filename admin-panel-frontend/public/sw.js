@@ -1,4 +1,7 @@
-const CACHE_NAME = 'smd-vital-pwa-v1';
+const CACHE_VERSION = 'v3';
+const APP_CACHE = `smd-vital-app-${CACHE_VERSION}`;
+const RUNTIME_CACHE = `smd-vital-runtime-${CACHE_VERSION}`;
+
 const APP_SHELL = [
   '/',
   '/login',
@@ -11,7 +14,7 @@ const APP_SHELL = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
+    caches.open(APP_CACHE).then((cache) => cache.addAll(APP_SHELL))
   );
   self.skipWaiting();
 });
@@ -20,49 +23,89 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => ![APP_CACHE, RUNTIME_CACHE].includes(key))
+            .map((key) => caches.delete(key))
+        )
+      )
   );
   self.clients.claim();
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (request.method !== 'GET') return;
+  if (request.method !== 'GET') {
+    return;
+  }
 
   if (url.pathname.startsWith('/api/')) {
-    event.respondWith(fetch(request).catch(() => new Response(JSON.stringify({ offline: true }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 503,
-    })));
+    event.respondWith(networkOnlyApi(request));
     return;
   }
 
   if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          return response;
-        })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match('/offline.html')))
-    );
+    event.respondWith(networkFirstNavigation(request));
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-
-      return fetch(request).then((response) => {
-        if (response.ok && url.origin === self.location.origin) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-        }
-        return response;
-      });
-    })
-  );
+  if (url.origin === self.location.origin) {
+    event.respondWith(staleWhileRevalidate(request));
+  }
 });
+
+async function networkOnlyApi(request) {
+  try {
+    return await fetch(request);
+  } catch (_error) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        offline: true,
+        message: 'Sin conexion. La app conserva la interfaz instalada, pero las acciones clinicas requieren red.',
+      }),
+      {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+}
+
+async function networkFirstNavigation(request) {
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(RUNTIME_CACHE);
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (_error) {
+    const cached = await caches.match(request);
+    return cached || caches.match('/offline.html');
+  }
+}
+
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  const cached = await cache.match(request);
+  const fetched = fetch(request)
+    .then((response) => {
+      if (response.ok) {
+        cache.put(request, response.clone());
+      }
+      return response;
+    })
+    .catch(() => cached);
+
+  return cached || fetched;
+}

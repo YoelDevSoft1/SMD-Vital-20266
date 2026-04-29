@@ -1,8 +1,10 @@
 import React from 'react';
-import { formatDate } from '@/utils/dateFormat';
+import { useQuery } from '@tanstack/react-query';
+import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { X, Calendar, Clock, User, Stethoscope, MapPin, DollarSign, FileText, AlertCircle, CheckCircle, XCircle, RefreshCw, Phone, Mail, Building } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import type { Appointment } from '@/types';
+import { adminService } from '@/services/admin.service';
+import type { Appointment, AppointmentTimelineItem } from '@/types';
 
 interface AppointmentDetailsViewProps {
   appointment: Appointment;
@@ -31,6 +33,13 @@ const statusColors = {
 };
 
 export default function AppointmentDetailsView({ appointment, onClose, onEdit }: AppointmentDetailsViewProps) {
+  const { data: timelineData, isLoading: isLoadingTimeline } = useQuery({
+    queryKey: ['appointment-timeline', appointment.id],
+    queryFn: () => adminService.getAppointmentTimeline(appointment.id),
+    staleTime: 10_000,
+  });
+
+  const timeline = timelineData?.data?.data?.items ?? [];
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CO', {
@@ -274,6 +283,44 @@ export default function AppointmentDetailsView({ appointment, onClose, onEdit }:
           )}
 
           {/* Información del Sistema */}
+          <div className="bg-slate-50 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <Clock className="w-5 h-5 mr-2" />
+              Trazabilidad en tiempo real
+            </h3>
+
+            {isLoadingTimeline ? (
+              <p className="text-sm text-gray-500">Cargando linea de tiempo...</p>
+            ) : timeline.length === 0 ? (
+              <p className="text-sm text-gray-500">Aun no hay eventos registrados para esta cita.</p>
+            ) : (
+              <div className="space-y-3">
+                {timeline.map((item) => (
+                  <div key={`${item.source}-${item.id}`} className="border-l-2 border-blue-200 pl-4">
+                    <div className="flex flex-col gap-1 rounded-md border border-slate-200 bg-white p-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">
+                          {getTimelineActionLabel(item.action)}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {getTimelineActor(item)} - {item.actorRole}
+                        </p>
+                        {getTimelinePayloadSummary(item.payload) && (
+                          <p className="mt-1 text-xs text-slate-600">
+                            {getTimelinePayloadSummary(item.payload)}
+                          </p>
+                        )}
+                      </div>
+                      <span className="text-xs font-medium text-slate-500">
+                        {formatDateTime(item.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="bg-gray-100 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Información del Sistema</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -295,4 +342,56 @@ export default function AppointmentDetailsView({ appointment, onClose, onEdit }:
       </div>
     </div>
   );
+}
+
+function getTimelineActionLabel(action: string) {
+  const labels: Record<string, string> = {
+    STARTED: 'Atencion iniciada',
+    UPDATED: 'Cita actualizada',
+    VITALS_RECORDED: 'Signos vitales registrados',
+    NOTE_ADDED: 'Nota clinica agregada',
+    PRESCRIPTION_CREATED: 'Formula creada',
+    DOCUMENT_SENT: 'Documentos enviados',
+    STATUS_CHANGED: 'Estado actualizado',
+    CREATE: 'Cita creada',
+    UPDATE: 'Registro actualizado',
+    DELETE: 'Registro eliminado',
+    COMPLETE: 'Cita completada',
+    SEND_EMAIL: 'Correo enviado',
+  };
+
+  return labels[action] ?? action;
+}
+
+function getTimelineActor(item: AppointmentTimelineItem) {
+  if (!item.actor) {
+    return 'Sistema';
+  }
+
+  return `${item.actor.firstName} ${item.actor.lastName}`;
+}
+
+function getTimelinePayloadSummary(payload?: Record<string, unknown> | null) {
+  if (!payload) {
+    return '';
+  }
+
+  const from = payload['from'];
+  const to = payload['to'] ?? payload['status'];
+  if (from || to) {
+    return `Estado: ${from ?? 'nuevo'} -> ${to ?? 'sin cambio'}`;
+  }
+
+  const changedFields = payload['changedFields'];
+  if (Array.isArray(changedFields) && changedFields.length > 0) {
+    return `Campos actualizados: ${changedFields.join(', ')}`;
+  }
+
+  const documents = payload['documents'];
+  if (Array.isArray(documents)) {
+    return `${documents.length} documento(s) procesado(s)`;
+  }
+
+  const keys = Object.keys(payload);
+  return keys.length ? `Datos registrados: ${keys.slice(0, 4).join(', ')}` : '';
 }

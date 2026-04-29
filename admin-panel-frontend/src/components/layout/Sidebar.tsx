@@ -5,9 +5,11 @@ import {
   Briefcase,
   Calendar,
   CreditCard,
+  FileJson,
   FileText,
   LayoutDashboard,
   LifeBuoy,
+  ShieldCheck,
   Star,
   Stethoscope,
   Users,
@@ -32,6 +34,8 @@ const adminNavItems: NavItem[] = [
   { to: '/services', icon: Briefcase, label: 'Servicios', description: 'Portafolio de ofertas clínicas' },
   { to: '/reviews', icon: Star, label: 'Reseñas', description: 'Opiniones y satisfacción del paciente' },
   { to: '/analytics', icon: BarChart3, label: 'Analíticas', description: 'Indicadores y tendencias' },
+  { to: '/audit', icon: ShieldCheck, label: 'Auditoria', description: 'Bitacora de acciones sensibles' },
+  { to: '/rips', icon: FileJson, label: 'RIPS', description: 'Borradores y export interno' },
   { to: '/system', icon: Activity, label: 'Sistema', description: 'Salud de la plataforma' },
 ];
 

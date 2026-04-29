@@ -91,31 +91,52 @@ export const doctorAvailabilitySchema = z.object({
   duration: z.number().int().min(15, 'Duration must be at least 15 minutes').optional(),
 });
 
+const appointmentStatusSchema = z.enum([
+  'PENDING',
+  'CONFIRMED',
+  'IN_PROGRESS',
+  'COMPLETED',
+  'CANCELLED',
+  'NO_SHOW',
+  'RESCHEDULED',
+]);
+
+const appointmentCoordinatesSchema = z.object({
+  lat: z.number().min(-90).max(90, 'Latitude must be between -90 and 90'),
+  lng: z.number().min(-180).max(180, 'Longitude must be between -180 and 180'),
+});
+
 // Appointment validation schemas
 export const createAppointmentSchema = z.object({
   patientId: z.string().cuid('Invalid patient ID'),
   doctorId: z.string().cuid('Invalid doctor ID'),
   serviceId: z.string().cuid('Invalid service ID'),
+  status: appointmentStatusSchema.optional().default('PENDING'),
   scheduledAt: z.string().datetime('Invalid scheduled date format'),
+  duration: z.number().int().min(15, 'Duration must be at least 15 minutes').max(480, 'Duration must be 8 hours or less'),
+  totalPrice: z.number().nonnegative('Total price must be zero or positive'),
   address: z.string().min(10, 'Address must be at least 10 characters'),
   city: z.string().min(2, 'City must be at least 2 characters'),
-  coordinates: z.object({
-    lat: z.number().min(-90).max(90, 'Latitude must be between -90 and 90'),
-    lng: z.number().min(-180).max(180, 'Longitude must be between -180 and 180'),
-  }).optional(),
+  coordinates: appointmentCoordinatesSchema.nullable().optional(),
+  assignedNurseId: z.string().cuid('Invalid nurse ID').nullable().optional(),
   notes: z.string().optional(),
+  diagnosis: z.string().optional(),
+  prescription: z.string().optional(),
 });
 
 export const updateAppointmentSchema = z.object({
+  patientId: z.string().cuid('Invalid patient ID').optional(),
+  doctorId: z.string().cuid('Invalid doctor ID').optional(),
+  serviceId: z.string().cuid('Invalid service ID').optional(),
+  status: appointmentStatusSchema.optional(),
   scheduledAt: z.string().datetime('Invalid scheduled date format').optional(),
+  duration: z.number().int().min(15, 'Duration must be at least 15 minutes').max(480, 'Duration must be 8 hours or less').optional(),
+  totalPrice: z.number().nonnegative('Total price must be zero or positive').optional(),
   address: z.string().min(10, 'Address must be at least 10 characters').optional(),
   city: z.string().min(2, 'City must be at least 2 characters').optional(),
-  coordinates: z.object({
-    lat: z.number().min(-90).max(90, 'Latitude must be between -90 and 90'),
-    lng: z.number().min(-180).max(180, 'Longitude must be between -180 and 180'),
-  }).optional(),
+  coordinates: appointmentCoordinatesSchema.nullable().optional(),
+  assignedNurseId: z.string().cuid('Invalid nurse ID').nullable().optional(),
   notes: z.string().optional(),
-  status: z.enum(['PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'NO_SHOW', 'RESCHEDULED']).optional(),
   diagnosis: z.string().optional(),
   prescription: z.string().optional(),
 });
@@ -162,6 +183,7 @@ const prescriptionItemSchema = z.object({
 export const clinicalFinishSchema = z.object({
   encounterSummary: z.string().min(2).optional(),
   encounterPayload: z.record(z.any()).optional(),
+  emailConsentAccepted: z.boolean().optional().default(false),
   medicalRecord: z.object({
     title: z.string().min(2),
     description: z.string().min(2),
@@ -185,6 +207,7 @@ export const clinicalRecordByEmailSchema = z.object({
   patientGender: z.enum(['MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY']).optional(),
   serviceName: z.string().min(2).optional(),
   sendEmail: z.boolean().optional().default(true),
+  emailConsentAccepted: z.boolean().optional().default(false),
   vitals: clinicalVitalsSchema.optional(),
   medicalRecord: z.object({
     title: z.string().min(2),
@@ -199,6 +222,10 @@ export const clinicalRecordByEmailSchema = z.object({
     templateVersion: z.string().optional(),
     items: z.array(prescriptionItemSchema).min(1)
   }).optional()
+});
+
+export const sendClinicalDocumentsSchema = z.object({
+  emailConsentAccepted: z.boolean().optional().default(false)
 });
 
 // Service validation schemas

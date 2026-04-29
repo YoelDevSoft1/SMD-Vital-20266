@@ -2,6 +2,7 @@ import { Bell, LogOut, Menu, Sparkles, User, Moon, Sun } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/context/theme';
+import PwaStatusIndicator from '@/components/PwaStatusIndicator';
 import type { UserRole } from '@/types';
 
 type HeaderProps = {
@@ -54,45 +55,42 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
   const headerCopy = user?.role ? HEADER_COPY[user.role] : HEADER_COPY.ADMIN;
 
   return (
-    <header className="relative z-20 flex h-16 shrink-0 items-center justify-between overflow-hidden border-b border-white/10 bg-slate-900 px-3 backdrop-blur-2xl sm:h-20 sm:px-6 lg:px-8 dark:border-white/5 dark:bg-slate-900/70">
+    <header className="relative z-20 flex h-16 shrink-0 items-center justify-between overflow-hidden border-b border-slate-200/70 bg-white/85 px-3 backdrop-blur-2xl sm:h-20 sm:px-6 lg:px-8 dark:border-white/5 dark:bg-slate-900/70">
       <div className="pointer-events-none absolute inset-0">
         <div className="glass-blob absolute -left-24 top-[-140%] h-72 w-72 rounded-full bg-cyan-400/25 blur-[140px] dark:bg-cyan-500/15" />
         <div className="glass-blob glass-blob--reverse absolute right-[-32%] bottom-[-150%] h-80 w-80 rounded-full bg-blue-500/20 blur-[170px] dark:bg-blue-500/15" />
-        <div className="absolute inset-0 bg-gradient-to-r from-white/22 via-white/10 to-white/16 dark:from-white/10 dark:via-white/5 dark:to-white/8" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-cyan-50/70 to-blue-50/70 dark:from-white/10 dark:via-white/5 dark:to-white/8" />
       </div>
 
       <div className="relative flex min-w-0 items-center gap-2 sm:gap-6">
         <button
           type="button"
           onClick={onToggleSidebar}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white shadow-sm transition hover:border-cyan-200 hover:bg-white/20 hover:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-200/60 focus:ring-offset-2 focus:ring-offset-slate-900 lg:hidden dark:border-white/20 dark:bg-slate-900/60 dark:hover:border-cyan-500/40 dark:hover:bg-slate-900/70 dark:hover:text-cyan-200"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-300/60 focus:ring-offset-2 focus:ring-offset-white lg:hidden dark:border-white/20 dark:bg-slate-900/60 dark:text-white dark:hover:border-cyan-500/40 dark:hover:bg-slate-900/70 dark:hover:text-cyan-200 dark:focus:ring-offset-slate-900"
           aria-label="Mostrar u ocultar menú lateral"
         >
           <Menu className="h-5 w-5" />
         </button>
 
         <div className="flex min-w-0 flex-col">
-          <span className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-white/80 lg:text-cyan-500">
+          <span className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-cyan-600 dark:text-cyan-200">
             <Sparkles className="hidden h-3.5 w-3.5 sm:block" />
             {headerCopy.badge}
           </span>
-          <h2 className="truncate text-sm font-semibold text-white sm:text-lg lg:text-slate-900 dark:text-white">
+          <h2 className="truncate text-sm font-semibold text-slate-900 sm:text-lg dark:text-white">
             Bienvenido{user?.firstName ? `, ${user.firstName}` : ''}
           </h2>
-          <p className="hidden text-xs text-white/70 sm:block lg:text-slate-500 dark:text-slate-300">
+          <p className="hidden text-xs text-slate-500 sm:block dark:text-slate-300">
             {headerCopy.subtitle}
           </p>
         </div>
       </div>
 
       <div className="relative flex shrink-0 items-center gap-2 sm:gap-4">
-        <div className="hidden items-center gap-2 rounded-2xl border border-white/30 bg-white/25 px-3 py-2 text-xs font-medium text-emerald-300 shadow-inner shadow-emerald-100 sm:flex lg:text-emerald-600 dark:border-emerald-400/40 dark:bg-emerald-500/10 dark:text-emerald-300">
-          <span className="flex h-2 w-2 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.75)]" />
-          Sistema estable
-        </div>
+        <PwaStatusIndicator className="hidden sm:inline-flex" />
         <button
           type="button"
-          className="hidden rounded-xl border border-white/30 bg-white/25 p-3 text-white transition hover:border-cyan-200 hover:bg-white/35 hover:text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-200/60 focus:ring-offset-2 focus:ring-offset-white sm:relative sm:block lg:text-slate-600 lg:hover:text-cyan-600 dark:border-white/20 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:border-cyan-500/40 dark:hover:bg-slate-900/70 dark:hover:text-cyan-300"
+          className="hidden rounded-xl border border-slate-200 bg-white/80 p-3 text-slate-600 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-300/60 focus:ring-offset-2 focus:ring-offset-white sm:relative sm:block dark:border-white/20 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:border-cyan-500/40 dark:hover:bg-slate-900/70 dark:hover:text-cyan-300 dark:focus:ring-offset-slate-900"
           aria-label="Notificaciones"
         >
           <Bell className="h-5 w-5" />
@@ -103,22 +101,22 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         <button
           type="button"
           onClick={toggleTheme}
-          className="inline-flex rounded-xl border border-white/20 bg-white/10 p-2.5 text-white transition hover:border-cyan-200 hover:bg-white/20 hover:text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-200/60 focus:ring-offset-2 focus:ring-offset-slate-900 sm:p-3 dark:border-white/20 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:border-cyan-500/40 dark:hover:bg-slate-900/70 dark:hover:text-cyan-300"
+          className="inline-flex rounded-xl border border-slate-200 bg-white/80 p-2.5 text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-300/60 focus:ring-offset-2 focus:ring-offset-white sm:p-3 dark:border-white/20 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:border-cyan-500/40 dark:hover:bg-slate-900/70 dark:hover:text-cyan-300 dark:focus:ring-offset-slate-900"
           aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
           aria-pressed={theme === 'dark'}
         >
           {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </button>
 
-        <div className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-1.5 py-1.5 shadow-sm lg:bg-white/25 dark:border-white/20 dark:bg-slate-900/60">
+        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-1.5 py-1.5 shadow-sm dark:border-white/20 dark:bg-slate-900/60">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-cyan-400 to-indigo-500 text-white shadow-inner transition group-hover:brightness-110 sm:h-10 sm:w-10 sm:rounded-xl">
             <User className="h-5 w-5" />
           </div>
           <div className="hidden text-right sm:block">
-            <p className="text-sm font-semibold text-white lg:text-slate-900 dark:text-white">
+            <p className="text-sm font-semibold text-slate-900 dark:text-white">
               {user?.firstName} {user?.lastName}
             </p>
-            <p className="text-xs text-white/70 lg:text-slate-500 dark:text-slate-300">{roleLabel}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-300">{roleLabel}</p>
           </div>
           <button
             type="button"

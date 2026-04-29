@@ -5,6 +5,7 @@ import { EmailService } from './email.service';
 import { SMSService } from './sms.service';
 import { NotificationService } from './notification.service';
 import { RedisService } from './redis.service';
+import prisma from '../utils/prisma';
 
 export class QueueService {
   private static emailQueue: Bull.Queue | null = null;
@@ -139,7 +140,28 @@ export class QueueService {
             await emailService.sendPaymentConfirmation(to, data.firstName, data.payment);
             break;
           case 'clinical-documents':
+            if (data.deliveryId) {
+              await prisma.documentDelivery.update({
+                where: { id: data.deliveryId },
+                data: {
+                  status: 'QUEUED',
+                  attempts: { increment: 1 },
+                  lastError: null
+                }
+              });
+            }
             await emailService.sendClinicalDocuments(to, data.firstName, data.appointment, data.documents);
+            if (data.deliveryId) {
+              await prisma.documentDelivery.update({
+                where: { id: data.deliveryId },
+                data: {
+                  status: 'SENT',
+                  sentAt: new Date(),
+                  failedAt: null,
+                  lastError: null
+                }
+              });
+            }
             break;
           default:
             throw new Error(`Unknown email template: ${template}`);
@@ -147,6 +169,18 @@ export class QueueService {
         
         logger.info('Email sent successfully', { to, template, jobId: job.id });
       } catch (error: any) {
+        if (template === 'clinical-documents' && data.deliveryId) {
+          await prisma.documentDelivery.update({
+            where: { id: data.deliveryId },
+            data: {
+              status: 'FAILED',
+              failedAt: new Date(),
+              lastError: error.message || 'Email processing failed'
+            }
+          }).catch((updateError) => {
+            logger.error('Failed to update document delivery status:', updateError);
+          });
+        }
         logger.error('Email processing failed:', error);
         throw error;
       }
@@ -295,6 +329,7 @@ export class QueueService {
     firstName: string;
     appointment: any;
     documents: Array<{ fileName: string; filePath: string }>;
+    deliveryId?: string;
   }, options?: Bull.JobOptions): Promise<Bull.Job | null> {
     return this.addEmailJob({
       to: data.to,
@@ -303,7 +338,8 @@ export class QueueService {
       data: {
         firstName: data.firstName,
         appointment: data.appointment,
-        documents: data.documents
+        documents: data.documents,
+        deliveryId: data.deliveryId
       }
     }, options);
   }

@@ -365,9 +365,15 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
     }
 
     const hasCoordinates = formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0;
+    const { isUrgent, ...appointmentPayload } = formData;
+    const notes = [appointmentPayload.notes.trim(), isUrgent ? 'Prioridad: cita urgente.' : '']
+      .filter(Boolean)
+      .join('\n');
+
     appointmentMutation.mutate({
-      ...formData,
+      ...appointmentPayload,
       patientId,
+      notes,
       scheduledAt: localInputToColombiaISO(formData.scheduledAt),
       coordinates: hasCoordinates ? formData.coordinates : null,
     });
@@ -400,9 +406,9 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
 
   return (
     <div className="fixed inset-0 z-[1200] flex items-end justify-center bg-black/55 p-0 sm:items-center sm:p-4">
-      <div className="relative z-[1201] flex h-[100dvh] w-full flex-col overflow-hidden bg-white shadow-xl sm:h-auto sm:max-h-[92vh] sm:max-w-4xl sm:rounded-lg">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-4 py-4 sm:p-6">
-          <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
+      <div className="relative z-[1201] flex h-[100dvh] w-full flex-col overflow-hidden bg-white shadow-xl dark:bg-slate-950 sm:h-auto sm:max-h-[92vh] sm:max-w-4xl sm:rounded-lg">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-950 sm:p-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
             {appointment ? 'Editar Cita' : 'Nueva Cita'}
           </h2>
           <Button variant="ghost" onClick={handleClose} className="h-10 w-10 p-0">
@@ -429,7 +435,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                   className={`flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     isNewPatient
                       ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
+                      : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50 dark:bg-slate-900 dark:text-blue-300 dark:border-blue-700 dark:hover:bg-slate-800'
                   }`}
                 >
                   <UserPlus className="w-3.5 h-3.5" />
@@ -438,7 +444,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               </div>
 
               {isNewPatient ? (
-                <div className="grid grid-cols-1 gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 sm:grid-cols-2 sm:p-4">
+                <div className="grid grid-cols-1 gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-900 dark:bg-blue-950/30 sm:grid-cols-2 sm:p-4">
                   <div>
                     <Label htmlFor="np-firstName" className="text-xs">Nombre *</Label>
                     <Input
@@ -490,7 +496,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                     id="patientId"
                     value={formData.patientId}
                     onChange={(e) => handleInputChange('patientId', e.target.value)}
-                    className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    className={`w-full rounded-md border bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:bg-slate-900 dark:text-slate-100 ${
                       errors.patientId ? 'border-red-500' : 'border-gray-300'
                     }`}
                   >
@@ -516,7 +522,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                 id="doctorId"
                 value={formData.doctorId}
                 onChange={(e) => handleInputChange('doctorId', e.target.value)}
-                className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full rounded-md border bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:bg-slate-900 dark:text-slate-100 ${
                   errors.doctorId ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
@@ -540,7 +546,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                 id="serviceId"
                 value={formData.serviceId}
                 onChange={(e) => handleServiceChange(e.target.value)}
-                className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full rounded-md border bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:bg-slate-900 dark:text-slate-100 ${
                   errors.serviceId ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
@@ -553,7 +559,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               </select>
               {errors.serviceId && <p className="text-red-500 text-sm mt-1">{errors.serviceId}</p>}
               {selectedService && (
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                   Duracion sugerida: {selectedService.duration} min - Precio base: ${selectedService.basePrice}
                 </p>
               )}
@@ -585,7 +591,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                 id="duration"
                 value={formData.duration}
                 onChange={(e) => handleInputChange('duration', parseInt(e.target.value))}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               >
                 {durationOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -684,11 +690,11 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 sm:p-4">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-slate-800 dark:bg-slate-900/70 sm:p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="text-sm font-semibold text-gray-900">Ubicacion en mapa</h3>
-                <p className="text-xs text-gray-600">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Ubicacion en mapa</h3>
+                <p className="text-xs text-gray-600 dark:text-slate-400">
                   Se calcula automaticamente con direccion y localidad. Puedes reintentar si corriges la direccion.
                 </p>
               </div>
@@ -704,7 +710,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               </Button>
             </div>
             {(geocodeStatus || formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0) && (
-              <div className="mt-3 text-xs text-gray-700">
+              <div className="mt-3 text-xs text-gray-700 dark:text-slate-300">
                 <p>{geocodeStatus || 'Coordenadas listas.'}</p>
                 <p className="mt-1 font-medium">
                   {formData.coordinates.lat.toFixed(6)}, {formData.coordinates.lng.toFixed(6)}
@@ -713,11 +719,11 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
             )}
           </div>
 
-          <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-3 sm:p-4">
+          <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-3 dark:border-blue-900 dark:bg-blue-950/30 sm:p-4">
             <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
               <div>
-                <h3 className="text-sm font-semibold text-gray-900">Horas disponibles del medico</h3>
-                <p className="text-xs text-gray-600">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Horas disponibles del medico</h3>
+                <p className="text-xs text-gray-600 dark:text-slate-400">
                   Selecciona medico, servicio y fecha para reservar un horario disponible.
                 </p>
               </div>
@@ -729,14 +735,14 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                 {availability.availability.map((block) => (
                   <span
                     key={block.id}
-                    className="rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-medium text-blue-800"
+                    className="rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-medium text-blue-800 dark:border-blue-800 dark:bg-slate-900 dark:text-blue-200"
                   >
                     {block.startTime} - {block.endTime}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="mb-3 text-xs text-amber-700">
+              <p className="mb-3 text-xs text-amber-700 dark:text-amber-300">
                 {formData.doctorId && selectedDate
                   ? 'Este medico aun no registro disponibilidad para este dia.'
                   : 'Pendiente seleccionar medico y fecha.'}
@@ -756,8 +762,8 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
                       selected
                         ? 'border-blue-600 bg-blue-600 text-white'
                         : slot.isAvailable
-                          ? 'border-gray-200 bg-white text-gray-800 hover:border-blue-400 hover:text-blue-700'
-                          : 'border-gray-100 bg-gray-100 text-gray-400'
+                          ? 'border-gray-200 bg-white text-gray-800 hover:border-blue-400 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100'
+                          : 'border-gray-100 bg-gray-100 text-gray-400 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-500'
                     }`}
                     title={slot.reason}
                   >
@@ -768,7 +774,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
             </div>
 
             {formData.scheduledAt && (
-              <p className="mt-3 text-xs font-medium text-gray-700">
+              <p className="mt-3 text-xs font-medium text-gray-700 dark:text-slate-300">
                 Hora seleccionada: {formData.scheduledAt.replace('T', ' ')}
               </p>
             )}
@@ -781,7 +787,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               id="notes"
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
-              className="min-h-24 w-full rounded-md border border-gray-300 p-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+              className="min-h-24 w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               rows={3}
               placeholder="Notas adicionales sobre la cita..."
             />
@@ -794,7 +800,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               id="diagnosis"
               value={formData.diagnosis}
               onChange={(e) => handleInputChange('diagnosis', e.target.value)}
-              className="min-h-24 w-full rounded-md border border-gray-300 p-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+              className="min-h-24 w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               rows={3}
               placeholder="Diagnóstico médico..."
             />
@@ -807,7 +813,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               id="prescription"
               value={formData.prescription}
               onChange={(e) => handleInputChange('prescription', e.target.value)}
-              className="min-h-24 w-full rounded-md border border-gray-300 p-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+              className="min-h-24 w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               rows={3}
               placeholder="Medicamentos y tratamientos prescritos..."
             />
@@ -826,7 +832,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
           </div>
 
           {/* Botones */}
-          <div className="sticky bottom-0 z-10 flex flex-col-reverse gap-3 border-t bg-white/95 px-4 py-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur sm:flex-row sm:justify-end sm:p-6 sm:shadow-none">
+          <div className="sticky bottom-0 z-10 flex flex-col-reverse gap-3 border-t border-gray-200 bg-white/95 px-4 py-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 sm:flex-row sm:justify-end sm:p-6 sm:shadow-none">
             <Button type="button" variant="outline" onClick={handleClose} className="w-full sm:w-auto">
               Cancelar
             </Button>

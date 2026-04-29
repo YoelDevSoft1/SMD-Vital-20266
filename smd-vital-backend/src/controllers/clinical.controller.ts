@@ -7,7 +7,8 @@ import {
   clinicalFinishSchema,
   clinicalRecordByEmailSchema,
   clinicalVitalsSchema,
-  encounterNotesSchema
+  encounterNotesSchema,
+  sendClinicalDocumentsSchema
 } from '../types/validation';
 import { config } from '../config/config';
 
@@ -68,6 +69,29 @@ export class ClinicalController {
       res.status(200).json(response);
     } catch (error: any) {
       this.handleError(res, error, 'Error fetching appointment details', req);
+    }
+  };
+
+  public getAppointmentTimeline = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const appointmentId = this.requireParam(req, 'id');
+      const timeline = await this.clinicalService.getAppointmentTimeline(
+        req.userId!,
+        req.userRole!,
+        appointmentId
+      );
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Appointment timeline retrieved successfully',
+        data: timeline,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      this.handleError(res, error, 'Error fetching appointment timeline', req);
     }
   };
 
@@ -193,6 +217,44 @@ export class ClinicalController {
       res.status(200).json(response);
     } catch (error: any) {
       this.handleError(res, error, 'Error finishing encounter', req);
+    }
+  };
+
+  public sendAppointmentDocuments = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const appointmentId = this.requireParam(req, 'id');
+      const parsed = sendClinicalDocumentsSchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid document delivery payload',
+          error: parsed.error.flatten(),
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const result = await this.clinicalService.sendAppointmentDocuments(
+        req.userId!,
+        req.userRole!,
+        appointmentId,
+        parsed.data
+      );
+
+      const response: ApiResponse = {
+        success: true,
+        message: result.emailQueued
+          ? 'Clinical documents queued for email delivery'
+          : 'Clinical documents delivery recorded but not queued',
+        data: result,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      this.handleError(res, error, 'Error sending clinical documents', req);
     }
   };
 

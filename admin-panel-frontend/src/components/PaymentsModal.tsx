@@ -11,6 +11,7 @@ import { adminService } from '@/services/admin.service';
 import type { Payment, PaymentFilters } from '@/types';
 import PaymentDetailsView from './PaymentDetailsView';
 import CreatePaymentForm from './CreatePaymentForm';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 interface PaymentsModalProps {
   isOpen: boolean;
@@ -56,6 +57,7 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   // Fetch payments
   const { data: paymentsData, isLoading, error } = useQuery({
@@ -94,9 +96,7 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este pago?')) {
-      deleteMutation.mutate(id);
-    }
+    setPendingDeleteId(id);
   };
 
   const handleViewDetails = (payment: Payment) => {
@@ -159,17 +159,6 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
     }).format(amount);
   };
 
-  // Debug logging
-  console.log('=== PAYMENTS MODAL DEBUG ===');
-  console.log('Has paymentsData:', !!paymentsData);
-  console.log('Payments data structure:', paymentsData ? Object.keys(paymentsData) : []);
-  console.log('Data structure:', paymentsData?.data ? Object.keys(paymentsData.data) : []);
-  console.log('Data.data structure:', paymentsData?.data?.data ? Object.keys(paymentsData.data.data) : []);
-  console.log('Payments array length:', paymentsData?.data?.data?.data?.length || 0);
-  console.log('Is loading:', isLoading);
-  console.log('Error:', error);
-  console.log('========================');
-
   if (!isOpen) return null;
 
   return (
@@ -217,7 +206,7 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
               <Label htmlFor="status">Estado</Label>
               <Select
                 value={filters.status}
-                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value, page: 1 }))}
+                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as PaymentFilters['status'], page: 1 }))}
               >
                 <option value="">Todos los estados</option>
                 <option value="PENDING">Pendiente</option>
@@ -230,7 +219,7 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
               <Label htmlFor="method">Método</Label>
               <Select
                 value={filters.method}
-                onChange={(e) => setFilters(prev => ({ ...prev, method: e.target.value, page: 1 }))}
+                onChange={(e) => setFilters(prev => ({ ...prev, method: e.target.value as PaymentFilters['method'], page: 1 }))}
               >
                 <option value="">Todos los métodos</option>
                 <option value="CARD">Tarjeta</option>
@@ -543,6 +532,21 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
           }}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={Boolean(pendingDeleteId)}
+        title="Eliminar pago"
+        message="Esta accion eliminara el pago seleccionado y no se podra deshacer."
+        confirmLabel="Eliminar"
+        isDanger
+        isLoading={deleteMutation.isPending}
+        onCancel={() => setPendingDeleteId(null)}
+        onConfirm={() => {
+          if (!pendingDeleteId) return;
+          deleteMutation.mutate(pendingDeleteId);
+          setPendingDeleteId(null);
+        }}
+      />
     </div>
   );
 }

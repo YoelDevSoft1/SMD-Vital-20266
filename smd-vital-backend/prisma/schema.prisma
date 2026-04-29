@@ -78,6 +78,8 @@ model Patient {
   prescriptions Prescription[]
   reviews Review[]
   encounters Encounter[]
+  consents PatientConsent[]
+  documentDeliveries DocumentDelivery[]
 
   @@map("patients")
 }
@@ -157,6 +159,7 @@ model Service {
   // Relations
   appointments Appointment[]
   doctorServices DoctorService[]
+  clinicalTemplates ClinicalTemplate[]
 
   @@map("services")
 }
@@ -224,6 +227,8 @@ model Appointment {
   serviceTraces ServiceTrace[]
   medicalRecords MedicalRecord[]
   prescriptions Prescription[]
+  documentDeliveries DocumentDelivery[]
+  ripsDraft RipsDraft?
 
   @@map("appointments")
 }
@@ -246,6 +251,27 @@ enum EncounterStatus {
 enum PrescriptionStatus {
   DRAFT
   FINAL
+}
+
+enum PatientConsentType {
+  DATA_PROCESSING
+  EMAIL_DELIVERY
+  CLINICAL_HISTORY
+  TELEMEDICINE
+}
+
+enum DocumentDeliveryStatus {
+  QUEUED
+  SENT
+  FAILED
+  SKIPPED
+}
+
+enum RipsDraftStatus {
+  DRAFT
+  VALIDATED
+  EXPORTED
+  FAILED
 }
 
 enum ServiceTraceAction {
@@ -276,6 +302,7 @@ enum AuditAction {
   DELETE
   COMPLETE
   SEND_EMAIL
+  DOWNLOAD
   LOGIN
   LOGOUT
 }
@@ -368,6 +395,87 @@ model AuditLog {
   actor User @relation("AuditLogActor", fields: [actorId], references: [id], onDelete: Cascade)
 
   @@map("audit_logs")
+}
+
+model PatientConsent {
+  id         String             @id @default(cuid())
+  patientId  String
+  type       PatientConsentType
+  version    String
+  acceptedAt DateTime           @default(now())
+  ipAddress  String?
+  userAgent  String?
+  source     String             @default("PWA")
+  createdAt  DateTime           @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, type, version])
+  @@index([patientId, acceptedAt])
+  @@map("patient_consents")
+}
+
+model DocumentDelivery {
+  id              String                 @id @default(cuid())
+  patientId       String
+  appointmentId   String?
+  medicalRecordId String?
+  prescriptionId  String?
+  email           String
+  status          DocumentDeliveryStatus @default(QUEUED)
+  attempts        Int                    @default(0)
+  lastError       String?
+  documents       Json?
+  queuedAt        DateTime               @default(now())
+  sentAt          DateTime?
+  failedAt        DateTime?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  patient       Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  appointment   Appointment?   @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  medicalRecord MedicalRecord? @relation(fields: [medicalRecordId], references: [id], onDelete: SetNull)
+  prescription  Prescription?  @relation(fields: [prescriptionId], references: [id], onDelete: SetNull)
+
+  @@index([patientId, createdAt])
+  @@index([appointmentId, status])
+  @@index([medicalRecordId])
+  @@index([prescriptionId])
+  @@map("document_deliveries")
+}
+
+model ClinicalTemplate {
+  id             String   @id @default(cuid())
+  serviceId      String?
+  name           String
+  version        String
+  requiredFields Json
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  service Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+
+  @@unique([serviceId, version])
+  @@index([serviceId, isActive])
+  @@map("clinical_templates")
+}
+
+model RipsDraft {
+  id            String          @id @default(cuid())
+  appointmentId String          @unique
+  payload       Json
+  status        RipsDraftStatus @default(DRAFT)
+  errors        Json?
+  generatedAt   DateTime        @default(now())
+  exportedAt    DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([status, generatedAt])
+  @@map("rips_drafts")
 }
 
 // Doctor Schedules
@@ -485,6 +593,7 @@ model MedicalRecord {
   encounter   Encounter? @relation(fields: [encounterId], references: [id], onDelete: SetNull)
   doctor      Doctor? @relation("MedicalRecordDoctor", fields: [doctorId], references: [id], onDelete: SetNull)
   nurse       User? @relation("MedicalRecordNurse", fields: [nurseId], references: [id], onDelete: SetNull)
+  documentDeliveries DocumentDelivery[]
 
   @@map("medical_records")
 }
@@ -525,6 +634,7 @@ model Prescription {
   appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
   encounter   Encounter? @relation(fields: [encounterId], references: [id], onDelete: SetNull)
   items       PrescriptionItem[]
+  documentDeliveries DocumentDelivery[]
 
   @@map("prescriptions")
 }

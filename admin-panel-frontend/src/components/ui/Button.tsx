@@ -2,12 +2,24 @@ import { cn } from '@/utils/cn';
 import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline' | 'glass';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline' | 'glass';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
   isLoading?: boolean;
 }
 
 const buttonVariants = {
+  default: [
+    'relative overflow-hidden',
+    'bg-gradient-to-br from-blue-500 to-blue-600 text-white',
+    'shadow-lg shadow-blue-500/30',
+    'hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02]',
+    'active:scale-[0.98]',
+    'focus:ring-blue-500/50',
+    'dark:from-blue-600 dark:to-blue-700',
+    'dark:shadow-blue-500/20 dark:hover:shadow-blue-500/30',
+    'transition-all duration-200',
+  ].join(' '),
+
   primary: [
     'relative overflow-hidden',
     'bg-gradient-to-br from-blue-500 to-blue-600 text-white',
@@ -90,6 +102,7 @@ const buttonSizes = {
   sm: 'px-3 py-1.5 text-xs rounded-lg',
   md: 'px-4 py-2 text-sm rounded-lg',
   lg: 'px-6 py-2.5 text-base rounded-xl',
+  icon: 'h-10 w-10 p-0 rounded-lg',
 };
 
 export function Button({

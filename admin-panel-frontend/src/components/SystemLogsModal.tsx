@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { X, RefreshCw, Search, Filter, AlertCircle, Loader2, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -41,12 +41,15 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
     queryFn: () => adminService.getSystemLogs(filters),
     enabled: isOpen,
     staleTime: 30_000,
-    onError: () => {
-      toast.error('No se pudieron cargar los logs del sistema.');
-    },
   });
 
-  const logsResponse = data?.data;
+  useEffect(() => {
+    if (error) {
+      toast.error('No se pudieron cargar los logs del sistema.');
+    }
+  }, [error]);
+
+  const logsResponse = data?.data?.data;
   const logs = logsResponse?.data ?? [];
   const pagination = logsResponse?.pagination;
 
@@ -68,7 +71,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
     setFilters((prev) => ({
       ...prev,
       [key]: value,
-      page: key === 'page' ? value : 1,
+      page: key === 'page' ? Number(value) : 1,
     }));
   };
 

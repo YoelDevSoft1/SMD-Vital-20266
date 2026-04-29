@@ -34,24 +34,19 @@ const getInitialTheme = (): Theme => {
 };
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
-    setThemeState(getInitialTheme());
-    setIsHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isHydrated) {
-      return;
-    }
-
     const root = document.documentElement;
     root.classList.toggle('dark', theme === 'dark');
     root.style.colorScheme = theme;
     window.localStorage.setItem(STORAGE_KEY, theme);
-  }, [isHydrated, theme]);
+
+    const themeColor = theme === 'dark' ? '#020617' : '#f8fafc';
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', themeColor);
+  }, [theme]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {

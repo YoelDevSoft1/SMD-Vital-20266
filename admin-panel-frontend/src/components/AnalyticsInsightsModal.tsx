@@ -13,7 +13,6 @@ import {
   DollarSign,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import type { AxiosResponse } from 'axios';
 import { adminService } from '@/services/admin.service';
 import type { AnalyticsData, AnalyticsFilters, AnalyticsMetric } from '@/types';
 import { Button } from '@/components/ui/Button';
@@ -122,14 +121,16 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
     [filters.startDate, filters.endDate, filters.groupBy, comparePreset, filters.doctorId, filters.serviceId, filters.city]
   );
 
-  const { data, isLoading, isFetching, error, refetch } = useQuery<AxiosResponse<{ data: AnalyticsData }>>({
+  const { data: analytics, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ['analytics-insights', requestParams],
-    queryFn: () => adminService.getAnalytics(requestParams),
+    queryFn: async () => {
+      const response = await adminService.getAnalytics(requestParams);
+      return response.data.data;
+    },
     enabled: isOpen,
     staleTime: 60_000,
   });
 
-  const analytics = data?.data;
   const trends: AnalyticsData['trends'] = analytics?.trends ?? [];
   const summary = analytics?.summary ?? {
     totalAppointments: 0,

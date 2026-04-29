@@ -5,7 +5,9 @@ import type {
   DoctorAvailabilityResponse,
   DoctorRouteResponse,
   PaginatedResponse,
+  AppointmentTimeline,
   PatientHistory,
+  SendDocumentsResult,
 } from '@/types';
 
 export interface ClinicalAppointmentFilters {
@@ -17,6 +19,7 @@ export interface ClinicalAppointmentFilters {
 export interface FinishEncounterPayload {
   encounterSummary?: string;
   encounterPayload?: Record<string, unknown>;
+  emailConsentAccepted?: boolean;
   medicalRecord: {
     title: string;
     description: string;
@@ -58,6 +61,7 @@ export interface CreateRecordByEmailPayload {
   patientGender?: string;
   serviceName?: string;
   sendEmail?: boolean;
+  emailConsentAccepted?: boolean;
   vitals?: {
     bpSys?: number;
     bpDia?: number;
@@ -121,6 +125,9 @@ export const clinicalService = {
   getAppointmentDetails: (id: string) =>
     api.get<ApiResponse<ClinicalAppointment>>(`/clinical/appointments/${id}`),
 
+  getAppointmentTimeline: (id: string) =>
+    api.get<ApiResponse<AppointmentTimeline>>(`/clinical/appointments/${id}/timeline`),
+
   startEncounter: (appointmentId: string) =>
     api.post<ApiResponse<any>>(`/clinical/appointments/${appointmentId}/start`),
 
@@ -129,6 +136,12 @@ export const clinicalService = {
 
   finishEncounter: (appointmentId: string, payload: FinishEncounterPayload) =>
     api.post<ApiResponse<any>>(`/clinical/appointments/${appointmentId}/finish`, payload),
+
+  sendAppointmentDocuments: (appointmentId: string, payload?: { emailConsentAccepted?: boolean }) =>
+    api.post<ApiResponse<SendDocumentsResult>>(
+      `/clinical/appointments/${appointmentId}/send-documents`,
+      payload ?? {}
+    ),
 
   addEncounterNotes: (encounterId: string, payload: { summary?: string; payload?: Record<string, unknown> }) =>
     api.post<ApiResponse<any>>(`/clinical/encounters/${encounterId}/notes`, payload),

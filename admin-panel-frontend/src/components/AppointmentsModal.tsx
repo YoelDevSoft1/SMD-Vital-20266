@@ -9,26 +9,15 @@ import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
-import type { Appointment, Doctor, Patient, Service } from '@/types';
+import type { Appointment, AppointmentFilters, Doctor, Patient, Service } from '@/types';
 import AppointmentDetailsView from './AppointmentDetailsView';
 import CreateAppointmentForm from './CreateAppointmentForm';
 import { GlassModal } from '@/components/ui/GlassModal';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 interface AppointmentsModalProps {
   isOpen: boolean;
   onClose: () => void;
-}
-
-interface AppointmentFilters {
-  page: number;
-  limit: number;
-  search?: string;
-  status?: string;
-  doctorId?: string;
-  patientId?: string;
-  serviceId?: string;
-  dateFrom?: string;
-  dateTo?: string;
 }
 
 const statusTranslations = {
@@ -68,6 +57,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   // Fetch appointments
   const { data: appointmentsData, isLoading, error } = useQuery({
@@ -135,9 +125,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta cita?')) {
-      deleteMutation.mutate(id);
-    }
+    setPendingDeleteId(id);
   };
 
   const handleViewDetails = (appointment: Appointment) => {
@@ -233,7 +221,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Todos los doctores</option>
-                {(doctorsData?.data?.data as Doctor[])?.map((doctor: Doctor) => (
+                {doctorsData?.data?.data?.data?.map((doctor: Doctor) => (
                   <option key={doctor.id} value={doctor.id}>
                     {doctor.user.firstName} {doctor.user.lastName}
                   </option>
@@ -250,7 +238,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Todos los pacientes</option>
-                {(patientsData?.data?.data as Patient[])?.map((patient: Patient) => (
+                {patientsData?.data?.data?.data?.map((patient: Patient) => (
                   <option key={patient.id} value={patient.id}>
                     {patient.user.firstName} {patient.user.lastName}
                   </option>
@@ -308,7 +296,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
           ) : (
             <div className="h-full overflow-y-auto">
               <div className="p-6">
-                {(appointmentsData?.data?.data as Appointment[])?.length === 0 ? (
+                {appointmentsData?.data?.data?.data?.length === 0 ? (
                   <div className="text-center py-12">
                     <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No hay citas</h3>
@@ -316,7 +304,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {(appointmentsData?.data?.data as Appointment[])?.map((appointment: Appointment) => (
+                    {appointmentsData?.data?.data?.data?.map((appointment: Appointment) => (
                       <div key={appointment.id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -480,6 +468,21 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
           }}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={Boolean(pendingDeleteId)}
+        title="Eliminar cita"
+        message="Esta accion eliminara la cita seleccionada y no se podra deshacer."
+        confirmLabel="Eliminar"
+        isDanger
+        isLoading={deleteMutation.isPending}
+        onCancel={() => setPendingDeleteId(null)}
+        onConfirm={() => {
+          if (!pendingDeleteId) return;
+          deleteMutation.mutate(pendingDeleteId);
+          setPendingDeleteId(null);
+        }}
+      />
     </div>
   );
 }

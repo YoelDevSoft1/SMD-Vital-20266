@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatDateTime } from '@/utils/dateFormat';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -10,6 +10,11 @@ import {
   PlayCircle,
   FileCheck2,
   MailPlus,
+  MailCheck,
+  ClipboardList,
+  HeartPulse,
+  MessageSquareText,
+  Stethoscope,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
@@ -22,10 +27,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { GlassModal } from '@/components/ui/GlassModal';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Switch } from '@/components/ui/Switch';
 import { cn } from '@/utils/cn';
 import { useAuthStore } from '@/store/auth.store';
-import type { ClinicalAppointment, PaginatedResponse } from '@/types';
+import type { AppointmentTimelineItem, ClinicalAppointment, PaginatedResponse, VitalSign } from '@/types';
 
 const statusLabels: Record<string, string> = {
   PENDING: 'Pendiente',
@@ -64,6 +70,7 @@ type FinishFormState = {
   frequency: string;
   duration: string;
   instructions: string;
+  emailConsentAccepted: boolean;
 };
 
 const emptyFinishForm: FinishFormState = {
@@ -83,6 +90,7 @@ const emptyFinishForm: FinishFormState = {
   frequency: '',
   duration: '',
   instructions: '',
+  emailConsentAccepted: false,
 };
 
 type EmailRecordFormState = {
@@ -108,6 +116,7 @@ type EmailRecordFormState = {
   duration: string;
   instructions: string;
   sendEmail: boolean;
+  emailConsentAccepted: boolean;
   // Vitals
   bpSys: string;
   bpDia: string;
@@ -142,6 +151,7 @@ const emptyEmailRecordForm: EmailRecordFormState = {
   duration: '',
   instructions: '',
   sendEmail: true,
+  emailConsentAccepted: false,
   // Vitals
   bpSys: '',
   bpDia: '',
@@ -182,11 +192,15 @@ export default function DoctorAppointments() {
   const { user } = useAuthStore();
   const [filters, setFilters] = useState({ page: 1, limit: 10, status: '' });
   const [selectedAppointment, setSelectedAppointment] = useState<ClinicalAppointment | null>(null);
+  const [activeAppointmentId, setActiveAppointmentId] = useState<string | null>(null);
+  const [evolutionNote, setEvolutionNote] = useState('');
   const [showFinishModal, setShowFinishModal] = useState(false);
   const [finishForm, setFinishForm] = useState<FinishFormState>(emptyFinishForm);
   const [showVitalsModal, setShowVitalsModal] = useState(false);
   const [vitalsForm, setVitalsForm] = useState<VitalsFormState>(emptyVitalsForm);
   const [showEmailRecordModal, setShowEmailRecordModal] = useState(false);
+  const [sendingDocumentsId, setSendingDocumentsId] = useState<string | null>(null);
+  const [documentSendCandidate, setDocumentSendCandidate] = useState<ClinicalAppointment | null>(null);
   const [emailRecordForm, setEmailRecordForm] =
     useState<EmailRecordFormState>(emptyEmailRecordForm);
 
@@ -204,6 +218,44 @@ export default function DoctorAppointments() {
   const payload = data?.data?.data as PaginatedResponse<ClinicalAppointment> | undefined;
   const appointments = payload?.data ?? [];
   const pagination = payload?.pagination;
+  const activeAppointment = useMemo(() => {
+    if (!appointments.length) {
+      return null;
+    }
+
+    return (
+      appointments.find((appointment) => appointment.id === activeAppointmentId) ??
+      appointments.find((appointment) => appointment.status === 'IN_PROGRESS') ??
+      appointments[0]
+    );
+  }, [activeAppointmentId, appointments]);
+
+  const { data: timelineData, isFetching: isFetchingTimeline } = useQuery({
+    queryKey: ['appointment-timeline', activeAppointment?.id],
+    queryFn: () => clinicalService.getAppointmentTimeline(activeAppointment!.id),
+    enabled: Boolean(activeAppointment?.id),
+    staleTime: 10_000,
+  });
+
+  const timeline = timelineData?.data?.data?.items ?? [];
+  const latestVitals = activeAppointment?.encounter?.vitals?.[0];
+  const vitalsAlerts = latestVitals ? buildVitalsAlerts(latestVitals) : [];
+  const clinicalChecklist = buildClinicalChecklist(activeAppointment, user?.role);
+
+  useEffect(() => {
+    if (!appointments.length) {
+      if (activeAppointmentId) {
+        setActiveAppointmentId(null);
+      }
+      return;
+    }
+
+    if (!activeAppointmentId || !appointments.some((appointment) => appointment.id === activeAppointmentId)) {
+      const nextAppointment =
+        appointments.find((appointment) => appointment.status === 'IN_PROGRESS') ?? appointments[0];
+      setActiveAppointmentId(nextAppointment.id);
+    }
+  }, [activeAppointmentId, appointments]);
 
   const startEncounterMutation = useMutation({
     mutationFn: (appointmentId: string) => clinicalService.startEncounter(appointmentId),
@@ -229,16 +281,69 @@ export default function DoctorAppointments() {
     },
   });
 
+  const addEncounterNoteMutation = useMutation({
+    mutationFn: ({ encounterId, summary }: { encounterId: string; summary: string }) =>
+      clinicalService.addEncounterNotes(encounterId, {
+        summary,
+        payload: {
+          evolutionNote: summary,
+          source: 'clinical-workbench',
+          savedAt: new Date().toISOString(),
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clinical-appointments'] });
+      if (activeAppointment?.id) {
+        queryClient.invalidateQueries({ queryKey: ['appointment-timeline', activeAppointment.id] });
+      }
+      setEvolutionNote('');
+      toast.success('Nota clinica guardada');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'No se pudo guardar la nota clinica');
+    },
+  });
+
   const finishEncounterMutation = useMutation({
     mutationFn: ({ appointmentId, payload }: { appointmentId: string; payload: FinishEncounterPayload }) =>
       clinicalService.finishEncounter(appointmentId, payload),
-    onSuccess: () => {
+    onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: ['clinical-appointments'] });
+      clearFinishDraft(variables.appointmentId);
       toast.success('Cita finalizada y registros generados');
       handleCloseFinishModal();
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'No se pudo finalizar la cita');
+    },
+  });
+
+  const sendDocumentsMutation = useMutation({
+    mutationFn: (appointmentId: string) =>
+      clinicalService.sendAppointmentDocuments(appointmentId, { emailConsentAccepted: true }),
+    onSuccess: (response, appointmentId) => {
+      const result = response.data.data;
+      queryClient.invalidateQueries({ queryKey: ['clinical-appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['appointment-timeline', appointmentId] });
+
+      if (!result?.documentDelivery) {
+        toast.success('Documentos disponibles. El paciente no tiene correo registrado.');
+        return;
+      }
+
+      if (result?.documentDelivery?.status === 'SKIPPED') {
+        toast.success('Documentos disponibles. El correo no se encolo por autorizacion o cola no disponible.');
+        return;
+      }
+
+      toast.success(result?.emailQueued ? 'Documentos enviados a cola de correo' : 'Entrega de documentos registrada');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'No se pudieron reenviar los documentos');
+    },
+    onSettled: () => {
+      setSendingDocumentsId(null);
+      setDocumentSendCandidate(null);
     },
   });
 
@@ -267,6 +372,18 @@ export default function DoctorAppointments() {
     };
   }, [appointments]);
 
+  useEffect(() => {
+    if (!showFinishModal || !selectedAppointment) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      saveFinishDraft(selectedAppointment.id, finishForm);
+    }, 400);
+
+    return () => window.clearTimeout(timeout);
+  }, [finishForm, selectedAppointment, showFinishModal]);
+
   const handleFilterChange = (key: keyof typeof filters, value: string | number) => {
     setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
   };
@@ -277,7 +394,8 @@ export default function DoctorAppointments() {
 
   const handleOpenFinishModal = (appointment: ClinicalAppointment) => {
     setSelectedAppointment(appointment);
-    setFinishForm(emptyFinishForm);
+    setActiveAppointmentId(appointment.id);
+    setFinishForm(loadFinishDraft(appointment.id));
     setShowFinishModal(true);
   };
 
@@ -292,6 +410,7 @@ export default function DoctorAppointments() {
       return;
     }
     setSelectedAppointment(appointment);
+    setActiveAppointmentId(appointment.id);
     const latestVitals = appointment.encounter.vitals?.[0];
     const asText = (value?: number | null) => (value === null || value === undefined ? '' : String(value));
     setVitalsForm(
@@ -317,6 +436,29 @@ export default function DoctorAppointments() {
     setSelectedAppointment(null);
   };
 
+  const handleSaveEvolutionNote = () => {
+    if (!navigator.onLine) {
+      toast.error('Sin conexion. Conserva la nota y guardala cuando vuelva la red.');
+      return;
+    }
+
+    const note = evolutionNote.trim();
+    if (!note || note.length < 2) {
+      toast.error('Escribe una nota clinica antes de guardar');
+      return;
+    }
+
+    if (!activeAppointment?.encounter?.id) {
+      toast.error('Primero inicia la atencion para guardar evolucion');
+      return;
+    }
+
+    addEncounterNoteMutation.mutate({
+      encounterId: activeAppointment.encounter.id,
+      summary: note,
+    });
+  };
+
   const handleOpenEmailRecordModal = () => {
     setEmailRecordForm(emptyEmailRecordForm);
     setShowEmailRecordModal(true);
@@ -326,32 +468,55 @@ export default function DoctorAppointments() {
     setShowEmailRecordModal(false);
   };
 
+  const handleStartEncounter = (appointment: ClinicalAppointment) => {
+    if (!navigator.onLine) {
+      toast.error('Sin conexion. No se puede iniciar una atencion sin confirmar con el servidor.');
+      return;
+    }
+
+    setActiveAppointmentId(appointment.id);
+    startEncounterMutation.mutate(appointment.id);
+  };
+
+  const handleSendDocuments = (appointment: ClinicalAppointment) => {
+    if (!navigator.onLine) {
+      toast.error('Sin conexion. No se pueden reenviar documentos en este momento.');
+      return;
+    }
+
+    if (appointment.status !== 'COMPLETED') {
+      toast.error('Solo se pueden reenviar documentos de citas completadas');
+      return;
+    }
+
+    setDocumentSendCandidate(appointment);
+  };
+
+  const handleConfirmSendDocuments = () => {
+    if (!documentSendCandidate) {
+      return;
+    }
+
+    setSendingDocumentsId(documentSendCandidate.id);
+    sendDocumentsMutation.mutate(documentSendCandidate.id);
+  };
+
   const handleVitalsSubmit = () => {
+    if (!navigator.onLine) {
+      toast.error('Sin conexion. No se pueden guardar signos vitales en este momento.');
+      return;
+    }
+
     if (!selectedAppointment?.encounter?.id) {
       toast.error('No se encontro un encuentro activo');
       return;
     }
 
-    const toNumber = (value: string) => {
-      const trimmed = value.trim();
-      if (!trimmed) {
-        return undefined;
-      }
-      const parsed = Number(trimmed);
-      return Number.isNaN(parsed) ? undefined : parsed;
-    };
-
-    const payload: VitalSignInput = {
-      bpSys: toNumber(vitalsForm.bpSys),
-      bpDia: toNumber(vitalsForm.bpDia),
-      heartRate: toNumber(vitalsForm.heartRate),
-      respiratoryRate: toNumber(vitalsForm.respiratoryRate),
-      temperature: toNumber(vitalsForm.temperature),
-      spo2: toNumber(vitalsForm.spo2),
-      weight: toNumber(vitalsForm.weight),
-      height: toNumber(vitalsForm.height),
-      notes: vitalsForm.notes.trim() || undefined,
-    };
+    const { payload, errors } = buildVitalsPayload(vitalsForm);
+    if (errors.length > 0) {
+      toast.error(errors[0]);
+      return;
+    }
 
     const hasValue = Object.values(payload).some((value) => value !== undefined && value !== '');
     if (!hasValue) {
@@ -363,6 +528,11 @@ export default function DoctorAppointments() {
   };
 
   const handleFinishSubmit = () => {
+    if (!navigator.onLine) {
+      toast.error('Sin conexion. El borrador queda guardado localmente hasta que vuelva la red.');
+      return;
+    }
+
     if (!selectedAppointment) {
       return;
     }
@@ -397,6 +567,7 @@ export default function DoctorAppointments() {
 
     const payload: FinishEncounterPayload = {
       encounterSummary: finishForm.encounterSummary.trim() || undefined,
+      emailConsentAccepted: finishForm.emailConsentAccepted,
       medicalRecord: {
         title: finishForm.recordTitle.trim(),
         description: finishForm.recordDescription.trim(),
@@ -430,6 +601,11 @@ export default function DoctorAppointments() {
   };
 
   const handleEmailRecordSubmit = () => {
+    if (!navigator.onLine) {
+      toast.error('Sin conexion. No se puede crear la historia clinica hasta recuperar la red.');
+      return;
+    }
+
     if (!emailRecordForm.patientEmail.trim()) {
       toast.error('Ingresa el correo del paciente');
       return;
@@ -437,6 +613,11 @@ export default function DoctorAppointments() {
 
     if (!emailRecordForm.recordTitle.trim() || !emailRecordForm.recordDescription.trim()) {
       toast.error('Completa el titulo y la descripcion del registro clinico');
+      return;
+    }
+
+    if (emailRecordForm.sendEmail && !emailRecordForm.emailConsentAccepted) {
+      toast.error('Confirma la autorizacion del paciente para enviar documentos por correo');
       return;
     }
 
@@ -463,23 +644,11 @@ export default function DoctorAppointments() {
     const medicalRecordPayload =
       Object.keys(payloadData).length > 0 ? payloadData : undefined;
 
-    const toNumber = (value: string) => {
-      const trimmed = value.trim();
-      if (!trimmed) return undefined;
-      const parsed = Number(trimmed);
-      return Number.isNaN(parsed) ? undefined : parsed;
-    };
-
-    const vitals = {
-      bpSys: toNumber(emailRecordForm.bpSys),
-      bpDia: toNumber(emailRecordForm.bpDia),
-      heartRate: toNumber(emailRecordForm.heartRate),
-      respiratoryRate: toNumber(emailRecordForm.respiratoryRate),
-      temperature: toNumber(emailRecordForm.temperature),
-      spo2: toNumber(emailRecordForm.spo2),
-      weight: toNumber(emailRecordForm.weight),
-      height: toNumber(emailRecordForm.height),
-    };
+    const { payload: vitals, errors: vitalsErrors } = buildVitalsPayload(emailRecordForm);
+    if (vitalsErrors.length > 0) {
+      toast.error(vitalsErrors[0]);
+      return;
+    }
 
     const hasVitals = Object.values(vitals).some((v) => v !== undefined);
 
@@ -491,6 +660,7 @@ export default function DoctorAppointments() {
       patientGender: emailRecordForm.patientGender.trim() || undefined,
       serviceName: emailRecordForm.serviceName.trim() || undefined,
       sendEmail: emailRecordForm.sendEmail,
+      emailConsentAccepted: emailRecordForm.emailConsentAccepted,
       vitals: hasVitals ? vitals : undefined,
       medicalRecord: {
         title: emailRecordForm.recordTitle.trim(),
@@ -658,6 +828,242 @@ export default function DoctorAppointments() {
       </div>
 
       <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+              <Stethoscope className="h-5 w-5 text-blue-600" />
+              Puesto de atencion clinica
+            </CardTitle>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Sigue la atencion activa, registra evolucion y revisa trazabilidad clinica.
+            </p>
+          </div>
+          {activeAppointment && (
+            <span
+              className={cn(
+                'inline-flex w-fit items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold',
+                statusColors[activeAppointment.status] || 'bg-gray-50 text-gray-700 border-gray-100'
+              )}
+            >
+              {statusLabels[activeAppointment.status] || activeAppointment.status}
+            </span>
+          )}
+        </CardHeader>
+        <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+          {!activeAppointment ? (
+            <div className="rounded-md border border-gray-200 p-4 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+              No hay citas asignadas para seguimiento clinico.
+            </div>
+          ) : (
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
+              <div className="space-y-4">
+                <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                        Paciente seleccionado
+                      </p>
+                      <h2 className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                        {activeAppointment.patient?.user?.firstName} {activeAppointment.patient?.user?.lastName}
+                      </h2>
+                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {activeAppointment.service?.name || 'Servicio no definido'} - {formatDateTime(activeAppointment.scheduledAt)}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {activeAppointment.address}, {activeAppointment.city}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {(activeAppointment.status === 'PENDING' || activeAppointment.status === 'CONFIRMED') && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleStartEncounter(activeAppointment)}
+                          disabled={startEncounterMutation.isPending}
+                        >
+                          <PlayCircle className="h-4 w-4" />
+                          Iniciar
+                        </Button>
+                      )}
+                      {activeAppointment.status === 'IN_PROGRESS' && user?.role === 'NURSE' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleOpenVitalsModal(activeAppointment)}
+                          className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                        >
+                          <HeartPulse className="h-4 w-4" />
+                          Signos
+                        </Button>
+                      )}
+                      {activeAppointment.status === 'IN_PROGRESS' &&
+                        (user?.role === 'DOCTOR' ||
+                          (user?.role === 'NURSE' && activeAppointment.service?.category === 'NURSING')) && (
+                          <Button size="sm" onClick={() => handleOpenFinishModal(activeAppointment)}>
+                            <FileCheck2 className="h-4 w-4" />
+                            Finalizar
+                          </Button>
+                        )}
+                      {activeAppointment.status === 'COMPLETED' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleSendDocuments(activeAppointment)}
+                          isLoading={sendingDocumentsId === activeAppointment.id}
+                          className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                        >
+                          <MailCheck className="h-4 w-4" />
+                          Reenviar docs
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </section>
+
+                <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                    <ClipboardList className="h-4 w-4 text-indigo-600" />
+                    Checklist de calidad clinica
+                  </h3>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {clinicalChecklist.map((item) => (
+                      <div
+                        key={item.id}
+                        className={cn(
+                          'rounded-md border p-3 text-sm',
+                          item.done
+                            ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300'
+                            : 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300'
+                        )}
+                      >
+                        <div className="flex items-start gap-2">
+                          {item.done ? <CheckCircle2 className="mt-0.5 h-4 w-4" /> : <AlertCircle className="mt-0.5 h-4 w-4" />}
+                          <div>
+                            <p className="font-semibold">{item.label}</p>
+                            <p className="mt-1 text-xs opacity-80">{item.detail}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                      <HeartPulse className="h-4 w-4 text-red-600" />
+                      Signos vitales recientes
+                    </h3>
+                    {activeAppointment.status === 'IN_PROGRESS' && user?.role === 'NURSE' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleOpenVitalsModal(activeAppointment)}
+                        className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                      >
+                        Registrar
+                      </Button>
+                    )}
+                  </div>
+
+                  {latestVitals ? (
+                    <div className="mt-3 space-y-3">
+                      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                        {buildVitalsChips(latestVitals).map((vital) => (
+                          <div key={vital.label} className="rounded-md border border-gray-200 p-3 dark:border-gray-700">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{vital.label}</p>
+                            <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{vital.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                      {vitalsAlerts.length > 0 && (
+                        <div className="space-y-2">
+                          {vitalsAlerts.map((alert) => (
+                            <div key={alert} className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
+                              {alert}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="mt-3 rounded-md border border-gray-200 p-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                      No hay signos vitales registrados para esta atencion.
+                    </p>
+                  )}
+                </section>
+
+                {user?.role === 'DOCTOR' && (
+                  <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                    <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                      <MessageSquareText className="h-4 w-4 text-blue-600" />
+                      Nota de evolucion
+                    </h3>
+                    {activeAppointment.encounter?.summary && (
+                      <p className="mt-2 rounded-md bg-gray-50 p-3 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        Ultima nota: {activeAppointment.encounter.summary}
+                      </p>
+                    )}
+                    <textarea
+                      value={evolutionNote}
+                      onChange={(event) => setEvolutionNote(event.target.value)}
+                      className="mt-3 min-h-[90px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                      placeholder="Evolucion, hallazgos, decisiones clinicas o cambios durante la atencion."
+                    />
+                    <div className="mt-3 flex justify-end">
+                      <Button
+                        size="sm"
+                        onClick={handleSaveEvolutionNote}
+                        isLoading={addEncounterNoteMutation.isPending}
+                        disabled={activeAppointment.status !== 'IN_PROGRESS'}
+                      >
+                        Guardar nota
+                      </Button>
+                    </div>
+                  </section>
+                )}
+              </div>
+
+              <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                      Trazabilidad clinica
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Eventos registrados por el equipo en tiempo real.
+                    </p>
+                  </div>
+                  {isFetchingTimeline && <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />}
+                </div>
+
+                <div className="mt-4 max-h-[520px] space-y-3 overflow-y-auto pr-1">
+                  {timeline.length === 0 ? (
+                    <p className="rounded-md border border-gray-200 p-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                      Aun no hay eventos para esta cita.
+                    </p>
+                  ) : (
+                    timeline.slice(0, 8).map((item: AppointmentTimelineItem) => (
+                      <div key={`${item.source}-${item.id}`} className="rounded-md border border-gray-200 p-3 dark:border-gray-700">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {getTimelineActionLabel(item.action)}
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          {getTimelineActor(item)} - {formatDateTime(item.createdAt)}
+                        </p>
+                        <span className="mt-2 inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                          {item.actorRole}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </section>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -711,7 +1117,12 @@ export default function DoctorAppointments() {
               {appointments.map((appointment) => (
                 <div
                   key={appointment.id}
-                  className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"
+                  className={cn(
+                    'flex flex-col gap-4 p-6 transition sm:flex-row sm:items-center sm:justify-between',
+                    activeAppointment?.id === appointment.id
+                      ? 'bg-blue-50/70 dark:bg-blue-900/20'
+                      : 'hover:bg-gray-50/70 dark:hover:bg-gray-800/40'
+                  )}
                 >
                   <div>
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -726,6 +1137,14 @@ export default function DoctorAppointments() {
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setActiveAppointmentId(appointment.id)}
+                      className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                    >
+                      Seguimiento
+                    </Button>
                     <span
                       className={cn(
                         'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium',
@@ -737,7 +1156,7 @@ export default function DoctorAppointments() {
                     {(appointment.status === 'PENDING' || appointment.status === 'CONFIRMED') && (
                       <Button
                         size="sm"
-                        onClick={() => startEncounterMutation.mutate(appointment.id)}
+                        onClick={() => handleStartEncounter(appointment)}
                         disabled={startEncounterMutation.isPending}
                       >
                         <PlayCircle className="h-4 w-4" />
@@ -764,6 +1183,18 @@ export default function DoctorAppointments() {
                           </Button>
                         )}
                       </>
+                    )}
+                    {appointment.status === 'COMPLETED' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleSendDocuments(appointment)}
+                        isLoading={sendingDocumentsId === appointment.id}
+                        className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                      >
+                        <MailCheck className="h-4 w-4" />
+                        Reenviar docs
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -812,6 +1243,9 @@ export default function DoctorAppointments() {
               </h2>
               <p className="text-sm text-slate-600 dark:text-slate-300">
                 Completa la historia clinica para cerrar la atencion.
+              </p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                El borrador se guarda en este dispositivo hasta finalizar la cita.
               </p>
             </div>
           </div>
@@ -989,6 +1423,21 @@ export default function DoctorAppointments() {
                 </div>
               </div>
             </div>
+
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+              <div>
+                <p className="font-medium">Autorizacion para envio por correo</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Confirma que el paciente autorizo recibir historia clinica y formula en su correo.
+                </p>
+              </div>
+              <Switch
+                checked={finishForm.emailConsentAccepted}
+                onCheckedChange={(checked) =>
+                  setFinishForm((prev) => ({ ...prev, emailConsentAccepted: checked }))
+                }
+              />
+            </div>
           </div>
 
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -1081,10 +1530,30 @@ export default function DoctorAppointments() {
                 <Switch
                   checked={emailRecordForm.sendEmail}
                   onCheckedChange={(checked) =>
-                    setEmailRecordForm((prev) => ({ ...prev, sendEmail: checked }))
+                    setEmailRecordForm((prev) => ({
+                      ...prev,
+                      sendEmail: checked,
+                      emailConsentAccepted: checked ? prev.emailConsentAccepted : false,
+                    }))
                   }
                 />
               </div>
+              {emailRecordForm.sendEmail && (
+                <div className="mt-3 flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                  <div>
+                    <p className="font-medium">Autorizacion del paciente</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      El paciente autorizo el tratamiento de datos y el envio de documentos clinicos por correo.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={emailRecordForm.emailConsentAccepted}
+                    onCheckedChange={(checked) =>
+                      setEmailRecordForm((prev) => ({ ...prev, emailConsentAccepted: checked }))
+                    }
+                  />
+                </div>
+              )}
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
@@ -1415,7 +1884,216 @@ export default function DoctorAppointments() {
           </div>
         </div>
       </GlassModal>
+
+      <ConfirmDialog
+        isOpen={Boolean(documentSendCandidate)}
+        title="Confirmar autorizacion"
+        message="Confirma que el paciente autorizo el tratamiento de datos y el envio de documentos clinicos por correo."
+        confirmLabel="Enviar documentos"
+        cancelLabel="Cancelar"
+        isLoading={Boolean(sendingDocumentsId)}
+        onConfirm={handleConfirmSendDocuments}
+        onCancel={() => setDocumentSendCandidate(null)}
+      />
     </div>
   );
+}
+
+type VitalsFormLike = Partial<Record<
+  'bpSys' | 'bpDia' | 'heartRate' | 'respiratoryRate' | 'temperature' | 'spo2' | 'weight' | 'height' | 'notes',
+  string
+>>;
+
+const FINISH_DRAFT_PREFIX = 'smd-vital:clinical-finish-draft:';
+
+const VITAL_LIMITS = {
+  bpSys: { label: 'PA sistolica', min: 40, max: 260, integer: true },
+  bpDia: { label: 'PA diastolica', min: 30, max: 160, integer: true },
+  heartRate: { label: 'Frecuencia cardiaca', min: 20, max: 250, integer: true },
+  respiratoryRate: { label: 'Frecuencia respiratoria', min: 5, max: 80, integer: true },
+  temperature: { label: 'Temperatura', min: 30, max: 45, integer: false },
+  spo2: { label: 'SpO2', min: 50, max: 100, integer: true },
+  weight: { label: 'Peso', min: 1, max: 350, integer: false },
+  height: { label: 'Talla', min: 30, max: 250, integer: false },
+} as const;
+
+function buildVitalsPayload(form: VitalsFormLike) {
+  const payload: VitalSignInput = {};
+  const errors: string[] = [];
+
+  (Object.keys(VITAL_LIMITS) as Array<keyof typeof VITAL_LIMITS>).forEach((key) => {
+    const rawValue = form[key]?.trim();
+    if (!rawValue) {
+      return;
+    }
+
+    const parsed = Number(rawValue);
+    const limits = VITAL_LIMITS[key];
+    if (!Number.isFinite(parsed)) {
+      errors.push(`${limits.label} debe ser numerico`);
+      return;
+    }
+
+    if (parsed < limits.min || parsed > limits.max) {
+      errors.push(`${limits.label} esta fuera del rango permitido (${limits.min}-${limits.max})`);
+      return;
+    }
+
+    (payload as Record<string, number | string | undefined>)[key] = limits.integer
+      ? Math.round(parsed)
+      : parsed;
+  });
+
+  if (form.notes?.trim()) {
+    payload.notes = form.notes.trim();
+  }
+
+  return { payload, errors };
+}
+
+function buildClinicalChecklist(appointment: ClinicalAppointment | null, role?: string) {
+  if (!appointment) {
+    return [];
+  }
+
+  const hasEncounter = Boolean(appointment.encounter?.id);
+  const hasVitals = Boolean(appointment.encounter?.vitals?.length);
+  const hasSummary = Boolean(appointment.encounter?.summary);
+  const isCompleted = appointment.status === 'COMPLETED';
+
+  return [
+    {
+      id: 'started',
+      label: 'Atencion iniciada',
+      done: hasEncounter || isCompleted,
+      detail: hasEncounter || isCompleted ? 'Existe encuentro clinico asociado.' : 'Inicia la atencion antes de registrar datos.',
+    },
+    {
+      id: 'vitals',
+      label: role === 'NURSE' ? 'Signos registrados' : 'Signos disponibles',
+      done: hasVitals || isCompleted,
+      detail: hasVitals ? 'Hay signos vitales recientes.' : 'Registra o solicita signos vitales antes de cerrar.',
+    },
+    {
+      id: 'evolution',
+      label: 'Evolucion documentada',
+      done: hasSummary || isCompleted,
+      detail: hasSummary ? 'Existe nota de evolucion en el encuentro.' : 'Guarda una nota clinica durante la atencion.',
+    },
+    {
+      id: 'closed',
+      label: 'Cierre clinico',
+      done: isCompleted,
+      detail: isCompleted ? 'Historia y documentos generados.' : 'Finaliza para crear historia clinica y documentos.',
+    },
+  ];
+}
+
+function buildVitalsChips(vitals: VitalSign) {
+  return [
+    {
+      label: 'Presion arterial',
+      value: vitals.bpSys || vitals.bpDia ? `${vitals.bpSys ?? '-'} / ${vitals.bpDia ?? '-'} mmHg` : '-',
+    },
+    { label: 'Frecuencia cardiaca', value: vitals.heartRate ? `${vitals.heartRate} lpm` : '-' },
+    { label: 'Respiracion', value: vitals.respiratoryRate ? `${vitals.respiratoryRate} rpm` : '-' },
+    { label: 'Temperatura', value: vitals.temperature ? `${vitals.temperature} C` : '-' },
+    { label: 'SpO2', value: vitals.spo2 ? `${vitals.spo2}%` : '-' },
+    { label: 'Peso', value: vitals.weight ? `${vitals.weight} kg` : '-' },
+    { label: 'Talla', value: vitals.height ? `${vitals.height} cm` : '-' },
+  ];
+}
+
+function buildVitalsAlerts(vitals: VitalSign) {
+  const alerts: string[] = [];
+
+  if ((vitals.bpSys && vitals.bpSys >= 180) || (vitals.bpDia && vitals.bpDia >= 120)) {
+    alerts.push('Alerta: presion arterial en rango critico.');
+  } else if ((vitals.bpSys && vitals.bpSys < 90) || (vitals.bpDia && vitals.bpDia < 60)) {
+    alerts.push('Alerta: presion arterial baja.');
+  }
+
+  if (vitals.spo2 && vitals.spo2 < 92) {
+    alerts.push('Alerta: saturacion de oxigeno baja.');
+  }
+
+  if (vitals.temperature && (vitals.temperature >= 38 || vitals.temperature < 35)) {
+    alerts.push('Alerta: temperatura fuera de rango normal.');
+  }
+
+  if (vitals.heartRate && (vitals.heartRate < 50 || vitals.heartRate > 120)) {
+    alerts.push('Alerta: frecuencia cardiaca fuera de rango normal.');
+  }
+
+  if (vitals.respiratoryRate && (vitals.respiratoryRate < 10 || vitals.respiratoryRate > 24)) {
+    alerts.push('Alerta: frecuencia respiratoria fuera de rango normal.');
+  }
+
+  return alerts;
+}
+
+function getTimelineActionLabel(action: string) {
+  const labels: Record<string, string> = {
+    STARTED: 'Atencion iniciada',
+    VITALS_RECORDED: 'Signos vitales registrados',
+    NOTE_ADDED: 'Nota clinica agregada',
+    COMPLETED: 'Atencion finalizada',
+    DOCUMENT_SENT: 'Documentos enviados',
+    STATUS_CHANGED: 'Estado actualizado',
+    appointment_created: 'Cita creada',
+    appointment_updated: 'Cita actualizada',
+    appointment_status_changed: 'Estado actualizado',
+    encounter_started: 'Atencion iniciada',
+    vitals_recorded: 'Signos vitales registrados',
+    note_added: 'Nota clinica agregada',
+    encounter_finished: 'Atencion finalizada',
+    documents_sent: 'Documentos enviados',
+  };
+
+  return labels[action] ?? action.replace(/_/g, ' ');
+}
+
+function getTimelineActor(item: AppointmentTimelineItem) {
+  if (!item.actor) {
+    return 'Sistema';
+  }
+
+  return `${item.actor.firstName} ${item.actor.lastName}`.trim() || item.actor.email || 'Usuario';
+}
+
+function getFinishDraftKey(appointmentId: string) {
+  return `${FINISH_DRAFT_PREFIX}${appointmentId}`;
+}
+
+function loadFinishDraft(appointmentId: string): FinishFormState {
+  try {
+    const rawDraft = window.localStorage.getItem(getFinishDraftKey(appointmentId));
+    if (!rawDraft) {
+      return emptyFinishForm;
+    }
+
+    return {
+      ...emptyFinishForm,
+      ...JSON.parse(rawDraft),
+    };
+  } catch (_error) {
+    return emptyFinishForm;
+  }
+}
+
+function saveFinishDraft(appointmentId: string, draft: FinishFormState) {
+  try {
+    window.localStorage.setItem(getFinishDraftKey(appointmentId), JSON.stringify(draft));
+  } catch (_error) {
+    // Local drafts are best effort; clinical writes still go through the API.
+  }
+}
+
+function clearFinishDraft(appointmentId: string) {
+  try {
+    window.localStorage.removeItem(getFinishDraftKey(appointmentId));
+  } catch (_error) {
+    // Ignore storage cleanup failures.
+  }
 }
 

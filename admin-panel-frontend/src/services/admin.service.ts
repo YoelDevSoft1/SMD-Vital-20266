@@ -1,21 +1,28 @@
 import api from './api';
 import type {
   ApiResponse,
+  AuditLogEntry,
+  AuditLogFilters,
   AnalyticsData,
   AnalyticsFilters,
   Appointment,
   AppointmentFilters,
+  AppointmentTimeline,
   DashboardStats,
   Doctor,
   DoctorAvailabilityResponse,
   DoctorFilters,
   DoctorRouteResponse,
   PaginatedResponse,
+  Patient,
   Payment,
   PaymentFilters,
   Review,
   ReviewFilters,
   RevenueReport,
+  RipsDraft,
+  RipsDraftFilters,
+  RipsExportResponse,
   Service,
   ServiceFilters,
   SystemHealth,
@@ -104,6 +111,9 @@ export const adminService = {
   getAppointmentDetails: (id: string) =>
     api.get<ApiResponse<Appointment>>(`/admin-panel/appointments/${id}`),
 
+  getAppointmentTimeline: (id: string) =>
+    api.get<ApiResponse<AppointmentTimeline>>(`/admin-panel/appointments/${id}/timeline`),
+
   createAppointment: (data: any) =>
     api.post<ApiResponse<Appointment>>('/admin-panel/appointments', data),
 
@@ -121,12 +131,12 @@ export const adminService = {
 
   // Patients
   getPatients: (filters: UserFilters) =>
-    api.get<ApiResponse<PaginatedResponse<User>>>('/admin-panel/patients', {
+    api.get<ApiResponse<PaginatedResponse<Patient>>>('/admin-panel/patients', {
       params: filters,
     }),
 
   createQuickPatient: (data: { firstName: string; lastName: string; documentId: string; phone: string }) =>
-    api.post<ApiResponse<any>>('/admin-panel/patients/quick', data),
+    api.post<ApiResponse<Patient>>('/admin-panel/patients/quick', data),
 
   // Payments
   getPayments: (filters: PaymentFilters) =>
@@ -217,9 +227,51 @@ export const adminService = {
     api.get<ApiResponse<PaginatedResponse<SystemLog>>>(
       '/admin-panel/system/logs',
       {
-        params: filters,
+        params: {
+          page: filters.page,
+          limit: filters.limit,
+          level: filters.level || undefined,
+          service: filters.service || undefined,
+          search: filters.search || undefined,
+          startDate: filters.dateFrom || undefined,
+          endDate: filters.dateTo || undefined,
+        },
       },
     ),
+
+  getAuditLogs: (filters: AuditLogFilters) =>
+    api.get<ApiResponse<PaginatedResponse<AuditLogEntry>>>('/admin-panel/audit', {
+      params: {
+        page: filters.page,
+        limit: filters.limit,
+        actorId: filters.actorId || undefined,
+        actorRole: filters.actorRole || undefined,
+        entity: filters.entity || undefined,
+        action: filters.action || undefined,
+        search: filters.search || undefined,
+        startDate: filters.dateFrom || undefined,
+        endDate: filters.dateTo || undefined,
+      },
+    }),
+
+  getRipsDrafts: (filters: RipsDraftFilters) =>
+    api.get<ApiResponse<PaginatedResponse<RipsDraft>>>('/admin-panel/rips/drafts', {
+      params: {
+        page: filters.page,
+        limit: filters.limit,
+        status: filters.status || undefined,
+        startDate: filters.dateFrom || undefined,
+        endDate: filters.dateTo || undefined,
+      },
+    }),
+
+  exportRipsDrafts: (filters: Omit<RipsDraftFilters, 'page'> = {}) =>
+    api.post<ApiResponse<RipsExportResponse>>('/admin-panel/rips/export', {
+      status: filters.status || undefined,
+      startDate: filters.dateFrom || undefined,
+      endDate: filters.dateTo || undefined,
+      limit: filters.limit,
+    }),
 
   // Export
   exportData: (type: string, format: string, filters: any) =>

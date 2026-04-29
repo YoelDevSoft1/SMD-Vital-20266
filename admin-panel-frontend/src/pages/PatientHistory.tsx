@@ -21,6 +21,7 @@ export default function PatientHistory() {
   const appointments = history?.appointments ?? [];
   const medicalRecords = history?.medicalRecords ?? [];
   const prescriptions = history?.prescriptions ?? [];
+  const documentDeliveries = history?.documentDeliveries ?? [];
 
   const handleDownload = async (type: 'record' | 'prescription', id: string, fallbackName: string) => {
     try {
@@ -249,6 +250,47 @@ export default function PatientHistory() {
                   </div>
                 );
               })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            Envio de documentos
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+              Cargando envios...
+            </div>
+          ) : documentDeliveries.length === 0 ? (
+            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+              No hay envios registrados.
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+              {documentDeliveries.map((delivery) => (
+                <div
+                  key={delivery.id}
+                  className="flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                      {delivery.email}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {formatDateTime(delivery.createdAt)}
+                      {delivery.lastError ? ` · ${delivery.lastError}` : ''}
+                    </p>
+                  </div>
+                  <span className="rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200">
+                    {delivery.status}
+                  </span>
+                </div>
+              ))}
             </div>
           )}
         </CardContent>

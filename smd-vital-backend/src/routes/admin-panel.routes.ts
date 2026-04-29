@@ -135,6 +135,13 @@ router.post('/doctors/:id/upload-media', uploadDoctorMedia, adminPanelController
 router.get('/appointments', adminPanelController.getAppointments);
 
 /**
+ * @route   GET /api/v1/admin-panel/appointments/:id/timeline
+ * @desc    Get appointment traceability timeline
+ * @access  Private/Admin
+ */
+router.get('/appointments/:id/timeline', adminPanelController.getAppointmentTimeline);
+
+/**
  * @route   GET /api/v1/admin-panel/appointments/:id
  * @desc    Get appointment details by ID
  * @access  Private/Admin
@@ -334,6 +341,12 @@ router.get('/system/health', adminPanelController.getSystemHealth);
  * @access  Private/Admin
  */
 router.get('/system/logs', adminPanelController.getSystemLogs);
+
+router.get('/audit', adminPanelController.getAuditLogs);
+
+router.get('/rips/drafts', adminPanelController.getRipsDrafts);
+
+router.post('/rips/export', adminPanelController.exportRipsDrafts);
 
 // ========================================
 // DATA EXPORT

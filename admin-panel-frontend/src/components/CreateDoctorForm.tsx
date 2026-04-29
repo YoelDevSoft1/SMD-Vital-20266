@@ -66,12 +66,11 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
     isAvailable: true,
   });
 
-  const [errors, setErrors] = useState<Partial<CreateDoctorData>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof CreateDoctorData, string>>>({});
 
   // Create doctor mutation
   const createDoctorMutation = useMutation({
     mutationFn: async (doctorData: CreateDoctorData) => {
-      console.log('Creating doctor with data:', doctorData);
       const response = await fetch('/api/v1/admin-panel/doctors', {
         method: 'POST',
         headers: {
@@ -98,7 +97,7 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
   });
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<CreateDoctorData> = {};
+    const newErrors: Partial<Record<keyof CreateDoctorData, string>> = {};
 
     if (!formData.email) newErrors.email = 'El email es requerido';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) {

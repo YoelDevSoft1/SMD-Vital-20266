@@ -72,7 +72,7 @@ export default function Login() {
   const currentYear = useMemo(() => new Date().getFullYear(), []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#020617]">
+    <div id="smd-vital-login-page" className="relative min-h-dvh overflow-hidden bg-[#020617]">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-[-22%] top-[-20%] h-[420px] w-[420px] rounded-full bg-cyan-500/25 blur-[160px]" />
         <div className="absolute right-[-15%] top-1/4 h-[520px] w-[520px] rounded-full bg-blue-500/20 blur-[200px]" />
