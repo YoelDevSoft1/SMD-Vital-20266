@@ -39,6 +39,8 @@ const statusColors: Record<string, string> = {
 export default function DoctorDashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const isDoctor = user?.role === 'DOCTOR';
   const today = new Date().toISOString().slice(0, 10);
   const [availabilityDate, setAvailabilityDate] = useState(today);
   const [availabilityBlocks, setAvailabilityBlocks] = useState<Array<{ startTime: string; endTime: string; notes?: string }>>([
@@ -57,12 +59,14 @@ export default function DoctorDashboard() {
   const { data: availabilityData, isFetching: isFetchingAvailability } = useQuery({
     queryKey: ['doctor-my-availability', availabilityDate],
     queryFn: () => clinicalService.getMyAvailability(availabilityDate, 60),
+    enabled: isDoctor,
     staleTime: 15_000,
   });
 
   const { data: routeData, isFetching: isFetchingRoute } = useQuery({
     queryKey: ['doctor-my-route', availabilityDate],
     queryFn: () => clinicalService.getMyRoute(availabilityDate),
+    enabled: isDoctor,
     staleTime: 15_000,
   });
 
@@ -156,138 +160,148 @@ export default function DoctorDashboard() {
         </Button>
       </div>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-          <div>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
-              Disponibilidad diaria
-            </CardTitle>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Define los rangos que administracion puede usar para agendarte.
-            </p>
-          </div>
-          <div className="grid grid-cols-[1fr_auto] gap-2 sm:flex sm:items-center">
-            <Input
-              type="date"
-              value={availabilityDate}
-              onChange={(event) => setAvailabilityDate(event.target.value)}
-              className="w-full sm:w-40"
-            />
-            <Button
-              onClick={() => availabilityMutation.mutate()}
-              isLoading={availabilityMutation.isPending}
-              disabled={isFetchingAvailability || availabilityMutation.isPending}
-            >
-              <Save className="h-4 w-4" />
-              Guardar
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3 p-4 sm:p-6">
-          {availabilityBlocks.map((block, index) => (
-            <div key={`${index}-${block.startTime}-${block.endTime}`} className="grid grid-cols-[1fr_1fr_auto] gap-2 sm:gap-3">
+      {isDoctor ? (
+        <>
+          <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+            <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
               <div>
-                <Label>Desde</Label>
-                <Input
-                  type="time"
-                  value={block.startTime}
-                  onChange={(event) =>
-                    setAvailabilityBlocks((current) =>
-                      current.map((item, itemIndex) =>
-                        itemIndex === index ? { ...item, startTime: event.target.value } : item
-                      )
-                    )
-                  }
-                />
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Disponibilidad diaria
+                </CardTitle>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Define los rangos que administracion puede usar para agendarte.
+                </p>
               </div>
-              <div>
-                <Label>Hasta</Label>
+              <div className="grid grid-cols-[1fr_auto] gap-2 sm:flex sm:items-center">
                 <Input
-                  type="time"
-                  value={block.endTime}
-                  onChange={(event) =>
-                    setAvailabilityBlocks((current) =>
-                      current.map((item, itemIndex) =>
-                        itemIndex === index ? { ...item, endTime: event.target.value } : item
-                      )
-                    )
-                  }
+                  type="date"
+                  value={availabilityDate}
+                  onChange={(event) => setAvailabilityDate(event.target.value)}
+                  className="w-full sm:w-40"
                 />
-              </div>
-              <div className="flex items-end">
                 <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() =>
-                    setAvailabilityBlocks((current) =>
-                      current.length === 1 ? current : current.filter((_, itemIndex) => itemIndex !== index)
-                    )
-                  }
-                  disabled={availabilityBlocks.length === 1}
-                  className="h-11 w-11 p-0 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                  onClick={() => availabilityMutation.mutate()}
+                  isLoading={availabilityMutation.isPending}
+                  disabled={isFetchingAvailability || availabilityMutation.isPending}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Save className="h-4 w-4" />
+                  Guardar
                 </Button>
               </div>
-            </div>
-          ))}
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() =>
-              setAvailabilityBlocks((current) => [...current, { startTime: '14:00', endTime: '18:00' }])
-            }
-            className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
-          >
-            <Plus className="h-4 w-4" />
-            Agregar rango
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
-            Ruta del dia
-          </CardTitle>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Citas ordenadas por hora y tiempos estimados de traslado.
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-4 p-4 sm:p-6">
-          <DailyRouteMap route={routeData?.data?.data} />
-          {isFetchingRoute ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Cargando ruta...</p>
-          ) : routeData?.data?.data?.segments?.length ? (
-            <div className="grid gap-2 md:grid-cols-2">
-              {routeData.data.data.segments.map((segment) => (
-                <div
-                  key={`${segment.fromAppointmentId}-${segment.toAppointmentId}`}
-                  className={cn(
-                    'rounded-md border p-3 text-sm',
-                    segment.status === 'OK' && 'border-emerald-200 bg-emerald-50 text-emerald-800',
-                    segment.status === 'RISK' && 'border-amber-200 bg-amber-50 text-amber-800',
-                    segment.status === 'CONFLICT' && 'border-red-200 bg-red-50 text-red-800',
-                    segment.status === 'MISSING_COORDINATES' && 'border-gray-200 bg-gray-50 text-gray-700'
-                  )}
-                >
-                  <div className="font-medium">
-                    {segment.status === 'OK' ? 'Traslado viable' : segment.status === 'RISK' ? 'Riesgo de retraso' : segment.status === 'CONFLICT' ? 'Choque de agenda' : 'Faltan coordenadas'}
+            </CardHeader>
+            <CardContent className="space-y-3 p-4 sm:p-6">
+              {availabilityBlocks.map((block, index) => (
+                <div key={`${index}-${block.startTime}-${block.endTime}`} className="grid grid-cols-[1fr_1fr_auto] gap-2 sm:gap-3">
+                  <div>
+                    <Label>Desde</Label>
+                    <Input
+                      type="time"
+                      value={block.startTime}
+                      onChange={(event) =>
+                        setAvailabilityBlocks((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index ? { ...item, startTime: event.target.value } : item
+                          )
+                        )
+                      }
+                    />
                   </div>
                   <div>
-                    {segment.distanceKm ?? '-'} km - {segment.estimatedTravelMinutes ?? '-'} min estimados
+                    <Label>Hasta</Label>
+                    <Input
+                      type="time"
+                      value={block.endTime}
+                      onChange={(event) =>
+                        setAvailabilityBlocks((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index ? { ...item, endTime: event.target.value } : item
+                          )
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() =>
+                        setAvailabilityBlocks((current) =>
+                          current.length === 1 ? current : current.filter((_, itemIndex) => itemIndex !== index)
+                        )
+                      }
+                      disabled={availabilityBlocks.length === 1}
+                      className="h-11 w-11 p-0 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Aun no hay suficientes citas con coordenadas para calcular la ruta.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  setAvailabilityBlocks((current) => [...current, { startTime: '14:00', endTime: '18:00' }])
+                }
+                className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+              >
+                <Plus className="h-4 w-4" />
+                Agregar rango
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+                Ruta del dia
+              </CardTitle>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Citas ordenadas por hora y tiempos estimados de traslado.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4 p-4 sm:p-6">
+              <DailyRouteMap route={routeData?.data?.data} />
+              {isFetchingRoute ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400">Cargando ruta...</p>
+              ) : routeData?.data?.data?.segments?.length ? (
+                <div className="grid gap-2 md:grid-cols-2">
+                  {routeData.data.data.segments.map((segment) => (
+                    <div
+                      key={`${segment.fromAppointmentId}-${segment.toAppointmentId}`}
+                      className={cn(
+                        'rounded-md border p-3 text-sm',
+                        segment.status === 'OK' && 'border-emerald-200 bg-emerald-50 text-emerald-800',
+                        segment.status === 'RISK' && 'border-amber-200 bg-amber-50 text-amber-800',
+                        segment.status === 'CONFLICT' && 'border-red-200 bg-red-50 text-red-800',
+                        segment.status === 'MISSING_COORDINATES' && 'border-gray-200 bg-gray-50 text-gray-700'
+                      )}
+                    >
+                      <div className="font-medium">
+                        {segment.status === 'OK' ? 'Traslado viable' : segment.status === 'RISK' ? 'Riesgo de retraso' : segment.status === 'CONFLICT' ? 'Choque de agenda' : 'Faltan coordenadas'}
+                      </div>
+                      <div>
+                        {segment.distanceKm ?? '-'} km - {segment.estimatedTravelMinutes ?? '-'} min estimados
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Aun no hay suficientes citas con coordenadas para calcular la ruta.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      ) : (
+        <Card className="border border-blue-200 bg-blue-50/60 shadow-sm dark:border-blue-800 dark:bg-blue-900/20">
+          <CardContent className="p-4 text-sm text-blue-800 sm:p-6 dark:text-blue-300">
+            Tu panel de enfermeria muestra citas asignadas y tareas clinicas. La disponibilidad y ruta diaria solo aplican a usuarios medico.
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="border border-gray-200 shadow-sm dark:border-gray-700">

@@ -178,20 +178,6 @@ export default function Doctors() {
   const allDoctors = (allDoctorsData?.data?.data?.data as Doctor[]) || [];
   const allDoctorsTotal = allDoctorsData?.data?.data?.pagination?.total || 0;
 
-  // Debug logging
-  console.log('Doctors Debug:', {
-    hasDoctorsData: !!doctorsData,
-    hasAllDoctorsData: !!allDoctorsData,
-    doctorsCount: doctors.length,
-    allDoctorsCount: allDoctors.length,
-    allDoctorsTotal: allDoctorsTotal,
-    availableDoctors: allDoctors.filter(d => d.isAvailable).length,
-    avgRating: allDoctors.length > 0 ? allDoctors.reduce((acc, d) => acc + d.rating, 0) / allDoctors.length : 0,
-    totalReviews: allDoctors.reduce((acc, d) => acc + (d.totalReviews || 0), 0),
-    pagination: pagination,
-    totalDoctors: totalDoctors
-  });
-
   // Calculate stats from all doctors
   const availableDoctors = allDoctors.filter(d => d.isAvailable).length;
   const avgRating = allDoctors.length > 0

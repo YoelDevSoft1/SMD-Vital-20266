@@ -857,18 +857,40 @@ export class AdminPanelController {
   public getAppointments = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = '1', limit = '10', search, status, dateFrom, dateTo, doctorId, patientId, serviceId } = req.query;
+      const pageNumber = Number.parseInt(page as string, 10);
+      const limitNumber = Number.parseInt(limit as string, 10);
+      const filters: {
+        page: number;
+        limit: number;
+        search?: string;
+        status?: string;
+        dateFrom?: string;
+        dateTo?: string;
+        doctorId?: string;
+        patientId?: string;
+        serviceId?: string;
+      } = {
+        page: Number.isFinite(pageNumber) && pageNumber > 0 ? pageNumber : 1,
+        limit: Number.isFinite(limitNumber) && limitNumber > 0 ? limitNumber : 10
+      };
 
-      const result = await this.adminService.getAppointments({
-        page: parseInt(page as string),
-        limit: parseInt(limit as string),
-        search: search as string,
-        status: status as string,
-        dateFrom: dateFrom as string,
-        dateTo: dateTo as string,
-        doctorId: doctorId as string,
-        patientId: patientId as string,
-        serviceId: serviceId as string
-      });
+      const cleanedSearch = this.cleanQueryString(search);
+      const cleanedStatus = this.cleanQueryString(status);
+      const cleanedDateFrom = this.cleanQueryString(dateFrom);
+      const cleanedDateTo = this.cleanQueryString(dateTo);
+      const cleanedDoctorId = this.cleanQueryString(doctorId);
+      const cleanedPatientId = this.cleanQueryString(patientId);
+      const cleanedServiceId = this.cleanQueryString(serviceId);
+
+      if (cleanedSearch) filters.search = cleanedSearch;
+      if (cleanedStatus) filters.status = cleanedStatus;
+      if (cleanedDateFrom) filters.dateFrom = cleanedDateFrom;
+      if (cleanedDateTo) filters.dateTo = cleanedDateTo;
+      if (cleanedDoctorId) filters.doctorId = cleanedDoctorId;
+      if (cleanedPatientId) filters.patientId = cleanedPatientId;
+      if (cleanedServiceId) filters.serviceId = cleanedServiceId;
+
+      const result = await this.adminService.getAppointments(filters);
 
       const response: ApiResponse = {
         success: true,
@@ -2288,4 +2310,8 @@ export class AdminPanelController {
       });
     }
   };
+
+  private cleanQueryString(value: unknown): string | undefined {
+    return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
+  }
 }

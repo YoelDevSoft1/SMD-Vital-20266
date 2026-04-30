@@ -222,8 +222,27 @@ export class ClinicalService {
   }
 
   public async getMyRoute(userId: string, date: string) {
-    const doctor = await this.getDoctorByUserId(userId);
     const { start, end, dateOnly } = getDayRange(date);
+    const doctor = await this.prisma.doctor.findUnique({
+      where: { userId },
+      include: { user: true }
+    });
+
+    if (!doctor) {
+      logger.warn('Clinical route requested by doctor without profile; returning empty route', {
+        userId,
+        date
+      });
+
+      return {
+        doctor: null,
+        date: formatDateOnly(dateOnly),
+        appointments: [],
+        stops: [],
+        segments: []
+      };
+    }
+
     const appointments = await this.prisma.appointment.findMany({
       where: {
         doctorId: doctor.id,

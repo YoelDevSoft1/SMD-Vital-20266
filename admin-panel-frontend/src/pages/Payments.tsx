@@ -128,29 +128,6 @@ export default function Payments() {
   // Recent payments for display (first 5)
   const payments = recentPaymentsData?.data?.data?.data || [];
 
-  // Debug logging
-  console.log('=== PAYMENTS DEBUG ===');
-  console.log('Has allPaymentsData:', !!allPaymentsData);
-  console.log('All payments array length:', allPayments.length);
-  console.log('Total payments:', totalPayments);
-  console.log('Completed payments:', completedPayments);
-  console.log('Pending payments:', pendingPayments);
-  console.log('Failed payments:', failedPayments);
-  console.log('Total revenue:', totalRevenue);
-  console.log('Calculated revenue:', calculatedRevenue);
-  console.log('Recent payments for display:', payments.length);
-  console.log('========================');
-  
-  // Debug dashboard data
-  console.log('=== DASHBOARD DEBUG ===');
-  console.log('Has dashboardData:', !!dashboardData);
-  console.log('Dashboard data structure:', dashboardData ? Object.keys(dashboardData) : []);
-  console.log('Dashboard data.data structure:', dashboardData?.data ? Object.keys(dashboardData.data) : []);
-  console.log('Dashboard data.data.data structure:', dashboardData?.data?.data ? Object.keys(dashboardData.data.data) : []);
-  console.log('Dashboard overview:', dashboardData?.data?.data?.overview);
-  console.log('Dashboard totalRevenue:', dashboardData?.data?.data?.overview?.totalRevenue);
-  console.log('========================');
-
   const stats = [
     {
       title: 'Total Pagos',

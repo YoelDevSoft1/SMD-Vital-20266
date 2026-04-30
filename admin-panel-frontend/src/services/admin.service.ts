@@ -32,6 +32,17 @@ import type {
   UserFilters,
 } from '@/types';
 
+function cleanParams<T extends Record<string, unknown>>(params: T) {
+  return Object.fromEntries(
+    Object.entries(params).filter(([, value]) => (
+      value !== undefined &&
+      value !== null &&
+      value !== '' &&
+      !(typeof value === 'number' && Number.isNaN(value))
+    ))
+  );
+}
+
 export const adminService = {
   // Dashboard
   getDashboard: () =>
@@ -104,7 +115,7 @@ export const adminService = {
     api.get<ApiResponse<PaginatedResponse<Appointment>>>(
       '/admin-panel/appointments',
       {
-        params: filters,
+        params: cleanParams(filters),
       },
     ),
 

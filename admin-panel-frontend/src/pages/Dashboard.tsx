@@ -46,22 +46,6 @@ export default function Dashboard() {
 
   const stats = data?.data?.data as DashboardStats | undefined;
 
-  // Debug logging
-  console.log('=== DASHBOARD DEBUG ===');
-  console.log('Raw data:', data);
-  console.log('Stats:', stats);
-  console.log('Total Users:', stats?.overview?.totalUsers);
-  console.log('Total Doctors:', stats?.overview?.totalDoctors);
-  console.log('Total Appointments:', stats?.overview?.totalAppointments);
-  console.log('Total Revenue:', stats?.overview?.totalRevenue);
-  console.log('========================');
-
-  // Temporary debug display
-  if (stats) {
-    console.log('STATS OVERVIEW:', stats.overview);
-    console.log('STATS APPOINTMENTS:', stats.appointments);
-  }
-
   const statCards = useMemo(() => {
     if (!stats) {
       return [

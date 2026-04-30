@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const APP_CACHE = `smd-vital-app-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `smd-vital-runtime-${CACHE_VERSION}`;
 
@@ -91,7 +91,7 @@ async function networkFirstNavigation(request) {
     return response;
   } catch (_error) {
     const cached = await caches.match(request);
-    return cached || caches.match('/offline.html');
+    return cached || await caches.match('/offline.html') || offlineHtmlResponse();
   }
 }
 
@@ -105,7 +105,28 @@ async function staleWhileRevalidate(request) {
       }
       return response;
     })
-    .catch(() => cached);
+    .catch(() => cached || fallbackAssetResponse(request));
 
   return cached || fetched;
+}
+
+function fallbackAssetResponse(request) {
+  if (request.destination === 'document') {
+    return offlineHtmlResponse();
+  }
+
+  return new Response('', {
+    status: 504,
+    statusText: 'Offline',
+  });
+}
+
+function offlineHtmlResponse() {
+  return new Response(
+    '<!doctype html><html lang="es"><head><meta charset="utf-8"><title>SMD Vital sin conexion</title></head><body><h1>Sin conexion</h1><p>Vuelve a intentarlo cuando recuperes la red.</p></body></html>',
+    {
+      status: 503,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    }
+  );
 }

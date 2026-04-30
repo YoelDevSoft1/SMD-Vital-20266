@@ -170,19 +170,6 @@ export default function Users() {
   const allUsers = (allUsersData?.data?.data?.data as User[]) || [];
   const allUsersTotal = allUsersData?.data?.data?.pagination?.total || 0;
 
-  // Debug logging
-  console.log('Users Debug:', {
-    hasUsersData: !!usersData,
-    hasAllUsersData: !!allUsersData,
-    usersCount: users.length,
-    allUsersCount: allUsers.length,
-    allUsersTotal: allUsersTotal,
-    activeUsers: allUsers.filter(u => u.isActive).length,
-    verifiedUsers: allUsers.filter(u => u.isVerified).length,
-    pagination: pagination,
-    totalUsers: totalUsers
-  });
-
   if (error) {
     return (
       <div className="space-y-6">

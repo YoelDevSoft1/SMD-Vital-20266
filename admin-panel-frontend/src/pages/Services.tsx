@@ -80,17 +80,6 @@ export default function Services() {
   // Recent services for display (first 5)
   const recentServices = recentServicesData?.data?.data?.data || [];
 
-  // Debug logging
-  console.log('Services Debug:', {
-    hasAllServicesData: !!allServicesData,
-    allServicesCount: allServices.length,
-    totalServices: totalServices,
-    activeServices: activeServices,
-    inactiveServices: inactiveServices,
-    totalRevenue: totalRevenue,
-    recentServicesCount: recentServices.length
-  });
-
   const stats = [
     {
       title: 'Total Servicios',

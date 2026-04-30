@@ -27,14 +27,6 @@ export default function Login() {
     onSuccess: (response) => {
       const { user, accessToken } = response.data.data;
 
-      console.debug('Login Success - Token received:', {
-        tokenLength: accessToken.length,
-        tokenStart: accessToken.substring(0, 20) + '...',
-        tokenEnd: '...' + accessToken.substring(accessToken.length - 20),
-        isJWTFormat: accessToken.split('.').length === 3,
-        user: user.email,
-      });
-
       setAuth(user, accessToken);
       toast.success('¡Bienvenido de nuevo!');
       navigate(getHomePath(user.role));
