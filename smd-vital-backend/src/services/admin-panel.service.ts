@@ -492,6 +492,10 @@ export class AdminPanelService {
         }
       });
 
+      if (user.role === 'DOCTOR') {
+        await this.ensureDoctorProfileForUser(user.id);
+      }
+
       return user;
     } catch (error) {
       logger.error('Error creating user:', error);
@@ -534,6 +538,10 @@ export class AdminPanelService {
           updatedAt: true,
         }
       });
+
+      if (user.role === 'DOCTOR') {
+        await this.ensureDoctorProfileForUser(user.id);
+      }
 
       return user;
     } catch (error) {
@@ -1139,6 +1147,36 @@ export class AdminPanelService {
       logger.error('Error verifying user:', error);
       throw error;
     }
+  }
+
+  private async ensureDoctorProfileForUser(userId: string) {
+    const existingDoctor = await prisma.doctor.findUnique({
+      where: { userId },
+      select: { id: true }
+    });
+
+    if (existingDoctor) {
+      return existingDoctor;
+    }
+
+    logger.warn('Creating fallback doctor profile for DOCTOR user', { userId });
+
+    return prisma.doctor.create({
+      data: {
+        userId,
+        licenseNumber: `AUTO-${userId.slice(-10)}`,
+        specialty: 'Medicina general',
+        experience: 0,
+        consultationFee: 0,
+        bio: 'Perfil medico creado automaticamente. Completar datos profesionales.',
+        education: null,
+        certifications: null,
+        languages: ['es'],
+        serviceAreas: ['Bogota'],
+        isAvailable: true
+      },
+      select: { id: true }
+    });
   }
 
 

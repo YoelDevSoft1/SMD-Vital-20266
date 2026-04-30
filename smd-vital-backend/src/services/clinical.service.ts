@@ -1758,11 +1758,49 @@ export class ClinicalService {
       include: { user: true }
     });
 
-    if (!doctor) {
-      throw this.createHttpError(404, 'Doctor profile not found');
+    if (doctor) {
+      return doctor;
     }
 
-    return doctor;
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, role: true, firstName: true, lastName: true }
+    });
+
+    if (!user) {
+      throw this.createHttpError(404, 'User not found');
+    }
+
+    if (user.role !== 'DOCTOR') {
+      throw this.createHttpError(403, 'Doctor role required');
+    }
+
+    logger.warn('Doctor user without doctor profile detected; creating fallback profile', {
+      userId,
+      firstName: user.firstName,
+      lastName: user.lastName
+    });
+
+    return this.prisma.doctor.create({
+      data: this.buildFallbackDoctorProfile(userId),
+      include: { user: true }
+    });
+  }
+
+  private buildFallbackDoctorProfile(userId: string): Prisma.DoctorCreateInput {
+    return {
+      user: { connect: { id: userId } },
+      licenseNumber: `AUTO-${userId.slice(-10)}`,
+      specialty: 'Medicina general',
+      experience: 0,
+      consultationFee: 0,
+      bio: 'Perfil medico creado automaticamente. Completar datos profesionales.',
+      education: null,
+      certifications: null,
+      languages: ['es'],
+      serviceAreas: ['Bogota'],
+      isAvailable: true
+    };
   }
 
   private getAppointmentInclude(): Prisma.AppointmentInclude {

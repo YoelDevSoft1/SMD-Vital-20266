@@ -32,6 +32,7 @@ import AppointmentsModal from '@/components/AppointmentsModal';
 import CreateAppointmentForm from '@/components/CreateAppointmentForm';
 import AppointmentDetailsView from '@/components/AppointmentDetailsView';
 import DailyRouteMap from '@/components/DailyRouteMap';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
 import type { Appointment, AppointmentFilters, AppointmentStatus, AppointmentTimelineItem, Doctor } from '@/types';
@@ -73,6 +74,7 @@ export default function Appointments() {
   const [selectedAppointments, setSelectedAppointments] = useState<string[]>([]);
   const [routeDoctorId, setRouteDoctorId] = useState('');
   const [routeDate, setRouteDate] = useState(new Date().toISOString().slice(0, 10));
+  const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null);
 
   // Fetch appointments
   const { data: appointmentsData, isLoading, isFetching, error, refetch } = useQuery({
@@ -133,9 +135,17 @@ export default function Appointments() {
   };
 
   const handleDeleteAppointment = (appointment: any) => {
-    if (confirm(`¿Estás seguro de que quieres eliminar la cita con ${appointment.patient?.user?.firstName}?`)) {
-      deleteAppointmentMutation.mutate(appointment.id);
+    setAppointmentToDelete(appointment);
+  };
+
+  const handleConfirmDeleteAppointment = () => {
+    if (!appointmentToDelete) {
+      return;
     }
+
+    deleteAppointmentMutation.mutate(appointmentToDelete.id, {
+      onSettled: () => setAppointmentToDelete(null),
+    });
   };
 
   const handleSelectAppointment = (appointmentId: string) => {
@@ -961,6 +971,18 @@ export default function Appointments() {
           }}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={Boolean(appointmentToDelete)}
+        title="Eliminar cita"
+        message={`Esta accion eliminara la cita de ${appointmentToDelete?.patient?.user?.firstName ?? 'este paciente'}.`}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        isDanger
+        isLoading={deleteAppointmentMutation.isPending}
+        onConfirm={handleConfirmDeleteAppointment}
+        onCancel={() => setAppointmentToDelete(null)}
+      />
     </div>
   );
 }
