@@ -1,123 +1,274 @@
 ---
 import { SITE } from 'astrowind:config';
 
-// SEO: Schema JSON-LD optimizado con URLs absolutas y datos E-E-A-T mejorados
-const clinic = {
-  '@context': 'https://schema.org',
+const siteUrl = SITE.site.replace(/\/$/, '');
+const clinicId = `${siteUrl}/#medicalClinic`;
+const organizationId = `${siteUrl}/#organization`;
+const homeServiceId = `${siteUrl}/#homeMedicalService`;
+
+const heroImageUrl = `${siteUrl}/_astro/hero-image.png`;
+
+const sameAs = [
+  'https://www.facebook.com/profile.php?id=61556817451561',
+  'https://www.instagram.com/smdvitalbogota_/',
+  'https://x.com/smdvitalbogotaoficial',
+  'https://wa.me/573042912564',
+];
+
+const address = {
+  '@type': 'PostalAddress',
+  streetAddress: 'Calle 42A Bis Sur #87I-74',
+  addressLocality: 'Bogotá',
+  addressRegion: 'Bogotá D.C.',
+  postalCode: '110836',
+  addressCountry: 'CO',
+};
+
+const geo = {
+  '@type': 'GeoCoordinates',
+  latitude: 4.60971,
+  longitude: -74.08175,
+};
+
+const areaServed = [
+  { '@type': 'City', name: 'Bogotá', sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1' },
+  { '@type': 'City', name: 'Usaquén, Bogotá' },
+  { '@type': 'City', name: 'Chapinero, Bogotá' },
+  { '@type': 'City', name: 'Santa Fe, Bogotá' },
+  { '@type': 'City', name: 'San Cristóbal, Bogotá' },
+  { '@type': 'City', name: 'Usme, Bogotá' },
+  { '@type': 'City', name: 'Tunjuelito, Bogotá' },
+  { '@type': 'City', name: 'Bosa, Bogotá' },
+  { '@type': 'City', name: 'Kennedy, Bogotá' },
+  { '@type': 'City', name: 'Fontibón, Bogotá' },
+  { '@type': 'City', name: 'Engativá, Bogotá' },
+  { '@type': 'City', name: 'Suba, Bogotá' },
+  { '@type': 'City', name: 'Barrios Unidos, Bogotá' },
+  { '@type': 'City', name: 'Teusaquillo, Bogotá' },
+  { '@type': 'City', name: 'Los Mártires, Bogotá' },
+  { '@type': 'City', name: 'Antonio Nariño, Bogotá' },
+  { '@type': 'City', name: 'Puente Aranda, Bogotá' },
+  { '@type': 'City', name: 'La Candelaria, Bogotá' },
+  { '@type': 'City', name: 'Rafael Uribe Uribe, Bogotá' },
+  { '@type': 'City', name: 'Ciudad Bolívar, Bogotá' },
+  { '@type': 'City', name: 'Sumapaz, Bogotá' },
+  { '@type': 'City', name: 'Chía, Cundinamarca', sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa' },
+  { '@type': 'City', name: 'Cajicá, Cundinamarca', sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1' },
+  { '@type': 'City', name: 'Soacha, Cundinamarca', sameAs: 'https://es.wikipedia.org/wiki/Soacha' },
+  { '@type': 'City', name: 'Funza, Cundinamarca' },
+  { '@type': 'City', name: 'Mosquera, Cundinamarca' },
+  { '@type': 'City', name: 'Cota, Cundinamarca' },
+  {
+    '@type': 'GeoCircle',
+    geoMidpoint: geo,
+    geoRadius: 50000,
+  },
+];
+
+const organizationSchema = {
+  '@type': 'Organization',
+  '@id': organizationId,
+  name: 'SMD Vital Bogotá',
+  url: siteUrl,
+  logo: {
+    '@type': 'ImageObject',
+    url: heroImageUrl,
+    width: 1200,
+    height: 630,
+  },
+  image: {
+    '@type': 'ImageObject',
+    url: heroImageUrl,
+    width: 1200,
+    height: 630,
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: '+57-304-291-2564',
+    contactType: 'customer service',
+    areaServed: 'CO',
+    availableLanguage: ['es'],
+  },
+  sameAs,
+};
+
+const clinicSchema = {
   '@type': 'MedicalClinic',
-  '@id': `${SITE.site}/#medicalClinic`,
+  '@id': clinicId,
   name: 'SMD Vital – Médico a Domicilio en Bogotá 24/7',
   alternateName: 'SMD Vital Bogotá - Médico a Domicilio',
   description:
     'Atención médica profesional a domicilio en Bogotá. Llegamos en 45 minutos con médicos certificados. Valoraciones, enfermería, laboratorio y teleconsultas 24/7 en las 20 localidades. Precios transparentes.',
-  url: SITE.site,
+  url: siteUrl,
   logo: {
     '@type': 'ImageObject',
-    url: `${SITE.site}/_astro/hero-image.png`,
+    url: heroImageUrl,
     width: 1200,
     height: 630,
   },
-  image: [
-    {
-      '@type': 'ImageObject',
-      url: `${SITE.site}/_astro/hero-image.png`,
-      width: 1200,
-      height: 630,
-    },
-  ],
+  image: {
+    '@type': 'ImageObject',
+    url: heroImageUrl,
+    width: 1200,
+    height: 630,
+  },
   telephone: '+57-304-291-2564',
   email: 'salud@smdvitalbogota.com',
+
   medicalSpecialty: [
-    'EmergencyMedicine',
-    'PrimaryCare',
-    'DiagnosticRadiology',
-    'GeneralPractice',
-    'Nursing',
-    'InternalMedicine',
-    'Geriatrics',
+    'https://schema.org/Emergency',
+    'https://schema.org/PrimaryCare',
+    'https://schema.org/Nursing',
+    'https://schema.org/LaboratoryScience',
+    'https://schema.org/Pathology',
+    'https://schema.org/Geriatric',
+    'https://schema.org/Radiography',
   ],
-  // SEO E-E-A-T: Credenciales médicas (aumenta confianza YMYL)
-  hasCredential: [
-    {
-      '@type': 'EducationalOccupationalCredential',
-      name: 'Registro profesional vigente - Ministerio de Salud Colombia',
-      credentialCategory: 'Certificación Profesional',
-      recognizedBy: {
-        '@type': 'Organization',
-        name: 'Ministerio de Salud y Protección Social de Colombia'
-      }
-    }
-  ],
-  keywords: 'médico a domicilio bogotá, doctor a casa bogotá, médico a domicilio barato, doctor a casa económico, enfermera a domicilio bogotá, laboratorio a domicilio bogotá, médico a domicilio 24 horas, doctor a casa bogotá precio, atención médica domiciliaria bogotá, médico a domicilio urgente, doctor a domicilio bogotá, enfermera profesional a domicilio, laboratorio clínico a domicilio, médico a domicilio chía, doctor a casa cajicá, médico a domicilio soacha, teleconsulta médica bogotá, valoración médica domiciliaria, curaciones a domicilio bogotá, inyectología a domicilio',
-  healthPlanNetwork: 'Particular',
+
+  hasCredential: {
+    '@type': 'EducationalOccupationalCredential',
+    name: 'Registro profesional vigente - Ministerio de Salud Colombia',
+    credentialCategory: 'Certificación Profesional',
+    recognizedBy: {
+      '@type': 'Organization',
+      name: 'Ministerio de Salud y Protección Social de Colombia',
+    },
+  },
+
+  keywords:
+    'médico a domicilio bogotá, doctor a casa bogotá, médico a domicilio barato, doctor a casa económico, enfermera a domicilio bogotá, laboratorio a domicilio bogotá, médico a domicilio 24 horas, doctor a casa bogotá precio, atención médica domiciliaria bogotá, médico a domicilio urgente, doctor a domicilio bogotá, enfermera profesional a domicilio, laboratorio clínico a domicilio, médico a domicilio chía, doctor a casa cajicá, médico a domicilio soacha, teleconsulta médica bogotá, valoración médica domiciliaria, curaciones a domicilio bogotá, inyectología a domicilio',
+
   priceRange: '$$$',
   currenciesAccepted: 'COP',
-  paymentAccepted: ['Efectivo', 'Tarjeta de crédito', 'Transferencia electrónica', 'Nequi', 'Daviplata'],
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'Calle 42A Bis Sur #87I-74',
-    addressLocality: 'Bogotá',
-    addressRegion: 'Bogotá D.C.',
-    postalCode: '110836',
-    addressCountry: 'CO',
+  paymentAccepted: [
+    'Efectivo',
+    'Tarjeta de crédito',
+    'Transferencia electrónica',
+    'Nequi',
+    'Daviplata',
+  ],
+
+  address,
+  geo,
+
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: [
+      'https://schema.org/Monday',
+      'https://schema.org/Tuesday',
+      'https://schema.org/Wednesday',
+      'https://schema.org/Thursday',
+      'https://schema.org/Friday',
+      'https://schema.org/Saturday',
+      'https://schema.org/Sunday',
+    ],
+    opens: '00:00',
+    closes: '23:59',
   },
-  geo: {
-    '@type': 'GeoCoordinates',
-    latitude: 4.60971,
-    longitude: -74.08175,
-  },
-  openingHoursSpecification: [
+
+  sameAs,
+  areaServed,
+
+  availableService: [
     {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-      opens: '00:00',
-      closes: '23:59',
+      '@type': 'MedicalProcedure',
+      name: 'Valoración Médica Domiciliaria',
+      description: 'Consulta médica general a domicilio con diagnóstico y tratamiento profesional.',
+      procedureType: 'https://schema.org/NoninvasiveProcedure',
+    },
+    {
+      '@type': 'MedicalProcedure',
+      name: 'Enfermería a Domicilio 24/7',
+      description: 'Servicios de enfermería especializada en el hogar con personal certificado.',
+      procedureType: 'https://schema.org/NoninvasiveProcedure',
+    },
+    {
+      '@type': 'MedicalTest',
+      name: 'Laboratorio Clínico a Domicilio',
+      description: 'Toma de muestras y pruebas diagnósticas en casa con resultados rápidos.',
+    },
+    {
+      '@type': 'MedicalProcedure',
+      name: 'Terapias Intravenosas',
+      description: 'Aplicación de sueros, antibióticos y medicamentos IV en domicilio.',
+      procedureType: 'https://schema.org/PercutaneousProcedure',
+    },
+    {
+      '@type': 'MedicalProcedure',
+      name: 'Curaciones y Manejo de Heridas',
+      description: 'Tratamiento especializado de heridas, úlceras y suturas a domicilio.',
+      procedureType: 'https://schema.org/PercutaneousProcedure',
     },
   ],
-  sameAs: [
-    'https://www.facebook.com/profile.php?id=61556817451561',
-    'https://www.instagram.com/smdvitalbogota_/',
-    'https://x.com/smdvitalbogotaoficial',
-    'https://wa.me/573042912564',
-  ],
-  // SEO Local: Area de servicio detallada (20 localidades de Bogotá + municipios)
-  areaServed: [
-    { '@type': 'City', name: 'Usaquén, Bogotá' },
-    { '@type': 'City', name: 'Chapinero, Bogotá' },
-    { '@type': 'City', name: 'Santa Fe, Bogotá' },
-    { '@type': 'City', name: 'San Cristóbal, Bogotá' },
-    { '@type': 'City', name: 'Usme, Bogotá' },
-    { '@type': 'City', name: 'Tunjuelito, Bogotá' },
-    { '@type': 'City', name: 'Bosa, Bogotá' },
-    { '@type': 'City', name: 'Kennedy, Bogotá' },
-    { '@type': 'City', name: 'Fontibón, Bogotá' },
-    { '@type': 'City', name: 'Engativá, Bogotá' },
-    { '@type': 'City', name: 'Suba, Bogotá' },
-    { '@type': 'City', name: 'Barrios Unidos, Bogotá' },
-    { '@type': 'City', name: 'Teusaquillo, Bogotá' },
-    { '@type': 'City', name: 'Los Mártires, Bogotá' },
-    { '@type': 'City', name: 'Antonio Nariño, Bogotá' },
-    { '@type': 'City', name: 'Puente Aranda, Bogotá' },
-    { '@type': 'City', name: 'La Candelaria, Bogotá' },
-    { '@type': 'City', name: 'Rafael Uribe Uribe, Bogotá' },
-    { '@type': 'City', name: 'Ciudad Bolívar, Bogotá' },
-    { '@type': 'City', name: 'Sumapaz, Bogotá' },
-    { '@type': 'City', name: 'Chía, Cundinamarca' },
-    { '@type': 'City', name: 'Cajicá, Cundinamarca' },
-    { '@type': 'City', name: 'Soacha, Cundinamarca' },
-    { '@type': 'City', name: 'Funza, Cundinamarca' },
-    { '@type': 'City', name: 'Mosquera, Cundinamarca' },
-    { '@type': 'City', name: 'Cota, Cundinamarca' },
-  ],
-  serviceArea: {
-    '@type': 'GeoCircle',
-    geoMidpoint: {
-      '@type': 'GeoCoordinates',
-      latitude: 4.60971,
-      longitude: -74.08175,
-    },
-    geoRadius: 50000,
+
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios Médicos Domiciliarios',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        name: 'Valoración Médica Domiciliaria',
+        priceCurrency: 'COP',
+        price: 120000,
+        availability: 'https://schema.org/InStock',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Valoración Médica Domiciliaria',
+          description: 'Consulta médica general a domicilio con diagnóstico y tratamiento profesional.',
+          procedureType: 'https://schema.org/NoninvasiveProcedure',
+        },
+      },
+      {
+        '@type': 'Offer',
+        name: 'Enfermería a Domicilio 24/7',
+        priceCurrency: 'COP',
+        price: 100000,
+        availability: 'https://schema.org/InStock',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Enfermería a Domicilio 24/7',
+          description: 'Servicios de enfermería especializada en el hogar con personal certificado.',
+          procedureType: 'https://schema.org/NoninvasiveProcedure',
+        },
+      },
+      {
+        '@type': 'Offer',
+        name: 'Laboratorio Clínico a Domicilio',
+        priceCurrency: 'COP',
+        availability: 'https://schema.org/InStock',
+        itemOffered: {
+          '@type': 'MedicalTest',
+          name: 'Laboratorio Clínico a Domicilio',
+          description: 'Toma de muestras y pruebas diagnósticas en casa con resultados rápidos.',
+        },
+      },
+      {
+        '@type': 'Offer',
+        name: 'Terapias Intravenosas',
+        priceCurrency: 'COP',
+        availability: 'https://schema.org/InStock',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Terapias Intravenosas',
+          description: 'Aplicación de sueros, antibióticos y medicamentos IV en domicilio.',
+          procedureType: 'https://schema.org/PercutaneousProcedure',
+        },
+      },
+      {
+        '@type': 'Offer',
+        name: 'Curaciones y Manejo de Heridas',
+        priceCurrency: 'COP',
+        availability: 'https://schema.org/InStock',
+        itemOffered: {
+          '@type': 'MedicalProcedure',
+          name: 'Curaciones y Manejo de Heridas',
+          description: 'Tratamiento especializado de heridas, úlceras y suturas a domicilio.',
+          procedureType: 'https://schema.org/PercutaneousProcedure',
+        },
+      },
+    ],
   },
+
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: 4.8,
@@ -125,62 +276,13 @@ const clinic = {
     bestRating: 5,
     worstRating: 1,
   },
-  hasOfferCatalog: {
-    '@type': 'OfferCatalog',
-    name: 'Servicios Médicos Domiciliarios',
-    itemListElement: [
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'MedicalProcedure',
-          name: 'Valoración Médica Domiciliaria',
-          description: 'Consulta médica general a domicilio con diagnóstico y tratamiento profesional',
-          procedureType: 'Medical consultation',
-        },
-      },
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'MedicalProcedure',
-          name: 'Enfermería a Domicilio 24/7',
-          description: 'Servicios de enfermería especializada en el hogar con personal certificado',
-          procedureType: 'Nursing care',
-        },
-      },
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'MedicalProcedure',
-          name: 'Laboratorio Clínico a Domicilio',
-          description: 'Toma de muestras y pruebas diagnósticas en casa con resultados rápidos',
-          procedureType: 'Diagnostic test',
-        },
-      },
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'MedicalProcedure',
-          name: 'Terapias Intravenosas',
-          description: 'Aplicación de sueros, antibióticos y medicamentos IV en domicilio',
-          procedureType: 'Intravenous therapy',
-        },
-      },
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'MedicalProcedure',
-          name: 'Curaciones y Manejo de Heridas',
-          description: 'Tratamiento especializado de heridas, úlceras y suturas a domicilio',
-          procedureType: 'Wound care',
-        },
-      },
-    ],
-  },
+
+  isAcceptingNewPatients: true,
 };
 
 const faqSchema = {
-  '@context': 'https://schema.org',
   '@type': 'FAQPage',
+  '@id': `${siteUrl}/#faq`,
   mainEntity: [
     {
       '@type': 'Question',
@@ -234,151 +336,102 @@ const faqSchema = {
 };
 
 const serviceSchema = {
-  '@context': 'https://schema.org',
   '@type': 'Service',
+  '@id': homeServiceId,
   name: 'Atención Médica Domiciliaria Bogotá',
-  description: 'Servicio médico profesional a domicilio en Bogotá con cobertura 24/7',
+  description: 'Servicio médico profesional a domicilio en Bogotá con cobertura 24/7.',
+  serviceType: 'Medical Service',
+  category: 'Healthcare',
   provider: {
-    '@type': 'MedicalClinic',
-    name: 'SMD Vital Bogotá',
-    url: SITE.site,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Calle 42A Bis Sur #87I-74',
-      addressLocality: 'Bogotá',
-      addressRegion: 'Bogotá D.C.',
-      postalCode: '110836',
-      addressCountry: 'CO',
-    },
-    telephone: '+57-304-291-2564',
-    priceRange: '$$$',
-    image: {
-      '@type': 'ImageObject',
-      url: `${SITE.site}/_astro/hero-image.png`,
-      width: 1200,
-      height: 630,
-    },
+    '@id': clinicId,
   },
-  areaServed: [
-    {
-      '@type': 'City',
-      name: 'Bogotá',
-      sameAs: 'https://es.wikipedia.org/wiki/Bogot%C3%A1',
-    },
-    {
-      '@type': 'City',
-      name: 'Chía',
-      sameAs: 'https://es.wikipedia.org/wiki/Ch%C3%ADa',
-    },
-    {
-      '@type': 'City',
-      name: 'Cajicá',
-      sameAs: 'https://es.wikipedia.org/wiki/Cajic%C3%A1',
-    },
-    {
-      '@type': 'City',
-      name: 'Soacha',
-      sameAs: 'https://es.wikipedia.org/wiki/Soacha',
-    },
-  ],
+  areaServed,
   availableChannel: [
     {
       '@type': 'ServiceChannel',
-      serviceUrl: 'https://wa.link/7cprhk',
-      serviceName: 'WhatsApp',
+      name: 'WhatsApp',
+      serviceUrl: 'https://wa.me/573042912564',
     },
     {
       '@type': 'ServiceChannel',
-      serviceSmsNumber: '+573042912564',
-      serviceName: 'Call Center',
+      name: 'Call Center',
+      servicePhone: {
+        '@type': 'ContactPoint',
+        telephone: '+57-304-291-2564',
+        contactType: 'customer service',
+        availableLanguage: ['es'],
+      },
     },
   ],
-  serviceType: 'Medical Service',
-  category: 'Healthcare',
-};
-
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  '@id': `${SITE.site}/#organization`,
-  name: 'SMD Vital Bogotá',
-  url: SITE.site,
-  logo: {
-    '@type': 'ImageObject',
-    url: '~/assets/images/hero-image.png',
-    width: 1200,
-    height: 630,
+  offers: {
+    '@type': 'AggregateOffer',
+    name: 'Servicios Médicos a Domicilio',
+    description: 'Atención médica profesional en el hogar con médicos certificados.',
+    priceCurrency: 'COP',
+    lowPrice: 80000,
+    highPrice: 250000,
+    offerCount: 8,
+    seller: {
+      '@id': organizationId,
+    },
+    offers: [
+      {
+        '@type': 'Offer',
+        name: 'Valoración Médica Domiciliaria',
+        price: 120000,
+        priceCurrency: 'COP',
+        availability: 'https://schema.org/InStock',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Enfermería Especializada 24/7',
+        price: 100000,
+        priceCurrency: 'COP',
+        availability: 'https://schema.org/InStock',
+      },
+    ],
   },
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: '+57-304-291-2564',
-    contactType: 'customer service',
-    areaServed: 'CO',
-    availableLanguage: ['Spanish'],
-  },
-  sameAs: [
-    'https://www.facebook.com/profile.php?id=61556817451561',
-    'https://www.instagram.com/smdvitalbogota_/',
-    'https://x.com/smdvitalbogotaoficial',
-  ],
 };
 
 const breadcrumbSchema = {
-  '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
+  '@id': `${siteUrl}/#breadcrumb`,
   itemListElement: [
     {
       '@type': 'ListItem',
       position: 1,
       name: 'Inicio',
-      item: SITE.site,
+      item: siteUrl,
     },
   ],
 };
 
-// Review Schema con testimonios
 const reviewSchema = {
-  '@context': 'https://schema.org',
   '@type': 'Review',
+  '@id': `${siteUrl}/#review-laura-gomez`,
   itemReviewed: {
-    '@type': 'MedicalClinic',
-    name: 'SMD Vital Bogotá',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Calle 42A Bis Sur #87I-74',
-      addressLocality: 'Bogotá',
-      addressRegion: 'Bogotá D.C.',
-      postalCode: '110836',
-      addressCountry: 'CO',
-    },
-    telephone: '+57-304-291-2564',
-    priceRange: '$$$',
-    image: {
-      '@type': 'ImageObject',
-      url: `${SITE.site}/_astro/hero-image.png`,
-      width: 1200,
-      height: 630,
-    },
+    '@id': clinicId,
   },
   reviewRating: {
     '@type': 'Rating',
     ratingValue: 4.8,
     bestRating: 5,
+    worstRating: 1,
   },
   author: {
     '@type': 'Person',
     name: 'Laura Gómez',
   },
-  reviewBody: 'SMD Vital me permitió recibir una consulta médica completa sin salir de casa. El médico fue muy profesional y atento. Ahorré tiempo y me sentí muy cómoda. Recomiendo el servicio 100%.',
+  reviewBody:
+    'SMD Vital me permitió recibir una consulta médica completa sin salir de casa. El médico fue muy profesional y atento. Ahorré tiempo y me sentí muy cómoda. Recomiendo el servicio 100%.',
   datePublished: '2025-09-15',
 };
 
-// HowTo Schema para el proceso de agendamiento
 const howToSchema = {
-  '@context': 'https://schema.org',
   '@type': 'HowTo',
+  '@id': `${siteUrl}/#how-to-agendar`,
   name: 'Cómo agendar atención médica a domicilio con SMD Vital',
-  description: 'Guía paso a paso para solicitar un médico a domicilio en Bogotá con respuesta en 45 minutos',
+  description: 'Guía paso a paso para solicitar un médico a domicilio en Bogotá.',
   totalTime: 'PT5M',
   estimatedCost: {
     '@type': 'MonetaryAmount',
@@ -391,66 +444,38 @@ const howToSchema = {
       position: 1,
       name: 'Contactar por WhatsApp o teléfono',
       text: 'Haz clic en WhatsApp o llama al call center. Un asesor clínico te atenderá de inmediato.',
-      url: `${SITE.site}/#features`,
-      image: '~/assets/images/hero-image.png',
-      width: 1200,
-      height: 630,
+      url: `${siteUrl}/#features`,
+      image: heroImageUrl,
     },
     {
       '@type': 'HowToStep',
       position: 2,
       name: 'Confirmar disponibilidad y datos',
       text: 'Validamos la dirección en Bogotá, tomamos antecedentes médicos y definimos el profesional y los insumos requeridos.',
-      url: `${SITE.site}/#features`,
+      url: `${siteUrl}/#features`,
     },
     {
       '@type': 'HowToStep',
       position: 3,
       name: 'Recibir al profesional médico',
-      text: 'El médico o enfermero llega a tu domicilio con un kit completo en menos de 45 minutos. Al finalizar, recibirás indicaciones y seguimiento por WhatsApp.',
-      url: `${SITE.site}/#features`,
+      text: 'El médico o enfermero llega a tu domicilio con un kit completo. Al finalizar, recibirás indicaciones y seguimiento por WhatsApp.',
+      url: `${siteUrl}/#features`,
     },
   ],
 };
 
-// AggregateOffer con rangos de precio
-const aggregateOfferSchema = {
+const schemaGraph = {
   '@context': 'https://schema.org',
-  '@type': 'AggregateOffer',
-  name: 'Servicios Médicos a Domicilio',
-  description: 'Atención médica profesional en tu hogar con médicos certificados',
-  priceCurrency: 'COP',
-  lowPrice: 80000,
-  highPrice: 250000,
-  offerCount: 8,
-  offers: [
-    {
-      '@type': 'Offer',
-      name: 'Valoración Médica Domiciliaria',
-      price: 120000,
-      priceCurrency: 'COP',
-      availability: 'https://schema.org/InStock',
-    },
-    {
-      '@type': 'Offer',
-      name: 'Enfermería Especializada 24/7',
-      price: 100000,
-      priceCurrency: 'COP',
-      availability: 'https://schema.org/InStock',
-    },
+  '@graph': [
+    organizationSchema,
+    clinicSchema,
+    serviceSchema,
+    faqSchema,
+    breadcrumbSchema,
+    reviewSchema,
+    howToSchema,
   ],
-  seller: {
-    '@type': 'Organization',
-    name: 'SMD Vital Bogotá',
-  },
 };
 ---
 
-<script type="application/ld+json" set:html={JSON.stringify(clinic)}></script>
-<script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
-<script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
-<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)}></script>
-<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)}></script>
-<script type="application/ld+json" set:html={JSON.stringify(reviewSchema)}></script>
-<script type="application/ld+json" set:html={JSON.stringify(howToSchema)}></script>
-<script type="application/ld+json" set:html={JSON.stringify(aggregateOfferSchema)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(schemaGraph)}></script>
