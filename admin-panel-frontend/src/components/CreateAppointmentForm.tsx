@@ -169,9 +169,29 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
       toast.success(appointment ? 'Cita actualizada' : 'Cita creada');
       onClose();
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al procesar la cita');
-    }
+onError: (error: any) => {
+  const response = error.response?.data;
+
+  console.error('ERROR CREANDO/ACTUALIZANDO CITA:', response || error);
+
+  const fieldErrors = response?.error?.fieldErrors;
+  const formErrors = response?.error?.formErrors;
+
+  const zodMessages = [
+    ...Object.entries(fieldErrors || {}).flatMap(([field, messages]) =>
+      Array.isArray(messages)
+        ? messages.map(message => `${field}: ${message}`)
+        : []
+    ),
+    ...(Array.isArray(formErrors) ? formErrors : []),
+  ];
+
+  toast.error(
+    zodMessages.length > 0
+      ? zodMessages.join('\n')
+      : response?.message || 'Error al procesar la cita'
+  );
+}
   });
 
   useEffect(() => {
@@ -342,43 +362,85 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isNewPatient && !validateNewPatient()) return;
-    if (!validateForm()) return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    let patientId = formData.patientId;
+  if (isNewPatient && !validateNewPatient()) return;
+  if (!validateForm()) return;
 
-    if (isNewPatient) {
-      try {
-        const result = await quickPatientMutation.mutateAsync(newPatientData);
-        patientId = result.data?.data?.id;
-        if (!patientId) {
-          toast.error('No se pudo crear el paciente');
-          return;
-        }
-        queryClient.invalidateQueries({ queryKey: ['patients-for-appointment'] });
-      } catch {
-        toast.error('Error creando el paciente');
+  const colombiaIso = localInputToColombiaISO(formData.scheduledAt);
+  const scheduledAtISO = new Date(colombiaIso).toISOString();
+
+  if (!appointment && new Date(scheduledAtISO) <= new Date()) {
+    setErrors(prev => ({
+      ...prev,
+      scheduledAt: 'La fecha y hora de la cita deben ser futuras',
+    }));
+    toast.error('No puedes crear una cita en una fecha u hora pasada');
+    return;
+  }
+
+  let patientId = formData.patientId;
+
+  if (isNewPatient) {
+    try {
+      const result = await quickPatientMutation.mutateAsync(newPatientData);
+      patientId = result.data?.data?.id;
+
+      if (!patientId) {
+        toast.error('No se pudo crear el paciente');
         return;
       }
+
+      queryClient.invalidateQueries({ queryKey: ['patients-for-appointment'] });
+    } catch (error: any) {
+      console.error('Error creando paciente:', error.response?.data || error);
+      toast.error(error.response?.data?.message || 'Error creando el paciente');
+      return;
     }
+  }
 
-    const hasCoordinates = formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0;
-    const { isUrgent, ...appointmentPayload } = formData;
-    const notes = [appointmentPayload.notes.trim(), isUrgent ? 'Prioridad: cita urgente.' : '']
-      .filter(Boolean)
-      .join('\n');
+  const hasCoordinates =
+    Number(formData.coordinates.lat) !== 0 ||
+    Number(formData.coordinates.lng) !== 0;
 
-    appointmentMutation.mutate({
-      ...appointmentPayload,
-      patientId,
-      notes,
-      scheduledAt: localInputToColombiaISO(formData.scheduledAt),
-      coordinates: hasCoordinates ? formData.coordinates : null,
-    });
+  const notes = [
+    formData.notes.trim(),
+    formData.isUrgent ? 'Prioridad: cita urgente.' : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const basePayload = {
+    patientId,
+    doctorId: formData.doctorId,
+    serviceId: formData.serviceId,
+    scheduledAt: scheduledAtISO,
+    duration: Number(formData.duration),
+    notes,
+    totalPrice: Number(formData.totalPrice),
+    address: formData.address.trim(),
+    city: formData.city.trim(),
+    coordinates: hasCoordinates
+      ? {
+          lat: Number(formData.coordinates.lat),
+          lng: Number(formData.coordinates.lng),
+        }
+      : null,
   };
 
+  const payload = appointment
+    ? {
+        ...basePayload,
+        diagnosis: formData.diagnosis?.trim() || undefined,
+        prescription: formData.prescription?.trim() || undefined,
+      }
+    : basePayload;
+
+  console.log('PAYLOAD CITA:', payload);
+
+  appointmentMutation.mutate(payload);
+};
   const handleClose = () => {
     setFormData({
       patientId: '',
