@@ -13,7 +13,7 @@ import {
   BarChart3,
   PieChart
 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Boton } from '@/components/ui/Boton';
 import { adminService } from '@/services/admin.service';
 import PaymentsModal from '@/components/PaymentsModal';
 import PaymentDetailsView from '@/components/PaymentDetailsView';
@@ -176,29 +176,29 @@ export default function Payments() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Pagos</h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-1">Administra todos los pagos del sistema</p>
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Gestión de Pagos</h1>
+          <p className="text-muted-foreground dark:text-muted-foreground mt-1">Administra todos los pagos del sistema</p>
         </div>
         <div className="flex items-center space-x-3">
-          <Button variant="outline" onClick={handleViewAll}>
+          <Boton variant="outline" onClick={handleViewAll}>
             <Filter className="w-4 h-4" />
             Ver Todos
-          </Button>
-          <Button onClick={handleCreateNew}>
+          </Boton>
+          <Boton onClick={handleCreateNew}>
             <Plus className="w-4 h-4" />
             Nuevo Pago
-          </Button>
+          </Boton>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
-          <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+          <div key={index} className="bg-white dark:bg-card rounded-lg shadow p-6 border border-border dark:border-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.title}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">{stat.title}</p>
+                <p className="text-2xl font-bold text-foreground dark:text-foreground">{stat.value}</p>
                 <div className="flex items-center mt-2">
                   {stat.changeType === 'positive' ? (
                     <TrendingUp className="w-4 h-4 text-green-500" />
@@ -210,7 +210,7 @@ export default function Payments() {
                   }`}>
                     {stat.change}
                   </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">vs mes anterior</span>
+                  <span className="text-sm text-muted-foreground dark:text-muted-foreground ml-1">vs mes anterior</span>
                 </div>
               </div>
               <div className={`p-3 rounded-full ${stat.bgColor}`}>
@@ -224,16 +224,16 @@ export default function Payments() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-card rounded-lg shadow p-6 border border-border dark:border-border">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Ingresos por Mes</h3>
-            <BarChart3 className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+            <h3 className="text-lg font-semibold text-foreground dark:text-foreground">Ingresos por Mes</h3>
+            <BarChart3 className="w-5 h-5 text-muted-foreground dark:text-muted-foreground" />
           </div>
           {revenueLoading ? (
             <div className="h-64 flex items-center justify-center">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                <p className="text-gray-500 dark:text-gray-400">Cargando datos de ingresos...</p>
+                <p className="text-muted-foreground dark:text-muted-foreground">Cargando formData de ingresos...</p>
               </div>
             </div>
           ) : (
@@ -242,16 +242,16 @@ export default function Payments() {
         </div>
 
         {/* Payment Methods */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-card rounded-lg shadow p-6 border border-border dark:border-border">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Métodos de Pago</h3>
-            <PieChart className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+            <h3 className="text-lg font-semibold text-foreground dark:text-foreground">Métodos de Pago</h3>
+            <PieChart className="w-5 h-5 text-muted-foreground dark:text-muted-foreground" />
           </div>
           {allPaymentsLoading ? (
             <div className="h-64 flex items-center justify-center">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                <p className="text-gray-500 dark:text-gray-400">Cargando métodos de pago...</p>
+                <p className="text-muted-foreground dark:text-muted-foreground">Cargando métodos de pago...</p>
               </div>
             </div>
           ) : (
@@ -261,42 +261,42 @@ export default function Payments() {
       </div>
 
       {/* Recent Payments */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-card rounded-lg shadow border border-border dark:border-border">
+        <div className="p-6 border-b border-border dark:border-border">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Pagos Recientes</h2>
-            <Button variant="outline" onClick={handleViewAll}>
+            <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Pagos Recientes</h2>
+            <Boton variant="outline" onClick={handleViewAll}>
               Ver todos los pagos
-            </Button>
+            </Boton>
           </div>
         </div>
         <div className="p-6">
           {payments.length === 0 ? (
             <div className="text-center py-12">
-              <CreditCard className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay pagos</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">No se encontraron pagos recientes.</p>
-              <Button onClick={handleCreateNew}>
+              <CreditCard className="w-12 h-12 mx-auto mb-4 text-muted-foreground dark:text-muted-foreground" />
+              <h3 className="text-lg font-medium text-foreground dark:text-foreground mb-2">No hay pagos</h3>
+              <p className="text-muted-foreground dark:text-muted-foreground mb-4">No se encontraron pagos recientes.</p>
+              <Boton onClick={handleCreateNew}>
                 <Plus className="w-4 h-4" />
                 Crear Primer Pago
-              </Button>
+              </Boton>
             </div>
           ) : (
             <div className="space-y-4">
               {payments.slice(0, 5).map((payment: any) => (
-                <div key={payment.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow bg-white dark:bg-gray-800">
+                <div key={payment.id} className="flex items-center justify-between p-4 border border-border dark:border-border rounded-lg hover:shadow-md transition-shadow bg-white dark:bg-card">
                   <div className="flex items-center space-x-4">
                     <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
                       <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
+                      <p className="font-medium text-foreground dark:text-foreground">
                         {payment.appointment?.patient?.user?.firstName} {payment.appointment?.patient?.user?.lastName}
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-muted-foreground dark:text-muted-foreground">
                         {payment.appointment?.service?.name}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-muted-foreground dark:text-muted-foreground">
                         {new Date(payment.createdAt).toLocaleDateString('es-ES', {
                           year: 'numeric',
                           month: 'long',
@@ -309,33 +309,33 @@ export default function Payments() {
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="text-right">
-                      <p className="font-semibold text-gray-900 dark:text-white">
+                      <p className="font-semibold text-foreground dark:text-foreground">
                         {new Intl.NumberFormat('es-CO', {
                           style: 'currency',
                           currency: 'COP'
                         }).format(payment.amount)}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{payment.method}</p>
+                      <p className="text-sm text-muted-foreground dark:text-muted-foreground">{payment.method}</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         payment.status === 'COMPLETED' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' :
                         payment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300' :
                         payment.status === 'FAILED' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                        'bg-muted text-muted-foreground dark:bg-card dark:text-muted-foreground'
                       }`}>
                         {payment.status === 'COMPLETED' ? 'Completado' :
                          payment.status === 'PENDING' ? 'Pendiente' :
                          payment.status === 'FAILED' ? 'Fallido' :
                          payment.status}
                       </span>
-                      <Button
+                      <Boton
                         variant="outline"
                         size="sm"
                         onClick={() => handleViewDetails(payment)}
                       >
                         <Eye className="w-4 h-4" />
-                      </Button>
+                      </Boton>
                     </div>
                   </div>
                 </div>

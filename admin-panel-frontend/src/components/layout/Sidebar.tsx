@@ -5,6 +5,7 @@ import {
   Briefcase,
   Calendar,
   CreditCard,
+  DollarSign,
   FileJson,
   FileText,
   LayoutDashboard,
@@ -16,171 +17,249 @@ import {
   X,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
+import { cn } from '@/utils/cn';
 import type { UserRole } from '@/types';
 
-type NavItem = {
-  to: string;
+type ElementoNavegacion = {
+  ruta: string;
   icon: typeof LayoutDashboard;
-  label: string;
+  etiqueta: string;
   description: string;
 };
 
-const adminNavItems: NavItem[] = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard', description: 'Resumen general y métricas clave' },
-  { to: '/users', icon: Users, label: 'Usuarios', description: 'Gestión de pacientes y administradores' },
-  { to: '/doctors', icon: Stethoscope, label: 'Doctores', description: 'Control de profesionales activos' },
-  { to: '/appointments', icon: Calendar, label: 'Citas', description: 'Agenda y coordinación operativa' },
-  { to: '/payments', icon: CreditCard, label: 'Pagos', description: 'Transacciones y conciliaciones' },
-  { to: '/services', icon: Briefcase, label: 'Servicios', description: 'Portafolio de ofertas clínicas' },
-  { to: '/reviews', icon: Star, label: 'Reseñas', description: 'Opiniones y satisfacción del paciente' },
-  { to: '/analytics', icon: BarChart3, label: 'Analíticas', description: 'Indicadores y tendencias' },
-  { to: '/audit', icon: ShieldCheck, label: 'Auditoria', description: 'Bitacora de acciones sensibles' },
-  { to: '/rips', icon: FileJson, label: 'RIPS', description: 'Borradores y export interno' },
-  { to: '/system', icon: Activity, label: 'Sistema', description: 'Salud de la plataforma' },
+const navegacionAdmin: ElementoNavegacion[] = [
+  { ruta: '/',               icon: LayoutDashboard, etiqueta: 'Inicio',       description: 'Resumen general y métricas clave' },
+  { ruta: '/users',          icon: Users,           etiqueta: 'Usuarios',     description: 'Gestión de pacientes y administradores' },
+  { ruta: '/doctors',        icon: Stethoscope,     etiqueta: 'Doctores',     description: 'Control de profesionales activos' },
+  { ruta: '/appointments',   icon: Calendar,        etiqueta: 'Citas',        description: 'Agenda y coordinación operativa' },
+  { ruta: '/payments',       icon: CreditCard,      etiqueta: 'Pagos',        description: 'Transacciones y conciliaciones' },
+  { ruta: '/billing',        icon: DollarSign,      etiqueta: 'Liquidación',  description: 'Cierre financiero con profesionales' },
+  { ruta: '/services',       icon: Briefcase,       etiqueta: 'Servicios',    description: 'Portafolio de ofertas clínicas' },
+  { ruta: '/reviews',        icon: Star,            etiqueta: 'Reseñas',      description: 'Opiniones y satisfacción del paciente' },
+  { ruta: '/analytics',      icon: BarChart3,       etiqueta: 'Analíticas',   description: 'Indicadores y tendencias' },
+  { ruta: '/audit',          icon: ShieldCheck,     etiqueta: 'Auditoría',    description: 'Bitácora de actions sensibles' },
+  { ruta: '/rips',           icon: FileJson,        etiqueta: 'RIPS',         description: 'Borradores y export interno' },
+  { ruta: '/system',         icon: Activity,        etiqueta: 'Sistema',      description: 'Salud de la plataforma' },
 ];
 
-const doctorNavItems: NavItem[] = [
-  { to: '/doctor', icon: LayoutDashboard, label: 'Panel clinico', description: 'Resumen de tu jornada' },
-  { to: '/doctor/appointments', icon: Calendar, label: 'Citas asignadas', description: 'Agenda y atenciones activas' },
+const navegacionDoctor: ElementoNavegacion[] = [
+  { ruta: '/doctor',                  icon: LayoutDashboard, etiqueta: 'Panel clínico',   description: 'Resumen de tu jornada' },
+  { ruta: '/doctor/appointments',     icon: Calendar,        etiqueta: 'Mis citas',       description: 'Agenda y atenciones activas' },
+  { ruta: '/doctor/earnings',         icon: DollarSign,      etiqueta: 'Mis ingresos',    description: 'Pagos y comisiones' },
 ];
 
-const patientNavItems: NavItem[] = [
-  { to: '/patient', icon: LayoutDashboard, label: 'Mi resumen', description: 'Citas y recordatorios' },
-  { to: '/patient/history', icon: FileText, label: 'Mi historial', description: 'Documentos y recetas' },
+const navegacionPaciente: ElementoNavegacion[] = [
+  { ruta: '/patient',          icon: LayoutDashboard, etiqueta: 'Mi resumen',   description: 'Citas y recordatorios' },
+  { ruta: '/patient/history',  icon: FileText,        etiqueta: 'Mi historial', description: 'Documentos y recetas' },
 ];
 
-type SidebarConfig = {
+const navegacionAsesor: ElementoNavegacion[] = [
+  { ruta: '/agent',           icon: LayoutDashboard, etiqueta: 'Mi actividad', description: 'Resumen de tus comisiones' },
+  { ruta: '/agent/earnings',  icon: DollarSign,      etiqueta: 'Comisiones',   description: 'Detalle de pagos pendientes' },
+];
+
+type ConfiguracionSidebar = {
   title: string;
   subtitle: string;
-  navItems: NavItem[];
+  elementos: ElementoNavegacion[];
 };
 
-export const getSidebarConfig = (role?: UserRole | null): SidebarConfig => {
-  if (role === 'DOCTOR' || role === 'NURSE') {
+export function obtenerConfiguracionSidebar(rol?: UserRole | null): ConfiguracionSidebar {
+  if (rol === 'DOCTOR' || rol === 'NURSE') {
     return {
-      title: 'Panel Clinico',
-      subtitle: 'Gestiona tus atenciones y registros clinicos',
-      navItems: doctorNavItems,
+      title: 'Panel Clínico',
+      subtitle: 'Gestiona tus atenciones y registros clínicos',
+      elementos: navegacionDoctor,
     };
   }
-
-  if (role === 'PATIENT') {
+  if (rol === 'PATIENT') {
     return {
-      title: 'Portal del paciente',
-      subtitle: 'Consulta tus citas y documentos clinicos',
-      navItems: patientNavItems,
+      title: 'Portal del Paciente',
+      subtitle: 'Consulta tus citas y documentos clínicos',
+      elementos: navegacionPaciente,
     };
   }
-
+  if (rol === 'AGENT') {
+    return {
+      title: 'Panel de Asesoría',
+      subtitle: 'Gestiona tus comisiones y servicios',
+      elementos: navegacionAsesor,
+    };
+  }
   return {
-    title: 'Panel Medico',
-    subtitle: 'Controla la operacion clinica en tiempo real',
-    navItems: adminNavItems,
+    title: 'Panel Médico',
+    subtitle: 'Controla la operación clínica en tiempo real',
+    elementos: navegacionAdmin,
   };
-};
+}
 
-type SidebarProps = {
-  isOpen: boolean;
+type PropiedadesSidebar = {
+  open: boolean;
   isDesktop: boolean;
   onClose: () => void;
 };
 
-export default function Sidebar({ isOpen, isDesktop, onClose }: SidebarProps) {
+const RUTAS_RAIZ = new Set(['/', '/doctor', '/patient', '/agent']);
+
+export default function Sidebar({ open, isDesktop, onClose }: PropiedadesSidebar) {
   const { user } = useAuthStore();
-  const { title, subtitle, navItems } = getSidebarConfig(user?.role);
-  const rootPaths = new Set(['/', '/doctor', '/patient']);
+  const { title, subtitle, elementos } = obtenerConfiguracionSidebar(user?.role);
 
   return (
-    <aside
-      className={`fixed inset-y-0 left-0 z-40 w-72 transform overflow-hidden bg-white/10 px-4 py-6 shadow-[0_40px_120px_-60px_rgba(56,189,248,0.45)] backdrop-blur-2xl transition-transform duration-300 ease-out dark:bg-slate-900/70 dark:shadow-[0_45px_140px_-65px_rgba(8,47,73,0.55)] lg:static lg:inset-auto lg:h-screen lg:w-80 lg:translate-x-0 lg:bg-white/12 lg:px-8 lg:py-10 lg:shadow-none dark:lg:bg-slate-900/75 ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}
-      aria-label="Navegación principal"
-    >
-      <div className="pointer-events-none absolute inset-0">
-        <div className="glass-blob absolute -left-16 top-[-22%] h-72 w-72 rounded-full bg-cyan-400/25 blur-[130px] dark:bg-cyan-500/15" />
-        <div className="glass-blob glass-blob--reverse absolute right-[-30%] bottom-[-18%] h-80 w-80 rounded-full bg-blue-500/25 blur-[150px] dark:bg-blue-500/15" />
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-white/10 dark:from-white/10 dark:via-white/5 dark:to-white/8" />
-      </div>
+    <>
+      {/* Overlay móvil — solo cuando está open en pantallas pequeñas */}
+      {!isDesktop && open ? (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Cerrar menú lateral"
+          className={cn(
+            'fixed inset-0 z-30 bg-foreground/50 backdrop-blur-sm',
+            'motion-safe:animate-fade-in lg:hidden',
+          )}
+        />
+      ) : null}
 
-      <div className="relative flex h-full flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-100 lg:text-blue-500 dark:text-cyan-200">
-              SMD Vital
-            </p>
-            <h1 className="mt-2 text-2xl font-semibold text-white lg:text-slate-900 dark:text-white">{title}</h1>
-            <p className="mt-1 text-sm text-white/70 lg:text-slate-600 dark:text-slate-300">
-              {subtitle}
-            </p>
+      <aside
+        className={cn(
+          // Base — limpio, blanco/card, sin glassmorphism
+          'flex flex-col border-r border-border bg-card',
+          // Layout responsive
+          'fixed inset-y-0 left-0 z-40 w-72',
+          'lg:static lg:inset-auto lg:h-dvh lg:w-72 lg:flex-shrink-0',
+          // Animación de entrada/salida móvil
+          'motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out',
+          open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        )}
+        aria-label="Navegación principal"
+      >
+        {/* Encabezado — branding + título del panel */}
+        <div className="flex items-start justify-between gap-3 border-b border-border px-5 py-5 lg:px-6">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              {/* Logo mark */}
+              <div
+                aria-hidden="true"
+                className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-info text-white shadow-soft-sm"
+              >
+                <span className="text-sm font-bold">SV</span>
+              </div>
+              <span className="text-sm font-semibold text-foreground">SMD Vital</span>
+            </div>
+            <h1 className="mt-3 text-lg font-semibold leading-tight text-foreground">
+              {title}
+            </h1>
+            <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
           </div>
-          {!isDesktop && (
+          {!isDesktop ? (
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-white/15 bg-white/15 p-2 text-white/70 transition hover:border-white/25 hover:bg-white/25 hover:text-white lg:hidden dark:border-white/10 dark:bg-slate-900/50 dark:hover:border-white/20 dark:hover:bg-slate-900/70"
               aria-label="Cerrar menú lateral"
+              className={cn(
+                'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md',
+                'text-muted-foreground transition-colors',
+                'hover:bg-muted hover:text-foreground',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              )}
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4" aria-hidden="true" />
             </button>
-          )}
+          ) : null}
         </div>
 
-        <nav className="space-y-2">
-          {navItems.map(({ to, icon: Icon, label, description }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={rootPaths.has(to)}
-              onClick={() => {
-                if (!isDesktop) {
-                  onClose();
-                }
-              }}
-              className={({ isActive }) =>
-                [
-                  'group relative block overflow-hidden rounded-2xl px-4 py-3 transition-all backdrop-blur-sm',
-                  isActive
-                    ? 'bg-white/20 text-white shadow-lg shadow-cyan-500/10 ring-1 ring-cyan-200/30 lg:bg-blue-50/90 lg:text-blue-700 dark:bg-cyan-500/15 dark:text-cyan-50 dark:ring-cyan-400/30 dark:shadow-cyan-500/20'
-                    : 'bg-white/8 text-white/70 hover:bg-white/12 hover:text-white lg:bg-white/70 lg:text-slate-500 lg:hover:bg-blue-50/90 lg:hover:text-blue-700 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white',
-                ].join(' ')
-              }
-            >
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-cyan-200 transition group-hover:bg-cyan-500/15 group-hover:text-cyan-100 lg:bg-blue-100/70 lg:text-blue-600 lg:group-hover:bg-blue-500/20 dark:bg-white/10 dark:text-cyan-200 dark:group-hover:bg-cyan-500/20 dark:group-hover:text-cyan-100">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold tracking-tight text-white lg:text-slate-700 dark:text-white">
-                    {label}
-                  </p>
-                  <p className="mt-1 truncate text-xs text-white/55 transition group-hover:text-white/85 lg:text-slate-400 lg:group-hover:text-slate-600 dark:text-slate-300 dark:group-hover:text-slate-100">
-                    {description}
-                  </p>
-                </div>
-                <span className="absolute right-4 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-gradient-to-br from-cyan-300 to-blue-500 opacity-0 transition group-hover:opacity-100 lg:bg-blue-500/80 dark:from-cyan-400 dark:to-blue-400" />
-              </div>
-            </NavLink>
-          ))}
+        {/* Navegación */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4 lg:px-4" aria-label="Secciones">
+          <ul className="space-y-1">
+            {elementos.map(({ ruta, icon: Icono, etiqueta, description }) => (
+              <li key={ruta}>
+                <NavLink
+                  to={ruta}
+                  end={RUTAS_RAIZ.has(ruta)}
+                  onClick={() => {
+                    if (!isDesktop) onClose();
+                  }}
+                  className={({ isActive: estaActivo }) =>
+                    cn(
+                      // Base
+                      'group relative flex items-start gap-3 rounded-lg px-3 py-2.5',
+                      'motion-safe:transition-colors motion-safe:duration-150',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
+                      // Inactivo — texto neutral
+                      !estaActivo && 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                      // Activo — fondo brand sutil + texto brand + indicador lateral
+                      estaActivo &&
+                        'bg-brand-50 text-brand-700 ring-1 ring-brand-200/60 dark:bg-brand-500/15 dark:text-brand-200 dark:ring-brand-500/30',
+                    )
+                  }
+                >
+                  {({ isActive: estaActivo }) => (
+                    <>
+                      {/* Indicador lateral (solo activo) — barra vertical brand */}
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-brand-500',
+                          'motion-safe:transition-opacity motion-safe:duration-150',
+                          estaActivo ? 'opacity-100' : 'opacity-0',
+                        )}
+                      />
+                      <Icono
+                        aria-hidden="true"
+                        className={cn(
+                          'mt-0.5 h-4 w-4 flex-shrink-0',
+                          estaActivo ? 'text-brand-600 dark:text-brand-300' : 'text-muted-foreground group-hover:text-foreground',
+                        )}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className={cn(
+                            'truncate text-sm font-medium',
+                            estaActivo ? 'text-brand-700 dark:text-brand-200' : 'text-foreground',
+                          )}
+                        >
+                          {etiqueta}
+                        </p>
+                        <p
+                          className={cn(
+                            'truncate text-xs',
+                            estaActivo
+                              ? 'text-brand-600/80 dark:text-brand-300/80'
+                              : 'text-muted-foreground',
+                          )}
+                        >
+                          {description}
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
         </nav>
 
-        <div className="relative mt-auto overflow-hidden rounded-2xl border border-white/15 bg-white/12 p-5 text-xs text-white/80 backdrop-blur-xl shadow-[0_25px_80px_-50px_rgba(56,189,248,0.4)] lg:border-white/20 lg:bg-white/65 lg:text-slate-600 dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-200">
-          <div className="pointer-events-none absolute inset-0">
-            <div className="glass-blob absolute -left-12 top-[-40%] h-40 w-40 rounded-full bg-cyan-300/20 blur-[120px] dark:bg-cyan-500/15" />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/10 dark:from-white/10 dark:via-transparent dark:to-white/12" />
-          </div>
-          <div className="relative space-y-2">
-            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200 lg:text-blue-600 dark:text-cyan-300">
-              <LifeBuoy className="h-4 w-4" />
-              Soporte prioritario
-            </p>
-            <p className="text-[13px] leading-relaxed text-white/80 dark:text-slate-200">
-              ¿Necesitas ayuda inmediata? Nuestro equipo médico está disponible 24/7 en{' '}
-              <span className="font-semibold text-white lg:text-blue-700 dark:text-cyan-200">soporte@smdvital.com</span>
-            </p>
-          </div>
+        {/* Pie — soporte */}
+        <div className="border-t border-border px-3 py-3 lg:px-4">
+          <a
+            href="mailto:soporte@smdvital.com"
+            className={cn(
+              'flex items-center gap-3 rounded-lg px-3 py-2.5',
+              'text-muted-foreground transition-colors',
+              'hover:bg-muted hover:text-foreground',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
+            )}
+          >
+            <LifeBuoy className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-foreground">
+                Soporte prioritario
+              </p>
+              <p className="truncate text-xs text-muted-foreground">soporte@smdvital.com</p>
+            </div>
+          </a>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

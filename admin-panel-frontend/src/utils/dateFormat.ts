@@ -1,6 +1,6 @@
 const TZ = 'America/Bogota';
 
-export function formatDateTime(dateString: string | Date): string {
+export function formatearFechaHora(dateString: string | Date): string {
   return new Intl.DateTimeFormat('es-CO', {
     timeZone: TZ,
     year: 'numeric',
@@ -12,7 +12,7 @@ export function formatDateTime(dateString: string | Date): string {
   }).format(new Date(dateString));
 }
 
-export function formatDate(dateString: string | Date): string {
+export function formatearFecha(dateString: string | Date): string {
   return new Intl.DateTimeFormat('es-CO', {
     timeZone: TZ,
     year: 'numeric',
@@ -21,7 +21,7 @@ export function formatDate(dateString: string | Date): string {
   }).format(new Date(dateString));
 }
 
-export function formatTime(dateString: string | Date): string {
+export function formatearHora(dateString: string | Date): string {
   return new Intl.DateTimeFormat('es-CO', {
     timeZone: TZ,
     hour: '2-digit',

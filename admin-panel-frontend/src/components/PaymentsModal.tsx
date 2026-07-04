@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, CreditCard, Filter, Search, Plus, Edit, Trash2, Eye, CheckCircle, XCircle, Clock, AlertCircle, Download, Calendar, DollarSign } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/Select';
-import { Switch } from '@/components/ui/Switch';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
+import { Seleccion } from '@/components/ui/Seleccion';
+import { Interruptor } from '@/components/ui/Interruptor';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Payment, PaymentFilters } from '@/types';
 import PaymentDetailsView from './PaymentDetailsView';
 import CreatePaymentForm from './CreatePaymentForm';
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { DialogoConfirmacion } from '@/components/ui/DialogoConfirmacion';
 
 interface PaymentsModalProps {
   isOpen: boolean;
@@ -142,7 +142,7 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
     toast.success(`Exportando pagos en formato ${format.toUpperCase()}`);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatearFecha = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
@@ -174,14 +174,14 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" onClick={() => setShowCreateForm(true)}>
+            <Boton variant="outline" onClick={() => setShowCreateForm(true)}>
               <Plus className="w-4 h-4" />
               Nuevo Pago
-            </Button>
-            <Button variant="outline" onClick={onClose}>
+            </Boton>
+            <Boton variant="outline" onClick={onClose}>
               <X className="w-4 h-4" />
               Cerrar
-            </Button>
+            </Boton>
           </div>
         </div>
 
@@ -189,10 +189,10 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <Label htmlFor="search">Buscar</Label>
+              <Etiqueta htmlFor="search">Buscar</Etiqueta>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
+                <Entrada
                   id="search"
                   placeholder="Buscar pagos..."
                   value={filters.search}
@@ -203,8 +203,8 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
             </div>
             
             <div>
-              <Label htmlFor="status">Estado</Label>
-              <Select
+              <Etiqueta htmlFor="status">Estado</Etiqueta>
+              <Seleccion
                 value={filters.status}
                 onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as PaymentFilters['status'], page: 1 }))}
               >
@@ -212,12 +212,12 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
                 <option value="PENDING">Pendiente</option>
                 <option value="COMPLETED">Completado</option>
                 <option value="FAILED">Fallido</option>
-              </Select>
+              </Seleccion>
             </div>
 
             <div>
-              <Label htmlFor="method">Método</Label>
-              <Select
+              <Etiqueta htmlFor="method">Método</Etiqueta>
+              <Seleccion
                 value={filters.method}
                 onChange={(e) => setFilters(prev => ({ ...prev, method: e.target.value as PaymentFilters['method'], page: 1 }))}
               >
@@ -228,12 +228,12 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
                 <option value="DAVIPLATA">Davivienda</option>
                 <option value="PSE">PSE</option>
                 <option value="CASH">Efectivo</option>
-              </Select>
+              </Seleccion>
             </div>
 
             <div>
-              <Label htmlFor="dateFrom">Fecha Desde</Label>
-              <Input
+              <Etiqueta htmlFor="dateFrom">Fecha Desde</Etiqueta>
+              <Entrada
                 id="dateFrom"
                 type="date"
                 value={filters.dateFrom}
@@ -244,7 +244,7 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
 
           <div className="flex items-center justify-between mt-4">
             <div className="flex items-center space-x-2">
-              <Button
+              <Boton
                 variant="outline"
                 size="sm"
                 onClick={() => setFilters({
@@ -258,26 +258,26 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
                 })}
               >
                 Limpiar Filtros
-              </Button>
+              </Boton>
             </div>
             
             <div className="flex items-center space-x-2">
-              <Button
+              <Boton
                 variant="outline"
                 size="sm"
                 onClick={() => handleExport('csv')}
               >
                 <Download className="w-4 h-4 mr-1" />
                 CSV
-              </Button>
-              <Button
+              </Boton>
+              <Boton
                 variant="outline"
                 size="sm"
                 onClick={() => handleExport('json')}
               >
                 <Download className="w-4 h-4 mr-1" />
                 JSON
-              </Button>
+              </Boton>
             </div>
           </div>
         </div>
@@ -290,26 +290,26 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
                 {selectedPayments.length} pago(s) seleccionado(s)
               </span>
               <div className="flex items-center space-x-2">
-                <Button
+                <Boton
                   size="sm"
                   onClick={() => handleBulkStatusUpdate('COMPLETED')}
                 >
                   Marcar como Completado
-                </Button>
-                <Button
+                </Boton>
+                <Boton
                   size="sm"
                   variant="outline"
                   onClick={() => handleBulkStatusUpdate('FAILED')}
                 >
                   Marcar como Fallido
-                </Button>
-                <Button
+                </Boton>
+                <Boton
                   size="sm"
                   variant="outline"
                   onClick={() => setSelectedPayments([])}
                 >
                   Cancelar
-                </Button>
+                </Boton>
               </div>
             </div>
           </div>
@@ -419,31 +419,31 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {formatDate(payment.createdAt)}
+                          {formatearFecha(payment.createdAt)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center space-x-2">
-                            <Button
+                            <Boton
                               variant="outline"
                               size="sm"
                               onClick={() => handleViewDetails(payment)}
                             >
                               <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
+                            </Boton>
+                            <Boton
                               variant="outline"
                               size="sm"
                               onClick={() => handleEdit(payment)}
                             >
                               <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
+                            </Boton>
+                            <Boton
                               variant="outline"
                               size="sm"
                               onClick={() => handleDelete(payment.id)}
                             >
                               <Trash2 className="w-4 h-4" />
-                            </Button>
+                            </Boton>
                           </div>
                         </td>
                       </tr>
@@ -455,7 +455,7 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
           )}
         </div>
 
-        {/* Pagination */}
+        {/* Paginacion */}
         {paymentsData?.data?.data?.pagination && paymentsData.data.data.pagination.totalPages > 1 && (
           <div className="border-t p-4">
             <div className="flex items-center justify-between">
@@ -473,25 +473,25 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
                 resultados
               </div>
               <div className="flex items-center space-x-2">
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => setFilters(prev => ({ ...prev, page: prev.page! - 1 }))}
                   disabled={!paymentsData.data.data.pagination.hasPrev}
                 >
                   Anterior
-                </Button>
+                </Boton>
                 <span className="text-sm text-gray-700">
                   Página {filters.page} de {paymentsData.data.data.pagination.totalPages}
                 </span>
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => setFilters(prev => ({ ...prev, page: prev.page! + 1 }))}
                   disabled={!paymentsData.data.data.pagination.hasNext}
                 >
                   Siguiente
-                </Button>
+                </Boton>
               </div>
             </div>
           </div>
@@ -533,7 +533,7 @@ export default function PaymentsModal({ isOpen, onClose }: PaymentsModalProps) {
         />
       )}
 
-      <ConfirmDialog
+      <DialogoConfirmacion
         isOpen={Boolean(pendingDeleteId)}
         title="Eliminar pago"
         message="Esta accion eliminara el pago seleccionado y no se podra deshacer."

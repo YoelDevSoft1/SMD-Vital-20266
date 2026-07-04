@@ -6,7 +6,7 @@ interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
   required?: boolean;
 }
 
-export function Label({ children, required, className, ...props }: LabelProps) {
+export function Etiqueta({ children, required, className, ...props }: LabelProps) {
   return (
     <label
       className={cn(

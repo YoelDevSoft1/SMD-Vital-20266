@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
 import { adminService } from '@/services/admin.service';
 import toast from 'react-hot-toast';
 
@@ -99,7 +99,7 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CreateDoctorData, string>> = {};
 
-    if (!formData.email) newErrors.email = 'El email es requerido';
+    if (!formData.email) newErrors.email = 'El email es required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'El email no es válido';
     }
@@ -109,9 +109,9 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
       newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
     }
 
-    if (!formData.firstName) newErrors.firstName = 'El nombre es requerido';
-    if (!formData.lastName) newErrors.lastName = 'El apellido es requerido';
-    if (!formData.licenseNumber) newErrors.licenseNumber = 'El número de licencia es requerido';
+    if (!formData.firstName) newErrors.firstName = 'El firstName es required';
+    if (!formData.lastName) newErrors.lastName = 'El lastName es required';
+    if (!formData.licenseNumber) newErrors.licenseNumber = 'El número de licencia es required';
     if (!formData.specialty) newErrors.specialty = 'La especialidad es requerida';
     if (formData.experience < 0) newErrors.experience = 'La experiencia debe ser mayor a 0';
     if (formData.consultationFee < 0) newErrors.consultationFee = 'La tarifa debe ser mayor a 0';
@@ -141,8 +141,8 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="firstName">Nombre *</Label>
-          <Input
+          <Etiqueta htmlFor="firstName">Nombre *</Etiqueta>
+          <Entrada
             id="firstName"
             value={formData.firstName}
             onChange={(e) => handleChange('firstName', e.target.value)}
@@ -151,8 +151,8 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
           />
         </div>
         <div>
-          <Label htmlFor="lastName">Apellido *</Label>
-          <Input
+          <Etiqueta htmlFor="lastName">Apellido *</Etiqueta>
+          <Entrada
             id="lastName"
             value={formData.lastName}
             onChange={(e) => handleChange('lastName', e.target.value)}
@@ -163,8 +163,8 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
       </div>
 
       <div>
-        <Label htmlFor="email">Email *</Label>
-        <Input
+        <Etiqueta htmlFor="email">Email *</Etiqueta>
+        <Entrada
           id="email"
           type="email"
           value={formData.email}
@@ -175,8 +175,8 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
       </div>
 
       <div>
-        <Label htmlFor="password">Contraseña *</Label>
-        <Input
+        <Etiqueta htmlFor="password">Contraseña *</Etiqueta>
+        <Entrada
           id="password"
           type="password"
           value={formData.password}
@@ -187,8 +187,8 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
       </div>
 
       <div>
-        <Label htmlFor="phone">Teléfono</Label>
-        <Input
+        <Etiqueta htmlFor="phone">Teléfono</Etiqueta>
+        <Entrada
           id="phone"
           type="tel"
           value={formData.phone}
@@ -200,8 +200,8 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="licenseNumber">Número de Licencia *</Label>
-          <Input
+          <Etiqueta htmlFor="licenseNumber">Número de Licencia *</Etiqueta>
+          <Entrada
             id="licenseNumber"
             value={formData.licenseNumber}
             onChange={(e) => handleChange('licenseNumber', e.target.value)}
@@ -210,7 +210,7 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
           />
         </div>
         <div>
-          <Label htmlFor="specialty">Especialidad *</Label>
+          <Etiqueta htmlFor="specialty">Especialidad *</Etiqueta>
           <select
             id="specialty"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -228,8 +228,8 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="experience">Años de Experiencia *</Label>
-          <Input
+          <Etiqueta htmlFor="experience">Años de Experiencia *</Etiqueta>
+          <Entrada
             id="experience"
             type="number"
             min="0"
@@ -240,8 +240,8 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
           />
         </div>
         <div>
-          <Label htmlFor="consultationFee">Tarifa de Consulta *</Label>
-          <Input
+          <Etiqueta htmlFor="consultationFee">Tarifa de Consulta *</Etiqueta>
+          <Entrada
             id="consultationFee"
             type="number"
             min="0"
@@ -254,14 +254,14 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
       </div>
 
       <div>
-        <Label htmlFor="bio">Biografía</Label>
+        <Etiqueta htmlFor="bio">Biografía</Etiqueta>
         <textarea
           id="bio"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           rows={3}
           value={formData.bio}
           onChange={(e) => handleChange('bio', e.target.value)}
-          placeholder="Breve descripción profesional..."
+          placeholder="Breve description profesional..."
         />
       </div>
 
@@ -279,21 +279,21 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
       </div>
 
       <div className="flex justify-end space-x-3 pt-4 border-t">
-        <Button
+        <Boton
           type="button"
           variant="outline"
           onClick={onCancel}
           disabled={createDoctorMutation.isPending}
         >
           Cancelar
-        </Button>
-        <Button
+        </Boton>
+        <Boton
           type="submit"
           disabled={createDoctorMutation.isPending}
           className="bg-blue-600 hover:bg-blue-700"
         >
           {createDoctorMutation.isPending ? 'Creando...' : 'Crear Doctor'}
-        </Button>
+        </Boton>
       </div>
     </form>
   );

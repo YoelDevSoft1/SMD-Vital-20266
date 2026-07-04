@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, CreditCard, DollarSign, Save, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/Select';
-import { GlassModal } from '@/components/ui/GlassModal';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
+import { Seleccion } from '@/components/ui/Seleccion';
+import { ModalCristal } from '@/components/ui/ModalCristal';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Payment, Appointment } from '@/types';
@@ -112,11 +112,11 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
     }
 
     if (!formData.method) {
-      newErrors.method = 'El método de pago es requerido';
+      newErrors.method = 'El método de pago es required';
     }
 
     if (!formData.status) {
-      newErrors.status = 'El estado es requerido';
+      newErrors.status = 'El estado es required';
     }
 
     setErrors(newErrors);
@@ -155,7 +155,7 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
   );
 
   return (
-    <GlassModal isOpen={isOpen} onClose={onClose} size="xl" variant="glass">
+    <ModalCristal isOpen={isOpen} onClose={onClose} size="xl" variant="glass">
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-white/10 dark:border-white/5">
           <div className="flex items-center space-x-3">
@@ -171,18 +171,18 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
               </p>
             </div>
           </div>
-          <Button variant="outline" onClick={onClose}>
+          <Boton variant="outline" onClick={onClose}>
             <X className="w-4 h-4" />
             Cerrar
-          </Button>
+          </Boton>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Appointment Selection */}
           <div className="space-y-2">
-            <Label htmlFor="appointmentId">Cita *</Label>
-            <Select
+            <Etiqueta htmlFor="appointmentId">Cita *</Etiqueta>
+            <Seleccion
               value={formData.appointmentId}
               onChange={(e) => handleInputChange('appointmentId', e.target.value)}
             >
@@ -192,7 +192,7 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
                   {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName} - {appointment.service?.name} - {new Date(appointment.scheduledAt).toLocaleDateString('es-ES')}
                 </option>
               ))}
-            </Select>
+            </Seleccion>
             {errors.appointmentId && (
               <p className="text-sm text-red-600 flex items-center">
                 <AlertCircle className="w-4 h-4 mr-1" />
@@ -238,10 +238,10 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
           {/* Amount and Currency */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="amount">Monto *</Label>
+              <Etiqueta htmlFor="amount">Monto *</Etiqueta>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
+                <Entrada
                   id="amount"
                   type="number"
                   step="0.01"
@@ -261,23 +261,23 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="currency">Moneda</Label>
-              <Select
+              <Etiqueta htmlFor="currency">Moneda</Etiqueta>
+              <Seleccion
                 value={formData.currency}
                 onChange={(e) => handleInputChange('currency', e.target.value)}
               >
                 <option value="COP">Peso Colombiano (COP)</option>
                 <option value="USD">Dólar Americano (USD)</option>
                 <option value="EUR">Euro (EUR)</option>
-              </Select>
+              </Seleccion>
             </div>
           </div>
 
           {/* Payment Method and Status */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="method">Método de Pago *</Label>
-              <Select
+              <Etiqueta htmlFor="method">Método de Pago *</Etiqueta>
+              <Seleccion
                 value={formData.method}
                 onChange={(e) => handleInputChange('method', e.target.value)}
               >
@@ -286,7 +286,7 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
                     {option.label}
                   </option>
                 ))}
-              </Select>
+              </Seleccion>
               {errors.method && (
                 <p className="text-sm text-red-600 flex items-center">
                   <AlertCircle className="w-4 h-4 mr-1" />
@@ -296,8 +296,8 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="status">Estado *</Label>
-              <Select
+              <Etiqueta htmlFor="status">Estado *</Etiqueta>
+              <Seleccion
                 value={formData.status}
                 onChange={(e) => handleInputChange('status', e.target.value)}
               >
@@ -306,7 +306,7 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
                     {option.label}
                   </option>
                 ))}
-              </Select>
+              </Seleccion>
               {errors.status && (
                 <p className="text-sm text-red-600 flex items-center">
                   <AlertCircle className="w-4 h-4 mr-1" />
@@ -319,8 +319,8 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
           {/* Transaction Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="transactionId">ID de Transacción</Label>
-              <Input
+              <Etiqueta htmlFor="transactionId">ID de Transacción</Etiqueta>
+              <Entrada
                 id="transactionId"
                 placeholder="TXN-123456789"
                 value={formData.transactionId}
@@ -329,8 +329,8 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
             </div>
 
           {/* <div className="space-y-2">
-            <Label htmlFor="stripePaymentIntentId">Stripe Payment Intent ID</Label>
-            <Input
+            <Etiqueta htmlFor="stripePaymentIntentId">Stripe Payment Intent ID</Etiqueta>
+            <Entrada
               id="stripePaymentIntentId"
               placeholder="pi_1234567890"
               value={formData.stripePaymentIntentId}
@@ -341,15 +341,15 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
 
           {/* Actions */}
           <div className="flex items-center justify-end space-x-3 pt-6 border-t">
-            <Button
+            <Boton
               type="button"
               variant="outline"
               onClick={onClose}
               disabled={paymentMutation.isPending}
             >
               Cancelar
-            </Button>
-            <Button
+            </Boton>
+            <Boton
               type="submit"
               disabled={paymentMutation.isPending}
             >
@@ -364,9 +364,9 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
                   {isEditing ? 'Actualizar Pago' : 'Crear Pago'}
                 </div>
               )}
-            </Button>
+            </Boton>
           </div>
         </form>
-    </GlassModal>
+    </ModalCristal>
   );
 }

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { formatDateTime, formatDate } from '@/utils/dateFormat';
+import { formatearFechaHora, formatearFecha } from '@/utils/dateFormat';
 import { useQuery } from '@tanstack/react-query';
 import { AlertCircle, FileDown, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { clinicalService } from '@/services/clinical.service';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/Button';
+import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
+import { Boton } from '@/components/ui/Boton';
 import type { PatientHistory as PatientHistoryType } from '@/types';
 
 export default function PatientHistory() {
@@ -54,10 +54,10 @@ export default function PatientHistory() {
     return (
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Mi historial</h1>
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Mi historial</h1>
         </div>
-        <Card className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
-          <CardContent className="flex flex-col gap-4 p-6 text-sm">
+        <Tarjeta className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
+          <TarjetaContenido className="flex flex-col gap-4 p-6 text-sm">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
               <div>
@@ -70,16 +70,16 @@ export default function PatientHistory() {
               </div>
             </div>
             <div>
-              <Button
+              <Boton
                 variant="outline"
                 onClick={() => refetch()}
-                className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                className="dark:text-foreground dark:border-border dark:hover:bg-muted"
               >
                 Reintentar
-              </Button>
+              </Boton>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
     );
   }
@@ -88,80 +88,80 @@ export default function PatientHistory() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Mi historial</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Mi historial</h1>
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             Consulta tus citas y documentos clinicos descargables.
           </p>
         </div>
-        <Button
+        <Boton
           variant="outline"
           onClick={() => refetch()}
           isLoading={isFetching}
-          className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+          className="dark:text-foreground dark:border-border dark:hover:bg-muted"
         >
           <RefreshCw className={isFetching ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />
           Actualizar
-        </Button>
+        </Boton>
       </div>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado>
+          <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
             Historial de citas
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
+          </TarjetaTitulo>
+        </TarjetaEncabezado>
+        <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               Cargando citas...
             </div>
           ) : appointments.length === 0 ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               No hay citas registradas.
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            <div className="divide-y divide-border dark:divide-border">
               {appointments.map((appointment) => (
                 <div
                   key={appointment.id}
                   className="flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                       {appointment.service?.name || 'Servicio no definido'}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatDateTime(appointment.scheduledAt)} · Dr.{' '}
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                      {formatearFechaHora(appointment.scheduledAt)} · Dr.{' '}
                       {appointment.doctor?.user?.firstName} {appointment.doctor?.user?.lastName}
                     </p>
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-xs text-muted-foreground dark:text-muted-foreground">
                     {appointment.status}
                   </span>
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </TarjetaContenido>
+      </Tarjeta>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado>
+          <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
             Historias medicas
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
+          </TarjetaTitulo>
+        </TarjetaEncabezado>
+        <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               Cargando historias...
             </div>
           ) : medicalRecords.length === 0 ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               No hay historias medicas registradas.
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            <div className="divide-y divide-border dark:divide-border">
               {medicalRecords.map((record) => {
                 const canDownload = Boolean(record.pdfPath);
                 return (
@@ -170,51 +170,51 @@ export default function PatientHistory() {
                     className="flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                      <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                         {record.title}
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                         {record.doctor?.user?.firstName} {record.doctor?.user?.lastName} ·{' '}
-                        {formatDate(record.createdAt)}
+                        {formatearFecha(record.createdAt)}
                       </p>
                     </div>
-                    <Button
+                    <Boton
                       variant="outline"
                       size="sm"
                       onClick={() =>
                         handleDownload('record', record.id, `historia-${record.id}.pdf`)
                       }
                       disabled={downloadingId === record.id || !canDownload}
-                      className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                      className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                     >
                       <FileDown className="h-4 w-4" />
                       {canDownload ? 'Descargar' : 'No disponible'}
-                    </Button>
+                    </Boton>
                   </div>
                 );
               })}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </TarjetaContenido>
+      </Tarjeta>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado>
+          <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
             Formulas medicas
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
+          </TarjetaTitulo>
+        </TarjetaEncabezado>
+        <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               Cargando formulas...
             </div>
           ) : prescriptions.length === 0 ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               No hay formulas medicas registradas.
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            <div className="divide-y divide-border dark:divide-border">
               {prescriptions.map((prescription) => {
                 const canDownload = Boolean(prescription.pdfPath);
                 return (
@@ -223,78 +223,78 @@ export default function PatientHistory() {
                     className="flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                        Formula del {formatDate(prescription.createdAt)}
+                      <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
+                        Formula del {formatearFecha(prescription.createdAt)}
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                         {prescription.doctor?.user?.firstName} {prescription.doctor?.user?.lastName}
                       </p>
                       {prescription.items?.length ? (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                           {prescription.items.map((item) => item.medication).join(', ')}
                         </p>
                       ) : null}
                     </div>
-                    <Button
+                    <Boton
                       variant="outline"
                       size="sm"
                       onClick={() =>
                         handleDownload('prescription', prescription.id, `formula-${prescription.id}.pdf`)
                       }
                       disabled={downloadingId === prescription.id || !canDownload}
-                      className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                      className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                     >
                       <FileDown className="h-4 w-4" />
                       {canDownload ? 'Descargar' : 'No disponible'}
-                    </Button>
+                    </Boton>
                   </div>
                 );
               })}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </TarjetaContenido>
+      </Tarjeta>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado>
+          <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
             Envio de documentos
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
+          </TarjetaTitulo>
+        </TarjetaEncabezado>
+        <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               Cargando envios...
             </div>
           ) : documentDeliveries.length === 0 ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               No hay envios registrados.
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            <div className="divide-y divide-border dark:divide-border">
               {documentDeliveries.map((delivery) => (
                 <div
                   key={delivery.id}
                   className="flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                       {delivery.email}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatDateTime(delivery.createdAt)}
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                      {formatearFechaHora(delivery.createdAt)}
                       {delivery.lastError ? ` · ${delivery.lastError}` : ''}
                     </p>
                   </div>
-                  <span className="rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200">
+                  <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground dark:border-border dark:text-foreground">
                     {delivery.status}
                   </span>
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </TarjetaContenido>
+      </Tarjeta>
     </div>
   );
 }

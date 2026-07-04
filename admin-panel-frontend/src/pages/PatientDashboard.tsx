@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { formatDateTime } from '@/utils/dateFormat';
+import { formatearFechaHora } from '@/utils/dateFormat';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, FileText, Activity, AlertCircle } from 'lucide-react';
 import { clinicalService } from '@/services/clinical.service';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/Button';
+import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
+import { Boton } from '@/components/ui/Boton';
 import type { PatientHistory } from '@/types';
 
 export default function PatientDashboard() {
@@ -34,10 +34,10 @@ export default function PatientDashboard() {
     return (
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Mi resumen</h1>
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Mi resumen</h1>
         </div>
-        <Card className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
-          <CardContent className="flex flex-col gap-4 p-6 text-sm">
+        <Tarjeta className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
+          <TarjetaContenido className="flex flex-col gap-4 p-6 text-sm">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
               <div>
@@ -50,16 +50,16 @@ export default function PatientDashboard() {
               </div>
             </div>
             <div>
-              <Button
+              <Boton
                 variant="outline"
                 onClick={() => refetch()}
-                className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                className="dark:text-foreground dark:border-border dark:hover:bg-muted"
               >
                 Reintentar
-              </Button>
+              </Boton>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
     );
   }
@@ -68,23 +68,23 @@ export default function PatientDashboard() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Mi resumen</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Mi resumen</h1>
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             Consulta tus proximas citas y documentos clinicos.
           </p>
         </div>
-        <Button variant="outline" onClick={() => navigate('/patient/history')}>
+        <Boton variant="outline" onClick={() => navigate('/patient/history')}>
           Ver historial
-        </Button>
+        </Boton>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Citas registradas</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Citas registradas</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {appointments.length}
                 </p>
               </div>
@@ -92,15 +92,15 @@ export default function PatientDashboard() {
                 <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Historias medicas</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Historias medicas</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {medicalRecords.length}
                 </p>
               </div>
@@ -108,15 +108,15 @@ export default function PatientDashboard() {
                 <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Formulas medicas</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Formulas medicas</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {prescriptions.length}
                 </p>
               </div>
@@ -124,55 +124,55 @@ export default function PatientDashboard() {
                 <Activity className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-row items-center justify-between">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
               Proximas citas
-            </CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            </TarjetaTitulo>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
               {isLoading ? 'Cargando...' : `${upcomingAppointments.length} en agenda`}
             </p>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
+        </TarjetaEncabezado>
+        <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               Cargando citas...
             </div>
           ) : upcomingAppointments.length === 0 ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               No tienes citas proximas.
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            <div className="divide-y divide-border dark:divide-border">
               {upcomingAppointments.map((appointment) => (
                 <div
                   key={appointment.id}
                   className="flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                       {appointment.service?.name || 'Servicio no definido'}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatDateTime(appointment.scheduledAt)} · Dr.{' '}
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                      {formatearFechaHora(appointment.scheduledAt)} · Dr.{' '}
                       {appointment.doctor?.user?.firstName} {appointment.doctor?.user?.lastName}
                     </p>
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-xs text-muted-foreground dark:text-muted-foreground">
                     {appointment.city}
                   </span>
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </TarjetaContenido>
+      </Tarjeta>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Stethoscope, DollarSign, Clock, Calendar, Activity, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react';
-import { Button } from './ui/Button';
+import { Boton } from './ui/Boton';
 import type { Service, ServiceCategory } from '@/types';
 
 interface ServiceDetailsViewProps {
@@ -53,13 +53,13 @@ export default function ServiceDetailsView({ service, onClose, onEdit }: Service
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" onClick={onEdit}>
+            <Boton variant="outline" size="sm" onClick={onEdit}>
               <Edit className="w-4 h-4" />
               Editar
-            </Button>
-            <Button variant="ghost" size="icon" onClick={onClose}>
+            </Boton>
+            <Boton variant="ghost" size="icon" onClick={onClose}>
               <X className="w-5 h-5" />
-            </Button>
+            </Boton>
           </div>
         </div>
 
@@ -200,13 +200,13 @@ export default function ServiceDetailsView({ service, onClose, onEdit }: Service
 
         {/* Footer */}
         <div className="flex justify-end space-x-3 p-6 border-t bg-gray-50">
-          <Button variant="outline" onClick={onClose}>
+          <Boton variant="outline" onClick={onClose}>
             Cerrar
-          </Button>
-          <Button onClick={onEdit}>
+          </Boton>
+          <Boton onClick={onEdit}>
             <Edit className="w-4 h-4" />
             Editar Servicio
-          </Button>
+          </Boton>
         </div>
       </div>
     </div>

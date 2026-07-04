@@ -8,7 +8,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: 'glass' | 'solid';
 }
 
-export function Input({ label, error, helperText, variant = 'glass', className, ...props }: InputProps) {
+export function Entrada({ label, error, helperText, variant = 'glass', className, ...props }: InputProps) {
   const baseStyles = [
     'w-full px-4 py-2.5 rounded-lg text-sm',
     'focus:outline-none focus:ring-2 focus:ring-offset-1',

@@ -20,8 +20,12 @@ import DoctorDashboard from './pages/DoctorDashboard';
 import DoctorAppointments from './pages/DoctorAppointments';
 import PatientDashboard from './pages/PatientDashboard';
 import PatientHistory from './pages/PatientHistory';
+// Billing Core
+import MyEarnings from './pages/MyEarnings';
+import MyCommissions from './pages/MyCommissions';
+import BillingDashboard from './pages/BillingDashboard';
 import type { UserRole } from './types';
-import { getHomePath } from './utils/roles';
+import { obtenerRutaInicio } from './utils/roles';
 import { realtimeService } from './services/realtime.service';
 
 function RoleRoute({
@@ -38,7 +42,7 @@ function RoleRoute({
   }
 
   if (!allowedRoles.includes(user.role)) {
-    return <Navigate to={getHomePath(user.role)} replace />;
+    return <Navigate to={obtenerRutaInicio(user.role)} replace />;
   }
 
   return <>{children}</>;
@@ -92,6 +96,7 @@ export default function App() {
           <Route path="system" element={<SystemHealth />} />
           <Route path="audit" element={<AuditLogs />} />
           <Route path="rips" element={<RipsDrafts />} />
+          <Route path="billing" element={<BillingDashboard />} />
         </Route>
 
         <Route
@@ -104,6 +109,7 @@ export default function App() {
         >
           <Route index element={<DoctorDashboard />} />
           <Route path="appointments" element={<DoctorAppointments />} />
+          <Route path="earnings" element={<MyEarnings />} />
         </Route>
 
         <Route
@@ -116,6 +122,18 @@ export default function App() {
         >
           <Route index element={<PatientDashboard />} />
           <Route path="history" element={<PatientHistory />} />
+        </Route>
+
+        <Route
+          path="/agent"
+          element={
+            <RoleRoute allowedRoles={['AGENT']}>
+              <DashboardLayout />
+            </RoleRoute>
+          }
+        >
+          <Route index element={<MyCommissions />} />
+          <Route path="earnings" element={<MyEarnings />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" replace />} />

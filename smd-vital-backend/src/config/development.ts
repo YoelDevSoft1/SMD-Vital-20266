@@ -12,7 +12,7 @@ export const devConfig = {
     refreshSecret: "dev-refresh-secret-key",
     refreshExpiresIn: "7d"
   },
-  port: 3000,
+  port: 4040,
   nodeEnv: "development",
   cors: {
     origin: "http://localhost:4322",

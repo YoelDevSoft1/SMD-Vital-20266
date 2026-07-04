@@ -1,85 +1,85 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { authService, RegisterCredentials } from '@/services/auth.service';
+import { authService, type RegisterCredentials } from '@/services/auth.service';
 import { useAuthStore } from '@/store/auth.store';
-import { getHomePath } from '@/utils/roles';
+import { obtenerRutaInicio } from '@/utils/roles';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
+import { Alerta } from '@/components/ui/Alerta';
+import { Insignia } from '@/components/ui/Insignia';
 import toast from 'react-hot-toast';
-import {
-  Eye,
-  EyeOff,
-  Loader2,
-  ShieldCheck,
-  Sparkles,
-  Stethoscope,
-  UserPlus,
-  Users,
-} from 'lucide-react';
+import { Eye, EyeOff, ShieldCheck, Sparkles, Stethoscope, Users } from 'lucide-react';
+
+interface ErroresFormulario {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
 
 export default function Register() {
-  const [formData, setFormData] = useState<RegisterCredentials>({
+  const [formData, setDatos] = useState<RegisterCredentials>({
     email: '',
     password: '',
     firstName: '',
     lastName: '',
     phone: '',
   });
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [confirmPassword, setConfirmarContrasena] = useState('');
+  const [showPassword, setMostrarContrasena] = useState(false);
+  const [showConfirmPassword, setMostrarConfirmar] = useState(false);
+  const [errores, setErrores] = useState<ErroresFormulario>({});
 
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
 
-  const registerMutation = useMutation({
+  const registroMutacion = useMutation({
     mutationFn: authService.register,
     onSuccess: (response) => {
       const { user, accessToken } = response.data.data;
       setAuth(user, accessToken);
       toast.success('Registro exitoso. Bienvenido a SMD Vital.');
-      navigate(getHomePath(user.role));
+      navigate(obtenerRutaInicio(user.role));
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || 'Error al crear la cuenta';
-      toast.error(message);
-    },
+    onError: (e: unknown) =>
+      toast.error(
+        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+          'Error al crear la cuenta',
+      ),
   });
 
-  const highlights = useMemo(
+  const benefits = useMemo(
     () => [
       {
         icon: ShieldCheck,
         title: 'Acceso seguro',
-        description: 'Protege tu informacion clinica con una cuenta verificada.',
+        description: 'Protege tu información clínica con una cuenta verificada.',
       },
       {
         icon: Users,
-        title: 'Atencion conectada',
-        description: 'Mantente al dia con el equipo medico y tus citas.',
+        title: 'Atención conectada',
+        description: 'Mantente al día con el equipo médico y tus citas.',
       },
       {
         icon: Sparkles,
         title: 'Historial centralizado',
-        description: 'Accede a tus registros y documentos clinicos en un solo lugar.',
+        description: 'Accede a tus registros y documentos clínicos en un solo lugar.',
       },
     ],
-    []
+    [],
   );
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: ErroresFormulario = {};
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'El nombre es requerido';
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'El apellido es requerido';
-    }
+    if (!formData.firstName.trim()) newErrors.firstName = 'El firstName es required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'El lastName es required';
 
     if (!formData.email.trim()) {
-      newErrors.email = 'El email es requerido';
+      newErrors.email = 'El email es required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'El email no es válido';
     }
@@ -99,291 +99,274 @@ export default function Register() {
       newErrors.confirmPassword = 'Las contraseñas no coinciden';
     }
 
-    setErrors(newErrors);
+    setErrores(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      registerMutation.mutate(formData);
-    }
+    if (validateForm()) registroMutacion.mutate(formData);
   };
 
-  const handleInputChange = (field: keyof RegisterCredentials, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }));
+  const handleInputChange = (campo: keyof RegisterCredentials, valor: string) => {
+    setDatos((prev) => ({ ...prev, [campo]: valor }));
+    // Limpiar error del campo cuando el usuario empieza a corregir
+    const mapaErrores: Record<keyof RegisterCredentials, keyof ErroresFormulario> = {
+      firstName: 'firstName',
+      lastName: 'lastName',
+      email: 'email',
+      password: 'password',
+      phone: 'confirmPassword',
+    };
+    const errorKey = mapaErrores[campo];
+    if (errores[errorKey]) {
+      setErrores((prev) => ({ ...prev, [errorKey]: undefined }));
     }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#020617]">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="glass-blob absolute -left-24 -top-32 h-[420px] w-[420px] rounded-full bg-cyan-500/14 blur-[180px] mix-blend-screen" />
-        <div className="glass-blob glass-blob--reverse absolute right-[-10%] top-1/5 h-[520px] w-[520px] rounded-full bg-sky-400/16 blur-[210px] mix-blend-screen" />
-        <div className="glass-blob glass-blob--slow absolute left-1/2 bottom-[-220px] h-[420px] w-[520px] -translate-x-1/2 rounded-full bg-blue-500/18 blur-[230px] mix-blend-screen" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_65%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(14,165,233,0.1),transparent_70%)]" />
-        <div className="absolute inset-x-0 bottom-[-180px] h-[360px] bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
-      </div>
+    <main className="relative min-h-dvh overflow-hidden bg-slate-950 text-foreground">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-brand-500/20 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-32 bottom-1/4 h-96 w-96 rounded-full bg-info/15 blur-3xl"
+      />
 
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-10">
-        <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-2">
-          <div className="order-2 space-y-8 text-white/90 lg:order-1 lg:max-w-xl lg:space-y-12">
-            <div className="inline-flex w-full max-w-xs items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur">
-              <UserPlus className="h-5 w-5 text-cyan-300" />
-              <span className="text-sm tracking-wide text-white/80">
-                Crea tu cuenta de paciente en minutos
-              </span>
-            </div>
+      <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-6xl flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
+        <div className="grid w-full items-center gap-8 lg:grid-cols-2 lg:gap-12">
+          {/* Columna marketing */}
+          <section className="order-2 space-y-8 text-white lg:order-1">
+            <Insignia
+              variant="success"
+              size="md"
+              icon={Users}
+              className="border-success/30 bg-success-muted text-success"
+            >
+              Crea tu cuenta de paciente en minutos
+            </Insignia>
 
             <div className="space-y-4">
               <h1 className="text-3xl font-semibold leading-tight text-white sm:text-4xl lg:text-5xl">
                 Tu salud organizada en un solo panel
               </h1>
-              <p className="text-base text-white/70 sm:text-lg">
-                Registra tu cuenta para ver tus citas, resultados y documentos clinicos.
+              <p className="max-w-lg text-base text-white/70 sm:text-lg">
+                Registra tu cuenta para ver tus citas, resultados y documentos clínicos.
               </p>
             </div>
 
-            <dl className="space-y-4">
-              {highlights.map(({ icon: Icon, title, description }) => (
-                <div
+            <ul className="space-y-3">
+              {benefits.map(({ icon: Icono, title, description }) => (
+                <li
                   key={title}
-                  className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur transition duration-300 hover:border-cyan-200/60 hover:bg-white/10"
+                  className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
                 >
-                  <div className="pointer-events-none absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100">
-                    <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-cyan-400/18 via-transparent to-blue-500/25 blur-3xl" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/12 via-transparent to-white/10" />
+                  <div
+                    aria-hidden="true"
+                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-success-muted text-success ring-1 ring-success/30"
+                  >
+                    <Icono className="h-5 w-5" />
                   </div>
-                  <div className="relative flex gap-4">
-                    <div className="mt-1 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-200 shadow-inner shadow-cyan-500/20">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <dt className="text-base font-semibold text-white">{title}</dt>
-                      <dd className="mt-1 text-sm text-white/70">{description}</dd>
-                    </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="mt-0.5 text-sm text-white/70">{description}</p>
                   </div>
-                </div>
+                </li>
               ))}
-            </dl>
-          </div>
+            </ul>
+          </section>
 
-          <div className="order-1 lg:order-2 lg:justify-self-end">
-            <div className="relative">
-              <div className="absolute inset-0 -translate-y-5 scale-[0.97] rounded-[36px] bg-gradient-to-br from-white/16 via-cyan-200/8 to-transparent opacity-60 blur-3xl" />
-              <div className="relative overflow-hidden rounded-[32px] border border-white/20 bg-white/12 p-8 shadow-[0_45px_140px_-60px_rgba(56,189,248,0.45)] backdrop-blur-2xl sm:p-10">
-                <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[32px]">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/18 via-cyan-100/6 to-transparent" />
-                  <div className="absolute -left-24 top-16 h-56 w-56 rounded-full bg-cyan-400/18 blur-3xl" />
-                  <div className="absolute right-[-30%] top-[-35%] h-72 w-72 rounded-full bg-blue-600/20 blur-[140px]" />
-                  <div className="absolute bottom-[-42%] left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sky-500/18 blur-[150px]" />
-                  <div className="absolute left-1/2 top-0 h-36 w-48 -translate-x-1/2 -translate-y-1/2 rotate-[28deg] bg-white/22 blur-3xl opacity-50" />
-                  <div className="absolute inset-y-[-40%] left-[-40%] w-[180%] rotate-[18deg] bg-gradient-to-r from-transparent via-white/12 to-transparent opacity-18" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.14),rgba(255,255,255,0)_55%)] opacity-30" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(59,130,246,0.15),transparent_65%)] opacity-40" />
+          {/* Formulario */}
+          <section className="order-1 lg:order-2">
+            <div className="mx-auto w-full max-w-lg rounded-2xl border border-white/10 bg-card/95 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
+              <div className="flex flex-col items-center text-center">
+                <div
+                  aria-hidden="true"
+                  className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-success to-emerald-700 text-white shadow-soft-md"
+                >
+                  <Stethoscope className="h-7 w-7" aria-hidden="true" />
                 </div>
-
-                <div className="relative z-10 flex flex-col">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-white/20 bg-white/10 shadow-[0_10px_40px_rgba(236,72,153,0.35)]">
-                    <div className="pointer-events-none absolute -inset-1 rounded-[18px] bg-gradient-to-br from-cyan-300/30 via-transparent to-white/18 opacity-70 blur-xl" />
-                      <Stethoscope className="relative h-9 w-9 text-cyan-200" />
-                    </div>
-                    <h2 className="mt-6 text-3xl font-semibold text-white sm:text-3xl">
-                      Crear cuenta de paciente
-                    </h2>
-                    <p className="mt-2 max-w-sm text-sm text-white/60">
-                      Completa tus datos y accede a tus servicios de salud.
-                    </p>
-                  </div>
-
-                  <form onSubmit={handleSubmit} className="mt-10 space-y-6">
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <label htmlFor="firstName" className="text-sm font-medium text-white/80">
-                          Nombre
-                        </label>
-                        <div className="group relative rounded-2xl border border-white/10 bg-slate-950/60">
-                          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/15 via-cyan-400/10 to-transparent opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100" />
-                          <input
-                            id="firstName"
-                            value={formData.firstName}
-                            onChange={(e) => handleInputChange('firstName', e.target.value)}
-                            className="relative z-10 w-full rounded-2xl bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-0"
-                            placeholder="Tu nombre"
-                            autoComplete="given-name"
-                          />
-                        </div>
-                        {errors.firstName && <p className="text-xs text-rose-300">{errors.firstName}</p>}
-                      </div>
-
-                      <div className="space-y-2">
-                        <label htmlFor="lastName" className="text-sm font-medium text-white/80">
-                          Apellido
-                        </label>
-                        <div className="group relative rounded-2xl border border-white/10 bg-slate-950/60">
-                          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/15 via-cyan-400/10 to-transparent opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100" />
-                          <input
-                            id="lastName"
-                            value={formData.lastName}
-                            onChange={(e) => handleInputChange('lastName', e.target.value)}
-                            className="relative z-10 w-full rounded-2xl bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-0"
-                            placeholder="Tu apellido"
-                            autoComplete="family-name"
-                          />
-                        </div>
-                        {errors.lastName && <p className="text-xs text-rose-300">{errors.lastName}</p>}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium text-white/80">
-                        Correo electronico
-                      </label>
-                      <div className="group relative rounded-2xl border border-white/10 bg-slate-950/60">
-                        <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/15 via-cyan-400/10 to-transparent opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100" />
-                        <input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => handleInputChange('email', e.target.value)}
-                          className="relative z-10 w-full rounded-2xl bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-0"
-                          placeholder="paciente@smdvital.com"
-                          autoComplete="email"
-                        />
-                      </div>
-                      {errors.email && <p className="text-xs text-rose-300">{errors.email}</p>}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="phone" className="text-sm font-medium text-white/80">
-                        Telefono (opcional)
-                      </label>
-                      <div className="group relative rounded-2xl border border-white/10 bg-slate-950/60">
-                        <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/15 via-cyan-400/10 to-transparent opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100" />
-                        <input
-                          id="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
-                          className="relative z-10 w-full rounded-2xl bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-0"
-                          placeholder="+57 300 123 4567"
-                          autoComplete="tel"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <label htmlFor="password" className="text-sm font-medium text-white/80">
-                          Contraseña
-                        </label>
-                        <div className="group relative rounded-2xl border border-white/10 bg-slate-950/60">
-                          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/15 via-cyan-400/10 to-transparent opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100" />
-                          <input
-                            id="password"
-                            type={showPassword ? 'text' : 'password'}
-                            value={formData.password}
-                            onChange={(e) => handleInputChange('password', e.target.value)}
-                            className="relative z-10 w-full rounded-2xl bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-0"
-                            placeholder="Mínimo 8 caracteres seguros"
-                            autoComplete="new-password"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword((prev) => !prev)}
-                            className="absolute inset-y-0 right-4 z-10 flex items-center text-white/60 transition hover:text-white"
-                            title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                          >
-                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                          </button>
-                        </div>
-                        {errors.password && <p className="text-xs text-rose-300">{errors.password}</p>}
-                      </div>
-
-                      <div className="space-y-2">
-                        <label htmlFor="confirmPassword" className="text-sm font-medium text-white/80">
-                          Confirmar contraseña
-                        </label>
-                        <div className="group relative rounded-2xl border border-white/10 bg-slate-950/60">
-                          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/15 via-cyan-400/10 to-transparent opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100" />
-                          <input
-                            id="confirmPassword"
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="relative z-10 w-full rounded-2xl bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-0"
-                            placeholder="Repite tu contraseña"
-                            autoComplete="new-password"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword((prev) => !prev)}
-                            className="absolute inset-y-0 right-4 z-10 flex items-center text-white/60 transition hover:text-white"
-                            title={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                          >
-                            {showConfirmPassword ? (
-                              <EyeOff className="h-5 w-5" />
-                            ) : (
-                              <Eye className="h-5 w-5" />
-                            )}
-                          </button>
-                        </div>
-                        {errors.confirmPassword && (
-                          <p className="text-xs text-rose-300">{errors.confirmPassword}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={registerMutation.isPending}
-                      className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white/90 px-4 py-3.5 text-base font-semibold text-slate-900 shadow-[0_25px_60px_-30px_rgba(15,23,42,0.45)] transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 enabled:hover:bg-white enabled:hover:text-slate-900/90 disabled:cursor-not-allowed disabled:opacity-75"
-                    >
-                      <span className="absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-50">
-                        <span className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/40 to-white/70" />
-                      </span>
-                      <span className="pointer-events-none absolute -left-full top-0 h-full w-1/3 bg-gradient-to-r from-transparent via-white/80 to-transparent opacity-0 transition duration-700 group-hover:left-full group-hover:opacity-60" />
-                      {registerMutation.isPending ? (
-                        <>
-                          <Loader2 className="h-5 w-5 animate-spin" />
-                          Creando cuenta...
-                        </>
-                      ) : (
-                        'Crear acceso seguro'
-                      )}
-                    </button>
-                  </form>
-
-                  <div className="mt-10 space-y-4 border-t border-white/10 pt-6 text-center text-xs text-white/60">
-                    <p>
-                      ¿Ya tienes una cuenta?{' '}
-                      <Link
-                        to="/login"
-                        className="font-semibold text-cyan-200 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                      >
-                        Iniciar sesión
-                      </Link>
-                    </p>
-                    <p>
-                      Asistencia inmediata:{' '}
-                      <a
-                        href="mailto:soporte@smdvital.com"
-                        className="font-semibold text-cyan-200 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                      >
-                        soporte@smdvital.com
-                      </a>
-                    </p>
-                  </div>
-                </div>
+                <h2 className="mt-5 text-2xl font-semibold text-foreground">
+                  Crear cuenta de paciente
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Completa tus formData y accede a tus servicios de salud.
+                </p>
               </div>
+
+              <form onSubmit={handleSubmit} className="mt-7 space-y-5" noValidate>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Etiqueta htmlFor="firstName" required>
+                      Nombre
+                    </Etiqueta>
+                    <Entrada
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                      placeholder="Tu firstName"
+                      autoComplete="given-name"
+                      error={errores.firstName}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Etiqueta htmlFor="lastName" required>
+                      Apellido
+                    </Etiqueta>
+                    <Entrada
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                      placeholder="Tu lastName"
+                      autoComplete="family-name"
+                      error={errores.lastName}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Etiqueta htmlFor="email" required>
+                    Correo electrónico
+                  </Etiqueta>
+                  <Entrada
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    placeholder="paciente@smdvital.com"
+                    autoComplete="email"
+                    error={errores.email}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Etiqueta htmlFor="phone">Teléfono (opcional)</Etiqueta>
+                  <Entrada
+                    id="phone"
+                    type="tel"
+                    value={formData.phone ?? ''}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    placeholder="+57 300 123 4567"
+                    autoComplete="tel"
+                  />
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Etiqueta htmlFor="password" required>
+                      Contraseña
+                    </Etiqueta>
+                    <div className="relative">
+                      <Entrada
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={formData.password}
+                        onChange={(e) => handleInputChange('password', e.target.value)}
+                        placeholder="Mínimo 8 caracteres"
+                        autoComplete="new-password"
+                        error={errores.password}
+                        className="pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setMostrarContrasena((p) => !p)}
+                        aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-lg text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" aria-hidden="true" />
+                        ) : (
+                          <Eye className="h-4 w-4" aria-hidden="true" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Etiqueta htmlFor="confirmPassword" required>
+                      Confirmar contraseña
+                    </Etiqueta>
+                    <div className="relative">
+                      <Entrada
+                        id="confirmPassword"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          setConfirmarContrasena(e.target.value);
+                          if (errores.confirmPassword) {
+                            setErrores((prev) => ({ ...prev, confirmPassword: undefined }));
+                          }
+                        }}
+                        placeholder="Repite tu contraseña"
+                        autoComplete="new-password"
+                        error={errores.confirmPassword}
+                        className="pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setMostrarConfirmar((p) => !p)}
+                        aria-label={
+                          showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                        }
+                        className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-lg text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4" aria-hidden="true" />
+                        ) : (
+                          <Eye className="h-4 w-4" aria-hidden="true" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <Alerta variant="info">
+                  Tu contraseña debe tener mínimo 8 caracteres e incluir mayúsculas, minúsculas y un número.
+                </Alerta>
+
+                <Boton
+                  type="submit"
+                  isLoading={registroMutacion.isPending}
+                  leftIcon={
+                    !registroMutacion.isPending ? <ShieldCheck className="h-4 w-4" /> : undefined
+                  }
+                  variant="success"
+                  size="lg"
+                  className="w-full"
+                >
+                  {registroMutacion.isPending ? 'Creando cuenta…' : 'Crear acceso seguro'}
+                </Boton>
+              </form>
+
+              <footer className="mt-6 space-y-2 border-t border-border pt-5 text-center text-xs text-muted-foreground">
+                <p>
+                  ¿Ya tienes una cuenta?{' '}
+                  <Link
+                    to="/login"
+                    className="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
+                  >
+                    Iniciar sesión
+                  </Link>
+                </p>
+                <p>
+                  Asistencia inmediata:{' '}
+                  <a
+                    href="mailto:soporte@smdvital.com"
+                    className="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
+                  >
+                    soporte@smdvital.com
+                  </a>
+                </p>
+              </footer>
             </div>
-          </div>
+          </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Stethoscope, DollarSign, Clock, FileText, Save } from 'lucide-react';
-import { Button } from './ui/Button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Select } from './ui/Select';
-import { Switch } from './ui/Switch';
+import { Boton } from './ui/Boton';
+import { Entrada } from './ui/Entrada';
+import { Etiqueta } from './ui/Etiqueta';
+import { Seleccion } from './ui/Seleccion';
+import { Interruptor } from './ui/Interruptor';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Service, ServiceCategory } from '@/types';
@@ -62,11 +62,11 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'El nombre del servicio es requerido';
+      newErrors.name = 'El firstName del servicio es required';
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'La descripción es requerida';
+      newErrors.description = 'La description es requerida';
     }
 
     if (formData.basePrice <= 0) {
@@ -159,13 +159,13 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
                 {isEditing ? 'Editar Servicio' : 'Nuevo Servicio'}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {isEditing ? 'Modifica los datos del servicio' : 'Completa la información del nuevo servicio'}
+                {isEditing ? 'Modifica los formData del servicio' : 'Completa la información del nuevo servicio'}
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Boton variant="ghost" size="sm" onClick={onClose}>
             <X className="w-5 h-5" />
-          </Button>
+          </Boton>
         </div>
 
         {/* Form */}
@@ -175,8 +175,8 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Información Básica</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
-                <Label htmlFor="name">Nombre del Servicio *</Label>
-                <Input
+                <Etiqueta htmlFor="name">Nombre del Servicio *</Etiqueta>
+                <Entrada
                   id="name"
                   type="text"
                   value={formData.name}
@@ -188,7 +188,7 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
               </div>
 
               <div className="md:col-span-2">
-                <Label htmlFor="description">Descripción *</Label>
+                <Etiqueta htmlFor="description">Descripción *</Etiqueta>
                 <textarea
                   id="description"
                   value={formData.description}
@@ -203,8 +203,8 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
               </div>
 
               <div>
-                <Label htmlFor="category">Categoría *</Label>
-                <Select
+                <Etiqueta htmlFor="category">Categoría *</Etiqueta>
+                <Seleccion
                   value={formData.category}
                   onChange={(e) => handleInputChange('category', e.target.value as ServiceCategory)}
                 >
@@ -213,12 +213,12 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
                       {option.label}
                     </option>
                   ))}
-                </Select>
+                </Seleccion>
               </div>
 
               <div>
-                <Label htmlFor="requirements">Requisitos</Label>
-                <Input
+                <Etiqueta htmlFor="requirements">Requisitos</Etiqueta>
+                <Entrada
                   id="requirements"
                   type="text"
                   value={formData.requirements}
@@ -234,10 +234,10 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Precios y Duración</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="basePrice">Precio Base (COP) *</Label>
+                <Etiqueta htmlFor="basePrice">Precio Base (COP) *</Etiqueta>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
+                  <Entrada
                     id="basePrice"
                     type="number"
                     value={formData.basePrice}
@@ -252,10 +252,10 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
               </div>
 
               <div>
-                <Label htmlFor="duration">Duración (minutos) *</Label>
+                <Etiqueta htmlFor="duration">Duración (minutos) *</Etiqueta>
                 <div className="relative">
                   <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
+                  <Entrada
                     id="duration"
                     type="number"
                     value={formData.duration}
@@ -275,14 +275,14 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Estado</h3>
             <div className="flex items-center space-x-3">
-              <Switch
+              <Interruptor
                 checked={formData.isActive}
                 onCheckedChange={(checked) => handleInputChange('isActive', checked)}
               />
               <div>
-                <Label htmlFor="isActive" className="text-base">
+                <Etiqueta htmlFor="isActive" className="text-base">
                   Servicio Activo
-                </Label>
+                </Etiqueta>
                 <p className="text-sm text-gray-500">
                   {formData.isActive 
                     ? 'El servicio está disponible para citas' 
@@ -295,10 +295,10 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
 
           {/* Actions */}
           <div className="flex justify-end space-x-3 pt-6 border-t">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Boton type="button" variant="outline" onClick={onClose}>
               Cancelar
-            </Button>
-            <Button 
+            </Boton>
+            <Boton 
               type="submit" 
               disabled={createMutation.isPending || updateMutation.isPending}
             >
@@ -308,7 +308,7 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
                 <Save className="w-4 h-4" />
               )}
               {isEditing ? 'Actualizar Servicio' : 'Crear Servicio'}
-            </Button>
+            </Boton>
           </div>
         </form>
       </div>

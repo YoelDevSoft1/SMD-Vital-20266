@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/ui/Button';
+import { Boton } from '@/components/ui/Boton';
 import { User } from '@/types';
 
 interface ExportUsersButtonProps {
@@ -66,8 +66,8 @@ export const ExportUsersButton: React.FC<ExportUsersButtonProps> = ({ users, sel
 
     const jsonContent = JSON.stringify(usersToExport.map(user => ({
       id: user.id,
-      nombre: user.firstName,
-      apellido: user.lastName,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       telefono: user.phone || '',
       rol: roleTranslations[user.role as keyof typeof roleTranslations] || user.role,
@@ -97,7 +97,7 @@ export const ExportUsersButton: React.FC<ExportUsersButtonProps> = ({ users, sel
 
   return (
     <div className="flex items-center space-x-2">
-      <Button
+      <Boton
         size="sm"
         variant="outline"
         onClick={exportToCSV}
@@ -107,8 +107,8 @@ export const ExportUsersButton: React.FC<ExportUsersButtonProps> = ({ users, sel
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
         Exportar CSV
-      </Button>
-      <Button
+      </Boton>
+      <Boton
         size="sm"
         variant="outline"
         onClick={exportToJSON}
@@ -118,7 +118,7 @@ export const ExportUsersButton: React.FC<ExportUsersButtonProps> = ({ users, sel
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
         Exportar JSON
-      </Button>
+      </Boton>
     </div>
   );
 };

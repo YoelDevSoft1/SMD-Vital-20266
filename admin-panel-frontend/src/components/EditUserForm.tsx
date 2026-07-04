@@ -1,193 +1,207 @@
-import React, { useState } from 'react';
-import { Button } from './ui/Button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Switch } from './ui/Switch';
-import { adminService } from '../services/admin.service';
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
+import { Interruptor } from '@/components/ui/Interruptor';
+import { adminService } from '@/services/admin.service';
+import { OPCIONES_ROLES } from '@/utils/roles';
+import type { User, UserRole } from '@/types';
 import { toast } from 'react-hot-toast';
 
-interface User {
+interface UsuarioEditable {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
   phone?: string;
-  role: string;
+  role: UserRole;
   isActive: boolean;
   isVerified: boolean;
 }
 
-interface EditUserFormProps {
+interface Propiedades {
   user: User;
-  onSuccess: () => void;
-  onCancel: () => void;
+  alExito: () => void;
+  alCancelar: () => void;
 }
 
-const roleTranslations = {
-  SUPER_ADMIN: 'Super Administrador',
-  ADMIN: 'Administrador',
-  DOCTOR: 'Médico',
-  NURSE: 'Enfermero/a',
-  PATIENT: 'Paciente',
-} as const;
+interface DatosFormulario {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  role: UserRole;
+  isActive: boolean;
+  isVerified: boolean;
+}
 
-export const EditUserForm: React.FC<EditUserFormProps> = ({ user, onSuccess, onCancel }) => {
-  const [formData, setFormData] = useState({
+export const EditUserForm: React.FC<Propiedades> = ({ user, alExito, alCancelar }) => {
+  const [datos, setDatos] = useState<DatosFormulario>({
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    phone: user.phone || '',
-    role: user.role,
+    phone: user.phone ?? '',
+    role: (user.role as UserRole) ?? 'PATIENT',
     isActive: user.isActive,
     isVerified: user.isVerified,
   });
+  const [errores, setErrores] = useState<Partial<Record<keyof DatosFormulario, string>>>({});
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
-  const updateUserMutation = useMutation({
-    mutationFn: (data: any) => adminService.updateUser(user.id, data),
+  const actualizarUsuarioMutacion = useMutation({
+    mutationFn: (payload: DatosFormulario) => adminService.updateUser(user.id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('Usuario actualizado exitosamente');
-      onSuccess();
+      alExito();
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al actualizar usuario');
-    },
+    onError: (e: unknown) =>
+      toast.error(
+        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+          'Error al actualizar usuario',
+      ),
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const validar = (): boolean => {
+    const nuevosErrores: Partial<Record<keyof DatosFormulario, string>> = {};
+    if (!datos.firstName.trim()) nuevosErrores.firstName = 'El nombre es requerido';
+    if (!datos.lastName.trim()) nuevosErrores.lastName = 'El apellido es requerido';
+    if (!datos.email.trim()) nuevosErrores.email = 'El email es requerido';
+    else if (!/\S+@\S+\.\S+/.test(datos.email)) nuevosErrores.email = 'El email no es válido';
+    if (datos.phone && !/^\+?[1-9]\d{6,14}$/.test(datos.phone)) {
+      nuevosErrores.phone = 'El teléfono no es válido';
+    }
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
+  };
 
-    try {
-      await updateUserMutation.mutateAsync(formData);
-    } catch (error) {
-      console.error('Error updating user:', error);
-    } finally {
-      setIsSubmitting(false);
+  const alEnviar = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validar()) actualizarUsuarioMutacion.mutate(datos);
+  };
+
+  const alCambiar = (campo: keyof DatosFormulario, valor: string | boolean) => {
+    setDatos((prev) => ({ ...prev, [campo]: valor }));
+    if (errores[campo]) {
+      setErrores((prev) => ({ ...prev, [campo]: undefined }));
     }
   };
 
-  const handleChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="firstName">Nombre *</Label>
-          <Input
-            id="firstName"
-            value={formData.firstName}
-            onChange={(e) => handleChange('firstName', e.target.value)}
-            required
-            disabled={isSubmitting}
+    <form onSubmit={alEnviar} className="space-y-6" noValidate>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="space-y-1.5">
+          <Etiqueta htmlFor="edit-firstName" required>
+            Nombre
+          </Etiqueta>
+          <Entrada
+            id="edit-firstName"
+            value={datos.firstName}
+            onChange={(e) => alCambiar('firstName', e.target.value)}
+            error={errores.firstName}
+            autoComplete="given-name"
           />
         </div>
 
-        <div>
-          <Label htmlFor="lastName">Apellido *</Label>
-          <Input
-            id="lastName"
-            value={formData.lastName}
-            onChange={(e) => handleChange('lastName', e.target.value)}
-            required
-            disabled={isSubmitting}
+        <div className="space-y-1.5">
+          <Etiqueta htmlFor="edit-lastName" required>
+            Apellido
+          </Etiqueta>
+          <Entrada
+            id="edit-lastName"
+            value={datos.lastName}
+            onChange={(e) => alCambiar('lastName', e.target.value)}
+            error={errores.lastName}
+            autoComplete="family-name"
           />
         </div>
 
-        <div>
-          <Label htmlFor="email">Correo Electrónico *</Label>
-          <Input
-            id="email"
+        <div className="space-y-1.5">
+          <Etiqueta htmlFor="edit-email" required>
+            Correo electrónico
+          </Etiqueta>
+          <Entrada
+            id="edit-email"
             type="email"
-            value={formData.email}
-            onChange={(e) => handleChange('email', e.target.value)}
-            required
-            disabled={isSubmitting}
+            value={datos.email}
+            onChange={(e) => alCambiar('email', e.target.value)}
+            error={errores.email}
+            autoComplete="email"
           />
         </div>
 
-        <div>
-          <Label htmlFor="phone">Teléfono</Label>
-          <Input
-            id="phone"
+        <div className="space-y-1.5">
+          <Etiqueta htmlFor="edit-phone">Teléfono</Etiqueta>
+          <Entrada
+            id="edit-phone"
             type="tel"
-            value={formData.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
-            disabled={isSubmitting}
+            value={datos.phone}
+            onChange={(e) => alCambiar('phone', e.target.value)}
+            error={errores.phone}
+            autoComplete="tel"
           />
         </div>
 
-        <div>
-          <Label htmlFor="role">Rol *</Label>
+        <div className="space-y-1.5 md:col-span-2">
+          <Etiqueta htmlFor="edit-role" required>
+            Rol
+          </Etiqueta>
           <select
-            id="role"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={formData.role}
-            onChange={(e) => handleChange('role', e.target.value)}
-            disabled={isSubmitting}
+            id="edit-role"
+            className="h-11 w-full rounded-lg border border-input bg-card px-3 text-sm text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card"
+            value={datos.role}
+            onChange={(e) => alCambiar('role', e.target.value as UserRole)}
           >
-            {Object.entries(roleTranslations).map(([key, value]) => (
-              <option key={key} value={key}>
-                {value}
+            {OPCIONES_ROLES.map((op) => (
+              <option key={op.valor} value={op.valor}>
+                {op.etiqueta}
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+      <fieldset className="space-y-4 rounded-lg border border-border p-4">
+        <legend className="px-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Estado de la cuenta
+        </legend>
+
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <Label htmlFor="isActive">Usuario Activo</Label>
-            <p className="text-sm text-gray-500">El usuario puede iniciar sesión</p>
+            <Etiqueta htmlFor="edit-isActive">Usuario activo</Etiqueta>
+            <p className="text-sm text-muted-foreground">El usuario puede iniciar sesión.</p>
           </div>
-          <Switch
-            id="isActive"
-            checked={formData.isActive}
-            onCheckedChange={(checked) => handleChange('isActive', checked)}
-            disabled={isSubmitting}
+          <Interruptor
+            id="edit-isActive"
+            checked={datos.isActive}
+            onCheckedChange={(checked) => alCambiar('isActive', checked)}
           />
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <Label htmlFor="isVerified">Usuario Verificado</Label>
-            <p className="text-sm text-gray-500">El usuario ha verificado su correo electrónico</p>
+            <Etiqueta htmlFor="edit-isVerified">Usuario verificado</Etiqueta>
+            <p className="text-sm text-muted-foreground">
+              El usuario ha confirmado su correo electrónico.
+            </p>
           </div>
-          <Switch
-            id="isVerified"
-            checked={formData.isVerified}
-            onCheckedChange={(checked) => handleChange('isVerified', checked)}
-            disabled={isSubmitting}
+          <Interruptor
+            id="edit-isVerified"
+            checked={datos.isVerified}
+            onCheckedChange={(checked) => alCambiar('isVerified', checked)}
           />
         </div>
-      </div>
+      </fieldset>
 
-      <div className="flex justify-end space-x-3 pt-4 border-t">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isSubmitting}
-        >
+      <div className="flex flex-col-reverse items-stretch gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end">
+        <Boton type="button" variant="outline" onClick={alCancelar}>
           Cancelar
-        </Button>
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          {isSubmitting ? 'Actualizando...' : 'Actualizar Usuario'}
-        </Button>
+        </Boton>
+        <Boton type="submit" isLoading={actualizarUsuarioMutacion.isPending}>
+          {actualizarUsuarioMutacion.isPending ? 'Actualizando…' : 'Actualizar usuario'}
+        </Boton>
       </div>
     </form>
   );

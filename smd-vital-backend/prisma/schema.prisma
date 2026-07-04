@@ -13,32 +13,35 @@ datasource db {
 
 // User Management
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  phone     String?  @unique
-  password  String
-  firstName String
-  lastName  String
-  role      UserRole @default(PATIENT)
-  isActive  Boolean  @default(true)
-  isVerified Boolean @default(false)
-  isPlaceholder Boolean @default(false)
-  avatar    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  email         String   @unique
+  phone         String?  @unique
+  password      String
+  firstName     String
+  lastName      String
+  role          UserRole @default(PATIENT)
+  isActive      Boolean  @default(true)
+  isVerified    Boolean  @default(false)
+  isPlaceholder Boolean  @default(false)
+  avatar        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
-  patient   Patient?
-  doctor    Doctor?
-  admin     Admin?
-  notifications Notification[]
-  encountersAsNurse Encounter[] @relation("EncounterNurse")
-  vitalSignsRecorded VitalSign[] @relation("VitalSignRecordedBy")
-  serviceTraces ServiceTrace[] @relation("ServiceTraceActor")
-  auditLogs AuditLog[] @relation("AuditLogActor")
-  assignedAppointments Appointment[] @relation("AppointmentAssignedNurse")
-  finishedAppointments Appointment[] @relation("AppointmentFinishedBy")
-  medicalRecordsAsNurse MedicalRecord[] @relation("MedicalRecordNurse")
+  patient               Patient?
+  doctor                Doctor?
+  admin                 Admin?
+  notifications         Notification[]
+  encountersAsNurse     Encounter[]              @relation("EncounterNurse")
+  vitalSignsRecorded    VitalSign[]              @relation("VitalSignRecordedBy")
+  serviceTraces         ServiceTrace[]           @relation("ServiceTraceActor")
+  auditLogs             AuditLog[]               @relation("AuditLogActor")
+  assignedAppointments  Appointment[]            @relation("AppointmentAssignedNurse")
+  finishedAppointments  Appointment[]            @relation("AppointmentFinishedBy")
+  bookedAppointments    Appointment[]            @relation("AppointmentBookedBy")
+  medicalRecordsAsNurse MedicalRecord[]          @relation("MedicalRecordNurse")
+  paymentAcksReceived   PaymentAcknowledgement[] @relation("PaymentAckRecipient")
+  payoutBatches         PayoutBatch[]            @relation("PayoutRecipient")
 
   @@map("users")
 }
@@ -47,38 +50,39 @@ enum UserRole {
   PATIENT
   DOCTOR
   NURSE
+  AGENT
   ADMIN
   SUPER_ADMIN
 }
 
 // Patient Information
 model Patient {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  dateOfBirth DateTime?
-  gender      Gender?
-  address     String?
-  city        String?
-  state       String?
-  zipCode     String?
-  emergencyContact String?
-  emergencyPhone   String?
-  medicalHistory   String?
-  allergies        String?
-  medications      String?
-  insuranceNumber  String?
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateOfBirth       DateTime?
+  gender            Gender?
+  address           String?
+  city              String?
+  state             String?
+  zipCode           String?
+  emergencyContact  String?
+  emergencyPhone    String?
+  medicalHistory    String?
+  allergies         String?
+  medications       String?
+  insuranceNumber   String?
   insuranceProvider String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   // Relations
-  appointments Appointment[]
-  medicalRecords MedicalRecord[]
-  prescriptions Prescription[]
-  reviews Review[]
-  encounters Encounter[]
-  consents PatientConsent[]
+  appointments       Appointment[]
+  medicalRecords     MedicalRecord[]
+  prescriptions      Prescription[]
+  reviews            Review[]
+  encounters         Encounter[]
+  consents           PatientConsent[]
   documentDeliveries DocumentDelivery[]
 
   @@map("patients")
@@ -93,47 +97,47 @@ enum Gender {
 
 // Doctor Information
 model Doctor {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  licenseNumber String   @unique
-  specialty     String
-  experience    Int      @default(0)
-  rating        Float    @default(0)
-  totalReviews  Int      @default(0)
-  isAvailable   Boolean  @default(true)
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licenseNumber   String   @unique
+  specialty       String
+  experience      Int      @default(0)
+  rating          Float    @default(0)
+  totalReviews    Int      @default(0)
+  isAvailable     Boolean  @default(true)
   consultationFee Float
-  bio           String?
-  education     String?
-  certifications String?
-  languages     String[]
-  serviceAreas  String[]
-  logoPath      String?
-  signaturePath String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  bio             String?
+  education       String?
+  certifications  String?
+  languages       String[]
+  serviceAreas    String[]
+  logoPath        String?
+  signaturePath   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
-  appointments Appointment[]
-  reviews      Review[]
-  schedules    DoctorSchedule[]
+  appointments   Appointment[]
+  reviews        Review[]
+  schedules      DoctorSchedule[]
   availabilities DoctorAvailability[]
-  services     DoctorService[]
-  prescriptions Prescription[]
-  encounters   Encounter[]
-  medicalRecords MedicalRecord[] @relation("MedicalRecordDoctor")
+  services       DoctorService[]
+  prescriptions  Prescription[]
+  encounters     Encounter[]
+  medicalRecords MedicalRecord[]      @relation("MedicalRecordDoctor")
 
   @@map("doctors")
 }
 
 // Admin Information
 model Admin {
-  id       String   @id @default(cuid())
-  userId   String   @unique
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  level    AdminLevel @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level     AdminLevel @default(ADMIN)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   @@map("admins")
 }
@@ -145,21 +149,23 @@ enum AdminLevel {
 
 // Services
 model Service {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  category    ServiceCategory
-  basePrice   Float
-  duration    Int      // in minutes
-  isActive    Boolean  @default(true)
+  id           String          @id @default(cuid())
+  name         String
+  description  String
+  category     ServiceCategory
+  basePrice    Float
+  duration     Int // in minutes
+  isActive     Boolean         @default(true)
   requirements String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  requiredRole UserRole        @default(DOCTOR) // DOCTOR | NURSE — quién atiende este servicio
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 
   // Relations
-  appointments Appointment[]
-  doctorServices DoctorService[]
+  appointments      Appointment[]
+  doctorServices    DoctorService[]
   clinicalTemplates ClinicalTemplate[]
+  marginRule        ServiceMarginRule?
 
   @@map("services")
 }
@@ -186,8 +192,8 @@ model DoctorService {
   updatedAt DateTime @updatedAt
 
   // Relations
-  doctor    Doctor  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  doctor  Doctor  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   @@unique([doctorId, serviceId])
   @@map("doctor_services")
@@ -195,40 +201,44 @@ model DoctorService {
 
 // Appointments
 model Appointment {
-  id          String   @id @default(cuid())
-  patientId   String
-  doctorId    String
-  serviceId   String
-  status      AppointmentStatus @default(PENDING)
-  scheduledAt DateTime
-  duration    Int      // in minutes
-  notes       String?
-  diagnosis   String?
-  prescription String?
-  totalPrice  Float
-  address     String
-  city        String
-  coordinates Json?    // { lat: number, lng: number }
+  id              String            @id @default(cuid())
+  patientId       String
+  doctorId        String
+  serviceId       String
+  status          AppointmentStatus @default(PENDING)
+  scheduledAt     DateTime
+  duration        Int // in minutes
+  notes           String?
+  diagnosis       String?
+  prescription    String?
+  totalPrice      Float
+  address         String
+  city            String
+  coordinates     Json? // { lat: number, lng: number }
   assignedNurseId String?
-  finishedAt  DateTime?
-  finishedById String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  finishedAt      DateTime?
+  finishedById    String?
+  bookedById      String? // AGENT (asesor/call center) que agendó
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   // Relations
-  patient     Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor      Doctor  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  service     Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  assignedNurse User? @relation("AppointmentAssignedNurse", fields: [assignedNurseId], references: [id], onDelete: SetNull)
-  finishedBy  User? @relation("AppointmentFinishedBy", fields: [finishedById], references: [id], onDelete: SetNull)
-  encounter   Encounter?
-  payments    Payment[]
-  reviews     Review[]
-  serviceTraces ServiceTrace[]
-  medicalRecords MedicalRecord[]
-  prescriptions Prescription[]
+  patient            Patient                  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor             Doctor                   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  service            Service                  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  assignedNurse      User?                    @relation("AppointmentAssignedNurse", fields: [assignedNurseId], references: [id], onDelete: SetNull)
+  finishedBy         User?                    @relation("AppointmentFinishedBy", fields: [finishedById], references: [id], onDelete: SetNull)
+  bookedBy           User?                    @relation("AppointmentBookedBy", fields: [bookedById], references: [id], onDelete: SetNull)
+  encounter          Encounter?
+  payments           Payment[]
+  reviews            Review[]
+  serviceTraces      ServiceTrace[]
+  medicalRecords     MedicalRecord[]
+  prescriptions      Prescription[]
   documentDeliveries DocumentDelivery[]
-  ripsDraft RipsDraft?
+  ripsDraft          RipsDraft?
+  marginSnapshot     MarginSnapshot?
+  acknowledgements   PaymentAcknowledgement[]
 
   @@map("appointments")
 }
@@ -238,6 +248,8 @@ enum AppointmentStatus {
   CONFIRMED
   IN_PROGRESS
   COMPLETED
+  PARTIALLY_RECONCILED // algunos acks pagados, otros pendientes
+  RECONCILED // todos los acks en ACKNOWLEDGED
   CANCELLED
   NO_SHOW
   RESCHEDULED
@@ -309,68 +321,68 @@ enum AuditAction {
 
 // Clinical Encounter
 model Encounter {
-  id            String          @id @default(cuid())
-  appointmentId String          @unique
-  patientId     String
-  doctorId      String
-  nurseId       String?
-  status        EncounterStatus @default(IN_PROGRESS)
-  summary       String?
-  payload       Json?
+  id              String          @id @default(cuid())
+  appointmentId   String          @unique
+  patientId       String
+  doctorId        String
+  nurseId         String?
+  status          EncounterStatus @default(IN_PROGRESS)
+  summary         String?
+  payload         Json?
   templateVersion String?
-  startedAt     DateTime        @default(now())
-  finishedAt    DateTime?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  startedAt       DateTime        @default(now())
+  finishedAt      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   // Relations
-  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  patient       Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor        Doctor      @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  nurse         User?       @relation("EncounterNurse", fields: [nurseId], references: [id], onDelete: SetNull)
-  vitals        VitalSign[]
+  appointment    Appointment     @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  patient        Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor         Doctor          @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  nurse          User?           @relation("EncounterNurse", fields: [nurseId], references: [id], onDelete: SetNull)
+  vitals         VitalSign[]
   medicalRecords MedicalRecord[]
-  prescriptions Prescription[]
-  serviceTraces ServiceTrace[]
+  prescriptions  Prescription[]
+  serviceTraces  ServiceTrace[]
 
   @@map("encounters")
 }
 
 // Vital Signs
 model VitalSign {
-  id             String   @id @default(cuid())
-  encounterId    String
-  recordedById   String
-  recordedAt     DateTime @default(now())
-  bpSys          Int?
-  bpDia          Int?
-  heartRate      Int?
+  id              String   @id @default(cuid())
+  encounterId     String
+  recordedById    String
+  recordedAt      DateTime @default(now())
+  bpSys           Int?
+  bpDia           Int?
+  heartRate       Int?
   respiratoryRate Int?
-  temperature    Float?
-  spo2           Int?
-  weight         Float?
-  height         Float?
-  notes          String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  temperature     Float?
+  spo2            Int?
+  weight          Float?
+  height          Float?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
-  encounter   Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
-  recordedBy  User      @relation("VitalSignRecordedBy", fields: [recordedById], references: [id], onDelete: Cascade)
+  encounter  Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  recordedBy User      @relation("VitalSignRecordedBy", fields: [recordedById], references: [id], onDelete: Cascade)
 
   @@map("vital_signs")
 }
 
 // Service Traceability
 model ServiceTrace {
-  id            String            @id @default(cuid())
+  id            String             @id @default(cuid())
   appointmentId String
   encounterId   String?
   actorId       String
   actorRole     UserRole
   action        ServiceTraceAction
   payload       Json?
-  createdAt     DateTime          @default(now())
+  createdAt     DateTime           @default(now())
 
   // Relations
   appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
@@ -482,15 +494,15 @@ model RipsDraft {
 model DoctorSchedule {
   id        String   @id @default(cuid())
   doctorId  String
-  dayOfWeek Int      // 0 = Sunday, 1 = Monday, etc.
-  startTime String   // "09:00"
-  endTime   String   // "17:00"
+  dayOfWeek Int // 0 = Sunday, 1 = Monday, etc.
+  startTime String // "09:00"
+  endTime   String // "17:00"
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  doctor    Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@map("doctor_schedules")
 }
@@ -506,7 +518,7 @@ model DoctorAvailability {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  doctor    Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@index([doctorId, date])
   @@map("doctor_availabilities")
@@ -514,19 +526,19 @@ model DoctorAvailability {
 
 // Payments
 model Payment {
-  id            String   @id @default(cuid())
-  appointmentId String
-  amount        Float
-  currency      String   @default("COP")
-  status        PaymentStatus @default(PENDING)
-  method        PaymentMethod
-  transactionId String?
+  id                    String        @id @default(cuid())
+  appointmentId         String
+  amount                Float
+  currency              String        @default("COP")
+  status                PaymentStatus @default(PENDING)
+  method                PaymentMethod
+  transactionId         String?
   stripePaymentIntentId String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
 
   // Relations
-  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }
@@ -550,49 +562,49 @@ enum PaymentMethod {
 
 // Reviews
 model Review {
-  id           String   @id @default(cuid())
-  patientId    String
-  doctorId     String
+  id            String   @id @default(cuid())
+  patientId     String
+  doctorId      String
   appointmentId String?
-  rating       Int      // 1-5
-  comment      String?
-  isVerified   Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  rating        Int // 1-5
+  comment       String?
+  isVerified    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
-  patient      Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor       Doctor      @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  appointment  Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  patient     Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor      Doctor       @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
 
   @@map("reviews")
 }
 
 // Medical Records
 model MedicalRecord {
-  id          String   @id @default(cuid())
-  patientId   String
-  appointmentId String?
-  encounterId String?
-  doctorId   String?
-  nurseId    String?
-  title       String
-  description String
-  type        MedicalRecordType
-  fileUrl     String?
-  payload     Json?
-  pdfPath     String?
+  id              String            @id @default(cuid())
+  patientId       String
+  appointmentId   String?
+  encounterId     String?
+  doctorId        String?
+  nurseId         String?
+  title           String
+  description     String
+  type            MedicalRecordType
+  fileUrl         String?
+  payload         Json?
+  pdfPath         String?
   templateVersion String?
-  doctorNotes String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  doctorNotes     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   // Relations
-  patient     Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
-  encounter   Encounter? @relation(fields: [encounterId], references: [id], onDelete: SetNull)
-  doctor      Doctor? @relation("MedicalRecordDoctor", fields: [doctorId], references: [id], onDelete: SetNull)
-  nurse       User? @relation("MedicalRecordNurse", fields: [nurseId], references: [id], onDelete: SetNull)
+  patient            Patient            @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  appointment        Appointment?       @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  encounter          Encounter?         @relation(fields: [encounterId], references: [id], onDelete: SetNull)
+  doctor             Doctor?            @relation("MedicalRecordDoctor", fields: [doctorId], references: [id], onDelete: SetNull)
+  nurse              User?              @relation("MedicalRecordNurse", fields: [nurseId], references: [id], onDelete: SetNull)
   documentDeliveries DocumentDelivery[]
 
   @@map("medical_records")
@@ -610,30 +622,30 @@ enum MedicalRecordType {
 
 // Prescriptions
 model Prescription {
-  id          String   @id @default(cuid())
-  patientId   String
-  doctorId    String
-  appointmentId String?
-  encounterId String?
-  medication  String
-  dosage      String
-  frequency   String
-  duration    String
-  instructions String?
-  status      PrescriptionStatus @default(DRAFT)
-  isActive    Boolean  @default(true)
-  pdfPath     String?
+  id              String             @id @default(cuid())
+  patientId       String
+  doctorId        String
+  appointmentId   String?
+  encounterId     String?
+  medication      String
+  dosage          String
+  frequency       String
+  duration        String
+  instructions    String?
+  status          PrescriptionStatus @default(DRAFT)
+  isActive        Boolean            @default(true)
+  pdfPath         String?
   templateVersion String?
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  notes           String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
 
   // Relations
-  patient     Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor      Doctor  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
-  encounter   Encounter? @relation(fields: [encounterId], references: [id], onDelete: SetNull)
-  items       PrescriptionItem[]
+  patient            Patient            @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor             Doctor             @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  appointment        Appointment?       @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  encounter          Encounter?         @relation(fields: [encounterId], references: [id], onDelete: SetNull)
+  items              PrescriptionItem[]
   documentDeliveries DocumentDelivery[]
 
   @@map("prescriptions")
@@ -652,24 +664,24 @@ model PrescriptionItem {
   updatedAt      DateTime @updatedAt
 
   // Relations
-  prescription   Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  prescription Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
 
   @@map("prescription_items")
 }
 
 // Notifications
 model Notification {
-  id        String   @id @default(cuid())
+  id        String           @id @default(cuid())
   userId    String
   title     String
   message   String
   type      NotificationType
-  isRead    Boolean  @default(false)
-  data      Json?    // Additional data
-  createdAt DateTime @default(now())
+  isRead    Boolean          @default(false)
+  data      Json? // Additional data
+  createdAt DateTime         @default(now())
 
   // Relations
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }
@@ -687,13 +699,13 @@ enum NotificationType {
 
 // System Settings
 model Setting {
-  id        String   @id @default(cuid())
-  key       String   @unique
+  id        String      @id @default(cuid())
+  key       String      @unique
   value     String
   type      SettingType @default(STRING)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
   @@map("settings")
 }
@@ -705,3 +717,144 @@ enum SettingType {
   JSON
 }
 
+// ============================================================
+// BILLING CORE — Reparto 3 actores: Profesional / Agente / SMD Vital
+// ============================================================
+
+// Regla de margen por servicio (3 montos fijos en COP)
+model ServiceMarginRule {
+  id        String @id @default(cuid())
+  serviceId String @unique
+
+  // Lo que gana cada actor en pesos colombianos (entero, COP)
+  professionalAmount Int // Doctor o Enfermera
+  agentAmount        Int // Call Center / Asesor
+  smdVitalAmount     Int // Plataforma (SMD Vital)
+
+  // Quién atiende este servicio
+  requiredRole UserRole
+
+  // Audit
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String?
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@map("service_margin_rules")
+}
+
+// Snapshot inmutable del split al confirmar la cita
+model MarginSnapshot {
+  id            String @id @default(cuid())
+  appointmentId String @unique
+  totalPrice    Int
+
+  // Profesional que atendió
+  professionalId     String?
+  professionalRole   UserRole? // DOCTOR | NURSE
+  professionalAmount Int
+
+  // Agente que agendó
+  agentId     String?
+  agentRole   UserRole?
+  agentAmount Int       @default(0)
+
+  // Plataforma
+  smdVitalAmount Int
+
+  // Audit trail
+  appliedRuleId       String
+  appliedRuleSnapshot Json // copia de la regla al momento (auditoría)
+  frozenAt            DateTime @default(now())
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([professionalId])
+  @@index([agentId])
+  @@map("margin_snapshots")
+}
+
+// Acknowledgement de pago por actor
+model PaymentAcknowledgement {
+  id            String @id @default(cuid())
+  appointmentId String
+
+  recipientId   String
+  recipientRole UserRole
+  amount        Int
+  concept       String // "Pago profesional" | "Comisión agente" | "Retención plataforma"
+
+  status AckStatus @default(PENDING)
+
+  paidById     String?
+  paidAt       DateTime?
+  paymentProof String? // URL del comprobante de transferencia
+
+  acknowledgedAt DateTime?
+  disputedReason String?
+
+  // Si pertenece a un payout batch
+  payoutItem PayoutBatchItem?
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  recipient   User        @relation("PaymentAckRecipient", fields: [recipientId], references: [id])
+
+  @@unique([appointmentId, recipientId])
+  @@index([recipientId, status])
+  @@index([status, paidAt])
+  @@map("payment_acknowledgements")
+}
+
+enum AckStatus {
+  PENDING // Aún no pagado por SMD Vital
+  PAID // Pagado por admin, falta que destinatario confirme
+  ACKNOWLEDGED // Destinatario confirmó recepción ✓
+  DISPUTED // Destinatario dice que NO recibió
+  CANCELLED // Cita cancelada, no aplica
+}
+
+// Lotes de liquidación (pago agrupado semanal/quincenal)
+model PayoutBatch {
+  id          String       @id @default(cuid())
+  recipientId String
+  periodStart DateTime
+  periodEnd   DateTime
+  totalAmount Int
+  status      PayoutStatus @default(DRAFT)
+
+  approvedById String?
+  approvedAt   DateTime?
+  paidAt       DateTime?
+  reference    String? // comprobante
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipient User              @relation("PayoutRecipient", fields: [recipientId], references: [id])
+  items     PayoutBatchItem[]
+
+  @@index([recipientId, periodStart, periodEnd])
+  @@index([status, periodEnd])
+  @@map("payout_batches")
+}
+
+model PayoutBatchItem {
+  id                String @id @default(cuid())
+  payoutBatchId     String
+  acknowledgementId String @unique
+
+  payoutBatch     PayoutBatch            @relation(fields: [payoutBatchId], references: [id], onDelete: Cascade)
+  acknowledgement PaymentAcknowledgement @relation(fields: [acknowledgementId], references: [id])
+
+  @@map("payout_batch_items")
+}
+
+enum PayoutStatus {
+  DRAFT
+  APPROVED
+  PAID
+  CANCELLED
+}

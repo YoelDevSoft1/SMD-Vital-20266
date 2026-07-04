@@ -22,9 +22,10 @@ import {
 } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
 import { Doctor, DoctorFilters } from '@/types';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
+import { EsqueletoTabla } from '@/components/ui/Esqueleto';
 import CreateDoctorForm from '@/components/CreateDoctorForm';
 import DoctorDetailsView from '@/components/DoctorDetailsView';
 import { EditDoctorForm } from '@/components/EditDoctorForm';
@@ -166,7 +167,7 @@ export default function Doctors() {
       'Ortopedia': 'bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800',
       'Pediatría': 'bg-teal-50 text-teal-700 border-teal-100 dark:bg-teal-900/20 dark:text-teal-300 dark:border-teal-800',
     };
-    return colors[specialty as keyof typeof colors] || 'bg-gray-50 text-gray-700 border-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
+    return colors[specialty as keyof typeof colors] || 'bg-muted text-foreground border-border dark:bg-card dark:text-muted-foreground dark:border-border';
   };
 
   // Doctors for display (paginated)
@@ -189,10 +190,10 @@ export default function Doctors() {
     return (
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de doctores</h1>
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Gestión de doctores</h1>
         </div>
-        <Card className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
-          <CardContent className="flex flex-col gap-4 p-6 text-sm">
+        <Tarjeta className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
+          <TarjetaContenido className="flex flex-col gap-4 p-6 text-sm">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
               <div>
@@ -203,13 +204,13 @@ export default function Doctors() {
               </div>
             </div>
             <div>
-              <Button variant="outline" onClick={() => refetch()} className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700">
+              <Boton variant="outline" onClick={() => refetch()} className="dark:text-foreground dark:border-border dark:hover:bg-muted">
                 <RefreshCw className="h-4 w-4" />
                 Reintentar
-              </Button>
+              </Boton>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
     );
   }
@@ -219,122 +220,122 @@ export default function Doctors() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de doctores</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Gestión de doctores</h1>
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             Administra el equipo médico de la plataforma SMD Vital
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button
+          <Boton
             variant="outline"
             onClick={() => refetch()}
             isLoading={isFetching}
             disabled={isFetching}
-            className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+            className="dark:text-foreground dark:border-border dark:hover:bg-muted"
           >
             <RefreshCw className={cn("mr-2 h-4 w-4", isFetching && "animate-spin")} />
             Actualizar
-          </Button>
+          </Boton>
           <ExportDoctorsButton
             doctors={doctors}
             selectedDoctors={selectedDoctors}
           />
-          <Button onClick={() => setShowCreateModal(true)}>
+          <Boton onClick={() => setShowCreateModal(true)}>
             <UserPlus className="h-4 w-4" />
             Crear doctor
-          </Button>
+          </Boton>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total doctores</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{allDoctorsTotal}</p>
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Total doctores</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">{allDoctorsTotal}</p>
               </div>
               <div className="rounded-xl bg-blue-50 dark:bg-blue-900/20 p-3">
                 <Stethoscope className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Disponibles</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{availableDoctors}</p>
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Disponibles</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">{availableDoctors}</p>
               </div>
               <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 p-3">
                 <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Calificación promedio</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
-                  {avgRating.toFixed(1)} <span className="text-sm text-gray-500 dark:text-gray-400">/5</span>
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Calificación promedio</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
+                  {avgRating.toFixed(1)} <span className="text-sm text-muted-foreground dark:text-muted-foreground">/5</span>
                 </p>
               </div>
               <div className="rounded-xl bg-amber-50 dark:bg-amber-900/20 p-3">
                 <Star className="h-5 w-5 text-amber-600 dark:text-amber-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total reseñas</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{totalReviews}</p>
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Total reseñas</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">{totalReviews}</p>
               </div>
               <div className="rounded-xl bg-indigo-50 dark:bg-indigo-900/20 p-3">
                 <Award className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
 
       {/* Filters */}
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader>
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
               Filtros de búsqueda
-            </CardTitle>
-            <Button
+            </TarjetaTitulo>
+            <Boton
               variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+              className="dark:text-foreground dark:border-border dark:hover:bg-muted"
             >
               <Filter className="h-4 w-4" />
               {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
-            </Button>
+            </Boton>
           </div>
-        </CardHeader>
+        </TarjetaEncabezado>
         {showFilters && (
-          <CardContent className="pt-0">
+          <TarjetaContenido className="pt-0">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
                   Buscar
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-                  <Input
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-muted-foreground" />
+                  <Entrada
                     placeholder="Nombre, especialidad, licencia..."
                     value={filters.search || ''}
                     onChange={(e) => handleFilterChange('search', e.target.value)}
@@ -343,11 +344,11 @@ export default function Doctors() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
                   Especialidad
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
                   value={filters.specialty || ''}
                   onChange={(e) => handleFilterChange('specialty', e.target.value || undefined)}
                 >
@@ -360,11 +361,11 @@ export default function Doctors() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
                   Disponibilidad
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
                   value={filters.isAvailable === undefined ? '' : filters.isAvailable.toString()}
                   onChange={(e) => handleFilterChange('isAvailable', e.target.value === '' ? undefined : e.target.value === 'true')}
                 >
@@ -374,11 +375,11 @@ export default function Doctors() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
                   Experiencia (años)
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
                   value={filters.experience || ''}
                   onChange={(e) => handleFilterChange('experience', e.target.value ? parseInt(e.target.value) : undefined)}
                 >
@@ -391,21 +392,21 @@ export default function Doctors() {
                 </select>
               </div>
             </div>
-          </CardContent>
+          </TarjetaContenido>
         )}
-      </Card>
+      </Tarjeta>
 
       {/* Bulk Actions */}
       {selectedDoctors.length > 0 && (
-        <Card className="border border-indigo-200 bg-indigo-50/60 dark:border-indigo-800 dark:bg-indigo-900/20 shadow-sm">
-          <CardContent className="p-4">
+        <Tarjeta className="border border-indigo-200 bg-indigo-50/60 dark:border-indigo-800 dark:bg-indigo-900/20 shadow-sm">
+          <TarjetaContenido className="p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium text-indigo-900 dark:text-indigo-300">
                   {selectedDoctors.length} doctor{selectedDoctors.length !== 1 ? 'es' : ''} seleccionado{selectedDoctors.length !== 1 ? 's' : ''}
                 </span>
                 <div className="flex gap-2">
-                  <Button
+                  <Boton
                     size="sm"
                     variant="outline"
                     onClick={() => {
@@ -418,8 +419,8 @@ export default function Doctors() {
                   >
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     Activar
-                  </Button>
-                  <Button
+                  </Boton>
+                  <Boton
                     size="sm"
                     variant="outline"
                     onClick={() => {
@@ -432,34 +433,34 @@ export default function Doctors() {
                   >
                     <XCircle className="h-3.5 w-3.5" />
                     Desactivar
-                  </Button>
+                  </Boton>
                   <ExportDoctorsButton
                     doctors={doctors}
                     selectedDoctors={selectedDoctors}
                   />
                 </div>
               </div>
-              <Button
+              <Boton
                 size="sm"
                 variant="outline"
                 onClick={() => setSelectedDoctors([])}
-                className="text-gray-600 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                className="text-muted-foreground dark:text-foreground dark:border-border dark:hover:bg-muted"
               >
                 Cancelar
-              </Button>
+              </Boton>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       )}
 
       {/* Doctors Grid */}
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-row items-center justify-between">
+      <Tarjeta className="overflow-hidden border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
               Lista de doctores
-            </CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            </TarjetaTitulo>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
               {isLoading ? 'Cargando...' : `${totalDoctors} doctor${totalDoctors !== 1 ? 'es' : ''} registrado${totalDoctors !== 1 ? 's' : ''}`}
             </p>
           </div>
@@ -469,36 +470,33 @@ export default function Doctors() {
                 type="checkbox"
                 checked={selectedDoctors.length === doctors.length && doctors.length > 0}
                 onChange={handleSelectAll}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-border rounded cursor-pointer"
               />
-              <span className="text-sm text-gray-600 dark:text-gray-400">Seleccionar todos</span>
+              <span className="text-sm text-muted-foreground dark:text-muted-foreground">Seleccionar todos</span>
             </div>
           )}
-        </CardHeader>
-        <CardContent className="p-0">
+        </TarjetaEncabezado>
+        <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center">
-              <div className="inline-flex items-center justify-center">
-                <RefreshCw className="h-8 w-8 animate-spin text-indigo-600" />
-              </div>
-              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">Cargando doctores...</p>
+            <div className="p-3">
+              <EsqueletoTabla rows={8} columns={5} />
             </div>
           ) : doctors.length === 0 ? (
             <div className="p-12 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
-                <Stethoscope className="h-6 w-6 text-gray-400 dark:text-gray-500" />
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted dark:bg-card">
+                <Stethoscope className="h-6 w-6 text-gray-400 dark:text-muted-foreground" />
               </div>
-              <h3 className="mt-4 text-sm font-medium text-gray-900 dark:text-white">No hay doctores</h3>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <h3 className="mt-4 text-sm font-medium text-foreground dark:text-foreground">No hay doctores</h3>
+              <p className="mt-2 text-sm text-muted-foreground dark:text-muted-foreground">
                 No se encontraron doctores con los filtros aplicados.
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            <div className="divide-y divide-border dark:divide-border">
               {doctors.map((doctor) => (
                 <div
                   key={doctor.id}
-                  className="p-6 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors"
+                  className="p-6 hover:bg-muted/50 dark:hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-start gap-4">
                     {/* Checkbox */}
@@ -506,7 +504,7 @@ export default function Doctors() {
                       type="checkbox"
                       checked={selectedDoctors.includes(doctor.id)}
                       onChange={() => handleSelectDoctor(doctor.id)}
-                      className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                      className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-border rounded cursor-pointer"
                     />
 
                     {/* Avatar */}
@@ -528,12 +526,12 @@ export default function Doctors() {
 
                     {/* Doctor Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div className="flex-1 min-w-[200px]">
+                          <h3 className="text-base font-semibold text-foreground dark:text-foreground">
                             Dr. {doctor.user.firstName} {doctor.user.lastName}
                           </h3>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground dark:text-muted-foreground">
                             <span className="inline-flex items-center gap-1">
                               <GraduationCap className="h-3 w-3" />
                               {doctor.licenseNumber}
@@ -554,24 +552,24 @@ export default function Doctors() {
 
                           {/* Additional Info */}
                           <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
-                            <span className="inline-flex items-center gap-1 text-gray-600 dark:text-gray-300">
+                            <span className="inline-flex items-center gap-1 text-muted-foreground dark:text-muted-foreground">
                               <Clock className="h-4 w-4" />
                               <span className="font-medium">{doctor.experience}</span> años exp.
                             </span>
-                            <span className="inline-flex items-center gap-1 text-gray-600 dark:text-gray-300">
+                            <span className="inline-flex items-center gap-1 text-muted-foreground dark:text-muted-foreground">
                               <DollarSign className="h-4 w-4" />
                               <span className="font-medium">${doctor.consultationFee.toLocaleString()}</span>
                             </span>
                             <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400">
                               <Star className="h-4 w-4 fill-amber-400 dark:fill-amber-500" />
                               <span className="font-medium">{doctor.rating.toFixed(1)}</span>
-                              <span className="text-gray-500 dark:text-gray-400">({doctor.totalReviews})</span>
+                              <span className="text-muted-foreground dark:text-muted-foreground">({doctor.totalReviews})</span>
                             </span>
                           </div>
                         </div>
 
                         {/* Status Badges */}
-                        <div className="flex flex-wrap gap-2 justify-end">
+                        <div className="flex flex-shrink-0 flex-wrap gap-2 justify-end">
                           <span className={cn(
                             'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium',
                             getSpecialtyBadgeColor(doctor.specialty)
@@ -597,38 +595,38 @@ export default function Doctors() {
 
                       {/* Actions */}
                       <div className="mt-4 flex flex-wrap gap-2">
-                        <Button
+                        <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => {
                             setSelectedDoctor(doctor);
                             setShowDetailsModal(true);
                           }}
-                          className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                          className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           Ver detalles
-                        </Button>
-                        <Button
+                        </Boton>
+                        <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => {
                             setSelectedDoctor(doctor);
                             setShowEditModal(true);
                           }}
-                          className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                          className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                         >
                           <Edit2 className="h-3.5 w-3.5" />
                           Editar
-                        </Button>
-                        <Button
+                        </Boton>
+                        <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => handleAvailabilityToggle(doctor)}
                           disabled={updateAvailabilityMutation.isPending}
                           className={doctor.isAvailable 
-                            ? 'text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-gray-600 dark:hover:bg-gray-700' 
-                            : 'text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 dark:border-gray-600 dark:hover:bg-gray-700'
+                            ? 'text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-border dark:hover:bg-muted' 
+                            : 'text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 dark:border-border dark:hover:bg-muted'
                           }
                         >
                           {doctor.isAvailable ? (
@@ -642,16 +640,16 @@ export default function Doctors() {
                               Activar
                             </>
                           )}
-                        </Button>
-                        <Button
+                        </Boton>
+                        <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => handleDeleteDoctor(doctor)}
-                          className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                          className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-border dark:hover:bg-muted"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Eliminar
-                        </Button>
+                        </Boton>
                       </div>
                     </div>
                   </div>
@@ -659,35 +657,35 @@ export default function Doctors() {
               ))}
             </div>
           )}
-        </CardContent>
+        </TarjetaContenido>
 
-        {/* Pagination */}
+        {/* Paginacion */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-6 py-4">
+          <div className="border-t border-border dark:border-border bg-muted dark:bg-card px-6 py-4">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-muted-foreground dark:text-muted-foreground">
                 Mostrando{' '}
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-medium text-foreground dark:text-foreground">
                   {((filters.page! - 1) * filters.limit!) + 1}
                 </span>
                 {' '}-{' '}
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-medium text-foreground dark:text-foreground">
                   {Math.min(filters.page! * filters.limit!, pagination.total)}
                 </span>
                 {' '}de{' '}
-                <span className="font-medium text-gray-900 dark:text-white">{pagination.total}</span>
+                <span className="font-medium text-foreground dark:text-foreground">{pagination.total}</span>
                 {' '}resultados
               </div>
               <div className="flex gap-2">
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(filters.page! - 1)}
                   disabled={!pagination.hasPrev}
-                  className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                  className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                 >
                   Anterior
-                </Button>
+                </Boton>
                 {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                   let page;
                   if (pagination.totalPages <= 5) {
@@ -700,51 +698,51 @@ export default function Doctors() {
                     page = filters.page! - 2 + i;
                   }
                   return (
-                    <Button
+                    <Boton
                       key={page}
                       variant={page === filters.page ? 'primary' : 'outline'}
                       size="sm"
                       onClick={() => handlePageChange(page)}
-                      className={page === filters.page ? '' : 'dark:text-white dark:border-gray-600 dark:hover:bg-gray-700'}
+                      className={page === filters.page ? '' : 'dark:text-foreground dark:border-border dark:hover:bg-muted'}
                     >
                       {page}
-                    </Button>
+                    </Boton>
                   );
                 })}
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(filters.page! + 1)}
                   disabled={!pagination.hasNext}
-                  className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                  className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                 >
                   Siguiente
-                </Button>
+                </Boton>
               </div>
             </div>
           </div>
         )}
-      </Card>
+      </Tarjeta>
 
       {/* Modals */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-2xl">
-            <Card className="border border-gray-200 shadow-2xl">
-              <CardHeader>
+            <Tarjeta className="border border-border shadow-2xl">
+              <TarjetaEncabezado>
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <TarjetaTitulo className="text-xl font-semibold text-foreground">
                     Crear nuevo doctor
-                  </CardTitle>
+                  </TarjetaTitulo>
                   <button
                     onClick={() => setShowCreateModal(false)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-gray-400 hover:text-muted-foreground transition-colors"
                   >
                     <XCircle className="h-6 w-6" />
                   </button>
                 </div>
-              </CardHeader>
-              <CardContent>
+              </TarjetaEncabezado>
+              <TarjetaContenido>
                 <CreateDoctorForm
                   onSuccess={() => {
                     setShowCreateModal(false);
@@ -752,8 +750,8 @@ export default function Doctors() {
                   }}
                   onCancel={() => setShowCreateModal(false)}
                 />
-              </CardContent>
-            </Card>
+              </TarjetaContenido>
+            </Tarjeta>
           </div>
         </div>
       )}
@@ -761,24 +759,24 @@ export default function Doctors() {
       {showDetailsModal && selectedDoctor && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-2xl">
-            <Card className="border border-gray-200 shadow-2xl">
-              <CardHeader>
+            <Tarjeta className="border border-border shadow-2xl">
+              <TarjetaEncabezado>
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <TarjetaTitulo className="text-xl font-semibold text-foreground">
                     Detalles del doctor
-                  </CardTitle>
+                  </TarjetaTitulo>
                   <button
                     onClick={() => setShowDetailsModal(false)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-gray-400 hover:text-muted-foreground transition-colors"
                   >
                     <XCircle className="h-6 w-6" />
                   </button>
                 </div>
-              </CardHeader>
-              <CardContent>
+              </TarjetaEncabezado>
+              <TarjetaContenido>
                 <DoctorDetailsView doctor={selectedDoctor} />
-              </CardContent>
-            </Card>
+              </TarjetaContenido>
+            </Tarjeta>
           </div>
         </div>
       )}
@@ -786,21 +784,21 @@ export default function Doctors() {
       {showEditModal && selectedDoctor && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-2xl">
-            <Card className="border border-gray-200 shadow-2xl">
-              <CardHeader>
+            <Tarjeta className="border border-border shadow-2xl">
+              <TarjetaEncabezado>
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <TarjetaTitulo className="text-xl font-semibold text-foreground">
                     Editar doctor
-                  </CardTitle>
+                  </TarjetaTitulo>
                   <button
                     onClick={() => setShowEditModal(false)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-gray-400 hover:text-muted-foreground transition-colors"
                   >
                     <XCircle className="h-6 w-6" />
                   </button>
                 </div>
-              </CardHeader>
-              <CardContent>
+              </TarjetaEncabezado>
+              <TarjetaContenido>
                 <EditDoctorForm
                   doctor={selectedDoctor}
                   onSuccess={() => {
@@ -809,8 +807,8 @@ export default function Doctors() {
                   }}
                   onCancel={() => setShowEditModal(false)}
                 />
-              </CardContent>
-            </Card>
+              </TarjetaContenido>
+            </Tarjeta>
           </div>
         </div>
       )}
@@ -818,42 +816,42 @@ export default function Doctors() {
       {showDeleteModal && selectedDoctor && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-md">
-            <Card className="border border-red-200 shadow-2xl">
-              <CardContent className="p-6">
+            <Tarjeta className="border border-red-200 shadow-2xl">
+              <TarjetaContenido className="p-6">
                 <div className="text-center">
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
                     <AlertCircle className="h-6 w-6 text-red-600" />
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">
                     Eliminar doctor
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       ¿Estás seguro de que quieres eliminar al{' '}
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-semibold text-foreground">
                         Dr. {selectedDoctor.user.firstName} {selectedDoctor.user.lastName}
                       </span>
                       ? Esta acción no se puede deshacer.
                     </p>
                   </div>
                   <div className="mt-6 flex justify-center gap-3">
-                    <Button
+                    <Boton
                       variant="outline"
                       onClick={() => setShowDeleteModal(false)}
                     >
                       Cancelar
-                    </Button>
-                    <Button
+                    </Boton>
+                    <Boton
                       onClick={confirmDelete}
                       disabled={deleteDoctorMutation.isPending}
                       className="bg-red-600 hover:bg-red-700"
                     >
                       {deleteDoctorMutation.isPending ? 'Eliminando...' : 'Eliminar doctor'}
-                    </Button>
+                    </Boton>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </TarjetaContenido>
+            </Tarjeta>
           </div>
         </div>
       )}

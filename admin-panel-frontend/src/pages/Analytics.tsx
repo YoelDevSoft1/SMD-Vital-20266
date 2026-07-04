@@ -12,14 +12,14 @@ import {
 } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
 import type { AnalyticsMetric } from '@/types';
-import { Button } from '@/components/ui/Button';
+import { Boton } from '@/components/ui/Boton';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  Tarjeta,
+  TarjetaContenido,
+  TarjetaDescripcion,
+  TarjetaEncabezado,
+  TarjetaTitulo,
+} from '@/components/ui/Tarjeta';
 import AnalyticsTrendChart from '@/components/AnalyticsTrendChart';
 import AnalyticsInsightsModal from '@/components/AnalyticsInsightsModal';
 
@@ -42,7 +42,7 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const formatNumber = (value: number) =>
+const formatearNumero = (value: number) =>
   new Intl.NumberFormat('es-CO', {
     maximumFractionDigits: 0,
   }).format(value);
@@ -109,30 +109,30 @@ export default function Analytics() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Analíticas</h1>
-          <p className="text-sm text-gray-600">
+          <h1 className="text-3xl font-bold text-foreground">Analíticas</h1>
+          <p className="text-sm text-muted-foreground">
             Visualiza el desempeño general, métricas claves y tendencias de la plataforma.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => refetch()} isLoading={isFetching}>
+          <Boton variant="outline" onClick={() => refetch()} isLoading={isFetching}>
             <RefreshCw className="h-4 w-4" />
-            Actualizar datos
-          </Button>
-          <Button onClick={() => setShowInsights(true)}>
+            Actualizar formData
+          </Boton>
+          <Boton onClick={() => setShowInsights(true)}>
             <LineChart className="h-4 w-4" />
             Abrir analíticas avanzadas
-          </Button>
+          </Boton>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="rounded-xl border border-dashed border-gray-200 bg-white p-12 text-center text-sm text-gray-500">
+        <div className="rounded-xl border border-dashed border-border bg-white p-12 text-center text-sm text-muted-foreground">
           Cargando métricas...
         </div>
       ) : error ? (
         <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-600">
-          Ocurrió un error al obtener los datos de analíticas. Intenta nuevamente.
+          Ocurrió un error al obtener los formData de analíticas. Intenta nuevamente.
         </div>
       ) : (
         <>
@@ -143,21 +143,21 @@ export default function Analytics() {
                 metric === 'revenue'
                   ? formatCurrency(summary.totalRevenue)
                   : metric === 'appointments'
-                  ? formatNumber(summary.totalAppointments)
-                  : formatNumber(summary.totalUsers);
+                  ? formatearNumero(summary.totalAppointments)
+                  : formatearNumero(summary.totalUsers);
               const change = calculateTrendChange(metric);
               const isPositive = change >= 0;
 
               return (
-                <Card key={metric} className="border border-gray-200 shadow-sm">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-600">
+                <Tarjeta key={metric} className="border border-border shadow-sm">
+                  <TarjetaEncabezado className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <TarjetaTitulo className="text-sm font-medium text-muted-foreground">
                       {metricLabels[metric]}
-                    </CardTitle>
+                    </TarjetaTitulo>
                     <Icon className="h-5 w-5 text-blue-500" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-semibold text-gray-900">{total}</div>
+                  </TarjetaEncabezado>
+                  <TarjetaContenido>
+                    <div className="text-2xl font-semibold text-foreground">{total}</div>
                     <p className="mt-2 flex items-center text-sm">
                       {isPositive ? (
                         <TrendingUp className="mr-1 h-4 w-4 text-emerald-500" />
@@ -167,85 +167,85 @@ export default function Analytics() {
                       <span className={isPositive ? 'text-emerald-600' : 'text-red-600'}>
                         {formatPercent(change)}
                       </span>
-                      <span className="ml-2 text-gray-500">vs inicio del periodo</span>
+                      <span className="ml-2 text-muted-foreground">vs inicio del periodo</span>
                     </p>
-                  </CardContent>
-                </Card>
+                  </TarjetaContenido>
+                </Tarjeta>
               );
             })}
           </div>
 
-          <Card className="border border-gray-200 shadow-sm">
-            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <Tarjeta className="border border-border shadow-sm">
+            <TarjetaEncabezado className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <CardTitle>Tendencias recientes</CardTitle>
-                <CardDescription>
+                <TarjetaTitulo>Tendencias recientes</TarjetaTitulo>
+                <TarjetaDescripcion>
                   Evolución de ingresos, citas y usuarios en los últimos 30 días.
-                </CardDescription>
+                </TarjetaDescripcion>
               </div>
               <div className="flex flex-wrap gap-2">
                 {(Object.keys(visibleMetrics) as AnalyticsMetric[]).map((metric) => (
-                  <Button
+                  <Boton
                     key={metric}
                     size="sm"
                     variant={visibleMetrics[metric] ? 'primary' : 'outline'}
                     onClick={() => handleMetricToggle(metric)}
                   >
                     {metricLabels[metric]}
-                  </Button>
+                  </Boton>
                 ))}
               </div>
-            </CardHeader>
-            <CardContent>
+            </TarjetaEncabezado>
+            <TarjetaContenido>
               <AnalyticsTrendChart data={trends} visibleMetrics={visibleMetrics} />
-            </CardContent>
-          </Card>
+            </TarjetaContenido>
+          </Tarjeta>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <Card className="border border-slate-200 bg-slate-50 shadow-sm">
-              <CardHeader>
-                <CardTitle>Ticket promedio</CardTitle>
-                <CardDescription>Ingresos promedio por cita confirmada.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-semibold text-gray-900">
+            <Tarjeta className="border border-border bg-muted shadow-sm">
+              <TarjetaEncabezado>
+                <TarjetaTitulo>Ticket promedio</TarjetaTitulo>
+                <TarjetaDescripcion>Ingresos promedio por cita confirmada.</TarjetaDescripcion>
+              </TarjetaEncabezado>
+              <TarjetaContenido>
+                <p className="text-2xl font-semibold text-foreground">
                   {formatCurrency(summary.averageOrderValue || 0)}
                 </p>
-                <p className="mt-2 text-xs text-gray-500">
-                  Basado en {formatNumber(summary.totalAppointments || 0)} citas del periodo.
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Basado en {formatearNumero(summary.totalAppointments || 0)} citas del periodo.
                 </p>
-              </CardContent>
-            </Card>
-            <Card className="border border-emerald-200 bg-emerald-50/80 shadow-sm">
-              <CardHeader>
-                <CardTitle>Crecimiento neto de usuarios</CardTitle>
-                <CardDescription>Usuarios incorporados durante el periodo medido.</CardDescription>
-              </CardHeader>
-              <CardContent>
+              </TarjetaContenido>
+            </Tarjeta>
+            <Tarjeta className="border border-emerald-200 bg-emerald-50/80 shadow-sm">
+              <TarjetaEncabezado>
+                <TarjetaTitulo>Crecimiento neto de usuarios</TarjetaTitulo>
+                <TarjetaDescripcion>Usuarios incorporados durante el periodo medido.</TarjetaDescripcion>
+              </TarjetaEncabezado>
+              <TarjetaContenido>
                 <p className="text-2xl font-semibold text-emerald-900">
-                  {formatNumber(summary.totalUsers || 0)}
+                  {formatearNumero(summary.totalUsers || 0)}
                 </p>
                 <p className="mt-2 text-xs text-emerald-700">
                   Mantén campañas activas si la tendencia es positiva.
                 </p>
-              </CardContent>
-            </Card>
-            <Card className="border border-indigo-200 bg-indigo-50/80 shadow-sm">
-              <CardHeader>
-                <CardTitle>Ritmo operativo</CardTitle>
-                <CardDescription>Citas promedio gestionadas por día.</CardDescription>
-              </CardHeader>
-              <CardContent>
+              </TarjetaContenido>
+            </Tarjeta>
+            <Tarjeta className="border border-indigo-200 bg-indigo-50/80 shadow-sm">
+              <TarjetaEncabezado>
+                <TarjetaTitulo>Ritmo operativo</TarjetaTitulo>
+                <TarjetaDescripcion>Citas promedio gestionadas por día.</TarjetaDescripcion>
+              </TarjetaEncabezado>
+              <TarjetaContenido>
                 <p className="text-2xl font-semibold text-indigo-900">
                   {trends.length > 0
-                    ? formatNumber(summary.totalAppointments / trends.length)
+                    ? formatearNumero(summary.totalAppointments / trends.length)
                     : '0'}
                 </p>
                 <p className="mt-2 text-xs text-indigo-700">
                   Ajusta turnos y logística según esta capacidad base.
                 </p>
-              </CardContent>
-            </Card>
+              </TarjetaContenido>
+            </Tarjeta>
           </div>
         </>
       )}

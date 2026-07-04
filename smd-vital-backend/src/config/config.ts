@@ -17,7 +17,7 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 
   // Server
-  PORT: z.string().transform(Number).default('3000'),
+  PORT: z.string().transform(Number).default('4040'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   API_VERSION: z.string().default('v1'),
 
@@ -85,7 +85,7 @@ const env = envSchema.parse({
   JWT_EXPIRES_IN: process.env['JWT_EXPIRES_IN'] || "24h",
   JWT_REFRESH_SECRET: process.env['JWT_REFRESH_SECRET'] || "dev-refresh-secret-key-that-is-at-least-32-characters-long-for-development",
   JWT_REFRESH_EXPIRES_IN: process.env['JWT_REFRESH_EXPIRES_IN'] || "7d",
-  PORT: process.env['PORT'] || "3000",
+  PORT: process.env['PORT'] || "4040",
   NODE_ENV: process.env['NODE_ENV'] || "development",
   API_VERSION: process.env['API_VERSION'] || "v1",
   CORS_ORIGIN: process.env['CORS_ORIGIN'] || "http://localhost:5173,http://localhost:5174",

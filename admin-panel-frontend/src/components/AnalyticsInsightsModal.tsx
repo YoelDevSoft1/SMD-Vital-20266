@@ -15,11 +15,11 @@ import {
 import toast from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { AnalyticsData, AnalyticsFilters, AnalyticsMetric } from '@/types';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectItem } from '@/components/ui/Select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
+import { Seleccion, SelectItem } from '@/components/ui/Seleccion';
+import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
 import AnalyticsTrendChart from '@/components/AnalyticsTrendChart';
 
 type RangePreset = '7d' | '30d' | '90d' | 'ytd' | 'custom';
@@ -57,7 +57,7 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const formatNumber = (value: number) =>
+const formatearNumero = (value: number) =>
   new Intl.NumberFormat('es-CO', {
     maximumFractionDigits: 0,
   }).format(value);
@@ -85,7 +85,7 @@ const getBestDay = (
   );
 };
 
-const formatDate = (value: Date) => format(value, 'yyyy-MM-dd');
+const formatearFecha = (value: Date) => format(value, 'yyyy-MM-dd');
 
 const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps) => {
   const today = useMemo(() => new Date(), []);
@@ -94,13 +94,13 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
   const [rangePreset, setRangePreset] = useState<RangePreset>('30d');
   const [comparePreset, setComparePreset] = useState<ComparePreset>('none');
   const [filters, setFilters] = useState<AnalyticsFilters>({
-    startDate: formatDate(defaultStart),
-    endDate: formatDate(today),
+    startDate: formatearFecha(defaultStart),
+    endDate: formatearFecha(today),
     groupBy: 'day',
   });
   const [customRange, setCustomRange] = useState({
-    startDate: formatDate(defaultStart),
-    endDate: formatDate(today),
+    startDate: formatearFecha(defaultStart),
+    endDate: formatearFecha(today),
   });
   const [visibleMetrics, setVisibleMetrics] = useState<Record<AnalyticsMetric, boolean>>({
     appointments: true,
@@ -173,12 +173,12 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
     if (start) {
       setFilters((prev) => ({
         ...prev,
-        startDate: formatDate(start!),
-        endDate: formatDate(end),
+        startDate: formatearFecha(start!),
+        endDate: formatearFecha(end),
       }));
       setCustomRange({
-        startDate: formatDate(start),
-        endDate: formatDate(end),
+        startDate: formatearFecha(start),
+        endDate: formatearFecha(end),
       });
     }
   };
@@ -212,63 +212,63 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-6 backdrop-blur-sm">
       <div className="relative flex h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
-        <header className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+        <header className="flex items-center justify-between border-b border-border px-6 py-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Analíticas Avanzadas</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-xl font-semibold text-foreground">Analíticas Avanzadas</h2>
+            <p className="text-sm text-muted-foreground">
               Explora en detalle el rendimiento de la plataforma y encuentra patrones relevantes.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button
+            <Boton
               variant="outline"
               onClick={() => refetch()}
               isLoading={isFetching}
             >
               <RefreshCw className="h-4 w-4" />
               Actualizar
-            </Button>
-            <Button variant="outline" onClick={() => handleExport('csv')}>
+            </Boton>
+            <Boton variant="outline" onClick={() => handleExport('csv')}>
               <Download className="h-4 w-4" />
               Exportar CSV
-            </Button>
-            <Button variant="outline" onClick={() => handleExport('json')}>
+            </Boton>
+            <Boton variant="outline" onClick={() => handleExport('json')}>
               <Download className="h-4 w-4" />
               Exportar JSON
-            </Button>
-            <Button variant="ghost" onClick={onClose}>
+            </Boton>
+            <Boton variant="ghost" onClick={onClose}>
               <X className="h-5 w-5" />
-            </Button>
+            </Boton>
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto bg-gray-50">
-          <section className="border-b border-gray-200 bg-white px-6 py-5">
+        <div className="flex-1 overflow-y-auto bg-muted">
+          <section className="border-b border-border bg-white px-6 py-5">
             <div className="grid gap-6 lg:grid-cols-12">
               <div className="lg:col-span-5">
-                <Label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
+                <Etiqueta className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
                   <CalendarRange className="h-4 w-4 text-blue-500" />
                   Rango de tiempo
-                </Label>
+                </Etiqueta>
                 <div className="flex flex-wrap gap-2">
                   {rangeOptions.map((option) => (
-                    <Button
+                    <Boton
                       key={option.id}
                       size="sm"
                       variant={rangePreset === option.id ? 'primary' : 'outline'}
                       onClick={() => handlePresetChange(option.id)}
                     >
                       {option.label}
-                    </Button>
+                    </Boton>
                   ))}
                 </div>
                 {rangePreset === 'custom' && (
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
                     <div>
-                      <Label htmlFor="custom-start" className="mb-1 block text-sm font-medium text-gray-700">
+                      <Etiqueta htmlFor="custom-start" className="mb-1 block text-sm font-medium text-foreground">
                         Desde
-                      </Label>
-                      <Input
+                      </Etiqueta>
+                      <Entrada
                         id="custom-start"
                         type="date"
                         value={customRange.startDate}
@@ -276,14 +276,14 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                       />
                     </div>
                     <div>
-                      <Label htmlFor="custom-end" className="mb-1 block text-sm font-medium text-gray-700">
+                      <Etiqueta htmlFor="custom-end" className="mb-1 block text-sm font-medium text-foreground">
                         Hasta
-                      </Label>
-                      <Input
+                      </Etiqueta>
+                      <Entrada
                         id="custom-end"
                         type="date"
                         value={customRange.endDate}
-                        max={formatDate(today)}
+                        max={formatearFecha(today)}
                         onChange={(event) => handleCustomDateChange('endDate', event.target.value)}
                       />
                     </div>
@@ -293,10 +293,10 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
 
               <div className="grid gap-4 lg:col-span-3">
                 <div>
-                  <Label htmlFor="group-by" className="mb-1 block text-sm font-medium text-gray-700">
+                  <Etiqueta htmlFor="group-by" className="mb-1 block text-sm font-medium text-foreground">
                     Agrupar por
-                  </Label>
-                  <Select
+                  </Etiqueta>
+                  <Seleccion
                     id="group-by"
                     value={filters.groupBy}
                     onChange={(event) =>
@@ -306,13 +306,13 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                     <SelectItem value="day">Día</SelectItem>
                     <SelectItem value="week">Semana</SelectItem>
                     <SelectItem value="month">Mes</SelectItem>
-                  </Select>
+                  </Seleccion>
                 </div>
                 <div>
-                  <Label htmlFor="compare-to" className="mb-1 block text-sm font-medium text-gray-700">
+                  <Etiqueta htmlFor="compare-to" className="mb-1 block text-sm font-medium text-foreground">
                     Comparar contra
-                  </Label>
-                  <Select
+                  </Etiqueta>
+                  <Seleccion
                     id="compare-to"
                     value={comparePreset}
                     onChange={(event) => setComparePreset(event.target.value as ComparePreset)}
@@ -320,17 +320,17 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                     <SelectItem value="none">Sin comparación</SelectItem>
                     <SelectItem value="previous_period">Periodo anterior</SelectItem>
                     <SelectItem value="previous_year">Mismo periodo año pasado</SelectItem>
-                  </Select>
+                  </Seleccion>
                 </div>
               </div>
 
               <div className="grid gap-4 lg:col-span-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="segment-service" className="mb-1 block text-sm font-medium text-gray-700">
+                    <Etiqueta htmlFor="segment-service" className="mb-1 block text-sm font-medium text-foreground">
                       Servicio (ID)
-                    </Label>
-                    <Input
+                    </Etiqueta>
+                    <Entrada
                       id="segment-service"
                       placeholder="Opcional"
                       value={filters.serviceId ?? ''}
@@ -340,10 +340,10 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                     />
                   </div>
                   <div>
-                    <Label htmlFor="segment-city" className="mb-1 block text-sm font-medium text-gray-700">
+                    <Etiqueta htmlFor="segment-city" className="mb-1 block text-sm font-medium text-foreground">
                       Ciudad
-                    </Label>
-                    <Input
+                    </Etiqueta>
+                    <Entrada
                       id="segment-city"
                       placeholder="Ej: Bogotá"
                       value={filters.city ?? ''}
@@ -354,10 +354,10 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="segment-doctor" className="mb-1 block text-sm font-medium text-gray-700">
+                  <Etiqueta htmlFor="segment-doctor" className="mb-1 block text-sm font-medium text-foreground">
                     Doctor (ID)
-                  </Label>
-                  <Input
+                  </Etiqueta>
+                  <Entrada
                     id="segment-doctor"
                     placeholder="Opcional"
                     value={filters.doctorId ?? ''}
@@ -372,7 +372,7 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
 
           <section className="px-6 py-6">
             {isLoading ? (
-              <div className="flex h-72 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-gray-500">
+              <div className="flex h-72 items-center justify-center rounded-xl border border-dashed border-border bg-white text-muted-foreground">
                 Cargando analíticas...
               </div>
             ) : error ? (
@@ -388,8 +388,8 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                       metric === 'revenue'
                         ? formatCurrency(summary.totalRevenue)
                         : metric === 'appointments'
-                        ? formatNumber(summary.totalAppointments)
-                        : formatNumber(summary.totalUsers);
+                        ? formatearNumero(summary.totalAppointments)
+                        : formatearNumero(summary.totalUsers);
                     const change =
                       metric === 'revenue'
                         ? revenueChange
@@ -399,15 +399,15 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                     const isPositive = change >= 0;
 
                     return (
-                      <Card key={metric} className="border border-gray-200 shadow-sm">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                          <CardTitle className="text-sm font-medium text-gray-600">
+                      <Tarjeta key={metric} className="border border-border shadow-sm">
+                        <TarjetaEncabezado className="flex flex-row items-center justify-between space-y-0 pb-2">
+                          <TarjetaTitulo className="text-sm font-medium text-muted-foreground">
                             {metricLabels[metric]}
-                          </CardTitle>
+                          </TarjetaTitulo>
                           <Icon className="h-5 w-5 text-blue-500" />
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-2xl font-semibold text-gray-900">{total}</div>
+                        </TarjetaEncabezado>
+                        <TarjetaContenido>
+                          <div className="text-2xl font-semibold text-foreground">{total}</div>
                           <div className="mt-2 flex items-center text-sm">
                             {isPositive ? (
                               <TrendingUp className="mr-1 h-4 w-4 text-emerald-500" />
@@ -417,32 +417,32 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                             <span className={isPositive ? 'text-emerald-600' : 'text-red-600'}>
                               {formatPercent(change)}
                             </span>
-                            <span className="ml-2 text-gray-500">vs inicio del periodo</span>
+                            <span className="ml-2 text-muted-foreground">vs inicio del periodo</span>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </TarjetaContenido>
+                      </Tarjeta>
                     );
                   })}
                 </div>
 
-                <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="mt-6 rounded-xl border border-border bg-white p-6 shadow-sm">
                   <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">Tendencias en el tiempo</h3>
-                      <p className="text-sm text-gray-500">
+                      <h3 className="text-lg font-semibold text-foreground">Tendencias en el tiempo</h3>
+                      <p className="text-sm text-muted-foreground">
                         Visualiza el comportamiento histórico y activa/desactiva las métricas de interés.
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       {(Object.keys(visibleMetrics) as AnalyticsMetric[]).map((metric) => (
-                        <Button
+                        <Boton
                           key={metric}
                           size="sm"
                           variant={visibleMetrics[metric] ? 'primary' : 'outline'}
                           onClick={() => handleMetricToggle(metric)}
                         >
                           {metricLabels[metric]}
-                        </Button>
+                        </Boton>
                       ))}
                     </div>
                   </div>
@@ -450,11 +450,11 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                 </div>
 
                 <div className="mt-6 grid gap-6 lg:grid-cols-2">
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle>Insights destacados</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4 text-sm text-gray-700">
+                  <Tarjeta className="border border-border shadow-sm">
+                    <TarjetaEncabezado>
+                      <TarjetaTitulo>Insights destacados</TarjetaTitulo>
+                    </TarjetaEncabezado>
+                    <TarjetaContenido className="space-y-4 text-sm text-foreground">
                       <div className="rounded-lg bg-blue-50/70 p-3">
                         <p className="font-semibold text-blue-900">Ingresos promedio diarios</p>
                         <p className="mt-1 text-blue-800">{formatCurrency(averageDailyRevenue)}</p>
@@ -465,7 +465,7 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                       <div className="rounded-lg bg-emerald-50 p-3">
                         <p className="font-semibold text-emerald-900">Citas promedio por periodo</p>
                         <p className="mt-1 text-emerald-800">
-                          {formatNumber(averageDailyAppointments)} citas
+                          {formatearNumero(averageDailyAppointments)} citas
                         </p>
                         <p className="text-xs text-emerald-600">
                           Ideal para dimensionar capacidad operativa y recursos.
@@ -496,24 +496,24 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                               month: 'long',
                               day: '2-digit',
                             }).format(new Date(bestAppointmentsDay.date))}{' '}
-                            · {formatNumber(bestAppointmentsDay.appointments)} citas
+                            · {formatearNumero(bestAppointmentsDay.appointments)} citas
                           </p>
                           <p className="text-xs text-amber-600">
                             Útil para ajustar disponibilidad de médicos y logística.
                           </p>
                         </div>
                       )}
-                    </CardContent>
-                  </Card>
+                    </TarjetaContenido>
+                  </Tarjeta>
 
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle>Detalle de los últimos periodos</CardTitle>
-                    </CardHeader>
-                    <CardContent className="overflow-hidden">
+                  <Tarjeta className="border border-border shadow-sm">
+                    <TarjetaEncabezado>
+                      <TarjetaTitulo>Detalle de los últimos periodos</TarjetaTitulo>
+                    </TarjetaEncabezado>
+                    <TarjetaContenido className="overflow-hidden">
                       <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200 text-sm">
-                          <thead className="bg-gray-50 text-left text-xs font-semibold uppercase text-gray-500">
+                        <table className="min-w-full divide-y divide-border text-sm">
+                          <thead className="bg-muted text-left text-xs font-semibold uppercase text-muted-foreground">
                             <tr>
                               <th className="px-4 py-3">Fecha</th>
                               <th className="px-4 py-3 text-right">Ingresos</th>
@@ -521,35 +521,35 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
                               <th className="px-4 py-3 text-right">Usuarios</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-gray-100 bg-white">
+                          <tbody className="divide-y divide-border bg-white">
                             {trends
                               .slice(-8)
                               .reverse()
                               .map((item: AnalyticsData['trends'][number]) => (
                               <tr key={item.date}>
-                                <td className="whitespace-nowrap px-4 py-3 text-gray-700">
+                                <td className="whitespace-nowrap px-4 py-3 text-foreground">
                                   {new Intl.DateTimeFormat('es-CO', {
                                     year: 'numeric',
                                     month: 'short',
                                     day: '2-digit',
                                   }).format(new Date(item.date))}
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-3 text-right text-gray-700">
+                                <td className="whitespace-nowrap px-4 py-3 text-right text-foreground">
                                   {formatCurrency(item.revenue)}
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-3 text-right text-gray-700">
-                                  {formatNumber(item.appointments)}
+                                <td className="whitespace-nowrap px-4 py-3 text-right text-foreground">
+                                  {formatearNumero(item.appointments)}
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-3 text-right text-gray-700">
-                                  {formatNumber(item.users)}
+                                <td className="whitespace-nowrap px-4 py-3 text-right text-foreground">
+                                  {formatearNumero(item.users)}
                                 </td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </TarjetaContenido>
+                  </Tarjeta>
                 </div>
               </>
             )}

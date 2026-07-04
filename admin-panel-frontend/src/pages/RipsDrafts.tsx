@@ -4,9 +4,9 @@ import { format, subDays } from 'date-fns';
 import { Download, FileJson, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Boton } from '@/components/ui/Boton';
+import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
+import { Entrada } from '@/components/ui/Entrada';
 import type { RipsDraft, RipsDraftFilters, RipsDraftStatus } from '@/types';
 
 const statusOptions: Array<RipsDraftStatus | ''> = ['', 'DRAFT', 'VALIDATED', 'EXPORTED', 'FAILED'];
@@ -18,7 +18,7 @@ const statusClass: Record<RipsDraftStatus, string> = {
   FAILED: 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300',
 };
 
-const formatDateTime = (value: string) =>
+const formatearFechaHora = (value: string) =>
   new Intl.DateTimeFormat('es-CO', {
     dateStyle: 'medium',
     timeStyle: 'short',
@@ -83,35 +83,35 @@ export default function RipsDrafts() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">RIPS</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">RIPS</h1>
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             Borradores internos para validacion y export JSON. No transmite al MUV.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => refetch()} isLoading={isFetching}>
+          <Boton variant="outline" onClick={() => refetch()} isLoading={isFetching}>
             <RefreshCw className="h-4 w-4" />
             Actualizar
-          </Button>
-          <Button onClick={() => exportMutation.mutate()} isLoading={exportMutation.isPending}>
+          </Boton>
+          <Boton onClick={() => exportMutation.mutate()} isLoading={exportMutation.isPending}>
             <Download className="h-4 w-4" />
             Exportar JSON
-          </Button>
+          </Boton>
         </div>
       </div>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado>
+          <TarjetaTitulo className="flex items-center gap-2 text-lg">
             <FileJson className="h-5 w-5 text-blue-600" />
             Filtros RIPS
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-4">
+          </TarjetaTitulo>
+        </TarjetaEncabezado>
+        <TarjetaContenido className="grid gap-3 md:grid-cols-4">
           <select
             value={filters.status ?? ''}
             onChange={(event) => updateFilter('status', event.target.value as RipsDraftStatus | '')}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+            className="rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
           >
             {statusOptions.map((status) => (
               <option key={status || 'all'} value={status}>
@@ -119,59 +119,59 @@ export default function RipsDrafts() {
               </option>
             ))}
           </select>
-          <Input
+          <Entrada
             type="date"
             value={filters.dateFrom ?? ''}
             onChange={(event) => updateFilter('dateFrom', event.target.value)}
           />
-          <Input
+          <Entrada
             type="date"
             value={filters.dateTo ?? ''}
             onChange={(event) => updateFilter('dateTo', event.target.value)}
           />
-          <Button variant="outline" onClick={() => refetch()}>
+          <Boton variant="outline" onClick={() => refetch()}>
             Aplicar filtros
-          </Button>
-        </CardContent>
-      </Card>
+          </Boton>
+        </TarjetaContenido>
+      </Tarjeta>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardContent className="p-0">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">Generando borradores...</div>
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">Generando borradores...</div>
           ) : error ? (
             <div className="p-12 text-center text-sm text-red-600 dark:text-red-400">No se pudo cargar RIPS.</div>
           ) : drafts.length === 0 ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">No hay borradores para estos filtros.</div>
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">No hay borradores para estos filtros.</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-800">
+              <table className="min-w-full divide-y divide-border text-sm dark:divide-border">
+                <thead className="bg-muted dark:bg-card">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-300">Generado</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-300">Cita</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-300">Paciente</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-300">Servicio</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-300">Estado</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-300">Errores</th>
+                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground dark:text-muted-foreground">Generado</th>
+                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground dark:text-muted-foreground">Cita</th>
+                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground dark:text-muted-foreground">Paciente</th>
+                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground dark:text-muted-foreground">Servicio</th>
+                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground dark:text-muted-foreground">Estado</th>
+                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground dark:text-muted-foreground">Errores</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                <tbody className="divide-y divide-border dark:divide-border">
                   {drafts.map((draft) => (
-                    <tr key={draft.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
-                      <td className="whitespace-nowrap px-4 py-3 text-gray-700 dark:text-gray-200">
-                        {formatDateTime(draft.generatedAt)}
+                    <tr key={draft.id} className="hover:bg-muted dark:hover:bg-card/60">
+                      <td className="whitespace-nowrap px-4 py-3 text-foreground dark:text-foreground">
+                        {formatearFechaHora(draft.generatedAt)}
                       </td>
-                      <td className="px-4 py-3 text-gray-700 dark:text-gray-200">
+                      <td className="px-4 py-3 text-foreground dark:text-foreground">
                         <div className="max-w-[160px] truncate">{draft.appointmentId}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                        <div className="text-xs text-muted-foreground dark:text-muted-foreground">
                           {draft.appointment?.status ?? 'Sin estado'}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-gray-700 dark:text-gray-200">
+                      <td className="px-4 py-3 text-foreground dark:text-foreground">
                         {draft.appointment?.patient?.user?.firstName} {draft.appointment?.patient?.user?.lastName}
                       </td>
-                      <td className="px-4 py-3 text-gray-700 dark:text-gray-200">
+                      <td className="px-4 py-3 text-foreground dark:text-foreground">
                         {draft.appointment?.service?.name ?? 'Sin servicio'}
                       </td>
                       <td className="px-4 py-3">
@@ -179,7 +179,7 @@ export default function RipsDrafts() {
                           {draft.status}
                         </span>
                       </td>
-                      <td className="max-w-[260px] px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
+                      <td className="max-w-[260px] px-4 py-3 text-xs text-muted-foreground dark:text-muted-foreground">
                         {draft.errors?.length ? draft.errors.join(', ') : 'Sin errores'}
                       </td>
                     </tr>
@@ -188,31 +188,31 @@ export default function RipsDrafts() {
               </table>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </TarjetaContenido>
+      </Tarjeta>
 
       {pagination ? (
-        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
+        <div className="flex items-center justify-between text-sm text-muted-foreground dark:text-muted-foreground">
           <span>
             Pagina {pagination.page} de {pagination.totalPages || 1} · {pagination.total} borradores
           </span>
           <div className="flex gap-2">
-            <Button
+            <Boton
               variant="outline"
               size="sm"
               disabled={!pagination.hasPrev}
               onClick={() => updateFilter('page', Math.max(1, (filters.page ?? 1) - 1))}
             >
               Anterior
-            </Button>
-            <Button
+            </Boton>
+            <Boton
               variant="outline"
               size="sm"
               disabled={!pagination.hasNext}
               onClick={() => updateFilter('page', (filters.page ?? 1) + 1)}
             >
               Siguiente
-            </Button>
+            </Boton>
           </div>
         </div>
       ) : null}

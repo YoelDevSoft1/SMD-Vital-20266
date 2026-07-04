@@ -1,7 +1,7 @@
 // Simple configuration for development
 export const config = {
   // Server configuration
-  port: parseInt(process.env['PORT'] || '3000'),
+  port: parseInt(process.env['PORT'] || '4040'),
   nodeEnv: process.env['NODE_ENV'] || 'development',
   apiVersion: process.env['API_VERSION'] || 'v1',
 
@@ -25,7 +25,7 @@ export const config = {
 
   // CORS configuration
   cors: {
-    origin: process.env['CORS_ORIGIN'] || ['http://localhost:5173', 'http://localhost:4321', 'http://localhost:3000'],
+    origin: process.env['CORS_ORIGIN'] || ['http://localhost:5173', 'http://localhost:4321', 'http://localhost:4040'],
     credentials: process.env['CORS_CREDENTIALS'] === 'true',
   },
 

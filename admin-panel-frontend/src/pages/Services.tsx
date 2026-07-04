@@ -22,11 +22,11 @@ import {
   FileText,
   Activity
 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
-// import { Select } from '@/components/ui/Select';
-// import { Switch } from '@/components/ui/Switch';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+// import { Etiqueta } from '@/components/ui/Etiqueta';
+// import { Seleccion } from '@/components/ui/Seleccion';
+// import { Interruptor } from '@/components/ui/Interruptor';
 import { adminService } from '../services/admin.service';
 import ServicesModal from '../components/ServicesModal';
 import ServiceDetailsView from '../components/ServiceDetailsView';
@@ -145,9 +145,9 @@ export default function Services() {
       'SPECIALIST': 'bg-purple-100 text-purple-800',
       'THERAPY': 'bg-pink-100 text-pink-800',
       'VACCINATION': 'bg-indigo-100 text-indigo-800',
-      'OTHER': 'bg-gray-100 text-gray-800'
+      'OTHER': 'bg-muted text-muted-foreground'
     };
-    return colors[category] || 'bg-gray-100 text-gray-800';
+    return colors[category] || 'bg-muted text-muted-foreground';
   };
 
   return (
@@ -155,18 +155,18 @@ export default function Services() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Servicios</h1>
-          <p className="text-gray-600 mt-1">Administra todos los servicios médicos del sistema</p>
+          <h1 className="text-3xl font-bold text-foreground">Gestión de Servicios</h1>
+          <p className="text-muted-foreground mt-1">Administra todos los servicios médicos del sistema</p>
         </div>
         <div className="flex items-center space-x-3">
-          <Button variant="outline" onClick={handleViewAll}>
+          <Boton variant="outline" onClick={handleViewAll}>
             <Filter className="w-4 h-4" />
             Ver Todos
-          </Button>
-          <Button onClick={handleCreateNew}>
+          </Boton>
+          <Boton onClick={handleCreateNew}>
             <Plus className="w-4 h-4" />
             Nuevo Servicio
-          </Button>
+          </Boton>
         </div>
       </div>
 
@@ -176,8 +176,8 @@ export default function Services() {
           <div key={index} className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
                 <div className="flex items-center mt-2">
                   {stat.changeType === 'positive' ? (
                     <TrendingUp className="w-4 h-4 text-green-500" />
@@ -189,7 +189,7 @@ export default function Services() {
                   }`}>
                     {stat.change}
                   </span>
-                  <span className="text-sm text-gray-500 ml-1">vs mes anterior</span>
+                  <span className="text-sm text-muted-foreground ml-1">vs mes anterior</span>
                 </div>
               </div>
               <div className={`p-3 rounded-full ${stat.bgColor}`}>
@@ -204,45 +204,45 @@ export default function Services() {
       <div className="bg-white rounded-lg shadow">
         <div className="p-6 border-b">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Servicios Recientes</h2>
-            <Button variant="outline" onClick={handleViewAll}>
+            <h2 className="text-lg font-semibold text-foreground">Servicios Recientes</h2>
+            <Boton variant="outline" onClick={handleViewAll}>
               Ver todos los servicios
-            </Button>
+            </Boton>
           </div>
         </div>
         <div className="p-6">
           {recentServices.length === 0 ? (
             <div className="text-center py-12">
-              <Stethoscope className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No hay servicios</h3>
-              <p className="text-gray-600 mb-4">No se encontraron servicios recientes.</p>
-              <Button onClick={handleCreateNew}>
+              <Stethoscope className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-medium text-foreground mb-2">No hay servicios</h3>
+              <p className="text-muted-foreground mb-4">No se encontraron servicios recientes.</p>
+              <Boton onClick={handleCreateNew}>
                 <Plus className="w-4 h-4" />
                 Crear Primer Servicio
-              </Button>
+              </Boton>
             </div>
           ) : (
             <div className="space-y-4">
               {recentServices.slice(0, 5).map((service: any) => (
-                <div key={service.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                <div key={service.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:shadow-md transition-shadow">
                   <div className="flex items-center space-x-4">
                     <div className="p-2 bg-blue-100 rounded-full">
                       <Stethoscope className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{service.name}</p>
-                      <p className="text-sm text-gray-600">{service.description}</p>
+                      <p className="font-medium text-foreground">{service.name}</p>
+                      <p className="text-sm text-muted-foreground">{service.description}</p>
                       <div className="flex items-center space-x-2 mt-1">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(service.category)}`}>
                           {getCategoryLabel(service.category)}
                         </span>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {new Intl.NumberFormat('es-CO', {
                             style: 'currency',
                             currency: 'COP'
                           }).format(service.basePrice)}
                         </span>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {service.duration} min
                         </span>
                       </div>
@@ -254,13 +254,13 @@ export default function Services() {
                     }`}>
                       {service.isActive ? 'Activo' : 'Inactivo'}
                     </span>
-                    <Button
+                    <Boton
                       variant="outline"
                       size="sm"
                       onClick={() => handleViewDetails(service)}
                     >
                       <Eye className="w-4 h-4" />
-                    </Button>
+                    </Boton>
                   </div>
                 </div>
               ))}

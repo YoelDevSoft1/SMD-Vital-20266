@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { formatDate } from '@/utils/dateFormat';
+import { formatearFecha } from '@/utils/dateFormat';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Calendar, Clock, User, Stethoscope, MapPin, Filter, Search, Plus, Edit, Trash2, Eye, CheckCircle, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/Select';
-import { Switch } from '@/components/ui/Switch';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
+import { Seleccion } from '@/components/ui/Seleccion';
+import { Interruptor } from '@/components/ui/Interruptor';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Appointment, AppointmentFilters, Doctor, Patient, Service } from '@/types';
 import AppointmentDetailsView from './AppointmentDetailsView';
 import CreateAppointmentForm from './CreateAppointmentForm';
-import { GlassModal } from '@/components/ui/GlassModal';
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { ModalCristal } from '@/components/ui/ModalCristal';
+import { DialogoConfirmacion } from '@/components/ui/DialogoConfirmacion';
 
 interface AppointmentsModalProps {
   isOpen: boolean;
@@ -175,19 +175,19 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
             <Calendar className="w-6 h-6 text-blue-600" />
             <h2 className="text-2xl font-bold text-gray-900">Gestión de Citas</h2>
           </div>
-          <Button variant="ghost" onClick={onClose}>
+          <Boton variant="ghost" onClick={onClose}>
             <X className="w-6 h-6" />
-          </Button>
+          </Boton>
         </div>
 
         {/* Filters */}
         <div className="p-6 border-b bg-gray-50">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             <div>
-              <Label htmlFor="search">Buscar</Label>
+              <Etiqueta htmlFor="search">Buscar</Etiqueta>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
+                <Entrada
                   id="search"
                   placeholder="Buscar citas..."
                   value={filters.search}
@@ -198,7 +198,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
             </div>
 
             <div>
-              <Label htmlFor="status">Estado</Label>
+              <Etiqueta htmlFor="status">Estado</Etiqueta>
               <select
                 id="status"
                 value={filters.status}
@@ -213,7 +213,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
             </div>
 
             <div>
-              <Label htmlFor="doctor">Doctor</Label>
+              <Etiqueta htmlFor="doctor">Doctor</Etiqueta>
               <select
                 id="doctor"
                 value={filters.doctorId}
@@ -230,7 +230,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
             </div>
 
             <div>
-              <Label htmlFor="patient">Paciente</Label>
+              <Etiqueta htmlFor="patient">Paciente</Etiqueta>
               <select
                 id="patient"
                 value={filters.patientId}
@@ -247,8 +247,8 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
             </div>
 
             <div>
-              <Label htmlFor="dateFrom">Desde</Label>
-              <Input
+              <Etiqueta htmlFor="dateFrom">Desde</Etiqueta>
+              <Entrada
                 id="dateFrom"
                 type="date"
                 value={filters.dateFrom}
@@ -257,8 +257,8 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
             </div>
 
             <div>
-              <Label htmlFor="dateTo">Hasta</Label>
-              <Input
+              <Etiqueta htmlFor="dateTo">Hasta</Etiqueta>
+              <Entrada
                 id="dateTo"
                 type="date"
                 value={filters.dateTo}
@@ -269,10 +269,10 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
 
           <div className="flex items-center justify-end mt-4">
             <div className="flex items-center space-x-2">
-              <Button onClick={() => setShowCreateForm(true)}>
+              <Boton onClick={() => setShowCreateForm(true)}>
                 <Plus className="w-4 h-4" />
                 Nueva Cita
-              </Button>
+              </Boton>
             </div>
           </div>
         </div>
@@ -318,7 +318,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                               <div className="flex items-center space-x-2">
                                 <Calendar className="w-4 h-4 text-gray-400" />
-                                <span className="text-sm text-gray-600">{formatDate(appointment.scheduledAt)}</span>
+                                <span className="text-sm text-gray-600">{formatearFecha(appointment.scheduledAt)}</span>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Clock className="w-4 h-4 text-gray-400" />
@@ -344,23 +344,23 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
                                 {formatCurrency(appointment.totalPrice)}
                               </div>
                               <div className="flex items-center space-x-2">
-                                <Button
+                                <Boton
                                   variant="outline"
                                   size="sm"
                                   onClick={() => handleViewDetails(appointment)}
                                 >
                                   <Eye className="w-4 h-4 mr-1" />
                                   Ver
-                                </Button>
-                                <Button
+                                </Boton>
+                                <Boton
                                   variant="outline"
                                   size="sm"
                                   onClick={() => handleEdit(appointment)}
                                 >
                                   <Edit className="w-4 h-4 mr-1" />
                                   Editar
-                                </Button>
-                                <Button
+                                </Boton>
+                                <Boton
                                   variant="outline"
                                   size="sm"
                                   onClick={() => handleDelete(appointment.id)}
@@ -368,7 +368,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
                                 >
                                   <Trash2 className="w-4 h-4 mr-1" />
                                   Eliminar
-                                </Button>
+                                </Boton>
                               </div>
                             </div>
                           </div>
@@ -382,7 +382,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
           )}
         </div>
 
-        {/* Pagination */}
+        {/* Paginacion */}
         {appointmentsData?.data?.data?.pagination && appointmentsData.data.data.pagination.totalPages > 1 && (
           <div className="border-t p-4">
             <div className="flex items-center justify-between">
@@ -400,32 +400,32 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
                 resultados
               </div>
               <div className="flex items-center space-x-2">
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(filters.page! - 1)}
                   disabled={!appointmentsData.data.data.pagination.hasPrev}
                 >
                   Anterior
-                </Button>
+                </Boton>
                 {Array.from({ length: appointmentsData.data.data.pagination.totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
+                  <Boton
                     key={page}
                     variant={page === filters.page ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => handlePageChange(page)}
                   >
                     {page}
-                  </Button>
+                  </Boton>
                 ))}
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(filters.page! + 1)}
                   disabled={!appointmentsData.data.data.pagination.hasNext}
                 >
                   Siguiente
-                </Button>
+                </Boton>
               </div>
             </div>
           </div>
@@ -469,7 +469,7 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
         />
       )}
 
-      <ConfirmDialog
+      <DialogoConfirmacion
         isOpen={Boolean(pendingDeleteId)}
         title="Eliminar cita"
         message="Esta accion eliminara la cita seleccionada y no se podra deshacer."

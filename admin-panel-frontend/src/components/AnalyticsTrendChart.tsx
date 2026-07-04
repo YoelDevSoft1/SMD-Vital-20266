@@ -61,8 +61,8 @@ function formatYAxisTick(metric: AnalyticsMetric, value: number) {
 const AnalyticsTrendChart = ({ data, visibleMetrics }: AnalyticsTrendChartProps) => {
   if (!data || data.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-lg border border-dashed border-gray-200 bg-white text-sm text-gray-500">
-        No hay datos disponibles para el rango seleccionado.
+      <div className="flex h-64 items-center justify-center rounded-lg border border-dashed border-border bg-white text-sm text-muted-foreground">
+        No hay formData disponibles para el rango seleccionado.
       </div>
     );
   }

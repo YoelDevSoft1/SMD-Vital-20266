@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { Button } from './ui/Button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
+import { Boton } from './ui/Boton';
+import { Entrada } from './ui/Entrada';
+import { Etiqueta } from './ui/Etiqueta';
 import { adminService } from '../services/admin.service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -170,8 +170,8 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="firstName">Nombre *</Label>
-          <Input
+          <Etiqueta htmlFor="firstName">Nombre *</Etiqueta>
+          <Entrada
             id="firstName"
             value={formData.firstName}
             onChange={(e) => handleChange('firstName', e.target.value)}
@@ -181,8 +181,8 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         </div>
 
         <div>
-          <Label htmlFor="lastName">Apellido *</Label>
-          <Input
+          <Etiqueta htmlFor="lastName">Apellido *</Etiqueta>
+          <Entrada
             id="lastName"
             value={formData.lastName}
             onChange={(e) => handleChange('lastName', e.target.value)}
@@ -192,8 +192,8 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         </div>
 
         <div>
-          <Label htmlFor="email">Correo Electrónico *</Label>
-          <Input
+          <Etiqueta htmlFor="email">Correo Electrónico *</Etiqueta>
+          <Entrada
             id="email"
             type="email"
             value={formData.email}
@@ -204,8 +204,8 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         </div>
 
         <div>
-          <Label htmlFor="phone">Teléfono</Label>
-          <Input
+          <Etiqueta htmlFor="phone">Teléfono</Etiqueta>
+          <Entrada
             id="phone"
             type="tel"
             value={formData.phone}
@@ -215,8 +215,8 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         </div>
 
         <div>
-          <Label htmlFor="licenseNumber">Número de Licencia *</Label>
-          <Input
+          <Etiqueta htmlFor="licenseNumber">Número de Licencia *</Etiqueta>
+          <Entrada
             id="licenseNumber"
             value={formData.licenseNumber}
             onChange={(e) => handleChange('licenseNumber', e.target.value)}
@@ -226,7 +226,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         </div>
 
         <div>
-          <Label htmlFor="specialty">Especialidad *</Label>
+          <Etiqueta htmlFor="specialty">Especialidad *</Etiqueta>
           <select
             id="specialty"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -243,8 +243,8 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         </div>
 
         <div>
-          <Label htmlFor="experience">Años de Experiencia *</Label>
-          <Input
+          <Etiqueta htmlFor="experience">Años de Experiencia *</Etiqueta>
+          <Entrada
             id="experience"
             type="number"
             min="0"
@@ -256,8 +256,8 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         </div>
 
         <div>
-          <Label htmlFor="consultationFee">Tarifa de Consulta *</Label>
-          <Input
+          <Etiqueta htmlFor="consultationFee">Tarifa de Consulta *</Etiqueta>
+          <Entrada
             id="consultationFee"
             type="number"
             min="0"
@@ -270,7 +270,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
       </div>
 
       <div>
-        <Label htmlFor="bio">Biografía</Label>
+        <Etiqueta htmlFor="bio">Biografía</Etiqueta>
         <textarea
           id="bio"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -278,13 +278,13 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
           value={formData.bio}
           onChange={(e) => handleChange('bio', e.target.value)}
           disabled={isSubmitting}
-          placeholder="Breve descripción profesional..."
+          placeholder="Breve description profesional..."
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="logo">Logo del Doctor</Label>
+          <Etiqueta htmlFor="logo">Logo del Doctor</Etiqueta>
           <div className="mt-2">
             <input
               ref={logoInputRef}
@@ -310,7 +310,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
                     </div>
                   )}
                 </div>
-                <Button
+                <Boton
                   type="button"
                   variant="outline"
                   size="sm"
@@ -320,10 +320,10 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
                 >
                   <Upload className="h-4 w-4 mr-2" />
                   Cambiar Logo
-                </Button>
+                </Boton>
               </div>
             ) : (
-              <Button
+              <Boton
                 type="button"
                 variant="outline"
                 onClick={() => logoInputRef.current?.click()}
@@ -335,7 +335,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
                   <span className="text-sm text-gray-600">Subir Logo</span>
                   <span className="text-xs text-gray-400 mt-1">PNG, JPG hasta 10MB</span>
                 </div>
-              </Button>
+              </Boton>
             )}
             {formData.logoPath && !logoPreview && (
               <p className="text-xs text-gray-500 mt-1">Actual: {formData.logoPath}</p>
@@ -344,7 +344,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         </div>
 
         <div>
-          <Label htmlFor="signature">Firma del Doctor</Label>
+          <Etiqueta htmlFor="signature">Firma del Doctor</Etiqueta>
           <div className="mt-2">
             <input
               ref={signatureInputRef}
@@ -370,7 +370,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
                     </div>
                   )}
                 </div>
-                <Button
+                <Boton
                   type="button"
                   variant="outline"
                   size="sm"
@@ -380,10 +380,10 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
                 >
                   <Upload className="h-4 w-4 mr-2" />
                   Cambiar Firma
-                </Button>
+                </Boton>
               </div>
             ) : (
-              <Button
+              <Boton
                 type="button"
                 variant="outline"
                 onClick={() => signatureInputRef.current?.click()}
@@ -395,7 +395,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
                   <span className="text-sm text-gray-600">Subir Firma</span>
                   <span className="text-xs text-gray-400 mt-1">PNG, JPG hasta 10MB</span>
                 </div>
-              </Button>
+              </Boton>
             )}
             {formData.signaturePath && !signaturePreview && (
               <p className="text-xs text-gray-500 mt-1">Actual: {formData.signaturePath}</p>
@@ -407,7 +407,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <Label htmlFor="isActive">Usuario Activo</Label>
+            <Etiqueta htmlFor="isActive">Usuario Activo</Etiqueta>
             <p className="text-sm text-gray-500">El doctor puede iniciar sesión</p>
           </div>
           <input
@@ -422,8 +422,8 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
 
         <div className="flex items-center justify-between">
           <div>
-            <Label htmlFor="isVerified">Usuario Verificado</Label>
-            <p className="text-sm text-gray-500">El doctor ha verificado su correo electrónico</p>
+            <Etiqueta htmlFor="isVerified">Usuario Verificado</Etiqueta>
+            <p className="text-sm text-gray-500">El doctor ha verificado su email electrónico</p>
           </div>
           <input
             type="checkbox"
@@ -437,7 +437,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
 
         <div className="flex items-center justify-between">
           <div>
-            <Label htmlFor="isAvailable">Disponible para Citas</Label>
+            <Etiqueta htmlFor="isAvailable">Disponible para Citas</Etiqueta>
             <p className="text-sm text-gray-500">El doctor puede recibir nuevas citas</p>
           </div>
           <input
@@ -452,21 +452,21 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
       </div>
 
       <div className="flex justify-end space-x-3 pt-4 border-t">
-        <Button
+        <Boton
           type="button"
           variant="outline"
           onClick={onCancel}
           disabled={isSubmitting}
         >
           Cancelar
-        </Button>
-        <Button
+        </Boton>
+        <Boton
           type="submit"
           disabled={isSubmitting}
           className="bg-blue-600 hover:bg-blue-700"
         >
           {isSubmitting ? 'Actualizando...' : 'Actualizar Doctor'}
-        </Button>
+        </Boton>
       </div>
     </form>
   );

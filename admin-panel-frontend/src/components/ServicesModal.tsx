@@ -1,15 +1,15 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Stethoscope, Search, Plus, Edit, Trash2, Eye, AlertCircle } from 'lucide-react';
-import { Button } from './ui/Button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
+import { Boton } from './ui/Boton';
+import { Entrada } from './ui/Entrada';
+import { Etiqueta } from './ui/Etiqueta';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Service, ServiceFilters } from '@/types';
 import ServiceDetailsView from './ServiceDetailsView';
 import CreateServiceForm from './CreateServiceForm';
-import { ConfirmDialog } from './ui/ConfirmDialog';
+import { DialogoConfirmacion } from './ui/DialogoConfirmacion';
 
 interface ServicesModalProps {
   isOpen: boolean;
@@ -184,41 +184,41 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Servicios</h2>
-          <Button
+          <Boton
             variant="ghost"
             size="sm"
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
           >
             <X className="w-5 h-5" />
-          </Button>
+          </Boton>
         </div>
 
         {/* Filters */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <Label htmlFor="search" className="text-gray-700 dark:text-gray-300">Buscar</Label>
+              <Etiqueta htmlFor="search" className="text-gray-700 dark:text-gray-300">Buscar</Etiqueta>
               <div className="flex">
-                <Input
+                <Entrada
                   id="search"
                   placeholder="Buscar servicios..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="rounded-r-none"
                 />
-                <Button
+                <Boton
                   onClick={handleSearch}
                   className="rounded-l-none"
                   size="sm"
                 >
                   <Search className="w-4 h-4" />
-                </Button>
+                </Boton>
               </div>
             </div>
 
             <div>
-              <Label htmlFor="category" className="text-gray-700 dark:text-gray-300">Categoría</Label>
+              <Etiqueta htmlFor="category" className="text-gray-700 dark:text-gray-300">Categoría</Etiqueta>
               <select
                 id="category"
                 value={filters.category || ''}
@@ -235,7 +235,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
             </div>
 
             <div>
-              <Label htmlFor="status" className="text-gray-700 dark:text-gray-300">Estado</Label>
+              <Etiqueta htmlFor="status" className="text-gray-700 dark:text-gray-300">Estado</Etiqueta>
               <select
                 id="status"
                 value={filters.isActive === undefined ? '' : filters.isActive ? 'active' : 'inactive'}
@@ -252,14 +252,14 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
             </div>
 
             <div className="flex items-end">
-              <Button
+              <Boton
                 onClick={() => setShowCreateForm(true)}
                 className="w-full"
                 size="sm"
               >
                 <Plus className="w-4 h-4" />
                 Nuevo Servicio
-              </Button>
+              </Boton>
             </div>
           </div>
 
@@ -269,7 +269,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 {selectedServices.length} servicios seleccionados
               </span>
-              <Button
+              <Boton
                 variant="outline"
                 size="sm"
                 onClick={handleBulkDelete}
@@ -277,7 +277,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
               >
                 <Trash2 className="w-4 h-4" />
                 Eliminar Seleccionados
-              </Button>
+              </Boton>
             </div>
           )}
         </div>
@@ -422,30 +422,30 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center space-x-2">
-                          <Button
+                          <Boton
                             variant="ghost"
                             size="sm"
                             onClick={() => handleView(service)}
                             className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                           >
                             <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button
+                          </Boton>
+                          <Boton
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEdit(service)}
                             className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
                           >
                             <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
+                          </Boton>
+                          <Boton
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDelete(service.id)}
                             className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </Boton>
                         </div>
                       </td>
                     </tr>
@@ -456,7 +456,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
           )}
         </div>
 
-        {/* Pagination */}
+        {/* Paginacion */}
         {servicesData?.data?.data?.pagination && servicesData.data.data.pagination.totalPages > 1 && (
           <div className="border-t border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between">
@@ -464,25 +464,25 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
                 Mostrando {((filters.page || 1) - 1) * (filters.limit || 10) + 1} a {Math.min((filters.page || 1) * (filters.limit || 10), servicesData.data.data.pagination.total)} de {servicesData.data.data.pagination.total} servicios
               </div>
               <div className="flex items-center space-x-2">
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handleFilterChange('page', (filters.page || 1) - 1)}
                   disabled={(filters.page || 1) <= 1}
                 >
                   Anterior
-                </Button>
+                </Boton>
                 <span className="text-sm text-gray-700 dark:text-gray-300">
                   Página {filters.page || 1} de {servicesData.data.data.pagination.totalPages}
                 </span>
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handleFilterChange('page', (filters.page || 1) + 1)}
                   disabled={(filters.page || 1) >= servicesData.data.data.pagination.totalPages}
                 >
                   Siguiente
-                </Button>
+                </Boton>
               </div>
             </div>
           </div>
@@ -516,7 +516,7 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
         />
       )}
 
-      <ConfirmDialog
+      <DialogoConfirmacion
         isOpen={Boolean(confirmAction)}
         title={confirmAction?.type === 'bulkDelete' ? 'Eliminar servicios' : 'Eliminar servicio'}
         message={

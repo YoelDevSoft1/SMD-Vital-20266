@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { formatDateTime } from '@/utils/dateFormat';
+import { formatearFechaHora } from '@/utils/dateFormat';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Calendar,
@@ -23,12 +23,12 @@ import {
   FinishEncounterPayload,
   VitalSignInput,
 } from '@/services/clinical.service';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { GlassModal } from '@/components/ui/GlassModal';
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { Switch } from '@/components/ui/Switch';
+import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { ModalCristal } from '@/components/ui/ModalCristal';
+import { DialogoConfirmacion } from '@/components/ui/DialogoConfirmacion';
+import { Interruptor } from '@/components/ui/Interruptor';
 import { cn } from '@/utils/cn';
 import { useAuthStore } from '@/store/auth.store';
 import type { AppointmentTimelineItem, ClinicalAppointment, PaginatedResponse, VitalSign } from '@/types';
@@ -49,7 +49,7 @@ const statusColors: Record<string, string> = {
   IN_PROGRESS: 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800',
   COMPLETED: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800',
   CANCELLED: 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800',
-  NO_SHOW: 'bg-gray-50 text-gray-700 border-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
+  NO_SHOW: 'bg-muted text-foreground border-border dark:bg-card dark:text-muted-foreground dark:border-border',
   RESCHEDULED: 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800',
 };
 
@@ -327,16 +327,16 @@ export default function DoctorAppointments() {
       queryClient.invalidateQueries({ queryKey: ['appointment-timeline', appointmentId] });
 
       if (!result?.documentDelivery) {
-        toast.success('Documentos disponibles. El paciente no tiene correo registrado.');
+        toast.success('Documentos disponibles. El paciente no tiene email registrado.');
         return;
       }
 
       if (result?.documentDelivery?.status === 'SKIPPED') {
-        toast.success('Documentos disponibles. El correo no se encolo por autorizacion o cola no disponible.');
+        toast.success('Documentos disponibles. El email no se encolo por autorizacion o cola no disponible.');
         return;
       }
 
-      toast.success(result?.emailQueued ? 'Documentos enviados a cola de correo' : 'Entrega de documentos registrada');
+      toast.success(result?.emailQueued ? 'Documentos enviados a cola de email' : 'Entrega de documentos registrada');
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'No se pudieron reenviar los documentos');
@@ -538,7 +538,7 @@ export default function DoctorAppointments() {
     }
 
     if (!finishForm.recordTitle.trim() || !finishForm.recordDescription.trim()) {
-      toast.error('Completa el titulo y la descripcion del registro clinico');
+      toast.error('Completa el title y la description del registro clinico');
       return;
     }
 
@@ -607,17 +607,17 @@ export default function DoctorAppointments() {
     }
 
     if (!emailRecordForm.patientEmail.trim()) {
-      toast.error('Ingresa el correo del paciente');
+      toast.error('Ingresa el email del paciente');
       return;
     }
 
     if (!emailRecordForm.recordTitle.trim() || !emailRecordForm.recordDescription.trim()) {
-      toast.error('Completa el titulo y la descripcion del registro clinico');
+      toast.error('Completa el title y la description del registro clinico');
       return;
     }
 
     if (emailRecordForm.sendEmail && !emailRecordForm.emailConsentAccepted) {
-      toast.error('Confirma la autorizacion del paciente para enviar documentos por correo');
+      toast.error('Confirma la autorizacion del paciente para enviar documentos por email');
       return;
     }
 
@@ -703,10 +703,10 @@ export default function DoctorAppointments() {
     return (
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Citas asignadas</h1>
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Citas asignadas</h1>
         </div>
-        <Card className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
-          <CardContent className="flex flex-col gap-4 p-6 text-sm">
+        <Tarjeta className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
+          <TarjetaContenido className="flex flex-col gap-4 p-6 text-sm">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
               <div>
@@ -719,16 +719,16 @@ export default function DoctorAppointments() {
               </div>
             </div>
             <div>
-              <Button
+              <Boton
                 variant="outline"
                 onClick={() => refetch()}
-                className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                className="dark:text-foreground dark:border-border dark:hover:bg-muted"
               >
                 Reintentar
-              </Button>
+              </Boton>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
     );
   }
@@ -737,37 +737,37 @@ export default function DoctorAppointments() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Citas asignadas</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Citas asignadas</h1>
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             Gestiona tus citas y finaliza historias clinicas.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
           {(user?.role === 'DOCTOR' || user?.role === 'NURSE') && (
-            <Button onClick={handleOpenEmailRecordModal}>
+            <Boton onClick={handleOpenEmailRecordModal}>
               <MailPlus className="h-4 w-4" />
-              Historia por correo
-            </Button>
+              Historia por email
+            </Boton>
           )}
-          <Button
+          <Boton
             variant="outline"
             onClick={() => refetch()}
             isLoading={isFetching}
-            className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+            className="dark:text-foreground dark:border-border dark:hover:bg-muted"
           >
             <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
             Actualizar
-          </Button>
+          </Boton>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Citas totales</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Citas totales</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {stats.total}
                 </p>
               </div>
@@ -775,15 +775,15 @@ export default function DoctorAppointments() {
                 <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Pendientes</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Pendientes</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {stats.pending}
                 </p>
               </div>
@@ -791,15 +791,15 @@ export default function DoctorAppointments() {
                 <Activity className="h-5 w-5 text-amber-600 dark:text-amber-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">En progreso</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">En progreso</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {stats.inProgress}
                 </p>
               </div>
@@ -807,15 +807,15 @@ export default function DoctorAppointments() {
                 <Activity className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Completadas</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Completadas</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {stats.completed}
                 </p>
               </div>
@@ -823,18 +823,18 @@ export default function DoctorAppointments() {
                 <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+            <TarjetaTitulo className="flex items-center gap-2 text-lg font-semibold text-foreground dark:text-foreground">
               <Stethoscope className="h-5 w-5 text-blue-600" />
               Puesto de atencion clinica
-            </CardTitle>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            </TarjetaTitulo>
+            <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
               Sigue la atencion activa, registra evolucion y revisa trazabilidad clinica.
             </p>
           </div>
@@ -842,85 +842,85 @@ export default function DoctorAppointments() {
             <span
               className={cn(
                 'inline-flex w-fit items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold',
-                statusColors[activeAppointment.status] || 'bg-gray-50 text-gray-700 border-gray-100'
+                statusColors[activeAppointment.status] || 'bg-muted text-foreground border-border'
               )}
             >
               {statusLabels[activeAppointment.status] || activeAppointment.status}
             </span>
           )}
-        </CardHeader>
-        <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+        </TarjetaEncabezado>
+        <TarjetaContenido className="p-4 pt-0 sm:p-6 sm:pt-0">
           {!activeAppointment ? (
-            <div className="rounded-md border border-gray-200 p-4 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+            <div className="rounded-md border border-border p-4 text-sm text-muted-foreground dark:border-border dark:text-muted-foreground">
               No hay citas asignadas para seguimiento clinico.
             </div>
           ) : (
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
               <div className="space-y-4">
-                <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                <section className="rounded-md border border-border p-4 dark:border-border">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground dark:text-muted-foreground">
                         Paciente seleccionado
                       </p>
-                      <h2 className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                      <h2 className="mt-1 text-lg font-semibold text-foreground dark:text-foreground">
                         {activeAppointment.patient?.user?.firstName} {activeAppointment.patient?.user?.lastName}
                       </h2>
-                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {activeAppointment.service?.name || 'Servicio no definido'} - {formatDateTime(activeAppointment.scheduledAt)}
+                      <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
+                        {activeAppointment.service?.name || 'Servicio no definido'} - {formatearFechaHora(activeAppointment.scheduledAt)}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
                         {activeAppointment.address}, {activeAppointment.city}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {(activeAppointment.status === 'PENDING' || activeAppointment.status === 'CONFIRMED') && (
-                        <Button
+                        <Boton
                           size="sm"
                           onClick={() => handleStartEncounter(activeAppointment)}
                           disabled={startEncounterMutation.isPending}
                         >
                           <PlayCircle className="h-4 w-4" />
                           Iniciar
-                        </Button>
+                        </Boton>
                       )}
                       {activeAppointment.status === 'IN_PROGRESS' && user?.role === 'NURSE' && (
-                        <Button
+                        <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => handleOpenVitalsModal(activeAppointment)}
-                          className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                          className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                         >
                           <HeartPulse className="h-4 w-4" />
                           Signos
-                        </Button>
+                        </Boton>
                       )}
                       {activeAppointment.status === 'IN_PROGRESS' &&
                         (user?.role === 'DOCTOR' ||
                           (user?.role === 'NURSE' && activeAppointment.service?.category === 'NURSING')) && (
-                          <Button size="sm" onClick={() => handleOpenFinishModal(activeAppointment)}>
+                          <Boton size="sm" onClick={() => handleOpenFinishModal(activeAppointment)}>
                             <FileCheck2 className="h-4 w-4" />
                             Finalizar
-                          </Button>
+                          </Boton>
                         )}
                       {activeAppointment.status === 'COMPLETED' && (
-                        <Button
+                        <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => handleSendDocuments(activeAppointment)}
                           isLoading={sendingDocumentsId === activeAppointment.id}
-                          className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                          className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                         >
                           <MailCheck className="h-4 w-4" />
                           Reenviar docs
-                        </Button>
+                        </Boton>
                       )}
                     </div>
                   </div>
                 </section>
 
-                <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
-                  <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                <section className="rounded-md border border-border p-4 dark:border-border">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground dark:text-foreground">
                     <ClipboardList className="h-4 w-4 text-indigo-600" />
                     Checklist de calidad clinica
                   </h3>
@@ -938,7 +938,7 @@ export default function DoctorAppointments() {
                         <div className="flex items-start gap-2">
                           {item.done ? <CheckCircle2 className="mt-0.5 h-4 w-4" /> : <AlertCircle className="mt-0.5 h-4 w-4" />}
                           <div>
-                            <p className="font-semibold">{item.label}</p>
+                            <p className="font-semibold">{item.etiqueta}</p>
                             <p className="mt-1 text-xs opacity-80">{item.detail}</p>
                           </div>
                         </div>
@@ -947,21 +947,21 @@ export default function DoctorAppointments() {
                   </div>
                 </section>
 
-                <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                <section className="rounded-md border border-border p-4 dark:border-border">
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                    <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground dark:text-foreground">
                       <HeartPulse className="h-4 w-4 text-red-600" />
                       Signos vitales recientes
                     </h3>
                     {activeAppointment.status === 'IN_PROGRESS' && user?.role === 'NURSE' && (
-                      <Button
+                      <Boton
                         size="sm"
                         variant="outline"
                         onClick={() => handleOpenVitalsModal(activeAppointment)}
-                        className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                        className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                       >
                         Registrar
-                      </Button>
+                      </Boton>
                     )}
                   </div>
 
@@ -969,9 +969,9 @@ export default function DoctorAppointments() {
                     <div className="mt-3 space-y-3">
                       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                         {buildVitalsChips(latestVitals).map((vital) => (
-                          <div key={vital.label} className="rounded-md border border-gray-200 p-3 dark:border-gray-700">
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{vital.label}</p>
-                            <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{vital.value}</p>
+                          <div key={vital.label} className="rounded-md border border-border p-3 dark:border-border">
+                            <p className="text-xs text-muted-foreground dark:text-muted-foreground">{vital.label}</p>
+                            <p className="mt-1 text-sm font-semibold text-foreground dark:text-foreground">{vital.value}</p>
                           </div>
                         ))}
                       </div>
@@ -986,50 +986,50 @@ export default function DoctorAppointments() {
                       )}
                     </div>
                   ) : (
-                    <p className="mt-3 rounded-md border border-gray-200 p-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                    <p className="mt-3 rounded-md border border-border p-3 text-sm text-muted-foreground dark:border-border dark:text-muted-foreground">
                       No hay signos vitales registrados para esta atencion.
                     </p>
                   )}
                 </section>
 
                 {user?.role === 'DOCTOR' && (
-                  <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
-                    <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                  <section className="rounded-md border border-border p-4 dark:border-border">
+                    <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground dark:text-foreground">
                       <MessageSquareText className="h-4 w-4 text-blue-600" />
                       Nota de evolucion
                     </h3>
                     {activeAppointment.encounter?.summary && (
-                      <p className="mt-2 rounded-md bg-gray-50 p-3 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                      <p className="mt-2 rounded-md bg-muted p-3 text-xs text-muted-foreground dark:bg-card dark:text-muted-foreground">
                         Ultima nota: {activeAppointment.encounter.summary}
                       </p>
                     )}
                     <textarea
                       value={evolutionNote}
                       onChange={(event) => setEvolutionNote(event.target.value)}
-                      className="mt-3 min-h-[90px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                      className="mt-3 min-h-[90px] w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-gray-900 dark:text-foreground"
                       placeholder="Evolucion, hallazgos, decisiones clinicas o cambios durante la atencion."
                     />
                     <div className="mt-3 flex justify-end">
-                      <Button
+                      <Boton
                         size="sm"
                         onClick={handleSaveEvolutionNote}
                         isLoading={addEncounterNoteMutation.isPending}
                         disabled={activeAppointment.status !== 'IN_PROGRESS'}
                       >
                         Guardar nota
-                      </Button>
+                      </Boton>
                     </div>
                   </section>
                 )}
               </div>
 
-              <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+              <section className="rounded-md border border-border p-4 dark:border-border">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                       Trazabilidad clinica
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                       Eventos registrados por el equipo en tiempo real.
                     </p>
                   </div>
@@ -1038,19 +1038,19 @@ export default function DoctorAppointments() {
 
                 <div className="mt-4 max-h-[520px] space-y-3 overflow-y-auto pr-1">
                   {timeline.length === 0 ? (
-                    <p className="rounded-md border border-gray-200 p-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                    <p className="rounded-md border border-border p-3 text-sm text-muted-foreground dark:border-border dark:text-muted-foreground">
                       Aun no hay eventos para esta cita.
                     </p>
                   ) : (
                     timeline.slice(0, 8).map((item: AppointmentTimelineItem) => (
-                      <div key={`${item.source}-${item.id}`} className="rounded-md border border-gray-200 p-3 dark:border-gray-700">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                      <div key={`${item.source}-${item.id}`} className="rounded-md border border-border p-3 dark:border-border">
+                        <p className="text-sm font-semibold text-foreground dark:text-foreground">
                           {getTimelineActionLabel(item.action)}
                         </p>
-                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          {getTimelineActor(item)} - {formatDateTime(item.createdAt)}
+                        <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
+                          {getTimelineActor(item)} - {formatearFechaHora(item.createdAt)}
                         </p>
-                        <span className="mt-2 inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        <span className="mt-2 inline-flex rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground dark:bg-card dark:text-muted-foreground">
                           {item.actorRole}
                         </span>
                       </div>
@@ -1060,23 +1060,23 @@ export default function DoctorAppointments() {
               </section>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </TarjetaContenido>
+      </Tarjeta>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
               Lista de citas
-            </CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            </TarjetaTitulo>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
               {isLoading ? 'Cargando...' : `${pagination?.total ?? appointments.length} citas registradas`}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <div className="min-w-[200px]">
               <select
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
                 value={filters.status}
                 onChange={(event) => handleFilterChange('status', event.target.value)}
               >
@@ -1092,7 +1092,7 @@ export default function DoctorAppointments() {
             </div>
             <div className="min-w-[120px]">
               <select
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
                 value={filters.limit}
                 onChange={(event) => handleFilterChange('limit', Number(event.target.value))}
               >
@@ -1102,18 +1102,18 @@ export default function DoctorAppointments() {
               </select>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
+        </TarjetaEncabezado>
+        <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               Cargando citas...
             </div>
           ) : appointments.length === 0 ? (
-            <div className="p-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
               No hay citas asignadas.
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            <div className="divide-y divide-border dark:divide-border">
               {appointments.map((appointment) => (
                 <div
                   key={appointment.id}
@@ -1121,130 +1121,130 @@ export default function DoctorAppointments() {
                     'flex flex-col gap-4 p-6 transition sm:flex-row sm:items-center sm:justify-between',
                     activeAppointment?.id === appointment.id
                       ? 'bg-blue-50/70 dark:bg-blue-900/20'
-                      : 'hover:bg-gray-50/70 dark:hover:bg-gray-800/40'
+                      : 'hover:bg-muted/70 dark:hover:bg-card/40'
                   )}
                 >
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                       {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                       {appointment.service?.name || 'Servicio no definido'} ·{' '}
-                      {formatDateTime(appointment.scheduledAt)}
+                      {formatearFechaHora(appointment.scheduledAt)}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                       {appointment.address}, {appointment.city}
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <Button
+                    <Boton
                       size="sm"
                       variant="outline"
                       onClick={() => setActiveAppointmentId(appointment.id)}
-                      className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                      className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                     >
                       Seguimiento
-                    </Button>
+                    </Boton>
                     <span
                       className={cn(
                         'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium',
-                        statusColors[appointment.status] || 'bg-gray-50 text-gray-700 border-gray-100'
+                        statusColors[appointment.status] || 'bg-muted text-foreground border-border'
                       )}
                     >
                       {statusLabels[appointment.status] || appointment.status}
                     </span>
                     {(appointment.status === 'PENDING' || appointment.status === 'CONFIRMED') && (
-                      <Button
+                      <Boton
                         size="sm"
                         onClick={() => handleStartEncounter(appointment)}
                         disabled={startEncounterMutation.isPending}
                       >
                         <PlayCircle className="h-4 w-4" />
                         Iniciar
-                      </Button>
+                      </Boton>
                     )}
                     {appointment.status === 'IN_PROGRESS' && (
                       <>
                         {user?.role === 'NURSE' && (
-                          <Button
+                          <Boton
                             size="sm"
                             variant="outline"
                             onClick={() => handleOpenVitalsModal(appointment)}
-                            className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                            className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                           >
                             Signos
-                          </Button>
+                          </Boton>
                         )}
                         {(user?.role === 'DOCTOR' ||
                           (user?.role === 'NURSE' && appointment.service?.category === 'NURSING')) && (
-                          <Button size="sm" onClick={() => handleOpenFinishModal(appointment)}>
+                          <Boton size="sm" onClick={() => handleOpenFinishModal(appointment)}>
                             <FileCheck2 className="h-4 w-4" />
                             Finalizar
-                          </Button>
+                          </Boton>
                         )}
                       </>
                     )}
                     {appointment.status === 'COMPLETED' && (
-                      <Button
+                      <Boton
                         size="sm"
                         variant="outline"
                         onClick={() => handleSendDocuments(appointment)}
                         isLoading={sendingDocumentsId === appointment.id}
-                        className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                        className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                       >
                         <MailCheck className="h-4 w-4" />
                         Reenviar docs
-                      </Button>
+                      </Boton>
                     )}
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
+        </TarjetaContenido>
 
         {pagination && pagination.totalPages > 1 && (
-          <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-6 py-4">
+          <div className="border-t border-border dark:border-border bg-muted dark:bg-card px-6 py-4">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-muted-foreground dark:text-muted-foreground">
                 Pagina {pagination.page} de {pagination.totalPages}
               </div>
               <div className="flex gap-2">
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={!pagination.hasPrev}
-                  className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                  className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                 >
                   Anterior
-                </Button>
-                <Button
+                </Boton>
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={!pagination.hasNext}
-                  className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                  className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                 >
                   Siguiente
-                </Button>
+                </Boton>
               </div>
             </div>
           </div>
         )}
-      </Card>
+      </Tarjeta>
 
-      <GlassModal isOpen={showFinishModal} onClose={handleCloseFinishModal} size="lg">
+      <ModalCristal isOpen={showFinishModal} onClose={handleCloseFinishModal} size="lg">
         <div className="p-6 sm:p-8">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+              <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
                 Finalizar cita
               </h2>
-              <p className="text-sm text-slate-600 dark:text-slate-300">
+              <p className="text-sm text-slate-600 dark:text-muted-foreground">
                 Completa la historia clinica para cerrar la atencion.
               </p>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              <p className="mt-1 text-xs text-foreground0 dark:text-muted-foreground">
                 El borrador se guarda en este dispositivo hasta finalizar la cita.
               </p>
             </div>
@@ -1252,7 +1252,7 @@ export default function DoctorAppointments() {
 
           <div className="mt-6 grid gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                 Resumen clinico
               </label>
               <textarea
@@ -1260,17 +1260,17 @@ export default function DoctorAppointments() {
                 onChange={(event) =>
                   setFinishForm((prev) => ({ ...prev, encounterSummary: event.target.value }))
                 }
-                className="min-h-[90px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                className="min-h-[90px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Resumen de la atencion y hallazgos relevantes."
               />
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+            <div className="rounded-2xl border border-border bg-muted p-4 dark:border-border dark:bg-card/60">
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                 Datos clinicos
               </h3>
               <div className="mt-4 grid gap-4">
-                <Input
+                <Entrada
                   value={finishForm.chiefComplaint}
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, chiefComplaint: event.target.value }))
@@ -1282,7 +1282,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, history: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Historia actual"
                 />
                 <textarea
@@ -1290,7 +1290,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, diagnosis: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Diagnostico"
                 />
                 <textarea
@@ -1298,7 +1298,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, plan: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Plan de manejo"
                 />
                 <textarea
@@ -1306,7 +1306,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, observations: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Observaciones"
                 />
                 <textarea
@@ -1314,7 +1314,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, procedures: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Procedimientos"
                 />
               </div>
@@ -1322,10 +1322,10 @@ export default function DoctorAppointments() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                   Titulo del registro
                 </label>
-                <Input
+                <Entrada
                   value={finishForm.recordTitle}
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, recordTitle: event.target.value }))
@@ -1334,7 +1334,7 @@ export default function DoctorAppointments() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                   Tipo de registro
                 </label>
                 <select
@@ -1342,7 +1342,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, recordType: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 >
                   <option value="DIAGNOSIS">Diagnostico</option>
                   <option value="PRESCRIPTION">Prescripcion</option>
@@ -1354,7 +1354,7 @@ export default function DoctorAppointments() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                 Descripcion del registro
               </label>
               <textarea
@@ -1362,13 +1362,13 @@ export default function DoctorAppointments() {
                 onChange={(event) =>
                   setFinishForm((prev) => ({ ...prev, recordDescription: event.target.value }))
                 }
-                className="min-h-[100px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                className="min-h-[100px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Detalle de la historia clinica."
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                 Notas del doctor
               </label>
               <textarea
@@ -1376,36 +1376,36 @@ export default function DoctorAppointments() {
                 onChange={(event) =>
                   setFinishForm((prev) => ({ ...prev, doctorNotes: event.target.value }))
                 }
-                className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Indicaciones adicionales."
               />
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+            <div className="rounded-2xl border border-border bg-muted p-4 dark:border-border dark:bg-card/60">
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                 Formula medica (opcional)
               </h3>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <Input
+                <Entrada
                   value={finishForm.medication}
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, medication: event.target.value }))
                   }
                   placeholder="Medicamento"
                 />
-                <Input
+                <Entrada
                   value={finishForm.dosage}
                   onChange={(event) => setFinishForm((prev) => ({ ...prev, dosage: event.target.value }))}
                   placeholder="Dosis"
                 />
-                <Input
+                <Entrada
                   value={finishForm.frequency}
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, frequency: event.target.value }))
                   }
                   placeholder="Frecuencia"
                 />
-                <Input
+                <Entrada
                   value={finishForm.duration}
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, duration: event.target.value }))
@@ -1413,7 +1413,7 @@ export default function DoctorAppointments() {
                   placeholder="Duracion"
                 />
                 <div className="sm:col-span-2">
-                  <Input
+                  <Entrada
                     value={finishForm.instructions}
                     onChange={(event) =>
                       setFinishForm((prev) => ({ ...prev, instructions: event.target.value }))
@@ -1424,14 +1424,14 @@ export default function DoctorAppointments() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:border-border dark:bg-card dark:text-foreground">
               <div>
-                <p className="font-medium">Autorizacion para envio por correo</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Confirma que el paciente autorizo recibir historia clinica y formula en su correo.
+                <p className="font-medium">Autorizacion para envio por email</p>
+                <p className="text-xs text-foreground0 dark:text-muted-foreground">
+                  Confirma que el paciente autorizo recibir historia clinica y formula en su email.
                 </p>
               </div>
-              <Switch
+              <Interruptor
                 checked={finishForm.emailConsentAccepted}
                 onCheckedChange={(checked) =>
                   setFinishForm((prev) => ({ ...prev, emailConsentAccepted: checked }))
@@ -1441,64 +1441,64 @@ export default function DoctorAppointments() {
           </div>
 
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Button variant="outline" onClick={handleCloseFinishModal}>
+            <Boton variant="outline" onClick={handleCloseFinishModal}>
               Cancelar
-            </Button>
-            <Button onClick={handleFinishSubmit} isLoading={finishEncounterMutation.isPending}>
+            </Boton>
+            <Boton onClick={handleFinishSubmit} isLoading={finishEncounterMutation.isPending}>
               Guardar y finalizar
-            </Button>
+            </Boton>
           </div>
         </div>
-      </GlassModal>
+      </ModalCristal>
 
-      <GlassModal isOpen={showEmailRecordModal} onClose={handleCloseEmailRecordModal} size="lg">
+      <ModalCristal isOpen={showEmailRecordModal} onClose={handleCloseEmailRecordModal} size="lg">
         <div className="p-6 sm:p-8">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                Historia por correo
+              <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
+                Historia por email
               </h2>
-              <p className="text-sm text-slate-600 dark:text-slate-300">
+              <p className="text-sm text-slate-600 dark:text-muted-foreground">
                 Crea historias clinicas para pacientes aun sin registro.
               </p>
             </div>
           </div>
 
           <div className="mt-6 grid gap-6">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+            <div className="rounded-2xl border border-border bg-muted p-4 dark:border-border dark:bg-card/60">
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                 Datos del paciente
               </h3>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <Input
+                <Entrada
                   value={emailRecordForm.patientEmail}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, patientEmail: event.target.value }))
                   }
                   placeholder="Correo del paciente"
                 />
-                <Input
+                <Entrada
                   value={emailRecordForm.serviceName}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, serviceName: event.target.value }))
                   }
                   placeholder="Servicio (opcional)"
                 />
-                <Input
+                <Entrada
                   value={emailRecordForm.patientFirstName}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, patientFirstName: event.target.value }))
                   }
                   placeholder="Nombre"
                 />
-                <Input
+                <Entrada
                   value={emailRecordForm.patientLastName}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, patientLastName: event.target.value }))
                   }
                   placeholder="Apellido"
                 />
-                <Input
+                <Entrada
                   type="date"
                   value={emailRecordForm.patientDateOfBirth}
                   onChange={(event) =>
@@ -1511,7 +1511,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, patientGender: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 >
                   <option value="">Género (opcional)</option>
                   <option value="MALE">Masculino</option>
@@ -1520,14 +1520,14 @@ export default function DoctorAppointments() {
                   <option value="PREFER_NOT_TO_SAY">Prefiero no decir</option>
                 </select>
               </div>
-              <div className="mt-4 flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+              <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:border-border dark:bg-card dark:text-foreground">
                 <div>
-                  <p className="font-medium">Enviar documentos por correo</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="font-medium">Enviar documentos por email</p>
+                  <p className="text-xs text-foreground0 dark:text-muted-foreground">
                     Envia la historia clinica al paciente.
                   </p>
                 </div>
-                <Switch
+                <Interruptor
                   checked={emailRecordForm.sendEmail}
                   onCheckedChange={(checked) =>
                     setEmailRecordForm((prev) => ({
@@ -1539,14 +1539,14 @@ export default function DoctorAppointments() {
                 />
               </div>
               {emailRecordForm.sendEmail && (
-                <div className="mt-3 flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                <div className="mt-3 flex items-center justify-between rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:border-border dark:bg-card dark:text-foreground">
                   <div>
                     <p className="font-medium">Autorizacion del paciente</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      El paciente autorizo el tratamiento de datos y el envio de documentos clinicos por correo.
+                    <p className="text-xs text-foreground0 dark:text-muted-foreground">
+                      El paciente autorizo el tratamiento de formData y el envio de documentos clinicos por email.
                     </p>
                   </div>
-                  <Switch
+                  <Interruptor
                     checked={emailRecordForm.emailConsentAccepted}
                     onCheckedChange={(checked) =>
                       setEmailRecordForm((prev) => ({ ...prev, emailConsentAccepted: checked }))
@@ -1556,12 +1556,12 @@ export default function DoctorAppointments() {
               )}
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+            <div className="rounded-2xl border border-border bg-muted p-4 dark:border-border dark:bg-card/60">
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                 Signos vitales (opcional)
               </h3>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <Input
+                <Entrada
                   value={emailRecordForm.bpSys}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, bpSys: event.target.value }))
@@ -1569,7 +1569,7 @@ export default function DoctorAppointments() {
                   placeholder="PA sistólica (mmHg)"
                   type="number"
                 />
-                <Input
+                <Entrada
                   value={emailRecordForm.bpDia}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, bpDia: event.target.value }))
@@ -1577,7 +1577,7 @@ export default function DoctorAppointments() {
                   placeholder="PA diastólica (mmHg)"
                   type="number"
                 />
-                <Input
+                <Entrada
                   value={emailRecordForm.heartRate}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, heartRate: event.target.value }))
@@ -1585,7 +1585,7 @@ export default function DoctorAppointments() {
                   placeholder="Frecuencia cardíaca (lpm)"
                   type="number"
                 />
-                <Input
+                <Entrada
                   value={emailRecordForm.respiratoryRate}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, respiratoryRate: event.target.value }))
@@ -1593,7 +1593,7 @@ export default function DoctorAppointments() {
                   placeholder="Frecuencia respiratoria (rpm)"
                   type="number"
                 />
-                <Input
+                <Entrada
                   value={emailRecordForm.temperature}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, temperature: event.target.value }))
@@ -1602,7 +1602,7 @@ export default function DoctorAppointments() {
                   type="number"
                   step="0.1"
                 />
-                <Input
+                <Entrada
                   value={emailRecordForm.spo2}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, spo2: event.target.value }))
@@ -1610,7 +1610,7 @@ export default function DoctorAppointments() {
                   placeholder="SpO2 (%)"
                   type="number"
                 />
-                <Input
+                <Entrada
                   value={emailRecordForm.weight}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, weight: event.target.value }))
@@ -1619,7 +1619,7 @@ export default function DoctorAppointments() {
                   type="number"
                   step="0.1"
                 />
-                <Input
+                <Entrada
                   value={emailRecordForm.height}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, height: event.target.value }))
@@ -1631,12 +1631,12 @@ export default function DoctorAppointments() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+            <div className="rounded-2xl border border-border bg-muted p-4 dark:border-border dark:bg-card/60">
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                 Datos clinicos
               </h3>
               <div className="mt-4 grid gap-4">
-                <Input
+                <Entrada
                   value={emailRecordForm.chiefComplaint}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, chiefComplaint: event.target.value }))
@@ -1648,7 +1648,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, history: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Historia actual"
                 />
                 <textarea
@@ -1656,7 +1656,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, diagnosis: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Diagnostico"
                 />
                 <textarea
@@ -1664,7 +1664,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, plan: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Plan de manejo"
                 />
                 <textarea
@@ -1672,7 +1672,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, observations: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Observaciones"
                 />
                 <textarea
@@ -1680,7 +1680,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, procedures: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Procedimientos"
                 />
               </div>
@@ -1688,10 +1688,10 @@ export default function DoctorAppointments() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                   Titulo del registro
                 </label>
-                <Input
+                <Entrada
                   value={emailRecordForm.recordTitle}
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, recordTitle: event.target.value }))
@@ -1700,7 +1700,7 @@ export default function DoctorAppointments() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                   Tipo de registro
                 </label>
                 <select
@@ -1708,7 +1708,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, recordType: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 >
                   <option value="DIAGNOSIS">Diagnostico</option>
                   <option value="PRESCRIPTION">Prescripcion</option>
@@ -1720,7 +1720,7 @@ export default function DoctorAppointments() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                 Descripcion del registro
               </label>
               <textarea
@@ -1728,13 +1728,13 @@ export default function DoctorAppointments() {
                 onChange={(event) =>
                   setEmailRecordForm((prev) => ({ ...prev, recordDescription: event.target.value }))
                 }
-                className="min-h-[100px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                className="min-h-[100px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Detalle de la historia clinica."
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                 Notas del doctor
               </label>
               <textarea
@@ -1742,39 +1742,39 @@ export default function DoctorAppointments() {
                 onChange={(event) =>
                   setEmailRecordForm((prev) => ({ ...prev, doctorNotes: event.target.value }))
                 }
-                className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Indicaciones adicionales."
               />
             </div>
 
             {user?.role === 'DOCTOR' && (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+              <div className="rounded-2xl border border-border bg-muted p-4 dark:border-border dark:bg-card/60">
                 <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                   Formula medica (opcional)
                 </h3>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <Input
+                  <Entrada
                     value={emailRecordForm.medication}
                     onChange={(event) =>
                       setEmailRecordForm((prev) => ({ ...prev, medication: event.target.value }))
                     }
                     placeholder="Medicamento"
                   />
-                  <Input
+                  <Entrada
                     value={emailRecordForm.dosage}
                     onChange={(event) =>
                       setEmailRecordForm((prev) => ({ ...prev, dosage: event.target.value }))
                     }
                     placeholder="Dosis"
                   />
-                  <Input
+                  <Entrada
                     value={emailRecordForm.frequency}
                     onChange={(event) =>
                       setEmailRecordForm((prev) => ({ ...prev, frequency: event.target.value }))
                     }
                     placeholder="Frecuencia"
                   />
-                  <Input
+                  <Entrada
                     value={emailRecordForm.duration}
                     onChange={(event) =>
                       setEmailRecordForm((prev) => ({ ...prev, duration: event.target.value }))
@@ -1782,7 +1782,7 @@ export default function DoctorAppointments() {
                     placeholder="Duracion"
                   />
                   <div className="sm:col-span-2">
-                    <Input
+                    <Entrada
                       value={emailRecordForm.instructions}
                       onChange={(event) =>
                         setEmailRecordForm((prev) => ({ ...prev, instructions: event.target.value }))
@@ -1796,70 +1796,70 @@ export default function DoctorAppointments() {
           </div>
 
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Button variant="outline" onClick={handleCloseEmailRecordModal}>
+            <Boton variant="outline" onClick={handleCloseEmailRecordModal}>
               Cancelar
-            </Button>
-            <Button onClick={handleEmailRecordSubmit} isLoading={createRecordByEmailMutation.isPending}>
+            </Boton>
+            <Boton onClick={handleEmailRecordSubmit} isLoading={createRecordByEmailMutation.isPending}>
               Guardar historia
-            </Button>
+            </Boton>
           </div>
         </div>
-      </GlassModal>
+      </ModalCristal>
 
-      <GlassModal isOpen={showVitalsModal} onClose={handleCloseVitalsModal} size="md">
+      <ModalCristal isOpen={showVitalsModal} onClose={handleCloseVitalsModal} size="md">
         <div className="p-6 sm:p-8">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+            <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
               Registrar signos vitales
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
+            <p className="text-sm text-slate-600 dark:text-muted-foreground">
               Registra los valores tomados durante la atencion.
             </p>
           </div>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <Input
+            <Entrada
               value={vitalsForm.bpSys}
               onChange={(event) => setVitalsForm((prev) => ({ ...prev, bpSys: event.target.value }))}
               placeholder="PA sistolica"
             />
-            <Input
+            <Entrada
               value={vitalsForm.bpDia}
               onChange={(event) => setVitalsForm((prev) => ({ ...prev, bpDia: event.target.value }))}
               placeholder="PA diastolica"
             />
-            <Input
+            <Entrada
               value={vitalsForm.heartRate}
               onChange={(event) =>
                 setVitalsForm((prev) => ({ ...prev, heartRate: event.target.value }))
               }
               placeholder="Frecuencia cardiaca"
             />
-            <Input
+            <Entrada
               value={vitalsForm.respiratoryRate}
               onChange={(event) =>
                 setVitalsForm((prev) => ({ ...prev, respiratoryRate: event.target.value }))
               }
               placeholder="Frecuencia respiratoria"
             />
-            <Input
+            <Entrada
               value={vitalsForm.temperature}
               onChange={(event) =>
                 setVitalsForm((prev) => ({ ...prev, temperature: event.target.value }))
               }
               placeholder="Temperatura"
             />
-            <Input
+            <Entrada
               value={vitalsForm.spo2}
               onChange={(event) => setVitalsForm((prev) => ({ ...prev, spo2: event.target.value }))}
               placeholder="SpO2"
             />
-            <Input
+            <Entrada
               value={vitalsForm.weight}
               onChange={(event) => setVitalsForm((prev) => ({ ...prev, weight: event.target.value }))}
               placeholder="Peso"
             />
-            <Input
+            <Entrada
               value={vitalsForm.height}
               onChange={(event) => setVitalsForm((prev) => ({ ...prev, height: event.target.value }))}
               placeholder="Talla"
@@ -1868,27 +1868,27 @@ export default function DoctorAppointments() {
               <textarea
                 value={vitalsForm.notes}
                 onChange={(event) => setVitalsForm((prev) => ({ ...prev, notes: event.target.value }))}
-                className="min-h-[80px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Notas adicionales"
               />
             </div>
           </div>
 
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Button variant="outline" onClick={handleCloseVitalsModal}>
+            <Boton variant="outline" onClick={handleCloseVitalsModal}>
               Cancelar
-            </Button>
-            <Button onClick={handleVitalsSubmit} isLoading={recordVitalsMutation.isPending}>
+            </Boton>
+            <Boton onClick={handleVitalsSubmit} isLoading={recordVitalsMutation.isPending}>
               Guardar signos
-            </Button>
+            </Boton>
           </div>
         </div>
-      </GlassModal>
+      </ModalCristal>
 
-      <ConfirmDialog
+      <DialogoConfirmacion
         isOpen={Boolean(documentSendCandidate)}
         title="Confirmar autorizacion"
-        message="Confirma que el paciente autorizo el tratamiento de datos y el envio de documentos clinicos por correo."
+        message="Confirma que el paciente autorizo el tratamiento de formData y el envio de documentos clinicos por email."
         confirmLabel="Enviar documentos"
         cancelLabel="Cancelar"
         isLoading={Boolean(sendingDocumentsId)}
@@ -1966,7 +1966,7 @@ function buildClinicalChecklist(appointment: ClinicalAppointment | null, role?: 
       id: 'started',
       label: 'Atencion iniciada',
       done: hasEncounter || isCompleted,
-      detail: hasEncounter || isCompleted ? 'Existe encuentro clinico asociado.' : 'Inicia la atencion antes de registrar datos.',
+      detail: hasEncounter || isCompleted ? 'Existe encuentro clinico asociado.' : 'Inicia la atencion antes de registrar formData.',
     },
     {
       id: 'vitals',

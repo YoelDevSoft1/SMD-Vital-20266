@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { UserRole } from '@/types';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
+import { adminService } from '@/services/admin.service';
+import { OPCIONES_ROLES } from '@/utils/roles';
+import type { UserRole } from '@/types';
 import toast from 'react-hot-toast';
 
-interface CreateUserFormProps {
-  onSuccess: () => void;
-  onCancel: () => void;
+interface Propiedades {
+  alExito: () => void;
+  alCancelar: () => void;
 }
 
-interface CreateUserData {
+interface DatosFormulario {
   email: string;
   password: string;
   firstName: string;
@@ -21,8 +24,8 @@ interface CreateUserData {
   isVerified: boolean;
 }
 
-export default function CreateUserForm({ onSuccess, onCancel }: CreateUserFormProps) {
-  const [formData, setFormData] = useState<CreateUserData>({
+export default function CreateUserForm({ alExito, alCancelar }: Propiedades) {
+  const [datos, setDatos] = useState<DatosFormulario>({
     email: '',
     password: '',
     firstName: '',
@@ -33,197 +36,193 @@ export default function CreateUserForm({ onSuccess, onCancel }: CreateUserFormPr
     isVerified: false,
   });
 
-  const [errors, setErrors] = useState<Partial<CreateUserData>>({});
+  const [errores, setErrores] = useState<Partial<Record<keyof DatosFormulario, string>>>({});
 
-  // Create user mutation
-  const createUserMutation = useMutation({
-    mutationFn: async (userData: CreateUserData) => {
-      const response = await fetch('/api/v1/admin-panel/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-        body: JSON.stringify(userData),
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || 'Error al crear usuario');
-      }
-
-      return responseData;
-    },
+  const crearUsuarioMutacion = useMutation({
+    mutationFn: (datosUsuario: DatosFormulario) => adminService.createUser(datosUsuario),
     onSuccess: () => {
       toast.success('Usuario creado exitosamente');
-      onSuccess();
+      alExito();
     },
-    onError: (error: any) => {
-      console.error('Error creating user:', error);
-      toast.error(error.message || 'Error al crear usuario');
-    },
+    onError: (e: unknown) =>
+      toast.error(
+        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+          (e as { message?: string })?.message ??
+          'Error al crear usuario',
+      ),
   });
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<CreateUserData> = {};
+  const validar = (): boolean => {
+    const nuevosErrores: Partial<Record<keyof DatosFormulario, string>> = {};
 
-    if (!formData.email) newErrors.email = 'El email es requerido';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'El email no es válido';
-
-    if (!formData.password) newErrors.password = 'La contraseña es requerida';
-    else if (formData.password.length < 6) newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
-
-    if (!formData.firstName) newErrors.firstName = 'El nombre es requerido';
-    if (!formData.lastName) newErrors.lastName = 'El apellido es requerido';
-
-    if (formData.phone && !/^\+?[1-9]\d{1,14}$/.test(formData.phone)) {
-      newErrors.phone = 'El teléfono no es válido';
+    if (!datos.email) {
+      nuevosErrores.email = 'El email es requerido';
+    } else if (!/\S+@\S+\.\S+/.test(datos.email)) {
+      nuevosErrores.email = 'El email no es válido';
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!datos.password) {
+      nuevosErrores.password = 'La contraseña es requerida';
+    } else if (datos.password.length < 8) {
+      nuevosErrores.password = 'La contraseña debe tener al menos 8 caracteres';
+    }
+
+    if (!datos.firstName?.trim()) nuevosErrores.firstName = 'El nombre es requerido';
+    if (!datos.lastName?.trim()) nuevosErrores.lastName = 'El apellido es requerido';
+
+    if (datos.phone && !/^\+?[1-9]\d{6,14}$/.test(datos.phone)) {
+      nuevosErrores.phone = 'El teléfono no es válido (ej. +573001234567)';
+    }
+
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const alEnviar = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      createUserMutation.mutate(formData);
-    }
+    if (validar()) crearUsuarioMutacion.mutate(datos);
   };
 
-  const handleChange = (field: keyof CreateUserData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+  const alCambiar = (campo: keyof DatosFormulario, valor: string | boolean) => {
+    setDatos((prev) => ({ ...prev, [campo]: valor }));
+    if (errores[campo]) {
+      setErrores((prev) => ({ ...prev, [campo]: undefined }));
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nombre *
-          </label>
-          <Input
-            value={formData.firstName}
-            onChange={(e) => handleChange('firstName', e.target.value)}
+    <form onSubmit={alEnviar} className="space-y-4" noValidate>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="space-y-1.5">
+          <Etiqueta htmlFor="create-firstName" required>
+            Nombre
+          </Etiqueta>
+          <Entrada
+            id="create-firstName"
+            value={datos.firstName}
+            onChange={(e) => alCambiar('firstName', e.target.value)}
             placeholder="Nombre"
-            error={errors.firstName}
+            error={errores.firstName}
+            autoComplete="given-name"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Apellido *
-          </label>
-          <Input
-            value={formData.lastName}
-            onChange={(e) => handleChange('lastName', e.target.value)}
+        <div className="space-y-1.5">
+          <Etiqueta htmlFor="create-lastName" required>
+            Apellido
+          </Etiqueta>
+          <Entrada
+            id="create-lastName"
+            value={datos.lastName}
+            onChange={(e) => alCambiar('lastName', e.target.value)}
             placeholder="Apellido"
-            error={errors.lastName}
+            error={errores.lastName}
+            autoComplete="family-name"
           />
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Email *
-        </label>
-        <Input
+      <div className="space-y-1.5">
+        <Etiqueta htmlFor="create-email" required>
+          Email
+        </Etiqueta>
+        <Entrada
+          id="create-email"
           type="email"
-          value={formData.email}
-          onChange={(e) => handleChange('email', e.target.value)}
+          value={datos.email}
+          onChange={(e) => alCambiar('email', e.target.value)}
           placeholder="usuario@ejemplo.com"
-          error={errors.email}
+          error={errores.email}
+          autoComplete="email"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Contraseña *
-        </label>
-        <Input
+      <div className="space-y-1.5">
+        <Etiqueta htmlFor="create-password" required>
+          Contraseña
+        </Etiqueta>
+        <Entrada
+          id="create-password"
           type="password"
-          value={formData.password}
-          onChange={(e) => handleChange('password', e.target.value)}
-          placeholder="Mínimo 6 caracteres"
-          error={errors.password}
+          value={datos.password}
+          onChange={(e) => alCambiar('password', e.target.value)}
+          placeholder="Mínimo 8 caracteres"
+          error={errores.password}
+          autoComplete="new-password"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Teléfono
-        </label>
-        <Input
-          value={formData.phone}
-          onChange={(e) => handleChange('phone', e.target.value)}
+      <div className="space-y-1.5">
+        <Etiqueta htmlFor="create-phone">Teléfono</Etiqueta>
+        <Entrada
+          id="create-phone"
+          type="tel"
+          value={datos.phone ?? ''}
+          onChange={(e) => alCambiar('phone', e.target.value)}
           placeholder="+573001234567"
-          error={errors.phone}
+          error={errores.phone}
+          autoComplete="tel"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Rol *
-        </label>
+      <div className="space-y-1.5">
+        <Etiqueta htmlFor="create-role" required>
+          Rol
+        </Etiqueta>
         <select
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={formData.role}
-          onChange={(e) => handleChange('role', e.target.value as UserRole)}
+          id="create-role"
+          className="h-11 w-full rounded-lg border border-input bg-card px-3 text-sm text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card"
+          value={datos.role}
+          onChange={(e) => alCambiar('role', e.target.value as UserRole)}
         >
-          <option value="PATIENT">Paciente</option>
-          <option value="DOCTOR">Médico</option>
-          <option value="NURSE">Enfermero/a</option>
-          <option value="ADMIN">Administrador</option>
-          <option value="SUPER_ADMIN">Super Administrador</option>
+          {OPCIONES_ROLES.map((op) => (
+            <option key={op.valor} value={op.valor}>
+              {op.etiqueta}
+            </option>
+          ))}
         </select>
       </div>
 
-      <div className="flex space-x-4">
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="isActive"
-            checked={formData.isActive}
-            onChange={(e) => handleChange('isActive', e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          />
-          <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
+      <fieldset className="space-y-3 rounded-lg border border-border p-3">
+        <legend className="px-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Estado de la cuenta
+        </legend>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+          <label
+            htmlFor="create-isActive"
+            className="inline-flex cursor-pointer items-center gap-2 text-sm text-foreground"
+          >
+            <input
+              type="checkbox"
+              id="create-isActive"
+              checked={datos.isActive}
+              onChange={(e) => alCambiar('isActive', e.target.checked)}
+              className="h-4 w-4 rounded border-input text-brand-600 focus:ring-2 focus:ring-ring"
+            />
             Usuario activo
           </label>
-        </div>
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="isVerified"
-            checked={formData.isVerified}
-            onChange={(e) => handleChange('isVerified', e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          />
-          <label htmlFor="isVerified" className="ml-2 block text-sm text-gray-900">
+          <label
+            htmlFor="create-isVerified"
+            className="inline-flex cursor-pointer items-center gap-2 text-sm text-foreground"
+          >
+            <input
+              type="checkbox"
+              id="create-isVerified"
+              checked={datos.isVerified}
+              onChange={(e) => alCambiar('isVerified', e.target.checked)}
+              className="h-4 w-4 rounded border-input text-brand-600 focus:ring-2 focus:ring-ring"
+            />
             Usuario verificado
           </label>
         </div>
-      </div>
+      </fieldset>
 
-      <div className="flex justify-end space-x-3 pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={createUserMutation.isPending}
-        >
+      <div className="flex flex-col-reverse items-stretch gap-2 pt-2 sm:flex-row sm:justify-end">
+        <Boton type="button" variant="outline" onClick={alCancelar} disabled={crearUsuarioMutacion.isPending}>
           Cancelar
-        </Button>
-        <Button
-          type="submit"
-          disabled={createUserMutation.isPending}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          {createUserMutation.isPending ? 'Creando...' : 'Crear Usuario'}
-        </Button>
+        </Boton>
+        <Boton type="submit" isLoading={crearUsuarioMutacion.isPending}>
+          {crearUsuarioMutacion.isPending ? 'Creando…' : 'Crear usuario'}
+        </Boton>
       </div>
     </form>
   );

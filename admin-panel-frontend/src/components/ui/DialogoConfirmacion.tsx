@@ -1,6 +1,6 @@
 import { AlertTriangle, X } from 'lucide-react';
-import { Button } from './Button';
-import { GlassModal } from './GlassModal';
+import { Boton } from './Boton';
+import { ModalCristal } from './ModalCristal';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -14,7 +14,7 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-export function ConfirmDialog({
+export function DialogoConfirmacion({
   isOpen,
   title,
   message,
@@ -26,7 +26,7 @@ export function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   return (
-    <GlassModal
+    <ModalCristal
       isOpen={isOpen}
       onClose={onCancel}
       size="sm"
@@ -66,19 +66,19 @@ export function ConfirmDialog({
         </div>
 
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+          <Boton type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
             {cancelLabel}
-          </Button>
-          <Button
+          </Boton>
+          <Boton
             type="button"
             variant={isDanger ? 'danger' : 'primary'}
             onClick={onConfirm}
             isLoading={isLoading}
           >
             {confirmLabel}
-          </Button>
+          </Boton>
         </div>
       </div>
-    </GlassModal>
+    </ModalCristal>
   );
 }

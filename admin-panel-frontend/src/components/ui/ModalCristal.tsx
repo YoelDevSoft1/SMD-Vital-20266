@@ -46,7 +46,7 @@ const modalVariants = {
   ),
 };
 
-export function GlassModal({
+export function ModalCristal({
   isOpen,
   onClose,
   children,

@@ -2,32 +2,42 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
-  Users,
-  Stethoscope,
+  Activity,
+  ArrowRight,
   CalendarCheck2,
   DollarSign,
-  Activity,
+  RefreshCw,
   ShieldCheck,
   Star,
-  RefreshCw,
-  ArrowRight,
+  Stethoscope,
+  Users,
 } from 'lucide-react';
+
 import { adminService } from '@/services/admin.service';
 import type { DashboardStats } from '@/types';
-import { DashboardStatCard } from '@/components/dashboard/DashboardStatCard';
-import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/utils/cn';
-
-const statusStyles: Record<string, string> = {
-  COMPLETED: 'bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800',
-  PENDING: 'bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800',
-  IN_PROGRESS: 'bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800',
-  CANCELLED: 'bg-rose-50 text-rose-700 border border-rose-100 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800',
-  NO_SHOW: 'bg-slate-50 text-slate-600 border border-slate-100 dark:bg-slate-800/20 dark:text-slate-400 dark:border-slate-700',
-  RESCHEDULED: 'bg-purple-50 text-purple-700 border border-purple-100 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800',
-};
+import {
+  TarjetaEstadisticaDashboard,
+} from '@/components/dashboard/TarjetaEstadisticaDashboard';
+import { EsqueletoDashboard } from '@/components/dashboard/EsqueletoDashboard';
+import { Boton } from '@/components/ui/Boton';
+import {
+  Tarjeta,
+  TarjetaContenido,
+  TarjetaEncabezado,
+  TarjetaTitulo,
+} from '@/components/ui/Tarjeta';
+import { Encabezado } from '@/components/ui/Encabezado';
+import { Insignia } from '@/components/ui/Insignia';
+import { Avatar } from '@/components/ui/Avatar';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
+import { Alerta } from '@/components/ui/Alerta';
+import {
+  formatearCOP,
+  formatearNumero,
+  formatearFechaHora,
+} from '@/utils/formato';
+import { obtenerMetaEstadoCita } from '@/utils/estados';
+import { obtenerMetaRol } from '@/utils/roles';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -46,32 +56,32 @@ export default function Dashboard() {
 
   const stats = data?.data?.data as DashboardStats | undefined;
 
-  const statCards = useMemo(() => {
+  const tarjetasEstadistica = useMemo(() => {
     if (!stats) {
       return [
         {
           title: 'Usuarios totales',
-          value: '0',
+          valor: '0',
           icon: Users,
-          accent: 'blue' as const,
+          acento: 'blue' as const,
         },
         {
           title: 'Doctores verificados',
-          value: '0',
+          valor: '0',
           icon: Stethoscope,
-          accent: 'purple' as const,
+          acento: 'purple' as const,
         },
         {
           title: 'Citas registradas',
-          value: '0',
+          valor: '0',
           icon: CalendarCheck2,
-          accent: 'indigo' as const,
+          acento: 'indigo' as const,
         },
         {
           title: 'Ingresos totales',
-          value: formatCurrency(0),
+          valor: formatearCOP(0),
           icon: DollarSign,
-          accent: 'emerald' as const,
+          acento: 'emerald' as const,
         },
       ];
     }
@@ -79,460 +89,425 @@ export default function Dashboard() {
     return [
       {
         title: 'Usuarios totales',
-        value: formatNumber(stats.overview?.totalUsers || 0),
+        valor: formatearNumero(stats.overview?.totalUsers ?? 0),
         icon: Users,
-        accent: 'blue' as const,
-        change: stats.growth?.users || 0,
+        acento: 'blue' as const,
+        change: stats.growth?.users ?? 0,
         changeLabel: 'vs mes anterior',
-        helperText: `${formatNumber(stats.overview?.activeUsers || 0)} activos`,
+        hint: `${formatearNumero(stats.overview?.activeUsers ?? 0)} activos`,
       },
       {
         title: 'Doctores verificados',
-        value: formatNumber(stats.overview?.totalDoctors || 0),
+        valor: formatearNumero(stats.overview?.totalDoctors ?? 0),
         icon: Stethoscope,
-        accent: 'purple' as const,
-        helperText: `${formatNumber(stats.overview?.verifiedDoctors || 0)} disponibles`,
+        acento: 'purple' as const,
+        hint: `${formatearNumero(stats.overview?.verifiedDoctors ?? 0)} disponibles`,
       },
       {
         title: 'Citas registradas',
-        value: formatNumber(stats.overview?.totalAppointments || 0),
+        valor: formatearNumero(stats.overview?.totalAppointments ?? 0),
         icon: CalendarCheck2,
-        accent: 'indigo' as const,
-        change: stats.growth?.appointments || 0,
+        acento: 'indigo' as const,
+        change: stats.growth?.appointments ?? 0,
         changeLabel: 'vs mes anterior',
-        helperText: `${formatNumber(stats.appointments?.completed || 0)} completadas`,
+        hint: `${formatearNumero(stats.appointments?.completed ?? 0)} completadas`,
       },
       {
         title: 'Ingresos totales',
-        value: formatCurrency(stats.overview?.totalRevenue || 0),
+        valor: formatearCOP(stats.overview?.totalRevenue ?? 0),
         icon: DollarSign,
-        accent: 'emerald' as const,
-        helperText: `Mes actual: ${formatCurrency(stats.overview?.monthlyRevenue || 0)}`,
+        acento: 'emerald' as const,
+        hint: `Mes actual: ${formatearCOP(stats.overview?.monthlyRevenue ?? 0)}`,
       },
     ];
   }, [stats]);
 
-  if (isLoading) {
-    return <DashboardSkeleton />;
-  }
+  if (isLoading) return <EsqueletoDashboard />;
 
   if (error) {
     return (
-      <Card className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
-        <CardContent className="flex flex-col gap-4 p-6 text-sm">
-          <div>
-            <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">No se pudo cargar el dashboard</h2>
-            <p className="text-red-600 dark:text-red-400">
-              Verifica tu conexión o vuelve a intentarlo en unos segundos.
-            </p>
-          </div>
-          <div>
-            <Button variant="outline" onClick={() => refetch()}>
-              Reintentar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <Alerta
+        variant="danger"
+        title="No se pudo cargar el dashboard"
+        action={
+          <Boton variant="outline" onClick={() => refetch()}>
+            <RefreshCw className="h-4 w-4" />
+            Reintentar
+          </Boton>
+        }
+      >
+        Verifica tu conexión o vuelve a intentarlo en unos segundos.
+      </Alerta>
     );
   }
 
   if (!stats) {
     return (
-      <Card className="border border-amber-200 bg-amber-50/60 dark:border-amber-800 dark:bg-amber-900/20">
-        <CardContent className="p-6 text-sm text-amber-700 dark:text-amber-300">
-          No hay datos de dashboard disponibles por ahora.
-        </CardContent>
-      </Card>
+      <Alerta variant="warning" title="Sin formData">
+        No hay formData de dashboard disponibles por ahora.
+      </Alerta>
     );
   }
 
-  const appointmentTotals = stats?.appointments?.total || 0;
-  const appointmentStatusBreakdown = [
+  const totalCitas = stats?.appointments?.total ?? 0;
+  const distribucionCitas = [
     {
-      key: 'pending',
-      label: 'Pendientes',
-      value: stats?.appointments?.pending ?? 0,
-      bar: 'bg-amber-400',
+      clave: 'pendientes',
+      etiqueta: 'Pendientes',
+      valor: stats?.appointments?.pending ?? 0,
+      barra: 'bg-warning',
     },
     {
-      key: 'completed',
-      label: 'Completadas',
-      value: stats?.appointments?.completed ?? 0,
-      bar: 'bg-emerald-500',
+      clave: 'completadas',
+      etiqueta: 'Completadas',
+      valor: stats?.appointments?.completed ?? 0,
+      barra: 'bg-success',
     },
     {
-      key: 'cancelled',
-      label: 'Canceladas',
-      value: stats?.appointments?.cancelled ?? 0,
-      bar: 'bg-rose-500',
+      clave: 'canceladas',
+      etiqueta: 'Canceladas',
+      valor: stats?.appointments?.cancelled ?? 0,
+      barra: 'bg-danger',
     },
   ];
 
-  const recentAppointments = stats?.recentActivity?.appointments?.slice(0, 5) || [];
-  const recentUsers = stats?.recentActivity?.users?.slice(0, 5) || [];
-  const topDoctors = stats?.topPerformers?.doctors?.slice(0, 5) || [];
-  const topServices = stats?.topPerformers?.services?.slice(0, 5) || [];
+  const citasRecientes = stats?.recentActivity?.appointments?.slice(0, 5) ?? [];
+  const usuariosRecientes = stats?.recentActivity?.users?.slice(0, 5) ?? [];
+  const doctoresDestacados = stats?.topPerformers?.doctors?.slice(0, 5) ?? [];
+  const serviciosDestacados = stats?.topPerformers?.services?.slice(0, 5) ?? [];
 
   return (
     <div className="space-y-6">
-      {/* Temporary debug display */}
-      <div className="bg-yellow-100 border border-yellow-400 p-4 rounded dark:bg-yellow-900/20 dark:border-yellow-800">
-        <h3 className="font-bold text-yellow-800 dark:text-yellow-300">DEBUG INFO:</h3>
-        <p className="text-yellow-700 dark:text-yellow-400"><strong>Has data:</strong> {data ? 'YES' : 'NO'}</p>
-        <p className="text-yellow-700 dark:text-yellow-400"><strong>Has stats:</strong> {stats ? 'YES' : 'NO'}</p>
-        <p className="text-yellow-700 dark:text-yellow-400"><strong>Stats type:</strong> {typeof stats}</p>
-        <p className="text-yellow-700 dark:text-yellow-400"><strong>Stats keys:</strong> {stats ? Object.keys(stats).join(', ') : 'N/A'}</p>
-        <p className="text-yellow-700 dark:text-yellow-400"><strong>Has overview:</strong> {stats?.overview ? 'YES' : 'NO'}</p>
-        <p className="text-yellow-700 dark:text-yellow-400"><strong>Overview keys:</strong> {stats?.overview ? Object.keys(stats.overview).join(', ') : 'N/A'}</p>
-        <p className="text-yellow-700 dark:text-yellow-400"><strong>Raw data structure:</strong> {JSON.stringify(data, null, 2).substring(0, 200)}...</p>
-      </div>
-      
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Panel general</h1>
-          <p className="text-sm text-slate-600 dark:text-slate-300">
-            Visión rápida de la operación y los indicadores clave de SMD Vital.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Button variant="outline" size="md" onClick={() => refetch()} isLoading={isFetching}>
-            <RefreshCw className="h-4 w-4" />
-            Actualizar
-          </Button>
-          <Button variant="primary" size="md" onClick={() => navigate('/analytics')}>
-            Explorar analíticas
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <Encabezado
+        title="Panel general"
+        subtitle="Visión rápida de la operación y los indicadores clave de SMD Vital."
+        actions={
+          <>
+            <Boton
+              variant="outline"
+              onClick={() => refetch()}
+              isLoading={isFetching}
+              leftIcon={<RefreshCw className="h-4 w-4" />}
+            >
+              Actualizar
+            </Boton>
+            <Boton onClick={() => navigate('/analytics')} rightIcon={<ArrowRight className="h-4 w-4" />}>
+              Explorar analíticas
+            </Boton>
+          </>
+        }
+      />
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {statCards.map((card) => (
-          <DashboardStatCard key={card.title} {...card} />
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4 lg:gap-4">
+        {tarjetasEstadistica.map((tarjeta) => (
+          <TarjetaEstadisticaDashboard key={tarjeta.title} {...tarjeta} />
         ))}
       </div>
 
       <div className="grid gap-6 xl:grid-cols-3">
-        <Card variant="elevated" className="xl:col-span-2">
-          <CardHeader className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+        <Tarjeta className="xl:col-span-2">
+          <TarjetaEncabezado className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-                Estado de las citas
-              </CardTitle>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Distribución de todas las citas registradas ({formatNumber(appointmentTotals)}).
+              <TarjetaTitulo className="text-base">Estado de las citas</TarjetaTitulo>
+              <p className="text-sm text-muted-foreground">
+                Distribución de todas las citas registradas ({formatearNumero(totalCitas)}).
               </p>
             </div>
-            <div className="rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300">
+            <Insignia variant="info" size="md">
               Tasa de éxito {stats?.appointments?.completionRate?.toFixed(1) ?? 0}%
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            {appointmentStatusBreakdown.map((item) => {
-              const percentage =
-                appointmentTotals > 0 ? (item.value / appointmentTotals) * 100 : 0;
+            </Insignia>
+          </TarjetaEncabezado>
+          <TarjetaContenido className="space-y-5">
+            {distribucionCitas.map((item) => {
+              const porcentaje =
+                totalCitas > 0 ? (item.valor / totalCitas) * 100 : 0;
               return (
-                <div key={item.key} className="space-y-2">
+                <div key={item.clave} className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-slate-700 dark:text-slate-300">{item.label}</span>
-                    <span className="text-slate-600 dark:text-slate-400">
-                      {formatNumber(item.value)}{' '}
-                      <span className="text-xs text-slate-500 dark:text-slate-500">
-                        ({percentage.toFixed(1)}%)
+                    <span className="font-medium text-foreground">{item.etiqueta}</span>
+                    <span className="text-muted-foreground tabular-nums">
+                      {formatearNumero(item.valor)}{' '}
+                      <span className="text-xs text-muted-foreground/70">
+                        ({porcentaje.toFixed(1)}%)
                       </span>
                     </span>
                   </div>
-                  <div className="h-2.5 w-full rounded-full bg-slate-200/50 dark:bg-slate-700/50">
+                  <div
+                    className="h-2 w-full overflow-hidden rounded-full bg-muted"
+                    role="progressbar"
+                    aria-valuenow={Math.round(porcentaje)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={item.etiqueta}
+                  >
                     <div
-                      className={cn('h-2.5 rounded-full transition-all duration-500 shadow-sm', item.bar)}
-                      style={{ width: `${percentage}%` }}
+                      className={`h-full ${item.barra} motion-safe:transition-all motion-safe:duration-500`}
+                      style={{ width: `${porcentaje}%` }}
                     />
                   </div>
                 </div>
               );
             })}
-            <div className="flex items-center gap-3 rounded-xl bg-indigo-50/80 p-4 text-sm font-medium text-indigo-700 border border-indigo-100/50 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800/50">
-              <ShieldCheck className="h-5 w-5 flex-shrink-0" />
-              <span>
-                {formatNumber(stats?.appointments?.completed || 0)} citas exitosas sobre{' '}
-                {formatNumber(appointmentTotals)} totales generan la tasa de éxito mostrada.
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+            <Alerta variant="info" icon={ShieldCheck}>
+              {formatearNumero(stats?.appointments?.completed ?? 0)} citas exitosas sobre{' '}
+              {formatearNumero(totalCitas)} totales generan la tasa de éxito mostrada.
+            </Alerta>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card variant="elevated">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Resumen financiero
-            </CardTitle>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+        <Tarjeta>
+          <TarjetaEncabezado>
+            <TarjetaTitulo className="text-base">Resumen financiero</TarjetaTitulo>
+            <p className="text-sm text-muted-foreground">
               Ingresos acumulados y facturación del mes en curso.
             </p>
-          </CardHeader>
-          <CardContent className="space-y-5">
+          </TarjetaEncabezado>
+          <TarjetaContenido className="space-y-5">
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Ingresos totales</p>
-              <p className="text-3xl font-bold text-slate-900 dark:text-white">
-                {formatCurrency(stats?.overview?.totalRevenue || 0)}
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                Ingresos totales
+              </p>
+              <p className="text-3xl font-bold tabular-nums text-foreground">
+                {formatearCOP(stats?.overview?.totalRevenue ?? 0)}
               </p>
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
-                <span>Mes actual</span>
-                <span className="font-semibold text-slate-900 dark:text-white">
-                  {formatCurrency(stats?.overview?.monthlyRevenue || 0)}
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Mes actual</span>
+                <span className="font-semibold tabular-nums text-foreground">
+                  {formatearCOP(stats?.overview?.monthlyRevenue ?? 0)}
                 </span>
               </div>
-              <RevenueProgress
-                total={stats?.overview?.totalRevenue || 0}
-                monthly={stats?.overview?.monthlyRevenue || 0}
+              <BarraIngresos
+                total={stats?.overview?.totalRevenue ?? 0}
+                mensual={stats?.overview?.monthlyRevenue ?? 0}
               />
             </div>
-            <div className="flex items-center gap-3 rounded-xl bg-emerald-50/80 p-4 text-sm font-medium text-emerald-700 border border-emerald-100/50 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800/50">
-              <Star className="h-5 w-5 flex-shrink-0" />
-              <span>
-                Calificación promedio del servicio:{' '}
-                <strong>{stats?.overview?.averageRating?.toFixed(1) ?? '0.0'} / 5</strong>
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+            <Alerta variant="success" icon={Star}>
+              Calificación promedio del servicio:{' '}
+              <strong>{stats?.overview?.averageRating?.toFixed(1) ?? '0.0'} / 5</strong>
+            </Alerta>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <Card variant="elevated">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Citas recientes
-            </CardTitle>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Últimas interacciones registradas junto al estado actual.
+        <Tarjeta>
+          <TarjetaEncabezado>
+            <TarjetaTitulo className="text-base">Citas recientes</TarjetaTitulo>
+            <p className="text-sm text-muted-foreground">
+              Últimas interacciones registradas con su estado actual.
             </p>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {recentAppointments.length === 0 && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">No se registran citas recientes.</p>
+          </TarjetaEncabezado>
+          <TarjetaContenido>
+            {citasRecientes.length === 0 ? (
+              <EstadoVacio
+                icon={CalendarCheck2}
+                title="Sin citas recientes"
+                description="Las nuevas citas aparecerán aquí conforme se agenden."
+              />
+            ) : (
+              <ul className="space-y-2">
+                {citasRecientes.map((cita) => {
+                  const metaEstado = obtenerMetaEstadoCita(cita.status);
+                  const IconoEstado = metaEstado.icon;
+                  return (
+                    <li
+                      key={cita.id}
+                      className="flex flex-col gap-2 rounded-lg border border-border p-3 motion-safe:transition-colors hover:border-brand-200 hover:bg-brand-50/40 dark:hover:border-brand-500/30 dark:hover:bg-brand-500/5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground">
+                          {cita.patient?.user.firstName} {cita.patient?.user.lastName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Con {cita.doctor?.user.firstName} {cita.doctor?.user.lastName}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                          <Activity className="h-3 w-3 text-info" aria-hidden="true" />
+                          {cita.service?.name ?? 'Servicio sin especificar'}
+                        </span>
+                        <Insignia variant={metaEstado.variant} size="sm" icon={IconoEstado}>
+                          {metaEstado.etiqueta}
+                        </Insignia>
+                        <span className="text-xs text-muted-foreground/80">{formatearFechaHora(cita.createdAt)}</span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             )}
-            {recentAppointments.map((appointment) => (
-              <div
-                key={appointment.id}
-                className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-white p-4 transition hover:border-indigo-200 hover:bg-indigo-50/40 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-600 dark:hover:bg-indigo-900/20"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {appointment.patient?.user.firstName}{' '}
-                      {appointment.patient?.user.lastName}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Con {appointment.doctor?.user.firstName}{' '}
-                      {appointment.doctor?.user.lastName}
-                    </p>
-                  </div>
-                  <span
-                    className={cn(
-                      'rounded-full px-3 py-1 text-xs font-medium',
-                      statusStyles[appointment.status] ?? statusStyles.PENDING
-                    )}
-                  >
-                    {appointment.status}
-                  </span>
-                </div>
-                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-                  <Activity className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />
-                  <span>{appointment.service?.name ?? 'Servicio sin especificar'}</span>
-                  <span className="text-gray-300 dark:text-gray-600">•</span>
-                  <span>{formatDateTime(appointment.createdAt)}</span>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card variant="elevated">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Nuevos usuarios
-            </CardTitle>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+        <Tarjeta>
+          <TarjetaEncabezado>
+            <TarjetaTitulo className="text-base">Nuevos usuarios</TarjetaTitulo>
+            <p className="text-sm text-muted-foreground">
               Cuentas creadas recientemente con su estado actual.
             </p>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {recentUsers.length === 0 && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">Aún no hay usuarios nuevos.</p>
+          </TarjetaEncabezado>
+          <TarjetaContenido>
+            {usuariosRecientes.length === 0 ? (
+              <EstadoVacio
+                icon={Users}
+                title="Aún no hay usuarios nuevos"
+                description="Las cuentas recién creadas aparecerán aquí."
+              />
+            ) : (
+              <ul className="space-y-2">
+                {usuariosRecientes.map((usuario) => {
+                  const metaRol = obtenerMetaRol(usuario.role);
+                  const IconoRol = metaRol.icon;
+                  const nombreCompleto = `${usuario.firstName} ${usuario.lastName}`;
+                  return (
+                    <li
+                      key={usuario.id}
+                      className="flex items-start gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-muted/40"
+                    >
+                      <Avatar name={nombreCompleto} size="md" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="truncate font-medium text-foreground">{nombreCompleto}</p>
+                          <Insignia variant={`role-${usuario.role.toLowerCase().replace('_', '-')}` as 'role-admin' | 'role-super' | 'role-doctor' | 'role-nurse' | 'role-patient' | 'role-agent'} size="sm" icon={IconoRol}>
+                            {metaRol.etiqueta}
+                          </Insignia>
+                        </div>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{usuario.email}</p>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                          <Insignia variant={usuario.isActive ? 'success' : 'neutral'} size="sm">
+                            {usuario.isActive ? 'Activo' : 'Inactivo'}
+                          </Insignia>
+                          <Insignia variant={usuario.isVerified ? 'info' : 'warning'} size="sm">
+                            {usuario.isVerified ? 'Verificado' : 'Pendiente'}
+                          </Insignia>
+                          <span className="ml-auto text-xs text-muted-foreground">{formatearFechaHora(usuario.createdAt)}</span>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             )}
-            {recentUsers.map((user) => (
-              <div
-                key={user.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-100 bg-white p-4 transition hover:border-indigo-200 hover:bg-indigo-50/40 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-600 dark:hover:bg-indigo-900/20"
-              >
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {user.firstName} {user.lastName}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
-                </div>
-                <div className="flex flex-col items-end gap-1 text-xs">
-                  <span className="rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-700 dark:bg-slate-700 dark:text-slate-300">
-                    {user.role}
-                  </span>
-                  <span className="text-gray-500 dark:text-gray-400">{formatDateTime(user.createdAt)}</span>
-                  <div className="flex gap-2 text-[10px]">
-                    <span
-                      className={cn(
-                        'rounded-full px-2 py-0.5 font-medium',
-                        user.isActive
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300'
-                          : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
-                      )}
-                    >
-                      {user.isActive ? 'Activo' : 'Inactivo'}
-                    </span>
-                    <span
-                      className={cn(
-                        'rounded-full px-2 py-0.5 font-medium',
-                        user.isVerified
-                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
-                          : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300'
-                      )}
-                    >
-                      {user.isVerified ? 'Verificado' : 'Pendiente'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <Card variant="elevated">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Doctores destacados
-            </CardTitle>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+        <Tarjeta>
+          <TarjetaEncabezado>
+            <TarjetaTitulo className="text-base">Doctores destacados</TarjetaTitulo>
+            <p className="text-sm text-muted-foreground">
               Profesionales mejor valorados y con mayor volumen de citas.
             </p>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {topDoctors.length === 0 && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">No se encontraron médicos destacados.</p>
+          </TarjetaEncabezado>
+          <TarjetaContenido>
+            {doctoresDestacados.length === 0 ? (
+              <EstadoVacio
+                icon={Stethoscope}
+                title="Sin médicos destacados"
+                description="Cuando haya actividad, verás aquí a los profesionales mejor valorados."
+              />
+            ) : (
+              <ul className="space-y-2">
+                {doctoresDestacados.map((doctor) => (
+                  <li
+                    key={doctor.id}
+                    className="flex items-center justify-between gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-muted/40"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-foreground">
+                        {doctor.user.firstName} {doctor.user.lastName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{doctor.specialty}</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <Insignia variant="warning" size="sm" icon={Star}>
+                        {doctor.rating?.toFixed(1) ?? 'N/A'}
+                      </Insignia>
+                      <span className="text-xs text-muted-foreground">
+                        {doctor._count?.appointments ?? 0} citas ·{' '}
+                        {doctor.isAvailable ? 'Disponible' : 'Ocupado'}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             )}
-            {topDoctors.map((doctor) => (
-              <div
-                key={doctor.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-100 bg-white p-4 transition hover:border-indigo-200 hover:bg-indigo-50/40 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-600 dark:hover:bg-indigo-900/20"
-              >
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {doctor.user.firstName} {doctor.user.lastName}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{doctor.specialty}</p>
-                </div>
-                <div className="flex flex-col items-end gap-1 text-xs text-gray-500 dark:text-gray-400">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 font-medium text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
-                    <Star className="h-3 w-3" />
-                    {doctor.rating?.toFixed(1) ?? 'N/A'}
-                  </span>
-                  <span>
-                    {doctor._count?.appointments ?? 0} citas •{' '}
-                    {doctor.isAvailable ? 'Disponible' : 'Ocupado'}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card variant="elevated">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Servicios más demandados
-            </CardTitle>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+        <Tarjeta>
+          <TarjetaEncabezado>
+            <TarjetaTitulo className="text-base">Servicios más demandados</TarjetaTitulo>
+            <p className="text-sm text-muted-foreground">
               Procedimientos o especialidades con mayor número de citas.
             </p>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {topServices.length === 0 && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">Sin servicios destacados por el momento.</p>
+          </TarjetaEncabezado>
+          <TarjetaContenido>
+            {serviciosDestacados.length === 0 ? (
+              <EstadoVacio
+                icon={Activity}
+                title="Sin servicios destacados"
+                description="Los servicios con más demanda aparecerán ordenados aquí."
+              />
+            ) : (
+              <ul className="space-y-2">
+                {serviciosDestacados.map((servicio) => (
+                  <li
+                    key={servicio.id}
+                    className="flex items-center justify-between gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-muted/40"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-foreground">{servicio.name}</p>
+                      <p className="text-xs text-muted-foreground">{servicio.category}</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-xs text-muted-foreground">
+                        {servicio._count?.appointments ?? 0} citas
+                      </span>
+                      <Insignia variant="success" size="sm">
+                        {formatearCOP(servicio.basePrice)}
+                      </Insignia>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             )}
-            {topServices.map((service) => (
-              <div
-                key={service.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-100 bg-white p-4 transition hover:border-indigo-200 hover:bg-indigo-50/40 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-600 dark:hover:bg-indigo-900/20"
-              >
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{service.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{service.category}</p>
-                </div>
-                <div className="flex flex-col items-end gap-1 text-xs text-gray-500 dark:text-gray-400">
-                  <span>
-                    {service._count?.appointments ?? 0} citas •{' '}
-                    {service.isActive ? 'Activo' : 'Inactivo'}
-                  </span>
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                    {formatCurrency(service.basePrice)}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
     </div>
   );
 }
 
-function formatCurrency(value: number | null | undefined) {
-  return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value ?? 0);
-}
-
-function formatNumber(value: number | null | undefined) {
-  return new Intl.NumberFormat('es-CO', {
-    maximumFractionDigits: 0,
-  }).format(value ?? 0);
-}
-
-function formatDateTime(value: string | Date) {
-  if (!value) return 'Sin fecha';
-  return new Intl.DateTimeFormat('es-CO', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(value));
-}
-
-interface RevenueProgressProps {
+interface PropiedadesBarraIngresos {
   total: number;
-  monthly: number;
+  mensual: number;
 }
 
-function RevenueProgress({ total, monthly }: RevenueProgressProps) {
-  const clampedTotal = total > 0 ? total : 1;
-  const percentage = Math.min(100, Math.max(0, (monthly / clampedTotal) * 100));
-
+function BarraIngresos({ total, mensual }: PropiedadesBarraIngresos) {
+  const denom = total > 0 ? total : 1;
+  const porcentaje = Math.min(100, Math.max(0, (mensual / denom) * 100));
   return (
     <div>
-      <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+      <div
+        className="h-2 w-full overflow-hidden rounded-full bg-muted"
+        role="progressbar"
+        aria-valuenow={Math.round(porcentaje)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Porcentaje de ingresos del mes actual"
+      >
         <div
-          className="h-2 rounded-full bg-emerald-500 transition-all"
-          style={{ width: `${percentage}%` }}
+          className="h-full bg-success motion-safe:transition-all motion-safe:duration-500"
+          style={{ width: `${porcentaje}%` }}
         />
       </div>
-      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-        {percentage.toFixed(1)}% de los ingresos totales se generó este mes.
+      <p className="mt-1 text-xs text-muted-foreground">
+        {porcentaje.toFixed(1)}% de los ingresos totales se generó este mes.
       </p>
     </div>
   );

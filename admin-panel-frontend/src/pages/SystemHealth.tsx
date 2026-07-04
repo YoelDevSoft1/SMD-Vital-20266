@@ -2,18 +2,18 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Activity, Database, Server, HardDrive, RefreshCw, Clock, AlertTriangle } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
-import { Button } from '@/components/ui/Button';
+import { Boton } from '@/components/ui/Boton';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  Tarjeta,
+  TarjetaContenido,
+  TarjetaDescripcion,
+  TarjetaEncabezado,
+  TarjetaTitulo,
+} from '@/components/ui/Tarjeta';
 import SystemLogsModal from '@/components/SystemLogsModal';
 
-function formatDateTime(value?: string) {
-  if (!value) return 'Sin datos';
+function formatearFechaHora(value?: string) {
+  if (!value) return 'Sin formData';
   try {
     return new Intl.DateTimeFormat('es-ES', {
       year: 'numeric',
@@ -29,7 +29,7 @@ function formatDateTime(value?: string) {
 }
 
 function formatUptime(seconds?: number) {
-  if (!seconds || seconds <= 0) return 'Sin datos';
+  if (!seconds || seconds <= 0) return 'Sin formData';
   const days = Math.floor(seconds / 86_400);
   const hours = Math.floor((seconds % 86_400) / 3_600);
   const minutes = Math.floor((seconds % 3_600) / 60);
@@ -44,7 +44,7 @@ function formatUptime(seconds?: number) {
 }
 
 function statusStyles(status?: string) {
-  if (!status) return 'bg-gray-100 text-gray-700';
+  if (!status) return 'bg-muted text-foreground';
   const normalized = status.toUpperCase();
   if (normalized === 'HEALTHY' || normalized === 'UP') {
     return 'bg-green-100 text-green-700';
@@ -55,7 +55,7 @@ function statusStyles(status?: string) {
   if (normalized === 'DOWN' || normalized === 'CRITICAL') {
     return 'bg-red-100 text-red-700';
   }
-  return 'bg-gray-100 text-gray-700';
+  return 'bg-muted text-foreground';
 }
 
 export default function SystemHealth() {
@@ -90,7 +90,7 @@ export default function SystemHealth() {
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-600">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
           <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
           <span>Cargando estado del sistema...</span>
         </div>
@@ -101,7 +101,7 @@ export default function SystemHealth() {
   if (error) {
     return (
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Estado del Sistema</h1>
+        <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Estado del Sistema</h1>
         <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-1 h-5 w-5 text-red-600 dark:text-red-400" />
@@ -112,12 +112,12 @@ export default function SystemHealth() {
               <p className="text-sm text-red-600/80 dark:text-red-400/80">
                 Verifica la conexión con el backend y vuelve a intentarlo.
               </p>
-              <Button
+              <Boton
                 variant="outline"
                 onClick={() => refetch()}
               >
                 Reintentar
-              </Button>
+              </Boton>
             </div>
           </div>
         </div>
@@ -129,144 +129,144 @@ export default function SystemHealth() {
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Estado del Sistema</h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-            Última actualización: {formatDateTime(health?.timestamp)}
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Estado del Sistema</h1>
+          <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
+            Última actualización: {formatearFechaHora(health?.timestamp)}
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button
+          <Boton
             variant="outline"
             onClick={() => refetch()}
             isLoading={isFetching}
           >
             <RefreshCw className="h-4 w-4" />
             Actualizar estado
-          </Button>
-          <Button onClick={() => setShowLogs(true)}>
+          </Boton>
+          <Boton onClick={() => setShowLogs(true)}>
             Ver logs del sistema
-          </Button>
+          </Boton>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <Tarjeta className="lg:col-span-2">
+          <TarjetaEncabezado className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
-              <CardTitle>Resumen Operativo</CardTitle>
-              <CardDescription>
+              <TarjetaTitulo>Resumen Operativo</TarjetaTitulo>
+              <TarjetaDescripcion>
                 Información general del estado actual del backend y sus recursos.
-              </CardDescription>
+              </TarjetaDescripcion>
             </div>
             <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${statusStyles(health?.status)}`}>
               <Activity className="h-4 w-4" />
-              {health?.status ? health.status : 'Sin datos'}
+              {health?.status ? health.status : 'Sin formData'}
             </span>
-          </CardHeader>
-          <CardContent className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-              <p className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          </TarjetaEncabezado>
+          <TarjetaContenido className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-lg border border-border dark:border-border bg-white dark:bg-card p-4">
+              <p className="flex items-center gap-2 text-sm font-medium text-foreground dark:text-muted-foreground">
                 <Clock className="h-4 w-4 text-blue-500" />
                 Uptime
               </p>
-              <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+              <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                 {formatUptime(health?.uptime)}
               </p>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
                 Tiempo en línea desde el último reinicio
               </p>
             </div>
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-              <p className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <div className="rounded-lg border border-border dark:border-border bg-white dark:bg-card p-4">
+              <p className="flex items-center gap-2 text-sm font-medium text-foreground dark:text-muted-foreground">
                 <Server className="h-4 w-4 text-purple-500" />
                 Plataforma
               </p>
-              <p className="mt-2 text-lg font-semibold text-gray-900 dark:text-white">
-                {health?.system.platform ?? 'Sin datos'}
+              <p className="mt-2 text-lg font-semibold text-foreground dark:text-foreground">
+                {health?.system.platform ?? 'Sin formData'}
               </p>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
                 Node {health?.system.nodeVersion ?? 'N/A'}
               </p>
             </div>
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-              <p className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <div className="rounded-lg border border-border dark:border-border bg-white dark:bg-card p-4">
+              <p className="flex items-center gap-2 text-sm font-medium text-foreground dark:text-muted-foreground">
                 <HardDrive className="h-4 w-4 text-emerald-500" />
                 Memoria externa
               </p>
-              <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
-                {memory ? `${memory.external} ${memory.unit}` : 'Sin datos'}
+              <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
+                {memory ? `${memory.external} ${memory.unit}` : 'Sin formData'}
               </p>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
                 Recursos adicionales disponibles
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Servicios críticos</CardTitle>
-            <CardDescription>
+        <Tarjeta>
+          <TarjetaEncabezado>
+            <TarjetaTitulo>Servicios críticos</TarjetaTitulo>
+            <TarjetaDescripcion>
               Estado de las dependencias principales para la operación.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+            </TarjetaDescripcion>
+          </TarjetaEncabezado>
+          <TarjetaContenido className="space-y-4">
+            <div className="flex items-start gap-3 rounded-lg border border-border dark:border-border bg-muted dark:bg-card p-4">
               <Database className="mt-1 h-5 w-5 text-indigo-500" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">Base de datos</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Conectividad y salud de la base de datos principal.</p>
+                <p className="text-sm font-semibold text-foreground dark:text-foreground">Base de formData</p>
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground">Conectividad y salud de la base de formData principal.</p>
               </div>
               <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusStyles(health?.services.database)}`}>
-                {health?.services.database ?? 'Sin datos'}
+                {health?.services.database ?? 'Sin formData'}
               </span>
             </div>
-            <div className="flex items-start gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+            <div className="flex items-start gap-3 rounded-lg border border-border dark:border-border bg-muted dark:bg-card p-4">
               <Server className="mt-1 h-5 w-5 text-amber-500" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">Redis / Cache</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Estado del servicio de cache y colas.</p>
+                <p className="text-sm font-semibold text-foreground dark:text-foreground">Redis / Cache</p>
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground">Estado del servicio de cache y colas.</p>
               </div>
               <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusStyles(health?.services.redis)}`}>
-                {health?.services.redis ?? 'Sin datos'}
+                {health?.services.redis ?? 'Sin formData'}
               </span>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Uso de memoria</CardTitle>
-            <CardDescription>
+        <Tarjeta>
+          <TarjetaEncabezado>
+            <TarjetaTitulo>Uso de memoria</TarjetaTitulo>
+            <TarjetaDescripcion>
               Monitoreo del consumo de memoria del proceso Node.js.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            </TarjetaDescripcion>
+          </TarjetaEncabezado>
+          <TarjetaContenido className="space-y-4">
             {memory ? (
               <>
                 <div>
-                  <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground dark:text-muted-foreground">
                     <span>Uso actual</span>
                     <span>{memoryUsage}%</span>
                   </div>
-                  <div className="mt-2 h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div className="mt-2 h-3 w-full rounded-full bg-muted dark:bg-card">
                     <div
                       className="h-3 rounded-full bg-blue-500 transition-all"
                       style={{ width: `${memoryUsage}%` }}
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
+                <div className="grid grid-cols-2 gap-4 text-sm text-foreground dark:text-muted-foreground">
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Utilizada</p>
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">Utilizada</p>
                     <p className="font-semibold">
                       {memory.used} {memory.unit}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Total disponible</p>
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">Total disponible</p>
                     <p className="font-semibold">
                       {memory.total} {memory.unit}
                     </p>
@@ -274,40 +274,40 @@ export default function SystemHealth() {
                 </div>
               </>
             ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400">No hay información disponible.</p>
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground">No hay información disponible.</p>
             )}
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Uso de CPU</CardTitle>
-            <CardDescription>Consumo de CPU del proceso y uso del sistema.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Tarjeta>
+          <TarjetaEncabezado>
+            <TarjetaTitulo>Uso de CPU</TarjetaTitulo>
+            <TarjetaDescripcion>Consumo de CPU del proceso y uso del sistema.</TarjetaDescripcion>
+          </TarjetaEncabezado>
+          <TarjetaContenido className="space-y-4">
             {cpu ? (
               <>
                 <div>
-                  <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground dark:text-muted-foreground">
                     <span>Uso del proceso</span>
                     <span>{cpuUsage}%</span>
                   </div>
-                  <div className="mt-2 h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div className="mt-2 h-3 w-full rounded-full bg-muted dark:bg-card">
                     <div
                       className="h-3 rounded-full bg-emerald-500 transition-all"
                       style={{ width: `${cpuUsage}%` }}
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
+                <div className="grid grid-cols-2 gap-4 text-sm text-foreground dark:text-muted-foreground">
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Proceso (user)</p>
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">Proceso (user)</p>
                     <p className="font-semibold">
                       {cpu.user} {cpu.unit}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Sistema</p>
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">Sistema</p>
                     <p className="font-semibold">
                       {cpu.system} {cpu.unit}
                     </p>
@@ -315,10 +315,10 @@ export default function SystemHealth() {
                 </div>
               </>
             ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400">No hay información disponible.</p>
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground">No hay información disponible.</p>
             )}
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
 
       <SystemLogsModal

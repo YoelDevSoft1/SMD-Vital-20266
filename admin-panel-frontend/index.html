@@ -4,14 +4,43 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/pwa-icon.svg" />
     <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Typography: Inter (clinical / clean). Preconnect for fastest font swap. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
+    />
+
+    <!-- PWA: Iconos para iOS (iOS downscalea, así que 192 funciona) -->
     <link rel="apple-touch-icon" href="/pwa-icon-192.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/pwa-icon-192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/pwa-icon-192.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/pwa-icon-192.png" />
+
+    <!-- PWA: Splash screen iOS (iPhone X portrait) -->
+    <!-- iOS requiere imagen específica por resolución. Usamos la 512 como fallback único -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
     <meta name="description" content="Panel de administracion SMD Vital - Gestion de medicos a domicilio en Bogota" />
-    <meta name="theme-color" content="#0f172a" />
+
+    <!-- PWA: Theme colors (coinciden con el branding SMD Vital) -->
+    <meta name="theme-color" content="#0F76E6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0F76E6" media="(prefers-color-scheme: dark)" />
+
+    <!-- PWA: iOS / Android -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="SMD Vital" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+
+    <!-- PWA: Format detection (no queremos que iOS convierta teléfonos en links) -->
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- iOS Splash Screens (referencia al icono mientras el SW arranca) -->
+    <link rel="apple-touch-startup-image" href="/pwa-icon-512.png" />
+
     <title>SMD Vital - Admin Panel</title>
   </head>
   <body>

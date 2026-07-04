@@ -297,6 +297,7 @@ export class AdminPanelController {
         limit: parseInt(limit as string),
         search: search as string,
         specialty: specialty as string,
+        includeNurses: req.userRole === 'AGENT',
         ...(isAvailable && { isAvailable: isAvailable === 'true' }),
         ...(rating && { rating: parseInt(rating as string) }),
         ...(experience && { experience: parseInt(experience as string) }),

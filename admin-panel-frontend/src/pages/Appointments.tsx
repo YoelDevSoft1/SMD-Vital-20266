@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { formatDateTime, formatTime } from '@/utils/dateFormat';
+import { formatearFechaHora, formatearHora } from '@/utils/dateFormat';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Calendar,
@@ -25,37 +25,24 @@ import {
   ListChecks,
 } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
+import { EsqueletoTabla } from '@/components/ui/Esqueleto';
+import { Insignia } from '@/components/ui/Insignia';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
+import { Modal } from '@/components/ui/Modal';
+import { obtenerMetaEstadoCita } from '@/utils/estados';
 import AppointmentsModal from '@/components/AppointmentsModal';
 import CreateAppointmentForm from '@/components/CreateAppointmentForm';
 import AppointmentDetailsView from '@/components/AppointmentDetailsView';
 import DailyRouteMap from '@/components/DailyRouteMap';
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { DialogoConfirmacion } from '@/components/ui/DialogoConfirmacion';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
 import type { Appointment, AppointmentFilters, AppointmentStatus, AppointmentTimelineItem, Doctor } from '@/types';
 
-const statusTranslations: Record<AppointmentStatus, string> = {
-  PENDING: 'Pendiente',
-  CONFIRMED: 'Confirmada',
-  IN_PROGRESS: 'En Progreso',
-  COMPLETED: 'Completada',
-  CANCELLED: 'Cancelada',
-  NO_SHOW: 'No Asistió',
-  RESCHEDULED: 'Reprogramada',
-};
 
-const statusColors: Record<AppointmentStatus, string> = {
-  PENDING: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800',
-  CONFIRMED: 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800',
-  IN_PROGRESS: 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800',
-  COMPLETED: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800',
-  CANCELLED: 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800',
-  NO_SHOW: 'bg-gray-50 text-gray-700 border-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
-  RESCHEDULED: 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800',
-};
 
 export default function Appointments() {
   const queryClient = useQueryClient();
@@ -181,10 +168,10 @@ export default function Appointments() {
     return (
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Gestión de citas</h1>
+          <h1 className="text-2xl font-bold text-foreground dark:text-foreground sm:text-3xl">Gestión de citas</h1>
         </div>
-        <Card className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
-          <CardContent className="flex flex-col gap-4 p-6 text-sm">
+        <Tarjeta className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
+          <TarjetaContenido className="flex flex-col gap-4 p-6 text-sm">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
               <div>
@@ -195,17 +182,17 @@ export default function Appointments() {
               </div>
             </div>
             <div>
-              <Button 
+              <Boton 
                 variant="outline" 
                 onClick={() => refetch()}
-                className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                className="dark:text-foreground dark:border-border dark:hover:bg-muted"
               >
                 <RefreshCw className="h-4 w-4" />
                 Reintentar
-              </Button>
+              </Boton>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
     );
   }
@@ -215,31 +202,31 @@ export default function Appointments() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Gestión de citas</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <h1 className="text-2xl font-bold text-foreground dark:text-foreground sm:text-3xl">Gestión de citas</h1>
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             Administra todas las citas médicas del sistema SMD Vital
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
-          <Button
+          <Boton
             variant="outline"
             onClick={() => refetch()}
             isLoading={isFetching}
             disabled={isFetching}
-            className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+            className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
           >
             <RefreshCw className={cn("mr-2 h-4 w-4", isFetching && "animate-spin")} />
             Actualizar
-          </Button>
-          <Button 
+          </Boton>
+          <Boton 
             variant="outline" 
             onClick={() => setShowModal(true)}
-            className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+            className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
           >
             <Calendar className="h-4 w-4" />
             Ver todas
-          </Button>
-          <Button
+          </Boton>
+          <Boton
             onClick={() => {
               setSelectedAppointment(null);
               setShowCreateForm(true);
@@ -248,18 +235,18 @@ export default function Appointments() {
           >
             <CalendarPlus className="h-4 w-4" />
             Nueva cita
-          </Button>
+          </Boton>
         </div>
       </div>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+            <TarjetaTitulo className="flex items-center gap-2 text-lg font-semibold text-foreground dark:text-foreground">
               <Radio className="h-5 w-5 text-emerald-600" />
               Torre de control operativa
-            </CardTitle>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            </TarjetaTitulo>
+            <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
               Estado vivo de agenda, riesgos y trazabilidad del equipo.
             </p>
           </div>
@@ -267,8 +254,8 @@ export default function Appointments() {
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
             Sincronizado en tiempo real
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
+        </TarjetaEncabezado>
+        <TarjetaContenido className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {liveStats.statusCards.map((item) => (
               <button
@@ -276,35 +263,34 @@ export default function Appointments() {
                 type="button"
                 onClick={() => handleFilterChange('status', item.status)}
                 className={cn(
-                  'rounded-md border p-4 text-left transition hover:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60',
-                  item.className,
-                  filters.status === item.status && 'ring-2 ring-blue-500/40'
+                  'rounded-xl border border-border bg-card p-4 text-left transition-all hover:border-brand-300 hover:shadow-soft-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                  filters.status === item.status && 'ring-2 ring-brand-500/40 bg-brand-50 dark:bg-brand-500/10'
                 )}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold uppercase tracking-normal">{item.label}</p>
-                    <p className="mt-2 text-2xl font-semibold">{item.count}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{item.etiqueta}</p>
+                    <p className="mt-2 text-2xl font-semibold tabular-nums text-foreground">{item.count}</p>
                   </div>
-                  <Activity className="h-4 w-4 shrink-0" />
+                  <Insignia variante={item.variant} tamaño="sm" />
                 </div>
-                <p className="mt-2 text-xs opacity-80">{item.description}</p>
+                <p className="mt-2 text-xs text-muted-foreground">{item.description}</p>
               </button>
             ))}
           </div>
 
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
             <div className="grid gap-4 lg:grid-cols-2">
-              <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+              <section className="rounded-md border border-border p-4 dark:border-border">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                    <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground dark:text-foreground">
                       <ShieldAlert className="h-4 w-4 text-amber-600" />
                       Alertas de operacion
                     </h2>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Prioriza retrasos, coordenadas y choques de ruta.</p>
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">Prioriza retrasos, coordenadas y choques de ruta.</p>
                   </div>
-                  <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                  <span className="rounded-full bg-muted px-2 py-1 text-xs font-semibold text-foreground dark:bg-card dark:text-muted-foreground">
                     {liveStats.alerts.length}
                   </span>
                 </div>
@@ -344,23 +330,23 @@ export default function Appointments() {
                 </div>
               </section>
 
-              <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+              <section className="rounded-md border border-border p-4 dark:border-border">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                    <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground dark:text-foreground">
                       <Route className="h-4 w-4 text-blue-600" />
                       Cola prioritaria
                     </h2>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Siguientes citas que requieren seguimiento.</p>
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">Siguientes citas que requieren seguimiento.</p>
                   </div>
-                  <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                  <span className="rounded-full bg-muted px-2 py-1 text-xs font-semibold text-foreground dark:bg-card dark:text-muted-foreground">
                     {liveStats.priorityAppointments.length}
                   </span>
                 </div>
 
                 <div className="mt-4 space-y-2">
                   {liveStats.priorityAppointments.length === 0 ? (
-                    <p className="rounded-md border border-gray-200 p-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                    <p className="rounded-md border border-border p-3 text-sm text-muted-foreground dark:border-border dark:text-muted-foreground">
                       No hay citas activas en la pagina actual.
                     </p>
                   ) : (
@@ -370,22 +356,22 @@ export default function Appointments() {
                         type="button"
                         onClick={() => setSelectedTimelineAppointment(appointment)}
                         className={cn(
-                          'w-full rounded-md border border-gray-200 p-3 text-left transition hover:border-blue-300 hover:bg-blue-50 dark:border-gray-700 dark:hover:border-blue-800 dark:hover:bg-blue-900/20',
+                          'w-full rounded-md border border-border p-3 text-left transition hover:border-blue-300 hover:bg-blue-50 dark:border-border dark:hover:border-blue-800 dark:hover:bg-blue-900/20',
                           selectedTimelineAppointment?.id === appointment.id && 'border-blue-400 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20'
                         )}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
+                            <p className="truncate text-sm font-semibold text-foreground dark:text-foreground">
                               {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName}
                             </p>
-                            <p className="mt-1 truncate text-xs text-gray-500 dark:text-gray-400">
-                              {formatTime(appointment.scheduledAt)} - Dr. {appointment.doctor?.user?.firstName} {appointment.doctor?.user?.lastName}
+                            <p className="mt-1 truncate text-xs text-muted-foreground dark:text-muted-foreground">
+                              {formatearHora(appointment.scheduledAt)} - Dr. {appointment.doctor?.user?.firstName} {appointment.doctor?.user?.lastName}
                             </p>
                           </div>
-                          <span className={cn('shrink-0 rounded-full border px-2 py-0.5 text-[11px] font-semibold', statusColors[appointment.status])}>
-                            {statusTranslations[appointment.status]}
-                          </span>
+                          <Insignia variante={obtenerMetaEstadoCita(appointment.status).variant} tamaño="sm" icon={obtenerMetaEstadoCita(appointment.status).icon}>
+                            {obtenerMetaEstadoCita(appointment.status).etiqueta}
+                          </Insignia>
                         </div>
                       </button>
                     ))
@@ -394,19 +380,19 @@ export default function Appointments() {
               </section>
             </div>
 
-            <section className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+            <section className="rounded-md border border-border p-4 dark:border-border">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                  <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground dark:text-foreground">
                     <ListChecks className="h-4 w-4 text-indigo-600" />
                     Trazabilidad activa
                   </h2>
                   {timelineAppointment ? (
-                    <p className="mt-1 truncate text-xs text-gray-500 dark:text-gray-400">
-                      {timelineAppointment.patient?.user?.firstName} {timelineAppointment.patient?.user?.lastName} - {formatTime(timelineAppointment.scheduledAt)}
+                    <p className="mt-1 truncate text-xs text-muted-foreground dark:text-muted-foreground">
+                      {timelineAppointment.patient?.user?.firstName} {timelineAppointment.patient?.user?.lastName} - {formatearHora(timelineAppointment.scheduledAt)}
                     </p>
                   ) : (
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Selecciona una cita para ver sus eventos.</p>
+                    <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">Selecciona una cita para ver sus eventos.</p>
                   )}
                 </div>
                 {isFetchingTimeline && <RefreshCw className="h-4 w-4 animate-spin text-indigo-600" />}
@@ -414,26 +400,26 @@ export default function Appointments() {
 
               <div className="mt-4 max-h-[360px] space-y-3 overflow-y-auto pr-1">
                 {!timelineAppointment ? (
-                  <p className="rounded-md border border-gray-200 p-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                  <p className="rounded-md border border-border p-3 text-sm text-muted-foreground dark:border-border dark:text-muted-foreground">
                     Usa el boton Trazabilidad en una cita o selecciona una de la cola prioritaria.
                   </p>
                 ) : timeline.length === 0 ? (
-                  <p className="rounded-md border border-gray-200 p-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                  <p className="rounded-md border border-border p-3 text-sm text-muted-foreground dark:border-border dark:text-muted-foreground">
                     Todavia no hay eventos registrados para esta cita.
                   </p>
                 ) : (
                   timeline.slice(0, 8).map((item: AppointmentTimelineItem) => (
-                    <div key={`${item.source}-${item.id}`} className="relative rounded-md border border-gray-200 p-3 dark:border-gray-700">
+                    <div key={`${item.source}-${item.id}`} className="relative rounded-md border border-border p-3 dark:border-border">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          <p className="text-sm font-semibold text-foreground dark:text-foreground">
                             {getTimelineActionLabel(item.action)}
                           </p>
-                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            {getTimelineActor(item)} - {formatDateTime(item.createdAt)}
+                          <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
+                            {getTimelineActor(item)} - {formatearFechaHora(item.createdAt)}
                           </p>
                         </div>
-                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground dark:bg-card dark:text-muted-foreground">
                           {item.actorRole}
                         </span>
                       </div>
@@ -443,17 +429,17 @@ export default function Appointments() {
               </div>
             </section>
           </div>
-        </CardContent>
-      </Card>
+        </TarjetaContenido>
+      </Tarjeta>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-col gap-3 p-4 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado className="flex flex-col gap-3 p-4 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+            <TarjetaTitulo className="flex items-center gap-2 text-lg font-semibold text-foreground dark:text-foreground">
               <MapPin className="h-5 w-5 text-blue-600" />
               Mapa diario de traslados
-            </CardTitle>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            </TarjetaTitulo>
+            <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
               Revisa las citas del medico por hora y los tramos con riesgo antes de agendar.
             </p>
           </div>
@@ -461,7 +447,7 @@ export default function Appointments() {
             <select
               value={routeDoctorId}
               onChange={(event) => setRouteDoctorId(event.target.value)}
-              className="rounded-md border border-gray-300 bg-white p-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+              className="rounded-md border border-border bg-white p-2 text-sm dark:border-border dark:bg-card dark:text-foreground"
             >
               <option value="">Selecciona medico</option>
               {doctors.map((doctor) => (
@@ -470,39 +456,39 @@ export default function Appointments() {
                 </option>
               ))}
             </select>
-            <Input
+            <Entrada
               type="date"
               value={routeDate}
               onChange={(event) => setRouteDate(event.target.value)}
             />
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4 p-4 sm:p-6">
+        </TarjetaEncabezado>
+        <TarjetaContenido className="space-y-4 p-4 sm:p-6">
           <DailyRouteMap route={route} />
 
           {isFetchingRoute ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Cargando ruta...</p>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground">Cargando ruta...</p>
           ) : routeDoctorId && route ? (
             <div className="grid gap-3 lg:grid-cols-[1fr_1fr]">
               <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Citas del dia</h3>
+                <h3 className="text-sm font-semibold text-foreground dark:text-foreground">Citas del dia</h3>
                 {route.stops.length === 0 ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">No hay citas para este medico en la fecha seleccionada.</p>
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground">No hay citas para este medico en la fecha seleccionada.</p>
                 ) : (
                   route.stops.map((stop) => (
-                    <div key={stop.appointment.id} className="rounded-md border border-gray-200 p-3 text-sm dark:border-gray-700">
-                      <div className="font-medium text-gray-900 dark:text-white">
-                        #{stop.order} {formatTime(stop.appointment.scheduledAt)} - {stop.appointment.patient?.user?.firstName} {stop.appointment.patient?.user?.lastName}
+                    <div key={stop.appointment.id} className="rounded-md border border-border p-3 text-sm dark:border-border">
+                      <div className="font-medium text-foreground dark:text-foreground">
+                        #{stop.order} {formatearHora(stop.appointment.scheduledAt)} - {stop.appointment.patient?.user?.firstName} {stop.appointment.patient?.user?.lastName}
                       </div>
-                      <div className="text-gray-500 dark:text-gray-400">{stop.appointment.address}</div>
+                      <div className="text-muted-foreground dark:text-muted-foreground">{stop.appointment.address}</div>
                     </div>
                   ))
                 )}
               </div>
               <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Tramos</h3>
+                <h3 className="text-sm font-semibold text-foreground dark:text-foreground">Tramos</h3>
                 {route.segments.length === 0 ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Se necesitan al menos dos citas con coordenadas para calcular traslados.</p>
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground">Se necesitan al menos dos citas con coordenadas para calcular traslados.</p>
                 ) : (
                   route.segments.map((segment) => (
                     <div
@@ -512,7 +498,7 @@ export default function Appointments() {
                         segment.status === 'OK' && 'border-emerald-200 bg-emerald-50 text-emerald-800',
                         segment.status === 'RISK' && 'border-amber-200 bg-amber-50 text-amber-800',
                         segment.status === 'CONFLICT' && 'border-red-200 bg-red-50 text-red-800',
-                        segment.status === 'MISSING_COORDINATES' && 'border-gray-200 bg-gray-50 text-gray-700'
+                        segment.status === 'MISSING_COORDINATES' && 'border-border bg-muted text-foreground'
                       )}
                     >
                       <div className="font-medium">
@@ -527,102 +513,102 @@ export default function Appointments() {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground">
               Selecciona un medico para ver su ruta diaria.
             </p>
           )}
-        </CardContent>
-      </Card>
+        </TarjetaContenido>
+      </Tarjeta>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-4 sm:p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total citas</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{totalCitas}</p>
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Total citas</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">{totalCitas}</p>
               </div>
               <div className="rounded-xl bg-blue-50 dark:bg-blue-900/20 p-3">
                 <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-4 sm:p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Pendientes</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{pendientes}</p>
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Pendientes</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">{pendientes}</p>
               </div>
               <div className="rounded-xl bg-amber-50 dark:bg-amber-900/20 p-3">
                 <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-4 sm:p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Completadas</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{completadas}</p>
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Completadas</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">{completadas}</p>
               </div>
               <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 p-3">
                 <CalendarCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-4 sm:p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Tasa de éxito</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
-                  {tasaExito.toFixed(1)}<span className="text-sm text-gray-500 dark:text-gray-400">%</span>
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Tasa de éxito</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
+                  {tasaExito.toFixed(1)}<span className="text-sm text-muted-foreground dark:text-muted-foreground">%</span>
                 </p>
               </div>
               <div className="rounded-xl bg-indigo-50 dark:bg-indigo-900/20 p-3">
                 <TrendingUp className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
 
       {/* Filters */}
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="p-4 sm:p-6">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado className="p-4 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
               Filtros de búsqueda
-            </CardTitle>
-            <Button
+            </TarjetaTitulo>
+            <Boton
               variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+              className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
             >
               <Filter className="h-4 w-4" />
               {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
-            </Button>
+            </Boton>
           </div>
-        </CardHeader>
+        </TarjetaEncabezado>
         {showFilters && (
-          <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+          <TarjetaContenido className="p-4 pt-0 sm:p-6 sm:pt-0">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
                   Buscar
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-                  <Input
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-muted-foreground" />
+                  <Entrada
                     placeholder="Paciente, doctor, servicio..."
                     value={filters.search || ''}
                     onChange={(e) => handleFilterChange('search', e.target.value)}
@@ -631,11 +617,11 @@ export default function Appointments() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
                   Estado
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
                   value={filters.status || ''}
                   onChange={(e) => handleFilterChange('status', e.target.value ? e.target.value as AppointmentStatus : undefined)}
                 >
@@ -650,11 +636,11 @@ export default function Appointments() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
                   Resultados por página
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
                   value={filters.limit}
                   onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
                 >
@@ -665,41 +651,41 @@ export default function Appointments() {
                 </select>
               </div>
             </div>
-          </CardContent>
+          </TarjetaContenido>
         )}
-      </Card>
+      </Tarjeta>
 
       {/* Bulk Actions */}
       {selectedAppointments.length > 0 && (
-        <Card className="border border-indigo-200 bg-indigo-50/60 dark:border-indigo-800 dark:bg-indigo-900/20 shadow-sm">
-          <CardContent className="p-4">
+        <Tarjeta className="border border-indigo-200 bg-indigo-50/60 dark:border-indigo-800 dark:bg-indigo-900/20 shadow-sm">
+          <TarjetaContenido className="p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium text-indigo-900 dark:text-indigo-300">
                   {selectedAppointments.length} cita{selectedAppointments.length !== 1 ? 's' : ''} seleccionada{selectedAppointments.length !== 1 ? 's' : ''}
                 </span>
               </div>
-              <Button
+              <Boton
                 size="sm"
                 variant="outline"
                 onClick={() => setSelectedAppointments([])}
-                className="text-gray-600 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                className="text-muted-foreground dark:text-foreground dark:border-border dark:hover:bg-muted"
               >
                 Cancelar
-              </Button>
+              </Boton>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       )}
 
       {/* Appointments Grid */}
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
               Lista de citas
-            </CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            </TarjetaTitulo>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
               {isLoading ? 'Cargando...' : `${totalAppointments} cita${totalAppointments !== 1 ? 's' : ''} registrada${totalAppointments !== 1 ? 's' : ''}`}
             </p>
           </div>
@@ -709,31 +695,28 @@ export default function Appointments() {
                 type="checkbox"
                 checked={selectedAppointments.length === appointments.length && appointments.length > 0}
                 onChange={handleSelectAll}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-border rounded cursor-pointer"
               />
-              <span className="text-sm text-gray-600 dark:text-gray-400">Seleccionar todas</span>
+              <span className="text-sm text-muted-foreground dark:text-muted-foreground">Seleccionar todas</span>
             </label>
           )}
-        </CardHeader>
-        <CardContent className="p-0">
+        </TarjetaEncabezado>
+        <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center">
-              <div className="inline-flex items-center justify-center">
-                <RefreshCw className="h-8 w-8 animate-spin text-indigo-600" />
-              </div>
-              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">Cargando citas...</p>
+            <div className="p-3">
+              <EsqueletoTabla rows={8} columns={6} />
             </div>
           ) : appointments.length === 0 ? (
             <div className="p-12 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
-                <Calendar className="h-6 w-6 text-gray-400 dark:text-gray-500" />
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted dark:bg-card">
+                <Calendar className="h-6 w-6 text-gray-400 dark:text-muted-foreground" />
               </div>
-              <h3 className="mt-4 text-sm font-medium text-gray-900 dark:text-white">No hay citas</h3>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <h3 className="mt-4 text-sm font-medium text-foreground dark:text-foreground">No hay citas</h3>
+              <p className="mt-2 text-sm text-muted-foreground dark:text-muted-foreground">
                 No se encontraron citas con los filtros aplicados.
               </p>
               <div className="mt-6">
-                <Button
+                <Boton
                   onClick={() => {
                     setSelectedAppointment(null);
                     setShowCreateForm(true);
@@ -741,15 +724,15 @@ export default function Appointments() {
                 >
                   <CalendarPlus className="h-4 w-4" />
                   Crear primera cita
-                </Button>
+                </Boton>
               </div>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            <div className="divide-y divide-border dark:divide-border">
               {appointments.map((appointment: any) => (
                 <div
                   key={appointment.id}
-                  className="p-4 transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-700/50 sm:p-6"
+                  className="p-4 transition-colors hover:bg-muted/50 dark:hover:bg-muted/50 sm:p-6"
                 >
                   <div className="flex items-start gap-3 sm:gap-4">
                     {/* Checkbox */}
@@ -757,7 +740,7 @@ export default function Appointments() {
                       type="checkbox"
                       checked={selectedAppointments.includes(appointment.id)}
                       onChange={() => handleSelectAppointment(appointment.id)}
-                      className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                      className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-border rounded cursor-pointer"
                     />
 
                     {/* Icon */}
@@ -772,23 +755,23 @@ export default function Appointments() {
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                         <div className="flex-1">
                           <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                               {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName}
                             </h3>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">→</span>
-                            <span className="text-sm text-gray-600 dark:text-gray-300">
+                            <span className="text-xs text-muted-foreground dark:text-muted-foreground">→</span>
+                            <span className="text-sm text-muted-foreground dark:text-muted-foreground">
                               Dr. {appointment.doctor?.user?.firstName} {appointment.doctor?.user?.lastName}
                             </span>
                           </div>
 
-                          <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+                          <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground dark:text-muted-foreground">
                             <span className="inline-flex items-center gap-1">
                               <Activity className="h-3 w-3" />
                               {appointment.service?.name || 'Servicio no especificado'}
                             </span>
                             <span className="inline-flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {formatDateTime(appointment.scheduledAt)}
+                              {formatearFechaHora(appointment.scheduledAt)}
                             </span>
                             {appointment.location && (
                               <span className="inline-flex items-center gap-1">
@@ -801,7 +784,7 @@ export default function Appointments() {
                           {/* Additional Info */}
                           {appointment.totalAmount && (
                             <div className="mt-2 flex items-center gap-2">
-                              <span className="inline-flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                              <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground dark:text-muted-foreground">
                                 <DollarSign className="h-4 w-4" />
                                 {formatCurrency(appointment.totalAmount)}
                               </span>
@@ -809,61 +792,61 @@ export default function Appointments() {
                           )}
                         </div>
 
-                        {/* Status Badge */}
+                        {/* Status Insignia */}
                         <div className="flex flex-wrap gap-2 justify-end">
-                          <span className={cn(
-                            'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium',
-                            statusColors[appointment.status as keyof typeof statusColors] || 'bg-gray-50 text-gray-700 border-gray-100'
-                          )}>
-                            {appointment.status === 'COMPLETED' && <CheckCircle2 className="h-3 w-3" />}
-                            {appointment.status === 'CANCELLED' && <XCircle className="h-3 w-3" />}
-                            {appointment.status === 'PENDING' && <Clock className="h-3 w-3" />}
-                            {statusTranslations[appointment.status as keyof typeof statusTranslations] || appointment.status}
-                          </span>
+                          {(() => {
+                            const meta = obtenerMetaEstadoCita(appointment.status);
+                            const Icono = meta.icon;
+                            return (
+                              <Insignia variante={meta.variant} tamaño="sm" icon={Icono}>
+                                {meta.etiqueta}
+                              </Insignia>
+                            );
+                          })()}
                         </div>
                       </div>
 
                       {/* Actions */}
                       <div className="mt-4 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
-                        <Button
+                        <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => handleViewDetails(appointment)}
-                          className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+                          className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           Ver detalles
-                        </Button>
-                        <Button
+                        </Boton>
+                        <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => setSelectedTimelineAppointment(appointment)}
-                          className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+                          className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
                         >
                           <ListChecks className="h-3.5 w-3.5" />
                           Trazabilidad
-                        </Button>
-                        <Button
+                        </Boton>
+                        <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => {
                             setSelectedAppointment(appointment);
                             setShowCreateForm(true);
                           }}
-                          className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+                          className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
                         >
                           <Edit2 className="h-3.5 w-3.5" />
                           Editar
-                        </Button>
-                        <Button
+                        </Boton>
+                        <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => handleDeleteAppointment(appointment)}
-                          className="w-full text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+                          className="w-full text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-border dark:hover:bg-muted sm:w-auto"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Eliminar
-                        </Button>
+                        </Boton>
                       </div>
                     </div>
                   </div>
@@ -871,35 +854,35 @@ export default function Appointments() {
               ))}
             </div>
           )}
-        </CardContent>
+        </TarjetaContenido>
 
-        {/* Pagination */}
+        {/* Paginacion */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="border-t border-gray-200 bg-gray-50 px-4 py-4 dark:border-gray-700 dark:bg-gray-800 sm:px-6">
+          <div className="border-t border-border bg-muted px-4 py-4 dark:border-border dark:bg-card sm:px-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-muted-foreground dark:text-muted-foreground">
                 Mostrando{' '}
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-medium text-foreground dark:text-foreground">
                   {((filters.page || 1) - 1) * (filters.limit || 10) + 1}
                 </span>
                 {' '}-{' '}
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-medium text-foreground dark:text-foreground">
                   {Math.min((filters.page || 1) * (filters.limit || 10), pagination.total)}
                 </span>
                 {' '}de{' '}
-                <span className="font-medium text-gray-900 dark:text-white">{pagination.total}</span>
+                <span className="font-medium text-foreground dark:text-foreground">{pagination.total}</span>
                 {' '}resultados
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange((filters.page || 1) - 1)}
                   disabled={!pagination.hasPrev}
-                  className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                  className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                 >
                   Anterior
-                </Button>
+                </Boton>
                 {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                   const currentPage = filters.page || 1;
                   let page;
@@ -913,31 +896,31 @@ export default function Appointments() {
                     page = currentPage - 2 + i;
                   }
                   return (
-                    <Button
+                    <Boton
                       key={page}
                       variant={page === currentPage ? 'primary' : 'outline'}
                       size="sm"
                       onClick={() => handlePageChange(page)}
-                      className={page === currentPage ? '' : 'dark:text-white dark:border-gray-600 dark:hover:bg-gray-700'}
+                      className={page === currentPage ? '' : 'dark:text-foreground dark:border-border dark:hover:bg-muted'}
                     >
                       {page}
-                    </Button>
+                    </Boton>
                   );
                 })}
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange((filters.page || 1) + 1)}
                   disabled={!pagination.hasNext}
-                  className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                  className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                 >
                   Siguiente
-                </Button>
+                </Boton>
               </div>
             </div>
           </div>
         )}
-      </Card>
+      </Tarjeta>
 
       {/* Modals */}
       {showModal && (
@@ -972,7 +955,7 @@ export default function Appointments() {
         />
       )}
 
-      <ConfirmDialog
+      <DialogoConfirmacion
         isOpen={Boolean(appointmentToDelete)}
         title="Eliminar cita"
         message={`Esta accion eliminara la cita de ${appointmentToDelete?.patient?.user?.firstName ?? 'este paciente'}.`}
@@ -1001,13 +984,16 @@ function buildLiveStats(
   route?: { segments?: Array<{ status: string }> } | null
 ) {
   const activeStatuses: AppointmentStatus[] = ['PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED'];
-  const statusCards = activeStatuses.map((status) => ({
-    status,
-    label: statusTranslations[status],
-    count: appointments.filter((appointment) => appointment.status === status).length,
-    description: getStatusDescription(status),
-    className: statusColors[status],
-  }));
+  const statusCards = activeStatuses.map((status) => {
+    const meta = obtenerMetaEstadoCita(status);
+    return {
+      status,
+      etiqueta: meta.etiqueta,
+      variant: meta.variant,
+      count: appointments.filter((appointment) => appointment.status === status).length,
+      description: getStatusDescription(status),
+    };
+  });
 
   const now = Date.now();
   const overdue = appointments.filter((appointment) => (

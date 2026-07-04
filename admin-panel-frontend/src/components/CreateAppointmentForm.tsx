@@ -2,12 +2,14 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { localInputToColombiaISO, utcToColombiaInputValue } from '@/utils/dateFormat';
 import { X, Calendar, Clock, User, Stethoscope, MapPin, DollarSign, FileText, UserPlus } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/Switch';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
+import { Interruptor } from '@/components/ui/Interruptor';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
+import billingService from '@/services/billing.service';
+import { useAuthStore } from '@/store/auth.store';
 import type { AvailabilitySlot, Doctor, Patient, Service } from '@/types';
 
 interface CreateAppointmentFormProps {
@@ -77,6 +79,58 @@ const bogotaLocalities = [
   'Sumapaz',
 ];
 
+function extraerListaPaginada<T>(response: unknown): T[] {
+  const axiosData = (response as { data?: unknown } | undefined)?.data;
+  const payload = (axiosData as { data?: unknown } | undefined)?.data ?? axiosData;
+
+  if (Array.isArray(payload)) {
+    return payload as T[];
+  }
+
+  const nestedData = (payload as { data?: unknown } | undefined)?.data;
+  if (Array.isArray(nestedData)) {
+    return nestedData as T[];
+  }
+
+  return [];
+}
+
+function obtenerClaveServicio(service: Service): string {
+  return service.name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/^c\.\s*/, 'control ')
+    .replace(/^s\.\s*/, 'suero ')
+    .replace(/\bresp\.\b/g, 'respiratoria')
+    .replace(/\bde\b/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function deduplicarServicios(services: Service[]): Service[] {
+  const byKey = new Map<string, Service>();
+
+  for (const service of services) {
+    const key = obtenerClaveServicio(service);
+    const current = byKey.get(key);
+    if (!current) {
+      byKey.set(key, service);
+      continue;
+    }
+
+    const currentScore = current.name.length + (current.description?.length ?? 0);
+    const nextScore = service.name.length + (service.description?.length ?? 0);
+    if (nextScore > currentScore) {
+      byKey.set(key, service);
+    }
+  }
+
+  return Array.from(byKey.values()).sort((left, right) =>
+    left.name.localeCompare(right.name, 'es')
+  );
+}
+
 interface NewPatientData {
   firstName: string;
   lastName: string;
@@ -86,6 +140,8 @@ interface NewPatientData {
 
 export default function CreateAppointmentForm({ isOpen, onClose, appointment }: CreateAppointmentFormProps) {
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const isAgent = user?.role === 'AGENT';
   const [isNewPatient, setIsNewPatient] = useState(false);
   const [newPatientData, setNewPatientData] = useState<NewPatientData>({
     firstName: '',
@@ -119,45 +175,98 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
   // Fetch data for dropdowns
   const { data: doctorsData } = useQuery({
     queryKey: ['doctors-for-appointment'],
-    queryFn: () => adminService.getDoctors({ page: 1, limit: 100 })
+    queryFn: () => adminService.getDoctors({ page: 1, limit: 100 }),
+    enabled: !isAgent,
   });
 
   const { data: patientsData } = useQuery({
     queryKey: ['patients-for-appointment'],
-    queryFn: () => adminService.getPatients({ page: 1, limit: 100 })
+    queryFn: () => adminService.getPatients({ page: 1, limit: 100 }),
+    enabled: !isAgent,
   });
 
   const { data: servicesData } = useQuery({
     queryKey: ['services-for-appointment'],
-    queryFn: () => adminService.getServices({ page: 1, limit: 100 })
+    queryFn: () => adminService.getServices({ page: 1, limit: 100 }),
+    enabled: !isAgent,
   });
 
-  const { data: availabilityData, isFetching: isFetchingAvailability } = useQuery({
-    queryKey: ['doctor-daily-availability', formData.doctorId, selectedDate, formData.duration],
-    queryFn: () => adminService.getDoctorDailyAvailability(
-      formData.doctorId,
-      selectedDate,
-      formData.duration
-    ),
-    enabled: Boolean(formData.doctorId && selectedDate),
+  const { data: bookingOptionsData } = useQuery({
+    queryKey: ['agent-booking-options'],
+    queryFn: () => billingService.getBookingOptions(),
+    enabled: isAgent,
+  });
+
+  const { data: availabilityData, isFetching: isFetchingAvailability } = useQuery<any>({
+    queryKey: ['doctor-daily-availability', formData.doctorId, formData.serviceId, selectedDate, formData.duration, isAgent],
+    queryFn: async () => {
+      if (isAgent) {
+        const result = await billingService.getAvailableSlots(
+          formData.doctorId,
+          formData.serviceId,
+          selectedDate,
+        );
+        return {
+          data: {
+            data: {
+              slots: result.slots.map((slot) => ({
+                startTime: new Date(slot.start).toTimeString().slice(0, 5),
+                endTime: new Date(slot.end).toTimeString().slice(0, 5),
+                isAvailable: true,
+                reason: undefined,
+              })),
+            },
+          },
+        };
+      }
+
+      return adminService.getDoctorDailyAvailability(
+        formData.doctorId,
+        selectedDate,
+        formData.duration
+      );
+    },
+    enabled: Boolean(formData.doctorId && selectedDate && (!isAgent || formData.serviceId)),
     staleTime: 15_000,
   });
 
   const availability = availabilityData?.data?.data;
-  const availableSlots = availability?.slots ?? [];
+  const availableSlots: AvailabilitySlot[] = availability?.slots ?? [];
+  const doctors = useMemo(
+    () => isAgent
+      ? ((bookingOptionsData?.data?.doctors ?? []) as Doctor[])
+      : extraerListaPaginada<Doctor>(doctorsData),
+    [bookingOptionsData, doctorsData, isAgent],
+  );
+  const patients = useMemo(
+    () => isAgent
+      ? ((bookingOptionsData?.data?.patients ?? []) as Patient[])
+      : extraerListaPaginada<Patient>(patientsData),
+    [bookingOptionsData, isAgent, patientsData],
+  );
+  const services = useMemo(
+    () => deduplicarServicios(
+      isAgent
+        ? ((bookingOptionsData?.data?.services ?? []) as Service[])
+        : extraerListaPaginada<Service>(servicesData)
+    ),
+    [bookingOptionsData, isAgent, servicesData],
+  );
   const selectedService = useMemo(() => {
-    return (servicesData?.data?.data?.data as Service[] | undefined)?.find(
-      (service) => service.id === formData.serviceId
-    );
-  }, [formData.serviceId, servicesData]);
+    return services.find((service) => service.id === formData.serviceId);
+  }, [formData.serviceId, services]);
 
-  const quickPatientMutation = useMutation({
-    mutationFn: (data: NewPatientData) => adminService.createQuickPatient(data),
+  const quickPatientMutation = useMutation<any, any, NewPatientData>({
+    mutationFn: (data: NewPatientData) =>
+      isAgent ? billingService.createQuickPatient(data) : adminService.createQuickPatient(data),
   });
 
   // Create/Update mutation
-  const appointmentMutation = useMutation({
+  const appointmentMutation = useMutation<any, any, any>({
     mutationFn: (data: any) => {
+      if (isAgent && !appointment) {
+        return billingService.createAppointment(data);
+      }
       if (appointment) {
         return adminService.updateAppointment(appointment.id, data);
       } else {
@@ -166,6 +275,7 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['agent-appointments'] });
       toast.success(appointment ? 'Cita actualizada' : 'Cita creada');
       onClose();
     },
@@ -238,9 +348,7 @@ onError: (error: any) => {
   };
 
   const handleServiceChange = (serviceId: string) => {
-    const service = (servicesData?.data?.data?.data as Service[] | undefined)?.find(
-      (item) => item.id === serviceId
-    );
+    const service = services.find((item) => item.id === serviceId);
 
     setFormData(prev => ({
       ...prev,
@@ -473,9 +581,9 @@ const handleSubmit = async (e: React.FormEvent) => {
           <h2 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
             {appointment ? 'Editar Cita' : 'Nueva Cita'}
           </h2>
-          <Button variant="ghost" onClick={handleClose} className="h-10 w-10 p-0">
+          <Boton variant="ghost" onClick={handleClose} className="h-10 w-10 p-0">
             <X className="w-6 h-6" />
-          </Button>
+          </Boton>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
@@ -484,10 +592,10 @@ const handleSubmit = async (e: React.FormEvent) => {
             {/* Paciente */}
             <div className="md:col-span-2">
               <div className="flex items-center justify-between mb-2">
-                <Label className="flex items-center space-x-2">
+                <Etiqueta className="flex items-center space-x-2">
                   <User className="w-4 h-4" />
                   <span>Paciente *</span>
-                </Label>
+                </Etiqueta>
                 <button
                   type="button"
                   onClick={() => {
@@ -508,8 +616,8 @@ const handleSubmit = async (e: React.FormEvent) => {
               {isNewPatient ? (
                 <div className="grid grid-cols-1 gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-900 dark:bg-blue-950/30 sm:grid-cols-2 sm:p-4">
                   <div>
-                    <Label htmlFor="np-firstName" className="text-xs">Nombre *</Label>
-                    <Input
+                    <Etiqueta htmlFor="np-firstName" className="text-xs">Nombre *</Etiqueta>
+                    <Entrada
                       id="np-firstName"
                       value={newPatientData.firstName}
                       onChange={(e) => setNewPatientData(prev => ({ ...prev, firstName: e.target.value }))}
@@ -519,8 +627,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                     {newPatientErrors.firstName && <p className="text-red-500 text-xs mt-0.5">{newPatientErrors.firstName}</p>}
                   </div>
                   <div>
-                    <Label htmlFor="np-lastName" className="text-xs">Apellido *</Label>
-                    <Input
+                    <Etiqueta htmlFor="np-lastName" className="text-xs">Apellido *</Etiqueta>
+                    <Entrada
                       id="np-lastName"
                       value={newPatientData.lastName}
                       onChange={(e) => setNewPatientData(prev => ({ ...prev, lastName: e.target.value }))}
@@ -530,8 +638,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                     {newPatientErrors.lastName && <p className="text-red-500 text-xs mt-0.5">{newPatientErrors.lastName}</p>}
                   </div>
                   <div>
-                    <Label htmlFor="np-documentId" className="text-xs">Cédula *</Label>
-                    <Input
+                    <Etiqueta htmlFor="np-documentId" className="text-xs">Cédula *</Etiqueta>
+                    <Entrada
                       id="np-documentId"
                       value={newPatientData.documentId}
                       onChange={(e) => setNewPatientData(prev => ({ ...prev, documentId: e.target.value }))}
@@ -541,8 +649,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                     {newPatientErrors.documentId && <p className="text-red-500 text-xs mt-0.5">{newPatientErrors.documentId}</p>}
                   </div>
                   <div>
-                    <Label htmlFor="np-phone" className="text-xs">Teléfono *</Label>
-                    <Input
+                    <Etiqueta htmlFor="np-phone" className="text-xs">Teléfono *</Etiqueta>
+                    <Entrada
                       id="np-phone"
                       value={newPatientData.phone}
                       onChange={(e) => setNewPatientData(prev => ({ ...prev, phone: e.target.value }))}
@@ -563,11 +671,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                     }`}
                   >
                     <option value="">Selecciona un paciente</option>
-                    {(patientsData?.data?.data?.data as Patient[])?.map((patient: Patient) => (
+                    {patients.map((patient: Patient) => (
                       <option key={patient.id} value={patient.id}>
                         {patient?.user?.firstName} {patient?.user?.lastName} - {patient?.user?.phone || patient?.user?.email}
                       </option>
-                    )) || []}
+                    ))}
                   </select>
                   {errors.patientId && <p className="text-red-500 text-sm mt-1">{errors.patientId}</p>}
                 </>
@@ -576,10 +684,10 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             {/* Doctor */}
             <div>
-              <Label htmlFor="doctorId" className="flex items-center space-x-2">
+              <Etiqueta htmlFor="doctorId" className="flex items-center space-x-2">
                 <Stethoscope className="w-4 h-4" />
                 <span>Doctor *</span>
-              </Label>
+              </Etiqueta>
               <select
                 id="doctorId"
                 value={formData.doctorId}
@@ -589,21 +697,21 @@ const handleSubmit = async (e: React.FormEvent) => {
                 }`}
               >
                 <option value="">Selecciona un doctor</option>
-                {(doctorsData?.data?.data?.data as Doctor[])?.map((doctor: Doctor) => (
+                {doctors.map((doctor: Doctor) => (
                   <option key={doctor.id} value={doctor.id}>
                     {doctor?.user?.firstName} {doctor?.user?.lastName} - {doctor?.specialty}
                   </option>
-                )) || []}
+                ))}
               </select>
               {errors.doctorId && <p className="text-red-500 text-sm mt-1">{errors.doctorId}</p>}
             </div>
 
             {/* Servicio */}
             <div>
-              <Label htmlFor="serviceId" className="flex items-center space-x-2">
+              <Etiqueta htmlFor="serviceId" className="flex items-center space-x-2">
                 <FileText className="w-4 h-4" />
                 <span>Servicio *</span>
-              </Label>
+              </Etiqueta>
               <select
                 id="serviceId"
                 value={formData.serviceId}
@@ -613,11 +721,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                 }`}
               >
                 <option value="">Selecciona un servicio</option>
-                {(servicesData?.data?.data?.data as Service[])?.map((service: Service) => (
+                {services.map((service: Service) => (
                   <option key={service.id} value={service.id}>
                     {service?.name} - {service?.description}
                   </option>
-                )) || []}
+                ))}
               </select>
               {errors.serviceId && <p className="text-red-500 text-sm mt-1">{errors.serviceId}</p>}
               {selectedService && (
@@ -629,11 +737,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             {/* Fecha */}
             <div>
-              <Label htmlFor="appointmentDate" className="flex items-center space-x-2">
+              <Etiqueta htmlFor="appointmentDate" className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" />
                 <span>Fecha *</span>
-              </Label>
-              <Input
+              </Etiqueta>
+              <Entrada
                 id="appointmentDate"
                 type="date"
                 value={selectedDate}
@@ -645,10 +753,10 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             {/* Duración */}
             <div>
-              <Label htmlFor="duration" className="flex items-center space-x-2">
+              <Etiqueta htmlFor="duration" className="flex items-center space-x-2">
                 <Clock className="w-4 h-4" />
                 <span>Duración</span>
-              </Label>
+              </Etiqueta>
               <select
                 id="duration"
                 value={formData.duration}
@@ -665,11 +773,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             {/* Precio */}
             <div>
-              <Label htmlFor="totalPrice" className="flex items-center space-x-2">
+              <Etiqueta htmlFor="totalPrice" className="flex items-center space-x-2">
                 <DollarSign className="w-4 h-4" />
                 <span>Precio Total *</span>
-              </Label>
-              <Input
+              </Etiqueta>
+              <Entrada
                 id="totalPrice"
                 type="number"
                 min="0"
@@ -684,11 +792,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             {/* Dirección */}
             <div>
-              <Label htmlFor="address" className="flex items-center space-x-2">
+              <Etiqueta htmlFor="address" className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4" />
                 <span>Dirección *</span>
-              </Label>
-              <Input
+              </Etiqueta>
+              <Entrada
                 id="address"
                 value={formData.address}
                 onChange={(e) => handleInputChange('address', e.target.value)}
@@ -700,8 +808,8 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             {/* Localidad */}
             <div>
-              <Label htmlFor="city">Localidad *</Label>
-              <Input
+              <Etiqueta htmlFor="city">Localidad *</Etiqueta>
+              <Entrada
                 id="city"
                 list="bogota-localities"
                 value={formData.city}
@@ -718,8 +826,8 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
 
             <div>
-              <Label htmlFor="latitude">Latitud para mapa</Label>
-              <Input
+              <Etiqueta htmlFor="latitude">Latitud para mapa</Etiqueta>
+              <Entrada
                 id="latitude"
                 type="number"
                 step="0.000001"
@@ -735,8 +843,8 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
 
             <div>
-              <Label htmlFor="longitude">Longitud para mapa</Label>
-              <Input
+              <Etiqueta htmlFor="longitude">Longitud para mapa</Etiqueta>
+              <Entrada
                 id="longitude"
                 type="number"
                 step="0.000001"
@@ -760,7 +868,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   Se calcula automaticamente con direccion y localidad. Puedes reintentar si corriges la direccion.
                 </p>
               </div>
-              <Button
+              <Boton
                 type="button"
                 variant="outline"
                 onClick={() => geocodeAddress(true)}
@@ -769,7 +877,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               >
                 <MapPin className="h-4 w-4" />
                 {isGeocoding ? 'Ubicando...' : 'Ubicar'}
-              </Button>
+              </Boton>
             </div>
             {(geocodeStatus || formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0) && (
               <div className="mt-3 text-xs text-gray-700 dark:text-slate-300">
@@ -844,7 +952,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Notas */}
           <div>
-            <Label htmlFor="notes">Notas</Label>
+            <Etiqueta htmlFor="notes">Notas</Etiqueta>
             <textarea
               id="notes"
               value={formData.notes}
@@ -857,7 +965,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Diagnóstico */}
           <div>
-            <Label htmlFor="diagnosis">Diagnóstico</Label>
+            <Etiqueta htmlFor="diagnosis">Diagnóstico</Etiqueta>
             <textarea
               id="diagnosis"
               value={formData.diagnosis}
@@ -870,7 +978,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Prescripción */}
           <div>
-            <Label htmlFor="prescription">Prescripción</Label>
+            <Etiqueta htmlFor="prescription">Prescripción</Etiqueta>
             <textarea
               id="prescription"
               value={formData.prescription}
@@ -883,24 +991,24 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Urgente */}
           <div className="flex items-center space-x-2">
-            <Switch
+            <Interruptor
               id="isUrgent"
               checked={formData.isUrgent}
               onCheckedChange={(checked) => handleInputChange('isUrgent', checked)}
             />
-            <Label htmlFor="isUrgent">Cita urgente</Label>
+            <Etiqueta htmlFor="isUrgent">Cita urgente</Etiqueta>
           </div>
 
           </div>
 
           {/* Botones */}
           <div className="sticky bottom-0 z-10 flex flex-col-reverse gap-3 border-t border-gray-200 bg-white/95 px-4 py-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 sm:flex-row sm:justify-end sm:p-6 sm:shadow-none">
-            <Button type="button" variant="outline" onClick={handleClose} className="w-full sm:w-auto">
+            <Boton type="button" variant="outline" onClick={handleClose} className="w-full sm:w-auto">
               Cancelar
-            </Button>
-            <Button type="submit" disabled={appointmentMutation.isPending} className="w-full sm:w-auto">
+            </Boton>
+            <Boton type="submit" disabled={appointmentMutation.isPending} className="w-full sm:w-auto">
               {appointmentMutation.isPending ? 'Guardando...' : (appointment ? 'Actualizar' : 'Crear')}
-            </Button>
+            </Boton>
           </div>
         </form>
       </div>

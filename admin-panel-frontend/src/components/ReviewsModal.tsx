@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, MessageSquare, Filter, Search, Plus, Edit, Trash2, Eye, CheckCircle, XCircle, AlertCircle, Download, Calendar, Star, Shield, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { Button } from './ui/Button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Select } from './ui/Select';
-import { Switch } from './ui/Switch';
+import { Boton } from './ui/Boton';
+import { Entrada } from './ui/Entrada';
+import { Etiqueta } from './ui/Etiqueta';
+import { Seleccion } from './ui/Seleccion';
+import { Interruptor } from './ui/Interruptor';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Review, ReviewFilters } from '@/types';
 import ReviewDetailsView from './ReviewDetailsView';
 import CreateReviewForm from './CreateReviewForm';
-import { ConfirmDialog } from './ui/ConfirmDialog';
+import { DialogoConfirmacion } from './ui/DialogoConfirmacion';
 
 interface ReviewsModalProps {
   isOpen: boolean;
@@ -151,13 +151,13 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Todas las Reseñas</h2>
           <div className="flex items-center space-x-2">
-            <Button onClick={() => setShowCreateForm(true)}>
+            <Boton onClick={() => setShowCreateForm(true)}>
               <Plus className="w-4 h-4" />
               Nueva Reseña
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            </Boton>
+            <Boton variant="ghost" size="sm" onClick={onClose}>
               <X className="w-5 h-5" />
-            </Button>
+            </Boton>
           </div>
         </div>
 
@@ -165,7 +165,7 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative col-span-full md:col-span-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <Input
+            <Entrada
               type="text"
               placeholder="Buscar por paciente, doctor, comentario..."
               className="pl-10"
@@ -175,8 +175,8 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
           </div>
           
           <div>
-            <Label htmlFor="rating" className="text-gray-700 dark:text-gray-300">Calificación</Label>
-            <Select
+            <Etiqueta htmlFor="rating" className="text-gray-700 dark:text-gray-300">Calificación</Etiqueta>
+            <Seleccion
               value={filters.rating || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value ? Number(e.target.value) : undefined, page: 1 }))}
             >
@@ -186,12 +186,12 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
               <option value="3">3 estrellas</option>
               <option value="2">2 estrellas</option>
               <option value="1">1 estrella</option>
-            </Select>
+            </Seleccion>
           </div>
 
           <div>
-            <Label htmlFor="status" className="text-gray-700 dark:text-gray-300">Estado</Label>
-            <Select
+            <Etiqueta htmlFor="status" className="text-gray-700 dark:text-gray-300">Estado</Etiqueta>
+            <Seleccion
               value={filters.isVerified === undefined ? '' : filters.isVerified ? 'true' : 'false'}
               onChange={(e) => setFilters(prev => ({ 
                 ...prev, 
@@ -202,12 +202,12 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
               <option value="">Todos los estados</option>
               <option value="true">Verificadas</option>
               <option value="false">Pendientes</option>
-            </Select>
+            </Seleccion>
           </div>
 
           <div>
-            <Label htmlFor="dateFrom">Fecha Desde</Label>
-            <Input
+            <Etiqueta htmlFor="dateFrom">Fecha Desde</Etiqueta>
+            <Entrada
               id="dateFrom"
               type="date"
               value={filters.dateFrom}
@@ -215,17 +215,17 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
             />
           </div>
           <div>
-            <Label htmlFor="dateTo">Fecha Hasta</Label>
-            <Input
+            <Etiqueta htmlFor="dateTo">Fecha Hasta</Etiqueta>
+            <Entrada
               id="dateTo"
               type="date"
               value={filters.dateTo}
               onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value, page: 1 }))}
             />
           </div>
-          <Button onClick={() => setFilters({ page: 1, limit: 10, rating: undefined, isVerified: undefined, search: '', doctorId: '', patientId: '', dateFrom: '', dateTo: '' })} variant="outline">
+          <Boton onClick={() => setFilters({ page: 1, limit: 10, rating: undefined, isVerified: undefined, search: '', doctorId: '', patientId: '', dateFrom: '', dateTo: '' })} variant="outline">
             Limpiar Filtros
-          </Button>
+          </Boton>
         </div>
 
         {/* Bulk Actions */}
@@ -235,13 +235,13 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
               {selectedReviews.length} reseñas seleccionadas
             </span>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" onClick={handleBulkVerify}>
+              <Boton variant="outline" size="sm" onClick={handleBulkVerify}>
                 <Shield className="w-4 h-4 mr-1" />
                 Verificar
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setSelectedReviews([])}>
+              </Boton>
+              <Boton variant="outline" size="sm" onClick={() => setSelectedReviews([])}>
                 Cancelar
-              </Button>
+              </Boton>
             </div>
           </div>
         )}
@@ -358,36 +358,36 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center space-x-2">
-                          <Button
+                          <Boton
                             variant="outline"
                             size="sm"
                             onClick={() => handleViewDetails(review)}
                           >
                             <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button
+                          </Boton>
+                          <Boton
                             variant="outline"
                             size="sm"
                             onClick={() => handleEdit(review)}
                           >
                             <Edit className="w-4 h-4" />
-                          </Button>
+                          </Boton>
                           {!review.isVerified && (
-                            <Button
+                            <Boton
                               variant="outline"
                               size="sm"
                               onClick={() => handleVerify(review.id)}
                             >
                               <Shield className="w-4 h-4" />
-                            </Button>
+                            </Boton>
                           )}
-                          <Button
+                          <Boton
                             variant="outline"
                             size="sm"
                             onClick={() => handleDelete(review.id)}
                           >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </Boton>
                         </div>
                       </td>
                     </tr>
@@ -398,7 +398,7 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
           )}
         </div>
 
-        {/* Pagination */}
+        {/* Paginacion */}
         {reviewsData?.data?.data?.pagination && reviewsData.data.data.pagination.totalPages > 1 && (
           <div className="border-t p-4">
             <div className="flex items-center justify-between">
@@ -416,25 +416,25 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
                 resultados
               </div>
               <div className="flex items-center space-x-2">
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => setFilters(prev => ({ ...prev, page: prev.page! - 1 }))}
                   disabled={!reviewsData.data.data.pagination.hasPrev}
                 >
                   Anterior
-                </Button>
+                </Boton>
                 <span className="text-sm text-gray-700">
                   Página {filters.page} de {reviewsData.data.data.pagination.totalPages}
                 </span>
-                <Button
+                <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => setFilters(prev => ({ ...prev, page: prev.page! + 1 }))}
                   disabled={!reviewsData.data.data.pagination.hasNext}
                 >
                   Siguiente
-                </Button>
+                </Boton>
               </div>
             </div>
           </div>
@@ -476,7 +476,7 @@ export default function ReviewsModal({ isOpen, onClose }: ReviewsModalProps) {
         />
       )}
 
-      <ConfirmDialog
+      <DialogoConfirmacion
         isOpen={Boolean(confirmAction)}
         title={
           confirmAction?.type === 'delete'

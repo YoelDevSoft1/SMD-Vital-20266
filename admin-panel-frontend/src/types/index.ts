@@ -21,7 +21,7 @@ export interface PaginatedResponse<T> {
 }
 
 // User types
-export type UserRole = 'PATIENT' | 'DOCTOR' | 'NURSE' | 'ADMIN' | 'SUPER_ADMIN';
+export type UserRole = 'PATIENT' | 'DOCTOR' | 'NURSE' | 'AGENT' | 'ADMIN' | 'SUPER_ADMIN';
 
 export interface User {
   id: string;

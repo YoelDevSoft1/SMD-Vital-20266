@@ -1,223 +1,293 @@
+/**
+ * SMD-Vital Global Styles
+ *
+ * Architecture:
+ *   1. Tailwind base/components/utilities
+ *   2. CSS variables for tokens (light + dark via .dark)
+ *   3. Base resets (mobile-tap-highlight, body styles, safe areas)
+ *   4. Focus-visible ring + reduced-motion global rules
+ *   5. Custom scrollbar + glass decoration classes
+ *
+ * Tokens philosophy: every color used by components MUST resolve through a CSS variable.
+ * Raw hex/hsl only here. If you find yourself adding a color in a component, add a token first.
+ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   1. CSS Variables — Light + Dark themes
+   ============================================================ */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Surface tokens */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --popover-foreground: 222 47% 11%;
+
+    /* Brand primary */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Neutrals (cool slate-leaning) */
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 214 32% 91%;
+    --accent-foreground: 222 47% 11%;
+
+    /* Destructive */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders / inputs / focus ring */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+
+    /* Status tokens — full saturation for solid, desaturated for muted/bg */
+    --success: 142 71% 38%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 142 76% 92%;
+    --success-muted-foreground: 142 71% 22%;
+
+    --warning: 32 95% 44%;
+    --warning-foreground: 0 0% 100%;
+    --warning-muted: 38 92% 90%;
+    --warning-muted-foreground: 32 95% 28%;
+
+    --danger: 0 72% 51%;
+    --danger-foreground: 0 0% 100%;
+    --danger-muted: 0 86% 95%;
+    --danger-muted-foreground: 0 72% 35%;
+
+    --info: 199 89% 41%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 199 89% 93%;
+    --info-muted-foreground: 199 89% 26%;
+
+    --neutral: 215 16% 47%;
+    --neutral-foreground: 0 0% 100%;
+    --neutral-muted: 215 20% 93%;
+    --neutral-muted-foreground: 215 16% 35%;
+
+    /* Role tokens — muted backgrounds + saturated text for badges */
+    --role-admin: 217 91% 60%;
+    --role-admin-muted: 217 91% 95%;
+
+    --role-super: 271 81% 56%;
+    --role-super-muted: 271 91% 95%;
+
+    --role-doctor: 173 80% 36%;
+    --role-doctor-muted: 173 80% 93%;
+
+    --role-nurse: 330 81% 52%;
+    --role-nurse-muted: 330 81% 95%;
+
+    --role-patient: 38 92% 50%;
+    --role-patient-muted: 38 92% 93%;
+
+    --role-agent: 187 94% 38%;
+    --role-agent-muted: 187 94% 92%;
+
+    --radius: 0.625rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222 47% 6%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 222 47% 8%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 47% 8%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 6%;
+
+    --secondary: 217 33% 14%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+    --muted: 217 33% 14%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 14%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 217 91% 60%;
+
+    /* Status — desaturated lighter variants for dark surfaces */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 142 40% 14%;
+    --success-muted-foreground: 142 76% 70%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 26 83% 14%;
+    --warning-muted: 38 50% 14%;
+    --warning-muted-foreground: 38 92% 70%;
+
+    --danger: 0 72% 58%;
+    --danger-foreground: 0 0% 100%;
+    --danger-muted: 0 50% 16%;
+    --danger-muted-foreground: 0 86% 75%;
+
+    --info: 199 89% 55%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 199 50% 14%;
+    --info-muted-foreground: 199 89% 75%;
+
+    --neutral: 215 20% 65%;
+    --neutral-foreground: 222 47% 6%;
+    --neutral-muted: 215 20% 16%;
+    --neutral-muted-foreground: 215 20% 75%;
+
+    /* Role tokens (dark) — subtle tinted backgrounds */
+    --role-admin: 217 91% 65%;
+    --role-admin-muted: 217 50% 16%;
+
+    --role-super: 271 81% 65%;
+    --role-super-muted: 271 50% 16%;
+
+    --role-doctor: 173 70% 50%;
+    --role-doctor-muted: 173 50% 14%;
+
+    --role-nurse: 330 75% 60%;
+    --role-nurse-muted: 330 50% 16%;
+
+    --role-patient: 38 92% 55%;
+    --role-patient-muted: 38 50% 14%;
+
+    --role-agent: 187 80% 50%;
+    --role-agent-muted: 187 50% 14%;
   }
 }
 
+/* ============================================================
+   2. Base resets
+   ============================================================ */
 @layer base {
   * {
     @apply border-border;
   }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
-  html,
-  body,
-  #root {
+  html, body, #root {
     min-height: 100%;
-  }
-
-  body {
     overscroll-behavior-y: none;
-    -webkit-tap-highlight-color: transparent;
   }
 
+  /* Login full-bleed dark backdrop */
   body:has(#smd-vital-login-page),
   #root:has(#smd-vital-login-page) {
-    background-color: #020617;
+    background-color: hsl(222 47% 6%);
   }
 
-  input,
-  select,
-  textarea {
+  /* Prevent iOS auto-zoom on focus (font >= 16px) */
+  input, select, textarea {
     font-size: 16px;
+  }
+
+  /* Safe area for PWA installed apps — bottom nav and headers */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* Scrollbar gutter stable so content doesn't shift when modal opens */
+  html {
+    scrollbar-gutter: stable;
+  }
+}
+
+/* ============================================================
+   3. Focus-visible (global) + Reduced-motion (global)
+   ============================================================ */
+
+/* Strong, visible focus ring on keyboard nav only */
+@layer base {
+  :focus-visible {
+    outline: none;
   }
 }
 
 @layer utilities {
-  .dark .bg-white {
-    background-color: rgb(30 41 59);
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
-  .dark .bg-gray-50 {
-    background-color: rgb(15 23 42 / 0.72);
-  }
-
-  .dark .bg-gray-100 {
-    background-color: rgb(30 41 59 / 0.9);
-  }
-
-  .dark .text-gray-900,
-  .dark .text-gray-800 {
-    color: rgb(248 250 252);
-  }
-
-  .dark .text-gray-700,
-  .dark .text-gray-600,
-  .dark .text-gray-500 {
-    color: rgb(203 213 225);
-  }
-
-  .dark .border-gray-100,
-  .dark .border-gray-200,
-  .dark .border-gray-300 {
-    border-color: rgb(51 65 85);
-  }
-
-  .dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
-  .dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
-    border-color: rgb(51 65 85);
-  }
-
-  .dark input:not([type='checkbox']):not([type='radio']),
-  .dark select,
-  .dark textarea {
-    background-color: rgb(15 23 42 / 0.72);
-    border-color: rgb(71 85 105);
-    color: rgb(248 250 252);
-  }
-
-  .dark input::placeholder,
-  .dark textarea::placeholder {
-    color: rgb(148 163 184);
+  /* Subtle ring for cards that become focusable */
+  .focus-ring-soft {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40;
   }
 }
 
-/* Custom scrollbar */
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   4. Scrollbar (subtle, themed)
+   ============================================================ */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-400 dark:bg-gray-600 rounded-md;
+  @apply bg-neutral-muted rounded-full;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500 dark:bg-gray-500;
+  @apply bg-neutral-muted-foreground/40;
+  background-clip: padding-box;
+  border: 2px solid transparent;
 }
 
-/* Loading animation */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--neutral-muted)) transparent;
 }
 
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* Glassmorphism motion utilities */
-@keyframes glassDrift {
-  0% {
-    transform: translate3d(-6%, -4%, 0) scale(1);
-    opacity: 0.55;
-  }
-  40% {
-    transform: translate3d(4%, 6%, 0) scale(1.08);
-    opacity: 0.75;
-  }
-  70% {
-    transform: translate3d(-2%, 10%, 0) scale(1.04);
-    opacity: 0.65;
-  }
-  100% {
-    transform: translate3d(6%, -2%, 0) scale(1.02);
-    opacity: 0.58;
-  }
-}
-
-@keyframes glassDriftReverse {
-  0% {
-    transform: translate3d(5%, -6%, 0) scale(1.02);
-    opacity: 0.6;
-  }
-  45% {
-    transform: translate3d(-8%, 4%, 0) scale(1.07);
-    opacity: 0.78;
-  }
-  80% {
-    transform: translate3d(4%, 8%, 0) scale(1.03);
-    opacity: 0.68;
-  }
-  100% {
-    transform: translate3d(-6%, -3%, 0) scale(1.01);
-    opacity: 0.6;
-  }
-}
-
-@keyframes glassSheen {
-  0% {
-    transform: translateX(-120%) rotate(18deg);
-    opacity: 0;
-  }
-  30% {
-    opacity: 0.45;
-  }
-  55% {
-    transform: translateX(40%) rotate(18deg);
-    opacity: 0.2;
-  }
-  70% {
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(120%) rotate(18deg);
-    opacity: 0;
-  }
-}
-
+/* ============================================================
+   5. Glass decoration (used by Header, GlassModal, Card blobs)
+   ============================================================ */
 .glass-blob {
   animation: glassDrift 28s ease-in-out infinite alternate;
   will-change: transform, opacity;
@@ -235,23 +305,10 @@
   animation: glassSheen 14s ease-in-out infinite;
 }
 
-/* Modal animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+@keyframes glassSheen {
+  0%   { transform: translateX(-120%) rotate(18deg); opacity: 0; }
+  30%  { opacity: 0.45; }
+  55%  { transform: translateX(40%) rotate(18deg); opacity: 0.2; }
+  70%  { opacity: 0; }
+  100% { transform: translateX(120%) rotate(18deg); opacity: 0; }
 }

@@ -4,10 +4,10 @@ import { X, RefreshCw, Search, Filter, AlertCircle, Loader2, FileText } from 'lu
 import toast from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { SystemLog, SystemLogFilters } from '@/types';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectItem, SelectValue } from '@/components/ui/Select';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
+import { Seleccion, SelectItem, SelectValue } from '@/components/ui/Seleccion';
 
 interface SystemLogsModalProps {
   isOpen: boolean;
@@ -94,7 +94,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
     setFilters((prev) => ({ ...prev, page }));
   };
 
-  const formatTimestamp = (value: string) => {
+  const formatearHorastamp = (value: string) => {
     try {
       return new Intl.DateTimeFormat('es-ES', {
         year: 'numeric',
@@ -122,20 +122,20 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button
+            <Boton
               variant="outline"
               onClick={() => refetch()}
               isLoading={isFetching}
             >
               <RefreshCw className="h-4 w-4" />
               Actualizar
-            </Button>
-            <Button
+            </Boton>
+            <Boton
               variant="ghost"
               onClick={onClose}
             >
               <X className="h-5 w-5" />
-            </Button>
+            </Boton>
           </div>
         </header>
 
@@ -144,12 +144,12 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
             <div className="border-b border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-5 py-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <div className="md:col-span-2">
-                  <Label htmlFor="log-search" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <Etiqueta htmlFor="log-search" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Búsqueda
-                  </Label>
+                  </Etiqueta>
                   <div className="relative">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-                    <Input
+                    <Entrada
                       id="log-search"
                       placeholder="Buscar por mensaje, requestId o contexto"
                       className="pl-9"
@@ -160,10 +160,10 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                 </div>
 
                 <div>
-                  <Label htmlFor="log-level" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <Etiqueta htmlFor="log-level" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Nivel
-                  </Label>
-                  <Select
+                  </Etiqueta>
+                  <Seleccion
                     id="log-level"
                     value={filters.level ?? ''}
                     onChange={(event) => handleFilterChange('level', event.target.value)}
@@ -174,14 +174,14 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                         {level}
                       </SelectItem>
                     ))}
-                  </Select>
+                  </Seleccion>
                 </div>
 
                 <div>
-                  <Label htmlFor="log-service" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <Etiqueta htmlFor="log-service" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Servicio
-                  </Label>
-                  <Select
+                  </Etiqueta>
+                  <Seleccion
                     id="log-service"
                     value={filters.service ?? ''}
                     onChange={(event) => handleFilterChange('service', event.target.value)}
@@ -192,16 +192,16 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                         {service}
                       </SelectItem>
                     ))}
-                  </Select>
+                  </Seleccion>
                 </div>
               </div>
 
               <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div>
-                  <Label htmlFor="date-from" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <Etiqueta htmlFor="date-from" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Desde
-                  </Label>
-                  <Input
+                  </Etiqueta>
+                  <Entrada
                     id="date-from"
                     type="date"
                     value={filters.dateFrom ?? ''}
@@ -209,10 +209,10 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                   />
                 </div>
                 <div>
-                  <Label htmlFor="date-to" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <Etiqueta htmlFor="date-to" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Hasta
-                  </Label>
-                  <Input
+                  </Etiqueta>
+                  <Entrada
                     id="date-to"
                     type="date"
                     value={filters.dateTo ?? ''}
@@ -220,13 +220,13 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                   />
                 </div>
                 <div className="flex items-end gap-3">
-                  <Button
+                  <Boton
                     variant="secondary"
                     className="w-full"
                     onClick={handleResetFilters}
                   >
                     Limpiar filtros
-                  </Button>
+                  </Boton>
                 </div>
               </div>
             </div>
@@ -286,7 +286,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                           }`}
                         >
                           <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-600">
-                            {formatTimestamp(log.timestamp)}
+                            {formatearHorastamp(log.timestamp)}
                           </td>
                           <td className="whitespace-nowrap px-4 py-3 text-sm">
                             <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${currentLevelColor(log.level)}`}>
@@ -314,20 +314,20 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                   registros
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button
+                  <Boton
                     variant="outline"
                     onClick={() => handlePageChange((filters.page ?? 1) - 1)}
                     disabled={!pagination.hasPrev || (filters.page ?? 1) <= 1}
                   >
                     Anterior
-                  </Button>
-                  <Button
+                  </Boton>
+                  <Boton
                     variant="outline"
                     onClick={() => handlePageChange((filters.page ?? 1) + 1)}
                     disabled={!pagination.hasNext || (filters.page ?? 1) >= pagination.totalPages}
                   >
                     Siguiente
-                  </Button>
+                  </Boton>
                 </div>
               </div>
             )}
@@ -347,7 +347,7 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
                 <div className="space-y-4 text-sm text-gray-700">
                   <div>
                     <p className="text-xs font-semibold uppercase text-gray-500">Timestamp</p>
-                    <p>{formatTimestamp(selectedLog.timestamp)}</p>
+                    <p>{formatearHorastamp(selectedLog.timestamp)}</p>
                   </div>
                   <div>
                     <p className="text-xs font-semibold uppercase text-gray-500">Nivel</p>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, MessageSquare, Star, Calendar, Shield, Edit, Trash2, CheckCircle, XCircle, User, Stethoscope } from 'lucide-react';
-import { Button } from './ui/Button';
-import { GlassModal } from './ui/GlassModal';
+import { Boton } from './ui/Boton';
+import { ModalCristal } from './ui/ModalCristal';
 import type { Review } from '@/types';
 
 interface ReviewDetailsViewProps {
@@ -37,7 +37,7 @@ export default function ReviewDetailsView({ review, onClose, onEdit }: ReviewDet
   };
 
   return (
-    <GlassModal isOpen={true} onClose={onClose} size="lg" variant="glass">
+    <ModalCristal isOpen={true} onClose={onClose} size="lg" variant="glass">
       {/* Header */}
       <div className="flex justify-between items-center p-6 border-b border-white/10 dark:border-white/5">
           <div className="flex items-center space-x-3">
@@ -50,13 +50,13 @@ export default function ReviewDetailsView({ review, onClose, onEdit }: ReviewDet
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" onClick={onEdit}>
+            <Boton variant="outline" size="sm" onClick={onEdit}>
               <Edit className="w-4 h-4" />
               Editar
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            </Boton>
+            <Boton variant="ghost" size="sm" onClick={onClose}>
               <X className="w-5 h-5" />
-            </Button>
+            </Boton>
           </div>
         </div>
 
@@ -199,14 +199,14 @@ export default function ReviewDetailsView({ review, onClose, onEdit }: ReviewDet
 
         {/* Footer */}
         <div className="flex justify-end space-x-3 p-6 border-t bg-gray-50">
-          <Button variant="outline" onClick={onClose}>
+          <Boton variant="outline" onClick={onClose}>
             Cerrar
-          </Button>
-          <Button onClick={onEdit}>
+          </Boton>
+          <Boton onClick={onEdit}>
             <Edit className="w-4 h-4" />
             Editar Reseña
-          </Button>
+          </Boton>
         </div>
-    </GlassModal>
+    </ModalCristal>
   );
 }

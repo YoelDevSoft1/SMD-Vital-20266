@@ -19,6 +19,44 @@ import {
 
 const prisma = prismaClient;
 
+function getServiceDedupKey(service: { name: string }): string {
+  return service.name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/^c\.\s*/, 'control ')
+    .replace(/^s\.\s*/, 'suero ')
+    .replace(/\bresp\.\b/g, 'respiratoria')
+    .replace(/\bde\b/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function dedupeDashboardServices<T extends { name: string; description?: string | null; _count?: { appointments?: number } }>(services: T[]): T[] {
+  const byKey = new Map<string, T>();
+
+  for (const service of services) {
+    const key = getServiceDedupKey(service);
+    const current = byKey.get(key);
+    if (!current) {
+      byKey.set(key, service);
+      continue;
+    }
+
+    const currentAppointments = current._count?.appointments ?? 0;
+    const nextAppointments = service._count?.appointments ?? 0;
+    const currentScore = currentAppointments * 10000 + current.name.length + (current.description?.length ?? 0);
+    const nextScore = nextAppointments * 10000 + service.name.length + (service.description?.length ?? 0);
+    if (nextScore > currentScore) {
+      byKey.set(key, service);
+    }
+  }
+
+  return Array.from(byKey.values())
+    .sort((left, right) => (right._count?.appointments ?? 0) - (left._count?.appointments ?? 0))
+    .slice(0, 5);
+}
+
 interface ActionContext {
   actorId?: string;
   actorRole?: UserRole;
@@ -123,7 +161,7 @@ export class AdminPanelService {
 
         // Popular services
         prisma.service.findMany({
-          take: 5,
+          take: 30,
           include: {
             _count: { select: { appointments: true } }
           },
@@ -201,7 +239,7 @@ export class AdminPanelService {
         },
         topPerformers: {
           doctors: topDoctors,
-          services: popularServices
+          services: dedupeDashboardServices(popularServices)
         }
       };
     } catch (error) {
@@ -576,14 +614,15 @@ export class AdminPanelService {
     isAvailable?: boolean;
     rating?: number;
     experience?: number;
+    includeNurses?: boolean;
   }) {
     try {
-      const { page, limit, search, specialty, isAvailable, rating, experience } = filters;
+      const { page, limit, search, specialty, isAvailable, rating, experience, includeNurses } = filters;
       const skip = (page - 1) * limit;
 
       const where: any = {
         user: {
-          role: 'DOCTOR'
+          role: includeNurses ? { in: ['DOCTOR', 'NURSE'] } : 'DOCTOR'
         }
       };
 

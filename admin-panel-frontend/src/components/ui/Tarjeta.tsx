@@ -4,6 +4,8 @@ import { cn } from '@/utils/cn';
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'glass' | 'solid' | 'elevated';
   withBlob?: boolean;
+  /** Add hover/focus interactivity styling (used for clickable cards). */
+  interactive?: boolean;
 }
 
 const cardVariants = {
@@ -15,27 +17,30 @@ const cardVariants = {
     'dark:bg-slate-900/60 dark:border-white/10'
   ),
   solid: cn(
-    'bg-white',
-    'border border-gray-200',
-    'shadow-sm',
-    'dark:bg-slate-800 dark:border-slate-700'
+    'bg-card',
+    'border border-border',
+    'shadow-soft-sm'
   ),
   elevated: cn(
     'relative overflow-hidden',
-    'bg-white/80 backdrop-blur-lg',
-    'border border-white/50',
-    'shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)]',
-    'dark:bg-slate-900/80 dark:border-white/20',
-    'dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]'
+    'bg-card/95',
+    'border border-border',
+    'shadow-soft-lg'
   ),
 };
 
-const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = 'solid', withBlob = false, children, ...props }, ref) => {
+const Tarjeta = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant = 'solid', withBlob = false, interactive = false, children, ...props }, ref) => {
     return (
       <div
         ref={ref}
-        className={cn('rounded-xl p-6', cardVariants[variant], className)}
+        className={cn(
+          'rounded-xl p-6',
+          cardVariants[variant],
+          interactive &&
+            'cursor-pointer transition-shadow duration-150 hover:shadow-soft-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+          className,
+        )}
         {...props}
       >
         {withBlob && variant === 'glass' && (
@@ -49,9 +54,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     );
   }
 );
-Card.displayName = 'Card';
+Tarjeta.displayName = 'Tarjeta';
 
-const CardHeader = React.forwardRef<
+const TarjetaEncabezado = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -61,9 +66,9 @@ const CardHeader = React.forwardRef<
     {...props}
   />
 ));
-CardHeader.displayName = 'CardHeader';
+TarjetaEncabezado.displayName = 'TarjetaEncabezado';
 
-const CardTitle = React.forwardRef<
+const TarjetaTitulo = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
@@ -73,9 +78,9 @@ const CardTitle = React.forwardRef<
     {...props}
   />
 ));
-CardTitle.displayName = 'CardTitle';
+TarjetaTitulo.displayName = 'TarjetaTitulo';
 
-const CardDescription = React.forwardRef<
+const TarjetaDescripcion = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
@@ -85,17 +90,17 @@ const CardDescription = React.forwardRef<
     {...props}
   />
 ));
-CardDescription.displayName = 'CardDescription';
+TarjetaDescripcion.displayName = 'TarjetaDescripcion';
 
-const CardContent = React.forwardRef<
+const TarjetaContenido = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
   <div ref={ref} className={cn('pt-0', className)} {...props} />
 ));
-CardContent.displayName = 'CardContent';
+TarjetaContenido.displayName = 'TarjetaContenido';
 
-const CardFooter = React.forwardRef<
+const TarjetaPie = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -105,6 +110,6 @@ const CardFooter = React.forwardRef<
     {...props}
   />
 ));
-CardFooter.displayName = 'CardFooter';
+TarjetaPie.displayName = 'TarjetaPie';
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+export { Tarjeta, TarjetaEncabezado, TarjetaPie, TarjetaTitulo, TarjetaDescripcion, TarjetaContenido };

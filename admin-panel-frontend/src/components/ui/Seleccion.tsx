@@ -24,7 +24,7 @@ interface SelectValueProps {
   placeholder?: string;
 }
 
-export const Select: React.FC<SelectProps> = ({ children, variant = 'glass', className, ...props }) => {
+export const Seleccion: React.FC<SelectProps> = ({ children, variant = 'glass', className, ...props }) => {
   const baseStyles = [
     'w-full px-4 py-2.5 rounded-lg text-sm',
     'focus:outline-none focus:ring-2 focus:ring-offset-1',

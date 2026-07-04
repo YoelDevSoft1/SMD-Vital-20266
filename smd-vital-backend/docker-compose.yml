@@ -19,7 +19,7 @@ services:
       - smdvital_postgres_data:/var/lib/postgresql/data
       - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
     ports:
-      - "${POSTGRES_EXTERNAL_PORT:-5433}:5432"
+      - "${POSTGRES_EXTERNAL_PORT:-5434}:5432"
     networks:
       - smdvital_network
     restart: unless-stopped
@@ -46,7 +46,7 @@ services:
     volumes:
       - smdvital_redis_data:/data
     ports:
-      - "${REDIS_EXTERNAL_PORT:-6380}:6379"
+      - "${REDIS_EXTERNAL_PORT:-6381}:6379"
     networks:
       - smdvital_network
     restart: unless-stopped
@@ -71,7 +71,7 @@ services:
     environment:
       <<: *common-variables
       NODE_ENV: ${NODE_ENV:-production}
-      PORT: ${BACKEND_PORT:-3000}
+      PORT: ${BACKEND_PORT:-4040}
       DATABASE_URL: postgresql://${POSTGRES_USER:-smd_vital_user}:${POSTGRES_PASSWORD:-smd_vital_password}@postgres:5432/${POSTGRES_DB:-smd_vital_db}
       REDIS_URL: redis://:${REDIS_PASSWORD:-smd_vital_redis_password}@redis:6379
       JWT_SECRET: ${JWT_SECRET:-smd-vital-jwt-secret-change-in-production}
@@ -102,7 +102,7 @@ services:
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
       SENTRY_DSN: ${SENTRY_DSN:-}
     ports:
-      - "${BACKEND_PORT:-3000}:3000"
+      - "${BACKEND_PORT:-4040}:4040"
     networks:
       - smdvital_network
     depends_on:
@@ -115,7 +115,7 @@ services:
       - ./logs:/app/logs
       - ./uploads:/app/uploads
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4040/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       interval: 30s
       timeout: 10s
       retries: 5

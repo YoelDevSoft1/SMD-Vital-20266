@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { formatTime } from '@/utils/dateFormat';
+import { formatearHora } from '@/utils/dateFormat';
 import { MapContainer, Marker, Polyline, Popup, TileLayer } from 'react-leaflet';
 import type { DoctorRouteResponse } from '@/types';
 
@@ -34,7 +34,7 @@ export default function DailyRouteMap({ route }: DailyRouteMapProps) {
             <Popup>
               <div className="space-y-1 text-sm">
                 <strong>#{stop.order} {stop.appointment.patient?.user?.firstName} {stop.appointment.patient?.user?.lastName}</strong>
-                <div>{formatTime(stop.appointment.scheduledAt)}</div>
+                <div>{formatearHora(stop.appointment.scheduledAt)}</div>
                 <div>{stop.appointment.address}</div>
               </div>
             </Popup>

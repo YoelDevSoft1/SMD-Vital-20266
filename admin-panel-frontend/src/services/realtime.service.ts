@@ -17,7 +17,7 @@ function resolveSocketUrl() {
   }
 
   if (import.meta.env.DEV) {
-    return `${window.location.protocol}//${window.location.hostname}:3000`;
+    return `${window.location.protocol}//${window.location.hostname}:4040`;
   }
 
   return window.location.origin;

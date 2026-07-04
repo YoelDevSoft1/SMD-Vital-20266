@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { formatDateTime } from '@/utils/dateFormat';
+import { formatearFechaHora } from '@/utils/dateFormat';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, CheckCircle2, Activity, AlertCircle, Upload, ImageIcon, Plus, Save, Trash2 } from 'lucide-react';
@@ -7,11 +7,11 @@ import toast from 'react-hot-toast';
 import { clinicalService } from '@/services/clinical.service';
 import { adminService } from '@/services/admin.service';
 import DailyRouteMap from '@/components/DailyRouteMap';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { GlassModal } from '@/components/ui/GlassModal';
+import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
+import { Boton } from '@/components/ui/Boton';
+import { Entrada } from '@/components/ui/Entrada';
+import { Etiqueta } from '@/components/ui/Etiqueta';
+import { ModalCristal } from '@/components/ui/ModalCristal';
 import { cn } from '@/utils/cn';
 import { useAuthStore } from '@/store/auth.store';
 import type { ClinicalAppointment, PaginatedResponse } from '@/types';
@@ -32,7 +32,7 @@ const statusColors: Record<string, string> = {
   IN_PROGRESS: 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800',
   COMPLETED: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800',
   CANCELLED: 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800',
-  NO_SHOW: 'bg-gray-50 text-gray-700 border-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
+  NO_SHOW: 'bg-muted text-foreground border-border dark:bg-card dark:text-muted-foreground dark:border-border',
   RESCHEDULED: 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800',
 };
 
@@ -111,10 +111,10 @@ export default function DoctorDashboard() {
     return (
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Panel clinico</h1>
+          <h1 className="text-2xl font-bold text-foreground dark:text-foreground sm:text-3xl">Panel clinico</h1>
         </div>
-        <Card className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
-          <CardContent className="flex flex-col gap-4 p-4 text-sm sm:p-6">
+        <Tarjeta className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
+          <TarjetaContenido className="flex flex-col gap-4 p-4 text-sm sm:p-6">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
               <div>
@@ -127,16 +127,16 @@ export default function DoctorDashboard() {
               </div>
             </div>
             <div>
-              <Button
+              <Boton
                 variant="outline"
                 onClick={() => refetch()}
-                className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                className="dark:text-foreground dark:border-border dark:hover:bg-muted"
               >
                 Reintentar
-              </Button>
+              </Boton>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
     );
   }
@@ -145,56 +145,56 @@ export default function DoctorDashboard() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Panel clinico</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <h1 className="text-2xl font-bold text-foreground dark:text-foreground sm:text-3xl">Panel clinico</h1>
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             Resumen de tus citas asignadas y estado actual.
           </p>
         </div>
-        <Button
+        <Boton
           variant="outline"
           onClick={() => navigate('/doctor/appointments')}
           isLoading={isFetching}
-          className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+          className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
         >
           Ver agenda
-        </Button>
+        </Boton>
       </div>
 
       {isDoctor ? (
         <>
-          <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-            <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <Tarjeta className="border border-border shadow-sm dark:border-border">
+            <TarjetaEncabezado className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
               <div>
-                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+                <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
                   Disponibilidad diaria
-                </CardTitle>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                </TarjetaTitulo>
+                <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
                   Define los rangos que administracion puede usar para agendarte.
                 </p>
               </div>
               <div className="grid grid-cols-[1fr_auto] gap-2 sm:flex sm:items-center">
-                <Input
+                <Entrada
                   type="date"
                   value={availabilityDate}
                   onChange={(event) => setAvailabilityDate(event.target.value)}
                   className="w-full sm:w-40"
                 />
-                <Button
+                <Boton
                   onClick={() => availabilityMutation.mutate()}
                   isLoading={availabilityMutation.isPending}
                   disabled={isFetchingAvailability || availabilityMutation.isPending}
                 >
                   <Save className="h-4 w-4" />
                   Guardar
-                </Button>
+                </Boton>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-3 p-4 sm:p-6">
+            </TarjetaEncabezado>
+            <TarjetaContenido className="space-y-3 p-4 sm:p-6">
               {availabilityBlocks.map((block, index) => (
                 <div key={`${index}-${block.startTime}-${block.endTime}`} className="grid grid-cols-[1fr_1fr_auto] gap-2 sm:gap-3">
                   <div>
-                    <Label>Desde</Label>
-                    <Input
+                    <Etiqueta>Desde</Etiqueta>
+                    <Entrada
                       type="time"
                       value={block.startTime}
                       onChange={(event) =>
@@ -207,8 +207,8 @@ export default function DoctorDashboard() {
                     />
                   </div>
                   <div>
-                    <Label>Hasta</Label>
-                    <Input
+                    <Etiqueta>Hasta</Etiqueta>
+                    <Entrada
                       type="time"
                       value={block.endTime}
                       onChange={(event) =>
@@ -221,7 +221,7 @@ export default function DoctorDashboard() {
                     />
                   </div>
                   <div className="flex items-end">
-                    <Button
+                    <Boton
                       type="button"
                       variant="outline"
                       onClick={() =>
@@ -230,41 +230,41 @@ export default function DoctorDashboard() {
                         )
                       }
                       disabled={availabilityBlocks.length === 1}
-                      className="h-11 w-11 p-0 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                      className="h-11 w-11 p-0 dark:text-foreground dark:border-border dark:hover:bg-muted"
                     >
                       <Trash2 className="h-4 w-4" />
-                    </Button>
+                    </Boton>
                   </div>
                 </div>
               ))}
 
-              <Button
+              <Boton
                 type="button"
                 variant="outline"
                 onClick={() =>
                   setAvailabilityBlocks((current) => [...current, { startTime: '14:00', endTime: '18:00' }])
                 }
-                className="w-full dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+                className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
               >
                 <Plus className="h-4 w-4" />
                 Agregar rango
-              </Button>
-            </CardContent>
-          </Card>
+              </Boton>
+            </TarjetaContenido>
+          </Tarjeta>
 
-          <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-            <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+          <Tarjeta className="border border-border shadow-sm dark:border-border">
+            <TarjetaEncabezado className="p-4 sm:p-6">
+              <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
                 Ruta del dia
-              </CardTitle>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              </TarjetaTitulo>
+              <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
                 Citas ordenadas por hora y tiempos estimados de traslado.
               </p>
-            </CardHeader>
-            <CardContent className="space-y-4 p-4 sm:p-6">
+            </TarjetaEncabezado>
+            <TarjetaContenido className="space-y-4 p-4 sm:p-6">
               <DailyRouteMap route={routeData?.data?.data} />
               {isFetchingRoute ? (
-                <p className="text-sm text-gray-500 dark:text-gray-400">Cargando ruta...</p>
+                <p className="text-sm text-muted-foreground dark:text-muted-foreground">Cargando ruta...</p>
               ) : routeData?.data?.data?.segments?.length ? (
                 <div className="grid gap-2 md:grid-cols-2">
                   {routeData.data.data.segments.map((segment) => (
@@ -275,7 +275,7 @@ export default function DoctorDashboard() {
                         segment.status === 'OK' && 'border-emerald-200 bg-emerald-50 text-emerald-800',
                         segment.status === 'RISK' && 'border-amber-200 bg-amber-50 text-amber-800',
                         segment.status === 'CONFLICT' && 'border-red-200 bg-red-50 text-red-800',
-                        segment.status === 'MISSING_COORDINATES' && 'border-gray-200 bg-gray-50 text-gray-700'
+                        segment.status === 'MISSING_COORDINATES' && 'border-border bg-muted text-foreground'
                       )}
                     >
                       <div className="font-medium">
@@ -288,28 +288,28 @@ export default function DoctorDashboard() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-muted-foreground dark:text-muted-foreground">
                   Aun no hay suficientes citas con coordenadas para calcular la ruta.
                 </p>
               )}
-            </CardContent>
-          </Card>
+            </TarjetaContenido>
+          </Tarjeta>
         </>
       ) : (
-        <Card className="border border-blue-200 bg-blue-50/60 shadow-sm dark:border-blue-800 dark:bg-blue-900/20">
-          <CardContent className="p-4 text-sm text-blue-800 sm:p-6 dark:text-blue-300">
+        <Tarjeta className="border border-blue-200 bg-blue-50/60 shadow-sm dark:border-blue-800 dark:bg-blue-900/20">
+          <TarjetaContenido className="p-4 text-sm text-blue-800 sm:p-6 dark:text-blue-300">
             Tu panel de enfermeria muestra citas asignadas y tareas clinicas. La disponibilidad y ruta diaria solo aplican a usuarios medico.
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-4 sm:p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Citas totales</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Citas totales</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {stats.total}
                 </p>
               </div>
@@ -317,15 +317,15 @@ export default function DoctorDashboard() {
                 <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-4 sm:p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Pendientes</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Pendientes</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {stats.pending}
                 </p>
               </div>
@@ -333,15 +333,15 @@ export default function DoctorDashboard() {
                 <Activity className="h-5 w-5 text-amber-600 dark:text-amber-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-4 sm:p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">En progreso</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">En progreso</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {stats.inProgress}
                 </p>
               </div>
@@ -349,15 +349,15 @@ export default function DoctorDashboard() {
                 <Activity className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
 
-        <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-          <CardContent className="p-4 sm:p-6">
+        <Tarjeta className="border border-border shadow-sm dark:border-border">
+          <TarjetaContenido className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Completadas</p>
-                <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Completadas</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
                   {stats.completed}
                 </p>
               </div>
@@ -365,50 +365,50 @@ export default function DoctorDashboard() {
                 <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TarjetaContenido>
+        </Tarjeta>
       </div>
 
-      <Card className="border border-gray-200 shadow-sm dark:border-gray-700">
-        <CardHeader className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <Tarjeta className="border border-border shadow-sm dark:border-border">
+        <TarjetaEncabezado className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
               Proximas citas
-            </CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            </TarjetaTitulo>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
               {isLoading ? 'Cargando...' : `${appointments.length} citas en agenda`}
             </p>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
+        </TarjetaEncabezado>
+        <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-8 text-center text-sm text-gray-500 dark:text-gray-400 sm:p-12">
+            <div className="p-8 text-center text-sm text-muted-foreground dark:text-muted-foreground sm:p-12">
               Cargando citas...
             </div>
           ) : appointments.length === 0 ? (
-            <div className="p-8 text-center text-sm text-gray-500 dark:text-gray-400 sm:p-12">
+            <div className="p-8 text-center text-sm text-muted-foreground dark:text-muted-foreground sm:p-12">
               No hay citas asignadas.
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            <div className="divide-y divide-border dark:divide-border">
               {appointments.map((appointment) => (
                 <div
                   key={appointment.id}
                   className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6"
                 >
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                       {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                       {appointment.service?.name || 'Servicio no definido'} ·{' '}
-                      {formatDateTime(appointment.scheduledAt)}
+                      {formatearFechaHora(appointment.scheduledAt)}
                     </p>
                   </div>
                   <span
                     className={cn(
                       'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium',
-                      statusColors[appointment.status] || 'bg-gray-50 text-gray-700 border-gray-100'
+                      statusColors[appointment.status] || 'bg-muted text-foreground border-border'
                     )}
                   >
                     {statusLabels[appointment.status] || appointment.status}
@@ -417,8 +417,8 @@ export default function DoctorDashboard() {
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </TarjetaContenido>
+      </Tarjeta>
     </div>
   );
 }

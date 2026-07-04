@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/ui/Button';
+import { Boton } from '@/components/ui/Boton';
 import { Doctor } from '@/types';
 
 interface ExportDoctorsButtonProps {
@@ -81,8 +81,8 @@ export const ExportDoctorsButton: React.FC<ExportDoctorsButtonProps> = ({ doctor
 
     const jsonContent = JSON.stringify(doctorsToExport.map(doctor => ({
       id: doctor.id,
-      nombre: doctor.user.firstName,
-      apellido: doctor.user.lastName,
+      firstName: doctor.user.firstName,
+      lastName: doctor.user.lastName,
       email: doctor.user.email,
       telefono: doctor.user.phone || '',
       numeroLicencia: doctor.licenseNumber,
@@ -130,7 +130,7 @@ export const ExportDoctorsButton: React.FC<ExportDoctorsButtonProps> = ({ doctor
 
   return (
     <div className="flex items-center space-x-2">
-      <Button
+      <Boton
         size="sm"
         variant="outline"
         onClick={exportToCSV}
@@ -140,8 +140,8 @@ export const ExportDoctorsButton: React.FC<ExportDoctorsButtonProps> = ({ doctor
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
         Exportar CSV
-      </Button>
-      <Button
+      </Boton>
+      <Boton
         size="sm"
         variant="outline"
         onClick={exportToJSON}
@@ -151,7 +151,7 @@ export const ExportDoctorsButton: React.FC<ExportDoctorsButtonProps> = ({ doctor
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
         Exportar JSON
-      </Button>
+      </Boton>
     </div>
   );
 };

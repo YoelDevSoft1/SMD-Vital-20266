@@ -1,8 +1,8 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { formatDate, formatDateTime } from '@/utils/dateFormat';
+import { formatearFecha, formatearFechaHora } from '@/utils/dateFormat';
 import { X, Calendar, Clock, User, Stethoscope, MapPin, DollarSign, FileText, AlertCircle, CheckCircle, XCircle, RefreshCw, Phone, Mail, Building } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Boton } from '@/components/ui/Boton';
 import { adminService } from '@/services/admin.service';
 import type { Appointment, AppointmentTimelineItem } from '@/types';
 
@@ -67,12 +67,12 @@ export default function AppointmentDetailsView({ appointment, onClose, onEdit }:
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-900">Detalles de la Cita</h2>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" onClick={onEdit}>
+            <Boton variant="outline" onClick={onEdit}>
               Editar
-            </Button>
-            <Button variant="ghost" onClick={onClose}>
+            </Boton>
+            <Boton variant="ghost" onClick={onClose}>
               <X className="w-6 h-6" />
-            </Button>
+            </Boton>
           </div>
         </div>
 
@@ -97,7 +97,7 @@ export default function AppointmentDetailsView({ appointment, onClose, onEdit }:
                 <Calendar className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-sm text-gray-600">Fecha y Hora</p>
-                  <p className="font-medium">{formatDate(appointment.scheduledAt)}</p>
+                  <p className="font-medium">{formatearFecha(appointment.scheduledAt)}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
@@ -312,7 +312,7 @@ export default function AppointmentDetailsView({ appointment, onClose, onEdit }:
                         )}
                       </div>
                       <span className="text-xs font-medium text-slate-500">
-                        {formatDateTime(item.createdAt)}
+                        {formatearFechaHora(item.createdAt)}
                       </span>
                     </div>
                   </div>
@@ -330,11 +330,11 @@ export default function AppointmentDetailsView({ appointment, onClose, onEdit }:
               </div>
               <div>
                 <p className="text-gray-600">Creada</p>
-                <p className="font-medium">{formatDate(appointment.createdAt)}</p>
+                <p className="font-medium">{formatearFecha(appointment.createdAt)}</p>
               </div>
               <div>
                 <p className="text-gray-600">Última Actualización</p>
-                <p className="font-medium">{formatDate(appointment.updatedAt)}</p>
+                <p className="font-medium">{formatearFecha(appointment.updatedAt)}</p>
               </div>
             </div>
           </div>
@@ -379,7 +379,7 @@ function getTimelinePayloadSummary(payload?: Record<string, unknown> | null) {
   const from = payload['from'];
   const to = payload['to'] ?? payload['status'];
   if (from || to) {
-    return `Estado: ${from ?? 'nuevo'} -> ${to ?? 'sin cambio'}`;
+    return `Estado: ${from ?? 'nuevo'} -> ${to ?? 'sin change'}`;
   }
 
   const changedFields = payload['changedFields'];

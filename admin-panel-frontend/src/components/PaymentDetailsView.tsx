@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, CreditCard, DollarSign, Calendar, User, Stethoscope, CheckCircle, XCircle, Clock, AlertCircle, Phone, Mail, Building, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { GlassModal } from '@/components/ui/GlassModal';
+import { Boton } from '@/components/ui/Boton';
+import { ModalCristal } from '@/components/ui/ModalCristal';
 import type { Payment } from '@/types';
 
 interface PaymentDetailsViewProps {
@@ -38,7 +38,7 @@ const statusIcons = {
 };
 
 export default function PaymentDetailsView({ payment, onClose, onEdit }: PaymentDetailsViewProps) {
-  const formatDate = (dateString: string) => {
+  const formatearFecha = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
@@ -58,7 +58,7 @@ export default function PaymentDetailsView({ payment, onClose, onEdit }: Payment
   const StatusIcon = statusIcons[payment.status as keyof typeof statusIcons] || AlertCircle;
 
   return (
-    <GlassModal isOpen={true} onClose={onClose} size="xl" variant="glass">
+    <ModalCristal isOpen={true} onClose={onClose} size="xl" variant="glass">
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-white/10 dark:border-white/5">
           <div className="flex items-center space-x-3">
@@ -71,14 +71,14 @@ export default function PaymentDetailsView({ payment, onClose, onEdit }: Payment
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" onClick={onEdit}>
+            <Boton variant="outline" onClick={onEdit}>
               <FileText className="w-4 h-4" />
               Editar
-            </Button>
-            <Button variant="outline" onClick={onClose}>
+            </Boton>
+            <Boton variant="outline" onClick={onClose}>
               <X className="w-4 h-4" />
               Cerrar
-            </Button>
+            </Boton>
           </div>
         </div>
 
@@ -167,7 +167,7 @@ export default function PaymentDetailsView({ payment, onClose, onEdit }: Payment
                     <span className="text-gray-600">Fecha de la Cita:</span>
                     <span className="font-medium text-gray-900">
                       {payment.appointment.scheduledAt ? 
-                        formatDate(payment.appointment.scheduledAt) : 'N/A'}
+                        formatearFecha(payment.appointment.scheduledAt) : 'N/A'}
                     </span>
                   </div>
                   
@@ -288,19 +288,19 @@ export default function PaymentDetailsView({ payment, onClose, onEdit }: Payment
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-600">Fecha de Creación</p>
                 <p className="font-medium text-gray-900">
-                  {formatDate(payment.createdAt)}
+                  {formatearFecha(payment.createdAt)}
                 </p>
               </div>
               
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-600">Última Actualización</p>
                 <p className="font-medium text-gray-900">
-                  {formatDate(payment.updatedAt)}
+                  {formatearFecha(payment.updatedAt)}
                 </p>
               </div>
             </div>
           </div>
         </div>
-    </GlassModal>
+    </ModalCristal>
   );
 }

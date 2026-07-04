@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { X, MessageSquare, Star, Save } from 'lucide-react';
-import { Button } from './ui/Button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Switch } from './ui/Switch';
-import { GlassModal } from './ui/GlassModal';
+import { Boton } from './ui/Boton';
+import { Entrada } from './ui/Entrada';
+import { Etiqueta } from './ui/Etiqueta';
+import { Interruptor } from './ui/Interruptor';
+import { ModalCristal } from './ui/ModalCristal';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Review } from '@/types';
@@ -72,11 +72,11 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.patientId) {
-      newErrors.patientId = 'El paciente es requerido';
+      newErrors.patientId = 'El paciente es required';
     }
 
     if (!formData.doctorId) {
-      newErrors.doctorId = 'El doctor es requerido';
+      newErrors.doctorId = 'El doctor es required';
     }
 
     if (formData.rating < 1 || formData.rating > 5) {
@@ -153,7 +153,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
   };
 
   return (
-    <GlassModal isOpen={isOpen} onClose={onClose} size="lg" variant="glass">
+    <ModalCristal isOpen={isOpen} onClose={onClose} size="lg" variant="glass">
       {/* Header */}
       <div className="flex justify-between items-center p-6 border-b border-white/10 dark:border-white/5">
           <div className="flex items-center space-x-3">
@@ -165,13 +165,13 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
                 {isEditing ? 'Editar Reseña' : 'Nueva Reseña'}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {isEditing ? 'Modifica los datos de la reseña' : 'Completa la información de la nueva reseña'}
+                {isEditing ? 'Modifica los formData de la reseña' : 'Completa la información de la nueva reseña'}
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Boton variant="ghost" size="sm" onClick={onClose}>
             <X className="w-5 h-5" />
-          </Button>
+          </Boton>
         </div>
 
         {/* Form */}
@@ -181,7 +181,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Paciente y Doctor</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="patientId">Paciente *</Label>
+                <Etiqueta htmlFor="patientId">Paciente *</Etiqueta>
                 <select
                   id="patientId"
                   value={formData.patientId}
@@ -199,7 +199,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
               </div>
 
               <div>
-                <Label htmlFor="doctorId">Doctor *</Label>
+                <Etiqueta htmlFor="doctorId">Doctor *</Etiqueta>
                 <select
                   id="doctorId"
                   value={formData.doctorId}
@@ -220,8 +220,8 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
 
           {/* Appointment ID */}
           <div>
-            <Label htmlFor="appointmentId">ID de Cita (Opcional)</Label>
-            <Input
+            <Etiqueta htmlFor="appointmentId">ID de Cita (Opcional)</Etiqueta>
+            <Entrada
               id="appointmentId"
               type="text"
               value={formData.appointmentId}
@@ -232,7 +232,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
 
           {/* Rating */}
           <div>
-            <Label htmlFor="rating">Calificación *</Label>
+            <Etiqueta htmlFor="rating">Calificación *</Etiqueta>
             <div className="mt-2">
               <div className="flex items-center space-x-1">
                 {getRatingStars(formData.rating)}
@@ -246,7 +246,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
 
           {/* Comment */}
           <div>
-            <Label htmlFor="comment">Comentario</Label>
+            <Etiqueta htmlFor="comment">Comentario</Etiqueta>
             <textarea
               id="comment"
               value={formData.comment}
@@ -261,14 +261,14 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Estado de Verificación</h3>
             <div className="flex items-center space-x-3">
-              <Switch
+              <Interruptor
                 checked={formData.isVerified}
                 onCheckedChange={(checked) => handleInputChange('isVerified', checked)}
               />
               <div>
-                <Label htmlFor="isVerified" className="text-base">
+                <Etiqueta htmlFor="isVerified" className="text-base">
                   Reseña Verificada
-                </Label>
+                </Etiqueta>
                 <p className="text-sm text-gray-500">
                   {formData.isVerified 
                     ? 'La reseña está verificada y es visible públicamente' 
@@ -281,10 +281,10 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
 
           {/* Actions */}
           <div className="flex justify-end space-x-3 pt-6 border-t">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Boton type="button" variant="outline" onClick={onClose}>
               Cancelar
-            </Button>
-            <Button 
+            </Boton>
+            <Boton 
               type="submit" 
               disabled={createMutation.isPending || updateMutation.isPending}
             >
@@ -294,9 +294,9 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
                 <Save className="w-4 h-4" />
               )}
               {isEditing ? 'Actualizar Reseña' : 'Crear Reseña'}
-            </Button>
+            </Boton>
           </div>
         </form>
-    </GlassModal>
+    </ModalCristal>
   );
 }

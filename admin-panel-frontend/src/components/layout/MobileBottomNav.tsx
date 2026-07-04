@@ -1,53 +1,82 @@
 import { NavLink } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth.store';
-import { getSidebarConfig } from './Sidebar';
+import { obtenerConfiguracionSidebar } from './Sidebar';
+import { cn } from '@/utils/cn';
 
+/** Paths considered "priority" for the mobile bottom nav (max 5 items). */
 const priorityPaths = new Set([
   '/',
   '/appointments',
   '/doctors',
   '/users',
+  '/billing',
   '/services',
   '/doctor',
   '/doctor/appointments',
+  '/doctor/earnings',
   '/patient',
   '/patient/history',
+  '/agent',
+  '/agent/earnings',
 ]);
 
-const rootPaths = new Set(['/', '/doctor', '/patient']);
+const rootPaths = new Set(['/', '/doctor', '/patient', '/agent']);
 
 export default function MobileBottomNav() {
   const { user } = useAuthStore();
-  const { navItems } = getSidebarConfig(user?.role);
-  const items = navItems.filter((item) => priorityPaths.has(item.to)).slice(0, 5);
+  const { elementos } = obtenerConfiguracionSidebar(user?.role);
+  const items = elementos.filter((item) => priorityPaths.has(item.ruta)).slice(0, 5);
 
   if (!items.length) return null;
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200/80 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.45rem)] pt-2 shadow-[0_-18px_50px_-32px_rgba(15,23,42,0.45)] backdrop-blur-xl [transform:translateZ(0)] lg:hidden dark:border-slate-700/80 dark:bg-slate-950/95"
-      aria-label="Navegacion movil"
+      className={cn(
+        'fixed inset-x-0 bottom-0 z-30 lg:hidden',
+        'border-t border-border bg-card/95 backdrop-blur-xl',
+        'px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2',
+        'shadow-[0_-18px_50px_-32px_rgba(15,23,42,0.18)]',
+      )}
+      aria-label="Navegación móvil"
     >
       <div
         className="mx-auto grid w-full max-w-[min(28rem,calc(100vw-1rem))] gap-1"
         style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
       >
-        {items.map(({ to, icon: Icon, label }) => (
+        {items.map(({ ruta, icon: Icono, etiqueta }) => (
           <NavLink
-            key={to}
-            to={to}
-            end={rootPaths.has(to)}
+            key={ruta}
+            to={ruta}
+            end={rootPaths.has(ruta)}
             className={({ isActive }) =>
-              [
-                'flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px] font-medium transition',
+              cn(
+                'flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px] font-medium',
+                'motion-safe:transition-colors motion-safe:duration-150',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                 isActive
-                  ? 'bg-blue-50 text-blue-700 dark:bg-cyan-500/15 dark:text-cyan-200'
-                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white',
-              ].join(' ')
+                  ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              )
             }
           >
-            <Icon className="h-5 w-5 shrink-0" />
-            <span className="max-w-full truncate leading-none">{label}</span>
+            {({ isActive }) => (
+              <>
+                <Icono
+                  aria-hidden="true"
+                  className={cn(
+                    'h-5 w-5 shrink-0 transition-transform',
+                    isActive && 'scale-110',
+                  )}
+                />
+                <span className="max-w-full truncate leading-none">{etiqueta}</span>
+                {isActive ? (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -top-0.5 h-0.5 w-6 rounded-full bg-brand-500"
+                  />
+                ) : null}
+              </>
+            )}
           </NavLink>
         ))}
       </div>
