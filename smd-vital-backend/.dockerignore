@@ -1,0 +1,55 @@
+# Excluye archivos del contexto Docker para smd-vital-backend
+# https://docs.docker.com/engine/reference/builder/#dockerignore-file
+
+# --- Dependencias ---
+node_modules/
+npm-debug.log*
+
+# --- Salidas de build ---
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# --- Runtime data (vive en volumenes) ---
+logs/
+uploads/
+tmp/
+temp/
+
+# --- Variables de entorno ---
+.env
+.env.local
+.env.*.local
+
+# --- Scripts de debug (no producción) ---
+check-*.js
+check-*.sql
+debug-*.js
+create-test-users.js
+test-backend.js
+
+# --- IDE / Editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- VCS ---
+.git/
+.gitignore
+
+# --- Documentación que no va a producción ---
+docs/
+README.md
+*.md
+
+# --- Filesystem sembrado (no se regenera en deploy) ---
+docker-compose.override.yml
+docker-compose.dev.yml
+docker-build.sh
+docker-build.bat

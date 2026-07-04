@@ -32,7 +32,7 @@ import type {
   UserFilters,
 } from '@/types';
 
-function cleanParams<T extends Record<string, unknown>>(params: T) {
+function cleanParams<T extends object>(params: T) {
   return Object.fromEntries(
     Object.entries(params).filter(([, value]) => (
       value !== undefined &&

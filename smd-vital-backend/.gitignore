@@ -95,8 +95,7 @@ temp/
 ehthumbs.db
 Thumbs.db
 
-# Docker
-.dockerignore
+# Docker — note: .dockerignore itself is TRACKED so the build context is reproducible
 
 # Database
 *.sqlite
