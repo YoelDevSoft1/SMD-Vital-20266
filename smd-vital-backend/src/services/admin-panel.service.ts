@@ -18,6 +18,7 @@ import {
 } from '../utils/scheduling';
 
 const prisma = prismaClient;
+const CLOSED_APPOINTMENT_STATUSES = ['COMPLETED', 'PARTIALLY_RECONCILED', 'RECONCILED'] as const;
 
 function getServiceDedupKey(service: { name: string }): string {
   return service.name
@@ -26,7 +27,7 @@ function getServiceDedupKey(service: { name: string }): string {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/^c\.\s*/, 'control ')
     .replace(/^s\.\s*/, 'suero ')
-    .replace(/\bresp\.\b/g, 'respiratoria')
+    .replace(/resp\.?/g, 'respiratoria')
     .replace(/\bde\b/g, '')
     .replace(/\s+/g, ' ')
     .trim();
@@ -96,26 +97,26 @@ export class AdminPanelService {
 
         // Appointment stats
         prisma.appointment.count({ where: { status: 'PENDING' } }),
-        prisma.appointment.count({ where: { status: 'COMPLETED' } }),
+        prisma.appointment.count({ where: { status: { in: [...CLOSED_APPOINTMENT_STATUSES] } } }),
         prisma.appointment.count({ where: { status: 'CANCELLED' } }),
 
         // User stats
         prisma.user.count({ where: { isActive: true } }),
         prisma.doctor.count({ where: { isAvailable: true } }),
 
-        // Revenue stats
-        prisma.payment.aggregate({
-          where: { status: 'COMPLETED' },
-          _sum: { amount: true }
+        // Revenue stats: facturación operativa por citas cerradas/reconciliadas.
+        prisma.appointment.aggregate({
+          where: { status: { in: [...CLOSED_APPOINTMENT_STATUSES] } },
+          _sum: { totalPrice: true }
         }),
-        prisma.payment.aggregate({
+        prisma.appointment.aggregate({
           where: {
-            status: 'COMPLETED',
+            status: { in: [...CLOSED_APPOINTMENT_STATUSES] },
             createdAt: {
               gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
             }
           },
-          _sum: { amount: true }
+          _sum: { totalPrice: true }
         }),
 
         // Average rating
@@ -218,8 +219,8 @@ export class AdminPanelService {
           totalPayments,
           activeUsers,
           verifiedDoctors,
-          totalRevenue: totalRevenue._sum.amount || 0,
-          monthlyRevenue: monthlyRevenue._sum.amount || 0,
+          totalRevenue: totalRevenue._sum.totalPrice || 0,
+          monthlyRevenue: monthlyRevenue._sum.totalPrice || 0,
           averageRating: avgRating._avg.rating || 0
         },
         appointments: {

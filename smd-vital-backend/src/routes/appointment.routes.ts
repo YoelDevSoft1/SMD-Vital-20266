@@ -161,7 +161,7 @@ function getServiceDedupKey(service: { name: string }): string {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/^c\.\s*/, 'control ')
     .replace(/^s\.\s*/, 'suero ')
-    .replace(/\bresp\.\b/g, 'respiratoria')
+    .replace(/resp\.?/g, 'respiratoria')
     .replace(/\bde\b/g, '')
     .replace(/\s+/g, ' ')
     .trim();
