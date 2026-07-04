@@ -3,18 +3,27 @@ import { useQuery } from '@tanstack/react-query';
 import {
   CreditCard,
   DollarSign,
-  TrendingUp,
-  TrendingDown,
-  Filter,
   Plus,
   Eye,
   CheckCircle,
   Clock,
   BarChart3,
-  PieChart
+  PieChart,
 } from 'lucide-react';
+
 import { Boton } from '@/components/ui/Boton';
+import { Insignia } from '@/components/ui/Insignia';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
+import { Encabezado } from '@/components/ui/Encabezado';
+import { TarjetaEstadistica } from '@/components/ui/TarjetaEstadistica';
+import { Avatar } from '@/components/ui/Avatar';
+import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
+import { Esqueleto } from '@/components/ui/Esqueleto';
 import { adminService } from '@/services/admin.service';
+import { formatearCOP, formatearFechaHora } from '@/utils/formato';
+import { obtenerMetaEstadoPago } from '@/utils/estados';
+import { cn } from '@/utils/cn';
+
 import PaymentsModal from '@/components/PaymentsModal';
 import PaymentDetailsView from '@/components/PaymentDetailsView';
 import CreatePaymentForm from '@/components/CreatePaymentForm';
@@ -23,75 +32,54 @@ import PaymentMethodsChart from '@/components/PaymentMethodsChart';
 import { useRevenueData } from '@/hooks/useRevenueData';
 
 export default function Payments() {
-  const [showModal, setShowModal] = useState(false);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [pagoSeleccionado, setPagoSeleccionado] = useState<unknown>(null);
 
-  // Fetch payments data for recent payments display
-  const { data: recentPaymentsData } = useQuery({
+  // Pagos recientes
+  const { data: pagosRecientesData, isLoading: cargandoRecientes } = useQuery({
     queryKey: ['recent-payments'],
-    queryFn: () => adminService.getPayments({ page: 1, limit: 5 })
+    queryFn: () => adminService.getPayments({ page: 1, limit: 5 }),
   });
 
-  // Fetch all payments data for statistics
-  const { data: allPaymentsData, isLoading: allPaymentsLoading } = useQuery({
+  // Todos los pagos (para estadísticas)
+  const { data: todosPagosData, isLoading: cargandoTodos } = useQuery({
     queryKey: ['all-payments-stats'],
-    queryFn: () => adminService.getPayments({ page: 1, limit: 1000 })
+    queryFn: () => adminService.getPayments({ page: 1, limit: 1000 }),
   });
 
-  // Fetch dashboard data
-  const { data: dashboardData } = useQuery({
+  // Stats del dashboard (para ingresos)
+  const { data: datosDashboard } = useQuery({
     queryKey: ['dashboard-stats'],
-    queryFn: () => adminService.getDashboard()
+    queryFn: () => adminService.getDashboard(),
   });
 
-  // Fetch revenue data for chart
-  const { data: analyticsData, isLoading: revenueLoading } = useRevenueData();
+  // Datos de revenue para gráfico
+  const { data: datosAnalytics, isLoading: cargandoIngresos } = useRevenueData();
 
-  const handleViewAll = () => {
-    setShowModal(true);
-  };
+  // Cálculos
+  const todosPagos: any[] = todosPagosData?.data?.data?.data ?? [];
+  const totalPagos = todosPagosData?.data?.data?.pagination?.total ?? todosPagos.length;
+  const completados = todosPagos.filter((p) => p.status === 'COMPLETED').length;
+  const pendientes = todosPagos.filter((p) => p.status === 'PENDING').length;
 
-  const handleCreateNew = () => {
-    setShowCreateForm(true);
-  };
+  // Ingresos: del dashboard si está, si no calculado de pagos completados
+  const ingresosCalculados = todosPagos
+    .filter((p) => p.status === 'COMPLETED')
+    .reduce((sum, p) => sum + (p.amount ?? 0), 0);
+  const ingresosTotales = datosDashboard?.data?.data?.overview?.totalRevenue ?? ingresosCalculados;
 
-  const handleViewDetails = (payment: any) => {
-    setSelectedPayment(payment);
-  };
-
-  // Calculate payment statistics from all payments
-  const allPayments = allPaymentsData?.data?.data?.data || [];
-  const totalPayments = allPaymentsData?.data?.data?.pagination?.total || 0;
-  const completedPayments = allPayments.filter(p => p.status === 'COMPLETED').length || 0;
-  const pendingPayments = allPayments.filter(p => p.status === 'PENDING').length || 0;
-  const failedPayments = allPayments.filter(p => p.status === 'FAILED').length || 0;
-  
-  // Calculate total revenue from completed payments as fallback
-  const calculatedRevenue = allPayments
-    .filter(p => p.status === 'COMPLETED')
-    .reduce((sum, p) => sum + (p.amount || 0), 0);
-  
-  const totalRevenue = dashboardData?.data?.data?.overview?.totalRevenue || calculatedRevenue;
-
-  // Process payment methods data for chart
-  const processPaymentMethodsData = () => {
-    if (!allPayments || allPayments.length === 0) {
-      return undefined; // Will use default data in component
-    }
-
-    // Count payments by method
-    const methodCounts = allPayments.reduce((acc: any, payment: any) => {
-      const method = payment.method || 'Otro';
-      acc[method] = (acc[method] || 0) + 1;
+  // Datos del gráfico de métodos de pago
+  const datosMetodosPago = (() => {
+    if (!todosPagos.length) return undefined;
+    const methodCounts = todosPagos.reduce<Record<string, number>>((acc, p) => {
+      const metodo = p.method ?? 'OTRO';
+      acc[metodo] = (acc[metodo] ?? 0) + 1;
       return acc;
     }, {});
-
-    // Convert to chart data format
-    const labels = Object.keys(methodCounts);
-    const data = Object.values(methodCounts) as number[];
-    
-    const colors = [
+    const etiquetas = Object.keys(methodCounts);
+    const data = Object.values(methodCounts);
+    const colores = [
       'rgba(59, 130, 246, 0.8)',
       'rgba(34, 197, 94, 0.8)',
       'rgba(168, 85, 247, 0.8)',
@@ -99,8 +87,7 @@ export default function Payments() {
       'rgba(239, 68, 68, 0.8)',
       'rgba(107, 114, 128, 0.8)',
     ];
-
-    const borderColors = [
+    const bordes = [
       'rgb(59, 130, 246)',
       'rgb(34, 197, 94)',
       'rgb(168, 85, 247)',
@@ -108,266 +95,235 @@ export default function Payments() {
       'rgb(239, 68, 68)',
       'rgb(107, 114, 128)',
     ];
-
     return {
-      labels,
+      labels: etiquetas,
       datasets: [
         {
-          label: 'Cantidad de Pagos',
+          label: 'Cantidad de pagos',
           data,
-          backgroundColor: colors.slice(0, labels.length),
-          borderColor: borderColors.slice(0, labels.length),
+          backgroundColor: colores.slice(0, etiquetas.length),
+          borderColor: bordes.slice(0, etiquetas.length),
           borderWidth: 1,
         },
       ],
     };
-  };
+  })();
 
-  const paymentMethodsData = processPaymentMethodsData();
-
-  // Recent payments for display (first 5)
-  const payments = recentPaymentsData?.data?.data?.data || [];
-
-  const stats = [
-    {
-      title: 'Total Pagos',
-      value: totalPayments,
-      icon: CreditCard,
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-100 dark:bg-blue-900/20',
-      change: '+12%',
-      changeType: 'positive'
-    },
-    {
-      title: 'Completados',
-      value: completedPayments,
-      icon: CheckCircle,
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-100 dark:bg-green-900/20',
-      change: '+8%',
-      changeType: 'positive'
-    },
-    {
-      title: 'Pendientes',
-      value: pendingPayments,
-      icon: Clock,
-      color: 'text-yellow-600 dark:text-yellow-400',
-      bgColor: 'bg-yellow-100 dark:bg-yellow-900/20',
-      change: '-3%',
-      changeType: 'negative'
-    },
-    {
-      title: 'Ingresos Totales',
-      value: new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP'
-      }).format(totalRevenue),
-      icon: DollarSign,
-      color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-100 dark:bg-purple-900/20',
-      change: '+15%',
-      changeType: 'positive'
-    }
-  ];
-
+  const pagos: any[] = pagosRecientesData?.data?.data?.data ?? [];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Gestión de Pagos</h1>
-          <p className="text-muted-foreground dark:text-muted-foreground mt-1">Administra todos los pagos del sistema</p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Boton variant="outline" onClick={handleViewAll}>
-            <Filter className="w-4 h-4" />
-            Ver Todos
-          </Boton>
-          <Boton onClick={handleCreateNew}>
-            <Plus className="w-4 h-4" />
-            Nuevo Pago
-          </Boton>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <div key={index} className="bg-white dark:bg-card rounded-lg shadow p-6 border border-border dark:border-border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">{stat.title}</p>
-                <p className="text-2xl font-bold text-foreground dark:text-foreground">{stat.value}</p>
-                <div className="flex items-center mt-2">
-                  {stat.changeType === 'positive' ? (
-                    <TrendingUp className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <TrendingDown className="w-4 h-4 text-red-500" />
-                  )}
-                  <span className={`text-sm font-medium ${
-                    stat.changeType === 'positive' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                  }`}>
-                    {stat.change}
-                  </span>
-                  <span className="text-sm text-muted-foreground dark:text-muted-foreground ml-1">vs mes anterior</span>
-                </div>
-              </div>
-              <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                <stat.icon className={`w-6 h-6 ${stat.color}`} />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Revenue Chart */}
-        <div className="bg-white dark:bg-card rounded-lg shadow p-6 border border-border dark:border-border">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground dark:text-foreground">Ingresos por Mes</h3>
-            <BarChart3 className="w-5 h-5 text-muted-foreground dark:text-muted-foreground" />
-          </div>
-          {revenueLoading ? (
-            <div className="h-64 flex items-center justify-center">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                <p className="text-muted-foreground dark:text-muted-foreground">Cargando formData de ingresos...</p>
-              </div>
-            </div>
-          ) : (
-            <RevenueChart data={(analyticsData as any)?.revenue || []} />
-          )}
-        </div>
-
-        {/* Payment Methods */}
-        <div className="bg-white dark:bg-card rounded-lg shadow p-6 border border-border dark:border-border">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground dark:text-foreground">Métodos de Pago</h3>
-            <PieChart className="w-5 h-5 text-muted-foreground dark:text-muted-foreground" />
-          </div>
-          {allPaymentsLoading ? (
-            <div className="h-64 flex items-center justify-center">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                <p className="text-muted-foreground dark:text-muted-foreground">Cargando métodos de pago...</p>
-              </div>
-            </div>
-          ) : (
-            <PaymentMethodsChart data={paymentMethodsData} />
-          )}
-        </div>
-      </div>
-
-      {/* Recent Payments */}
-      <div className="bg-white dark:bg-card rounded-lg shadow border border-border dark:border-border">
-        <div className="p-6 border-b border-border dark:border-border">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Pagos Recientes</h2>
-            <Boton variant="outline" onClick={handleViewAll}>
-              Ver todos los pagos
+      <Encabezado
+        titulo="Gestión de Pagos"
+        subtitulo="Administra todos los pagos del sistema."
+        acciones={
+          <>
+            <Boton
+              variant="outline"
+              onClick={() => setMostrarModal(true)}
+              leftIcon={<BarChart3 className="h-4 w-4" />}
+            >
+              Ver todos
             </Boton>
-          </div>
-        </div>
-        <div className="p-6">
-          {payments.length === 0 ? (
-            <div className="text-center py-12">
-              <CreditCard className="w-12 h-12 mx-auto mb-4 text-muted-foreground dark:text-muted-foreground" />
-              <h3 className="text-lg font-medium text-foreground dark:text-foreground mb-2">No hay pagos</h3>
-              <p className="text-muted-foreground dark:text-muted-foreground mb-4">No se encontraron pagos recientes.</p>
-              <Boton onClick={handleCreateNew}>
-                <Plus className="w-4 h-4" />
-                Crear Primer Pago
-              </Boton>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {payments.slice(0, 5).map((payment: any) => (
-                <div key={payment.id} className="flex items-center justify-between p-4 border border-border dark:border-border rounded-lg hover:shadow-md transition-shadow bg-white dark:bg-card">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
-                      <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground dark:text-foreground">
-                        {payment.appointment?.patient?.user?.firstName} {payment.appointment?.patient?.user?.lastName}
-                      </p>
-                      <p className="text-sm text-muted-foreground dark:text-muted-foreground">
-                        {payment.appointment?.service?.name}
-                      </p>
-                      <p className="text-sm text-muted-foreground dark:text-muted-foreground">
-                        {new Date(payment.createdAt).toLocaleDateString('es-ES', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                    </div>
+            <Boton
+              onClick={() => setMostrarFormulario(true)}
+              leftIcon={<Plus className="h-4 w-4" />}
+            >
+              Nuevo pago
+            </Boton>
+          </>
+        }
+      />
+
+      {/* Tarjetas de estadísticas */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        <TarjetaEstadistica
+          label="Total pagos"
+          value={formatearNumero(totalPagos)}
+          icon={CreditCard}
+          color="brand"
+          loading={cargandoTodos}
+        />
+        <TarjetaEstadistica
+          label="Completados"
+          value={formatearNumero(completados)}
+          icon={CheckCircle}
+          color="success"
+          loading={cargandoTodos}
+        />
+        <TarjetaEstadistica
+          label="Pendientes"
+          value={formatearNumero(pendientes)}
+          icon={Clock}
+          color="warning"
+          loading={cargandoTodos}
+        />
+        <TarjetaEstadistica
+          label="Ingresos totales"
+          value={formatearCOP(ingresosTotales)}
+          icon={DollarSign}
+          color="info"
+          loading={cargandoTodos}
+        />
+      </div>
+
+      {/* Gráficos */}
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Tarjeta>
+          <TarjetaEncabezado className="flex flex-row items-center justify-between">
+            <TarjetaTitulo className="text-base">Ingresos por mes</TarjetaTitulo>
+            <BarChart3 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          </TarjetaEncabezado>
+          <TarjetaContenido>
+            {cargandoIngresos ? (
+              <div className="h-64">
+                <Esqueleto className="h-full w-full" />
+              </div>
+            ) : (
+              <RevenueChart data={(datosAnalytics as { revenue?: unknown[] })?.revenue ?? []} />
+            )}
+          </TarjetaContenido>
+        </Tarjeta>
+
+        <Tarjeta>
+          <TarjetaEncabezado className="flex flex-row items-center justify-between">
+            <TarjetaTitulo className="text-base">Métodos de pago</TarjetaTitulo>
+            <PieChart className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          </TarjetaEncabezado>
+          <TarjetaContenido>
+            {cargandoTodos ? (
+              <div className="h-64">
+                <Esqueleto className="h-full w-full" />
+              </div>
+            ) : (
+              <PaymentMethodsChart data={datosMetodosPago} />
+            )}
+          </TarjetaContenido>
+        </Tarjeta>
+      </div>
+
+      {/* Pagos recientes */}
+      <Tarjeta>
+        <TarjetaEncabezado className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <TarjetaTitulo className="text-base">Pagos recientes</TarjetaTitulo>
+          <Boton
+            variant="outline"
+            size="sm"
+            onClick={() => setMostrarModal(true)}
+            leftIcon={<BarChart3 className="h-4 w-4" />}
+          >
+            Ver todos los pagos
+          </Boton>
+        </TarjetaEncabezado>
+        <TarjetaContenido>
+          {cargandoRecientes ? (
+            <ul className="space-y-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <li key={i} className="flex items-center gap-3 rounded-lg border border-border p-3">
+                  <Esqueleto className="h-9 w-9 flex-shrink-0 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Esqueleto className="h-4 w-1/3" />
+                    <Esqueleto className="h-3 w-1/2" />
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                      <p className="font-semibold text-foreground dark:text-foreground">
-                        {new Intl.NumberFormat('es-CO', {
-                          style: 'currency',
-                          currency: 'COP'
-                        }).format(payment.amount)}
-                      </p>
-                      <p className="text-sm text-muted-foreground dark:text-muted-foreground">{payment.method}</p>
+                  <Esqueleto className="h-5 w-16" />
+                </li>
+              ))}
+            </ul>
+          ) : pagos.length === 0 ? (
+            <EstadoVacio
+              icon={CreditCard}
+              titulo="Sin pagos registrados"
+              descripcion="Cuando se registren pagos en el sistema aparecerán aquí."
+              accion={
+                <Boton
+                  onClick={() => setMostrarFormulario(true)}
+                  leftIcon={<Plus className="h-4 w-4" />}
+                >
+                  Registrar primer pago
+                </Boton>
+              }
+            />
+          ) : (
+            <ul className="space-y-2">
+              {pagos.slice(0, 5).map((pago) => {
+                const metaEstado = obtenerMetaEstadoPago(pago.status);
+                const IconoEstado = metaEstado.icon;
+                const pacienteNombre =
+                  `${pago.appointment?.patient?.user?.firstName ?? ''} ${pago.appointment?.patient?.user?.lastName ?? ''}`.trim();
+                return (
+                  <li
+                    key={pago.id}
+                    className={cn(
+                      'flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border p-3',
+                      'motion-safe:transition-colors hover:bg-muted/50',
+                    )}
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <Avatar name={pacienteNombre} size="md" />
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-foreground">
+                          {pacienteNombre || 'Paciente'}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {pago.appointment?.service?.name ?? 'Servicio'}
+                        </p>
+                        <p className="text-xs text-muted-foreground/80">
+                          {formatearFechaHora(pago.createdAt)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        payment.status === 'COMPLETED' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' :
-                        payment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300' :
-                        payment.status === 'FAILED' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' :
-                        'bg-muted text-muted-foreground dark:bg-card dark:text-muted-foreground'
-                      }`}>
-                        {payment.status === 'COMPLETED' ? 'Completado' :
-                         payment.status === 'PENDING' ? 'Pendiente' :
-                         payment.status === 'FAILED' ? 'Fallido' :
-                         payment.status}
-                      </span>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className="text-sm font-semibold tabular-nums text-foreground">
+                          {formatearCOP(pago.amount)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{pago.method}</p>
+                      </div>
+                      <Insignia variant={metaEstado.variant} size="sm" icon={IconoEstado}>
+                        {metaEstado.etiqueta}
+                      </Insignia>
                       <Boton
                         variant="outline"
                         size="sm"
-                        onClick={() => handleViewDetails(payment)}
+                        onClick={() => setPagoSeleccionado(pago)}
+                        aria-label="Ver detalles del pago"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="h-3.5 w-3.5" />
                       </Boton>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  </li>
+                );
+              })}
+            </ul>
           )}
-        </div>
-      </div>
+        </TarjetaContenido>
+      </Tarjeta>
 
-      {/* Modals */}
+      {/* Modales */}
       <PaymentsModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        isOpen={mostrarModal}
+        onClose={() => setMostrarModal(false)}
       />
 
       <CreatePaymentForm
-        isOpen={showCreateForm}
-        onClose={() => setShowCreateForm(false)}
+        isOpen={mostrarFormulario}
+        onClose={() => setMostrarFormulario(false)}
       />
 
-      {selectedPayment && (
+      {pagoSeleccionado ? (
         <PaymentDetailsView
-          payment={selectedPayment}
-          onClose={() => {
-            setSelectedPayment(null);
-          }}
+          payment={pagoSeleccionado as Parameters<typeof PaymentDetailsView>[0]['payment']}
+          onClose={() => setPagoSeleccionado(null)}
           onEdit={() => {
-            setSelectedPayment(null);
-            setShowCreateForm(true);
+            setPagoSeleccionado(null);
+            setMostrarFormulario(true);
           }}
         />
-      )}
+      ) : null}
     </div>
   );
+}
+
+function formatearNumero(n: number): string {
+  return new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(n);
 }

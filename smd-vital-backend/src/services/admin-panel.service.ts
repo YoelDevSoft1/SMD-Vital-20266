@@ -27,7 +27,8 @@ function getServiceDedupKey(service: { name: string }): string {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/^c\.\s*/, 'control ')
     .replace(/^s\.\s*/, 'suero ')
-    .replace(/resp\.?/g, 'respiratoria')
+    .replace(/\bresp\.\s*/g, 'respiratoria ')
+    .replace(/\bresp\b/g, 'respiratoria')
     .replace(/\bde\b/g, '')
     .replace(/\s+/g, ' ')
     .trim();
@@ -104,19 +105,26 @@ export class AdminPanelService {
         prisma.user.count({ where: { isActive: true } }),
         prisma.doctor.count({ where: { isAvailable: true } }),
 
-        // Revenue stats: facturación operativa por citas cerradas/reconciliadas.
-        prisma.appointment.aggregate({
-          where: { status: { in: [...CLOSED_APPOINTMENT_STATUSES] } },
-          _sum: { totalPrice: true }
-        }),
-        prisma.appointment.aggregate({
+        // Revenue stats: ingreso neto de SMD Vital (smdVitalAmount del snapshot).
+        // NO usamos appointment.totalPrice porque ese es el monto total transaccionado,
+        // no lo que SMD se queda. La ganancia real de la plataforma es lo que sobra
+        // después de pagar al profesional y al agente.
+        prisma.marginSnapshot.aggregate({
           where: {
-            status: { in: [...CLOSED_APPOINTMENT_STATUSES] },
-            createdAt: {
-              gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+            appointment: { status: { in: [...CLOSED_APPOINTMENT_STATUSES] } }
+          },
+          _sum: { smdVitalAmount: true }
+        }),
+        prisma.marginSnapshot.aggregate({
+          where: {
+            appointment: {
+              status: { in: [...CLOSED_APPOINTMENT_STATUSES] },
+              createdAt: {
+                gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+              }
             }
           },
-          _sum: { totalPrice: true }
+          _sum: { smdVitalAmount: true }
         }),
 
         // Average rating
@@ -219,8 +227,10 @@ export class AdminPanelService {
           totalPayments,
           activeUsers,
           verifiedDoctors,
-          totalRevenue: totalRevenue._sum.totalPrice || 0,
-          monthlyRevenue: monthlyRevenue._sum.totalPrice || 0,
+          // smdVitalAmount = lo que se queda la plataforma (resto después de pagar al
+          // profesional y al agente). NO es el totalPrice, que incluye pagos a terceros.
+          totalRevenue: totalRevenue._sum.smdVitalAmount || 0,
+          monthlyRevenue: monthlyRevenue._sum.smdVitalAmount || 0,
           averageRating: avgRating._avg.rating || 0
         },
         appointments: {

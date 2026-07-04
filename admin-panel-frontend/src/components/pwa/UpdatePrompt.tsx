@@ -11,7 +11,6 @@
  */
 
 import { useEffect, useState } from 'react';
-import { registerSW } from 'virtual:pwa-register';
 import { RefreshCw, X } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -21,9 +20,11 @@ export default function UpdatePrompt() {
   const [showOfflineReady, setShowOfflineReady] = useState(false);
 
   useEffect(() => {
-    // Solo intentar registrar en producción (VITE define)
-    if (import.meta.env.PROD) {
-      const updateSW = registerSW({
+    // Solo intentar registrar en producción cuando PWA esté activada explícitamente.
+    if (import.meta.env.PROD && import.meta.env.VITE_ENABLE_PWA === 'true') {
+      const loadRegister = new Function("return import('virtual:pwa-register')");
+      loadRegister().then(({ registerSW }: typeof import('virtual:pwa-register')) => {
+        const updateSW = registerSW({
         immediate: true,
         onNeedRefresh() {
           setNeedRefresh(true);
@@ -38,8 +39,11 @@ export default function UpdatePrompt() {
         },
       });
 
-      // Exponer para debug
-      (window as any).__updateSW = updateSW;
+        // Exponer para debug
+        (window as any).__updateSW = updateSW;
+      }).catch((error) => {
+        console.warn('SW registration module unavailable:', error);
+      });
     }
   }, []);
 

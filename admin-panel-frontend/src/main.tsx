@@ -18,7 +18,27 @@ const queryClient = new QueryClient({
   },
 });
 
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
+const pwaEnabled = import.meta.env.PROD && import.meta.env.VITE_ENABLE_PWA === 'true';
+
+if ('serviceWorker' in navigator && !pwaEnabled) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.getRegistrations()
+      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+      .catch(() => undefined);
+
+    if ('caches' in window) {
+      caches.keys()
+        .then((keys) => Promise.all(
+          keys
+            .filter((key) => key.startsWith('smd-vital-') || key.includes('workbox'))
+            .map((key) => caches.delete(key))
+        ))
+        .catch(() => undefined);
+    }
+  });
+}
+
+if ('serviceWorker' in navigator && pwaEnabled) {
   let reloadingForUpdate = false;
 
   navigator.serviceWorker.addEventListener('controllerchange', () => {
