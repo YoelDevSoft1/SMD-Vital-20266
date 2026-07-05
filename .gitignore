@@ -48,6 +48,10 @@ coverage/
 junit.xml
 test-results/
 playwright-report/
+
+# ----- Smoke test scratch (contains token dumps + bcrypt hashes) -----
+.smoke/
+.cache-smoke/
 .playwright-mcp/
 
 # ----- OS files -----
