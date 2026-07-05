@@ -237,7 +237,10 @@ router.get(
           take: 200,
         }),
         prisma.patient.findMany({
-          include: {
+          select: {
+            id: true,
+            address: true,
+            city: true,
             user: {
               select: {
                 id: true,
