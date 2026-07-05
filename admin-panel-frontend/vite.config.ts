@@ -65,11 +65,13 @@ export default defineConfig({
           },
           {
             // Rutas de la app: NetworkFirst con fallback a offline.html
+            // networkTimeoutSeconds en 15s para tolerar cold start de Render free tier
+            // (el contenedor se duerme tras 15min de inactividad y tarda ~10-15s en despertar).
             urlPattern: ({ request }) => request.mode === 'navigate',
             handler: 'NetworkFirst',
             options: {
               cacheName: 'smd-vital-pages',
-              networkTimeoutSeconds: 3,
+              networkTimeoutSeconds: 15,
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24, // 1 día

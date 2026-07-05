@@ -2,7 +2,15 @@ import axios, { AxiosError } from 'axios';
 import { REFRESH_TOKEN_KEY, useAuthStore } from '@/store/auth.store';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1', // Usar variable de entorno o proxy de Vite
+  // Hard-code el backend de producción como fallback. VITE_API_URL tiene prioridad
+  // en build-time, pero si Render no lo inyecta por cualquier razón, la app
+  // sigue apuntando al backend correcto en vez de /api/v1 (que devuelve 404
+  // porque el admin panel es un static site sin server-side).
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    (typeof window !== 'undefined' && !/localhost|127\.0\.0\.1/.test(window.location.hostname)
+      ? 'https://smdvital-backend.onrender.com/api/v1'
+      : '/api/v1'),
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
