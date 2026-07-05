@@ -3,6 +3,7 @@ import {
   useEffect,
   useRef,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/utils/cn';
 
 interface GlassModalProps {
@@ -154,74 +155,87 @@ export function ModalCristal({
     }
   };
 
+  // IMPORTANT: render via createPortal al document.body para escapar del
+  // stacking context de <main> (z-10). El header (z-30 backdrop-blur stacking
+  // context) y el bottom-nav (z-30 backdrop-blur stacking context) viven como
+  // hermanos de main en el h-dvh parent; por reglas CSS, un modal anidado en
+  // main (z-10) NO puede superponerse al bottom-nav (z-30). Portalando al
+  // body, el modal queda en root y z-[60] gana como debe.
+  if (typeof document === 'undefined') return null;
+
+  const portalRoot = document.body;
+
   // `role="presentation"` on the backdrop, `role="dialog"` on the panel.
   // The inner content of `Modal` will own its own `role` attributes when
   // it composes over us, so we leave aria attrs to the panel only.
-  return (
-    <div
-      className={cn(
-        // Mobile: bottom-sheet edge-to-edge (items-end, sin padding).
-        // Desktop: modal centrado con respiro (items-center, padding 24).
-        'fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:justify-center',
-        'bg-slate-950/80 backdrop-blur-xl',
-        'dark:bg-slate-950/85',
-        'p-0 sm:px-6 sm:py-6',
-        'animate-[fadeIn_0.2s_ease-out]',
-        overlayClassName
-      )}
-      onClick={handleOverlayClick}
-      role="presentation"
-    >
+  return createPortal(
+    (
       <div
-        ref={panelRef}
-        // Make the panel focusable so we can move focus into it even when
-        // there are no focusable descendants (e.g. a static message).
-        tabIndex={-1}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={ariaLabelledBy}
-        aria-describedby={ariaDescribedBy}
         className={cn(
-          'relative flex w-full flex-col overflow-hidden outline-none',
-          // Mobile: 100dvh = fullscreen real (respeta viewport dinámico iOS).
-          // Desktop: 90vh con aire arriba/abajo para que se vea como modal.
-          'max-h-[100dvh] sm:max-h-[90vh]',
-          // Mobile: solo esquinas superiores redondeadas (bottom-sheet).
-          // Desktop: esquinas completas.
-          'rounded-t-2xl rounded-b-none sm:rounded-2xl',
-          'animate-[slideUp_0.3s_ease-out]',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950/40',
-          modalSizes[size],
-          modalVariants[variant],
-          containerClassName
+          // Mobile: bottom-sheet edge-to-edge (items-end, sin padding).
+          // Desktop: modal centrado con respiro (items-center, padding 24).
+          'fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:justify-center',
+          'bg-slate-950/80 backdrop-blur-xl',
+          'dark:bg-slate-950/85',
+          'p-0 sm:px-6 sm:py-6',
+          'animate-[fadeIn_0.2s_ease-out]',
+          overlayClassName
         )}
-        // Mobile: garantizar altura mínima para que el sheet siempre se vea como
-        // bottom-sheet y los consumidores (BottomPicker, etc.) tengan espacio
-        // suficiente para flex-layout. Sin esto, modales con poco contenido
-        // pueden colapsar a 100-150px y parecer hojas de papel.
-        style={{ minHeight: 'min(60dvh, 480px)' }}
+        onClick={handleOverlayClick}
+        role="presentation"
       >
-        {/* Animated blobs for glass variant */}
-        {withBlobs && variant === 'glass' && (
-          <div className="pointer-events-none absolute inset-0 opacity-60">
-            <div className="glass-blob absolute -left-24 top-6 h-56 w-56 rounded-full bg-cyan-400/30 blur-3xl" />
-            <div className="glass-blob glass-blob--reverse absolute right-0 bottom-0 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
-          </div>
-        )}
+        <div
+          ref={panelRef}
+          // Make the panel focusable so we can move focus into it even when
+          // there are no focusable descendants (e.g. a static message).
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
+          className={cn(
+            'relative flex w-full flex-col overflow-hidden outline-none',
+            // Mobile: 100dvh = fullscreen real (respeta viewport dinámico iOS).
+            // Desktop: 90vh con aire arriba/abajo para que se vea como modal.
+            'max-h-[100dvh] sm:max-h-[90vh]',
+            // Mobile: solo esquinas superiores redondeadas (bottom-sheet).
+            // Desktop: esquinas completas.
+            'rounded-t-2xl rounded-b-none sm:rounded-2xl',
+            'animate-[slideUp_0.3s_ease-out]',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950/40',
+            modalSizes[size],
+            modalVariants[variant],
+            containerClassName
+          )}
+          // Mobile: garantizar altura mínima para que el sheet siempre se vea como
+          // bottom-sheet y los consumidores (BottomPicker, etc.) tengan espacio
+          // suficiente para flex-layout. Sin esto, modales con poco contenido
+          // pueden colapsar a 100-150px y parecer hojas de papel.
+          style={{ minHeight: 'min(60dvh, 480px)' }}
+        >
+          {/* Animated blobs for glass variant */}
+          {withBlobs && variant === 'glass' && (
+            <div className="pointer-events-none absolute inset-0 opacity-60">
+              <div className="glass-blob absolute -left-24 top-6 h-56 w-56 rounded-full bg-cyan-400/30 blur-3xl" />
+              <div className="glass-blob glass-blob--reverse absolute right-0 bottom-0 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
+            </div>
+          )}
 
-        {/* Gradient overlay for elevated variant */}
-        {variant === 'elevated' && (
-          <div className="pointer-events-none absolute inset-0 opacity-30">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-white/20 dark:from-white/10 dark:via-transparent dark:to-white/5" />
-          </div>
-        )}
+          {/* Gradient overlay for elevated variant */}
+          {variant === 'elevated' && (
+            <div className="pointer-events-none absolute inset-0 opacity-30">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-white/20 dark:from-white/10 dark:via-transparent dark:to-white/5" />
+            </div>
+          )}
 
-        {/* Body con scroll. flex-1 para que ocupe el alto del contenedor flex-col
-            y permita header/footer sticky en los consumidores (e.g. Modal.tsx).
-            min-h-0 garantiza que el contenido flex-children (como BottomPicker) puedan
-            hacer `flex-1` correctamente y no se desborden por overflow natural. */}
-        <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
+          {/* Body con scroll. flex-1 para que ocupe el alto del contenedor flex-col
+              y permita header/footer sticky en los consumidores (e.g. Modal.tsx).
+              min-h-0 garantiza que el contenido flex-children (como BottomPicker) puedan
+              hacer `flex-1` correctamente y no se desborden por overflow natural. */}
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
+        </div>
       </div>
-    </div>
+    ),
+    portalRoot,
   );
 }

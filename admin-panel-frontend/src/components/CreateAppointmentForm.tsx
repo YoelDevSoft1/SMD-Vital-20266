@@ -1258,7 +1258,11 @@ export default function CreateAppointmentForm({
         {/* ── Footer sticky con CTA ──────────────────────────────────── */}
         <footer
           className={cn(
-            'sticky bottom-0 z-10 flex flex-col-reverse gap-2 border-t border-slate-200/70 bg-white/90 px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:flex-row sm:items-center sm:justify-between dark:border-slate-800/70 dark:bg-slate-950/90',
+            // Mobile: columna natural. DOM [Atrás, Siguiente] → Atrás arriba,
+            // Siguiente al fondo (alcance del pulgar). Antes era flex-col-reverse
+            // que ponía Atrás en el safe-area-bottom y quedaba oculto fuera de
+            // vista. Ahora ambos botones siempre visibles.
+            'sticky bottom-0 z-10 flex flex-col gap-2 border-t border-slate-200/70 bg-white/95 px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:flex-row sm:items-center sm:justify-between dark:border-slate-800/70 dark:bg-slate-950/95',
           )}
         >
           {step > 1 ? (
