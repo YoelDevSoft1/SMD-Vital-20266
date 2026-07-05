@@ -629,11 +629,91 @@ export class AdminPanelService {
 
   public async deleteUser(id: string) {
     try {
-      await prisma.user.delete({
-        where: { id }
+      // Evidencia primero (antes de cualquier mutacion) — el audit_log requiere
+      // que el user exista para referenciar actorId.
+      const existing = await prisma.user.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          isPlaceholder: true,
+          isActive: true,
+        },
       });
 
-      return { message: 'User deleted successfully' };
+      if (!existing) {
+        return { message: 'User already deleted', alreadyGone: true };
+      }
+
+      // Soft-delete para placeholder patients: si es PATIENT + isPlaceholder,
+      // marcar inactivo (isActive=false) en lugar de hard-delete. Esto evita que
+      // el cascade borre appointments y medical_records — y previene el bug
+      // "createQuickPatient recrea el placeholder porque ya no existe".
+      //
+      // Para cuentas reales (DOCTOR / NURSE / AGENT / ADMIN / SUPER_ADMIN),
+      // mantener hard-delete — son cuentas que el admin quiere borrar de verdad
+      // (dado de baja, mal registro, etc.).
+      const isPlaceholderPatient =
+        existing.role === 'PATIENT' && existing.isPlaceholder;
+
+      if (isPlaceholderPatient) {
+        await prisma.$transaction(async (tx) => {
+          await tx.user.update({
+            where: { id },
+            data: {
+              isActive: false,
+              // Conservamos email/role/isPlaceholder para que los flujos
+              // clinic-service.ensurePatientByEmail + createQuickPatient
+              // puedan REACTIVARLO en lugar de recrearlo.
+            },
+          });
+
+          await tx.auditLog.create({
+            data: {
+              actorId: id,
+              actorRole: 'PATIENT',
+              entity: 'USER',
+              entityId: id,
+              action: 'UPDATE',
+              payload: {
+                softDeleted: true,
+                reason: 'placeholder_patient_deactivation',
+              },
+            },
+          });
+        });
+
+        return {
+          message: 'Placeholder patient deactivated (preserves history)',
+          mode: 'soft',
+          userId: id,
+          email: existing.email,
+        };
+      }
+
+      // Hard delete para cuentas reales
+      await prisma.$transaction(async (tx) => {
+        await tx.user.delete({
+          where: { id },
+        });
+
+        await tx.auditLog.create({
+          data: {
+            actorId: id,
+            actorRole: existing.role as any,
+            entity: 'USER',
+            entityId: id,
+            action: 'DELETE',
+            payload: {
+              email: existing.email,
+              role: existing.role,
+            },
+          },
+        });
+      });
+
+      return { message: 'User deleted successfully', mode: 'hard' };
     } catch (error) {
       logger.error('Error deleting user:', error);
       throw error;
@@ -1794,12 +1874,51 @@ export class AdminPanelService {
     const placeholderEmail = `${data.documentId.toLowerCase().replace(/\s+/g, '')}@paciente.smdvital.temp`;
     const hashedPassword = await bcrypt.hash(data.documentId, 12);
 
-    const existingPatient = await prisma.patient.findFirst({
-      where: { user: { email: placeholderEmail } },
-      include: { user: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } } },
+    // -----------------------------------------------------------
+    // Bug fix: NO recrear al placeholder si ya existe (activo o soft-deleted).
+    //
+    // Antes: findFirst sobre Patient (sin filtro isActive), return existing.
+    // Issue: si admin habia soft-deleted al placeholder, el `deleteUser` en
+    // PATIENT+placeholder solo marca isActive=false (preserva el row). El
+    // `findFirst` aqui sigue retornando al user, perfecto. Pero si en algun
+    // momento se hard-delete el placeholder, este `findFirst` retorna null y
+    // el path `prisma.patient.create` GENERA un row nuevo con misma
+    // placeholderEmail — perdiendo la historia clinica del paciente.
+    //
+    // Solucion: si existe user con esa email (activo o no), REACTIVAR y
+    // actualizar campos. Si NO existe, crear.
+    // -----------------------------------------------------------
+    const existingUser = await prisma.user.findUnique({
+      where: { email: placeholderEmail },
+      include: { patient: { include: { user: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } } } } },
     });
-    if (existingPatient) return existingPatient;
 
+    if (existingUser && existingUser.role !== 'PATIENT') {
+      throw new Error('Email already belongs to a non-patient account');
+    }
+
+    if (existingUser && existingUser.patient) {
+      // Reactivar (o actualizar datos) del placeholder — NUNCA recrear.
+      const reactivated = await prisma.user.update({
+        where: { id: existingUser.id },
+        data: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phone: data.phone || existingUser.phone || null,
+          isActive: true,
+          isPlaceholder: true,
+          // Conservamos password (no la cambiamos en soft-delete, ya estaba
+          // hasheada con documentId).
+        },
+        include: {
+          patient: { include: { user: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } } } },
+        },
+      });
+
+      return reactivated.patient!;
+    }
+
+    // No existe — crear placeholder nuevo.
     return prisma.patient.create({
       data: {
         insuranceNumber: data.documentId,
