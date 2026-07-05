@@ -892,25 +892,50 @@ const handleSubmit = async (e: React.FormEvent) => {
               {isFetchingAvailability && <span className="text-xs text-blue-700">Cargando...</span>}
             </div>
 
-            {availability?.availability?.length ? (
-              <div className="mb-3 flex flex-wrap gap-2">
-                {availability.availability.map((block) => (
-                  <span
-                    key={block.id}
-                    className="rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-medium text-blue-800 dark:border-blue-800 dark:bg-slate-900 dark:text-blue-200"
-                  >
-                    {block.startTime} - {block.endTime}
-                  </span>
-                ))}
-              </div>
-            ) : formData.doctorId && selectedDate ? (
-              <p className="mb-3 text-xs text-amber-700 dark:text-amber-300">
-                Este medico aun no registro disponibilidad para este dia.
-              </p>
-            ) : (
+            {/* Estado: pendiente seleccionar doctor/fecha */}
+            {!formData.doctorId || !selectedDate ? (
               <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
                 Pendiente seleccionar doctor y fecha.
               </p>
+            ) : isFetchingAvailability ? (
+              <p className="mb-3 text-xs text-blue-700 dark:text-blue-300">
+                Buscando horarios disponibles...
+              </p>
+            ) : availableSlots.length === 0 ? (
+              /* Estado: sin slots. Para el admin tambien mostramos si el doctor
+                 no tiene bloques de availability ese dia (avisa al operador
+                 que registre disponibilidad). Para el agente mostramos solo
+                 "sin slots" para no exponer informacion de administracion. */
+              <div className="mb-3 space-y-1">
+                <p className="text-xs text-amber-700 dark:text-amber-300">
+                  Este medico no tiene horarios disponibles para este dia.
+                </p>
+                {!isAgent && availability?.availability?.length === 0 && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    El doctor tampoco registro bloques de disponibilidad para esta fecha.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <>
+                {/* Solo el admin ve los bloques de disponibilidad que el doctor registro.
+                    Para el agente, los slots ya vienen calculados por el backend. */}
+                {!isAgent && availability?.availability?.length ? (
+                  <div className="mb-3 flex flex-wrap gap-2">
+                    {availability.availability.map((block) => (
+                      <span
+                        key={block.id}
+                        className="rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-medium text-blue-800 dark:border-blue-800 dark:bg-slate-900 dark:text-blue-200"
+                      >
+                        {block.startTime} - {block.endTime}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                <p className="mb-3 text-xs font-medium text-blue-800 dark:text-blue-200">
+                  {availableSlots.length} slot(s) disponible(s)
+                </p>
+              </>
             )}
 
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
