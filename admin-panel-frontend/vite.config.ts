@@ -64,9 +64,15 @@ export default defineConfig({
             },
           },
           {
-            // Rutas de la app: NetworkFirst con fallback a offline.html
-            // networkTimeoutSeconds en 15s para tolerar cold start de Render free tier
-            // (el contenedor se duerme tras 15min de inactividad y tarda ~10-15s en despertar).
+            // Rutas de la app: NetworkFirst con timeout amplio para tolerar cold start
+            // de Render free tier. Si la red responde, sirve lo nuevo. Si no responde
+            // en networkTimeoutSeconds, sirve la version cacheada de index.html
+            // (precacheado al instalar el SW) en vez de offline.html.
+            //
+            // CRITICO: NO usamos navigateFallback='/offline.html' porque genera
+            // loops cuando el SW esta atrapado con una version vieja: cada reload
+            // cae en offline.html otra vez. Con fallback a index.html (precache)
+            // el reload SIEMPRE termina cargando la app, incluso si la red falla.
             urlPattern: ({ request }) => request.mode === 'navigate',
             handler: 'NetworkFirst',
             options: {
@@ -79,9 +85,11 @@ export default defineConfig({
             },
           },
         ],
-        // Página offline fallback
-        navigateFallback: '/offline.html',
-        navigateFallbackDenylist: [/^\/api\//],
+        // Página offline fallback removida a proposito. Ver el comentario
+        // arriba en la regla navigate-mode para entender por que.
+        // (?_cb= y ?update= NO se cachean — son URL de escape que queremos
+        // que siempre vayan a la red al index.html precacheado.)
+        navigateFallbackDenylist: [/^\/api\//, /\?_cb=/, /\?update=/],
       },
       // Hooks del dev: deshabilitar SW en dev para no cachear cosas raras
       devOptions: {
