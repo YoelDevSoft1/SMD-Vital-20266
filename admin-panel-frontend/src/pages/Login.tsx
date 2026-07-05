@@ -21,8 +21,8 @@ export default function Login() {
   const loginMutacion = useMutation({
     mutationFn: authService.login,
     onSuccess: (response) => {
-      const { user, accessToken } = response.data.data;
-      setAuth(user, accessToken);
+      const { user, accessToken, refreshToken } = response.data.data;
+      setAuth(user, accessToken, refreshToken);
       toast.success(`¡Bienvenido${user.firstName ? `, ${user.firstName}` : ''}!`);
       navigate(obtenerRutaInicio(user.role));
     },

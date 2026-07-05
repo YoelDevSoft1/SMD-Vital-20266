@@ -39,8 +39,8 @@ export default function Register() {
   const registroMutacion = useMutation({
     mutationFn: authService.register,
     onSuccess: (response) => {
-      const { user, accessToken } = response.data.data;
-      setAuth(user, accessToken);
+      const { user, accessToken, refreshToken } = response.data.data;
+      setAuth(user, accessToken, refreshToken);
       toast.success('Registro exitoso. Bienvenido a SMD Vital.');
       navigate(obtenerRutaInicio(user.role));
     },
