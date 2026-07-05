@@ -1006,7 +1006,7 @@ export default function DoctorAppointments() {
                     <textarea
                       value={evolutionNote}
                       onChange={(event) => setEvolutionNote(event.target.value)}
-                      className="mt-3 min-h-[90px] w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-gray-900 dark:text-foreground"
+                      className="mt-3 min-h-[90px] w-full rounded-md border border-border bg-white px-3 py-3 text-base text-foreground outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-gray-900 dark:text-foreground"
                       placeholder="Evolucion, hallazgos, decisiones clinicas o cambios durante la atencion."
                     />
                     <div className="mt-3 flex justify-end">
@@ -1080,7 +1080,7 @@ export default function DoctorAppointments() {
               </label>
               <select
                 id="appointments-status-filter"
-                className="min-h-[44px] w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-border dark:bg-card dark:text-foreground"
+                className="min-h-[44px] w-full rounded-lg border border-border bg-white px-3 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-border dark:bg-card dark:text-foreground"
                 value={filters.status}
                 onChange={(event) => handleFilterChange('status', event.target.value)}
               >
@@ -1100,7 +1100,7 @@ export default function DoctorAppointments() {
               </label>
               <select
                 id="appointments-limit-filter"
-                className="min-h-[44px] w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-border dark:bg-card dark:text-foreground"
+                className="min-h-[44px] w-full rounded-lg border border-border bg-white px-3 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-border dark:bg-card dark:text-foreground"
                 value={filters.limit}
                 onChange={(event) => handleFilterChange('limit', Number(event.target.value))}
               >
@@ -1277,7 +1277,7 @@ export default function DoctorAppointments() {
                 onChange={(event) =>
                   setFinishForm((prev) => ({ ...prev, encounterSummary: event.target.value }))
                 }
-                className="min-h-[90px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                className="min-h-[90px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Resumen de la atencion y hallazgos relevantes."
               />
             </div>
@@ -1299,7 +1299,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, history: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Historia actual"
                 />
                 <textarea
@@ -1307,7 +1307,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, diagnosis: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Diagnostico"
                 />
                 <textarea
@@ -1315,7 +1315,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, plan: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Plan de manejo"
                 />
                 <textarea
@@ -1323,7 +1323,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, observations: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Observaciones"
                 />
                 <textarea
@@ -1331,7 +1331,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, procedures: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Procedimientos"
                 />
               </div>
@@ -1359,7 +1359,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setFinishForm((prev) => ({ ...prev, recordType: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 >
                   <option value="DIAGNOSIS">Diagnostico</option>
                   <option value="PRESCRIPTION">Prescripcion</option>
@@ -1379,7 +1379,7 @@ export default function DoctorAppointments() {
                 onChange={(event) =>
                   setFinishForm((prev) => ({ ...prev, recordDescription: event.target.value }))
                 }
-                className="min-h-[100px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                className="min-h-[100px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Detalle de la historia clinica."
               />
             </div>
@@ -1393,7 +1393,7 @@ export default function DoctorAppointments() {
                 onChange={(event) =>
                   setFinishForm((prev) => ({ ...prev, doctorNotes: event.target.value }))
                 }
-                className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Indicaciones adicionales."
               />
             </div>
@@ -1458,7 +1458,7 @@ export default function DoctorAppointments() {
           </div>
 
           <div className="sticky bottom-0 z-10 -mx-6 mt-0 border-t border-border bg-background/95 px-6 py-4 backdrop-blur sm:-mx-8 sm:px-8">
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Boton variant="outline" onClick={handleCloseFinishModal} className="w-full sm:w-auto">
                 Cancelar
               </Boton>
@@ -1533,7 +1533,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, patientGender: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 >
                   <option value="">Género (opcional)</option>
                   <option value="MALE">Masculino</option>
@@ -1670,7 +1670,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, history: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Historia actual"
                 />
                 <textarea
@@ -1678,7 +1678,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, diagnosis: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Diagnostico"
                 />
                 <textarea
@@ -1686,7 +1686,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, plan: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Plan de manejo"
                 />
                 <textarea
@@ -1694,7 +1694,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, observations: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Observaciones"
                 />
                 <textarea
@@ -1702,7 +1702,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, procedures: event.target.value }))
                   }
-                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                   placeholder="Procedimientos"
                 />
               </div>
@@ -1730,7 +1730,7 @@ export default function DoctorAppointments() {
                   onChange={(event) =>
                     setEmailRecordForm((prev) => ({ ...prev, recordType: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 >
                   <option value="DIAGNOSIS">Diagnostico</option>
                   <option value="PRESCRIPTION">Prescripcion</option>
@@ -1750,7 +1750,7 @@ export default function DoctorAppointments() {
                 onChange={(event) =>
                   setEmailRecordForm((prev) => ({ ...prev, recordDescription: event.target.value }))
                 }
-                className="min-h-[100px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                className="min-h-[100px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Detalle de la historia clinica."
               />
             </div>
@@ -1764,7 +1764,7 @@ export default function DoctorAppointments() {
                 onChange={(event) =>
                   setEmailRecordForm((prev) => ({ ...prev, doctorNotes: event.target.value }))
                 }
-                className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Indicaciones adicionales."
               />
             </div>
@@ -1818,7 +1818,7 @@ export default function DoctorAppointments() {
           </div>
 
           <div className="sticky bottom-0 z-10 -mx-6 mt-0 border-t border-border bg-background/95 px-6 py-4 backdrop-blur sm:-mx-8 sm:px-8">
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Boton variant="outline" onClick={handleCloseEmailRecordModal} className="w-full sm:w-auto">
                 Cancelar
               </Boton>
@@ -1898,14 +1898,14 @@ export default function DoctorAppointments() {
               <textarea
                 value={vitalsForm.notes}
                 onChange={(event) => setVitalsForm((prev) => ({ ...prev, notes: event.target.value }))}
-                className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
+                className="min-h-[80px] w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
                 placeholder="Notas adicionales"
               />
             </div>
           </div>
 
           <div className="sticky bottom-0 z-10 -mx-6 mt-0 border-t border-border bg-background/95 px-6 py-4 backdrop-blur sm:-mx-8 sm:px-8">
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Boton variant="outline" onClick={handleCloseVitalsModal} className="w-full sm:w-auto">
                 Cancelar
               </Boton>
