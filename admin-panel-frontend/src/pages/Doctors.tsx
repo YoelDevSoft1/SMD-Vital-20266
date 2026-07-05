@@ -26,6 +26,8 @@ import { Boton } from '@/components/ui/Boton';
 import { Entrada } from '@/components/ui/Entrada';
 import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
 import { EsqueletoTabla } from '@/components/ui/Esqueleto';
+import { Seleccion } from '@/components/ui/Seleccion';
+import { Etiqueta } from '@/components/ui/Etiqueta';
 import CreateDoctorForm from '@/components/CreateDoctorForm';
 import DoctorDetailsView from '@/components/DoctorDetailsView';
 import { EditDoctorForm } from '@/components/EditDoctorForm';
@@ -344,11 +346,9 @@ export default function Doctors() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
-                  Especialidad
-                </label>
-                <select
-                  className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
+                <Etiqueta htmlFor="doctors-specialty">Especialidad</Etiqueta>
+                <Seleccion
+                  id="doctors-specialty"
                   value={filters.specialty || ''}
                   onChange={(e) => handleFilterChange('specialty', e.target.value || undefined)}
                 >
@@ -358,28 +358,24 @@ export default function Doctors() {
                       {specialty}
                     </option>
                   ))}
-                </select>
+                </Seleccion>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
-                  Disponibilidad
-                </label>
-                <select
-                  className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
+                <Etiqueta htmlFor="doctors-availability">Disponibilidad</Etiqueta>
+                <Seleccion
+                  id="doctors-availability"
                   value={filters.isAvailable === undefined ? '' : filters.isAvailable.toString()}
                   onChange={(e) => handleFilterChange('isAvailable', e.target.value === '' ? undefined : e.target.value === 'true')}
                 >
                   <option value="">Todos</option>
                   <option value="true">Disponibles</option>
                   <option value="false">No disponibles</option>
-                </select>
+                </Seleccion>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
-                  Experiencia (años)
-                </label>
-                <select
-                  className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
+                <Etiqueta htmlFor="doctors-experience">Experiencia (años)</Etiqueta>
+                <Seleccion
+                  id="doctors-experience"
                   value={filters.experience || ''}
                   onChange={(e) => handleFilterChange('experience', e.target.value ? parseInt(e.target.value) : undefined)}
                 >
@@ -389,7 +385,7 @@ export default function Doctors() {
                   <option value="5">5+ años</option>
                   <option value="10">10+ años</option>
                   <option value="15">15+ años</option>
-                </select>
+                </Seleccion>
               </div>
             </div>
           </TarjetaContenido>
@@ -726,23 +722,25 @@ export default function Doctors() {
 
       {/* Modals */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-2xl">
-            <Tarjeta className="border border-border shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4">
+          <div className="relative flex w-full max-w-2xl flex-col overflow-hidden max-h-[100dvh] sm:max-h-[90vh]">
+            <Tarjeta className="flex flex-1 flex-col overflow-hidden border border-border shadow-2xl">
               <TarjetaEncabezado>
                 <div className="flex justify-between items-center">
                   <TarjetaTitulo className="text-xl font-semibold text-foreground">
                     Crear nuevo doctor
                   </TarjetaTitulo>
                   <button
+                    type="button"
                     onClick={() => setShowCreateModal(false)}
-                    className="text-gray-400 hover:text-muted-foreground transition-colors"
+                    aria-label="Cerrar"
+                    className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <XCircle className="h-6 w-6" />
+                    <XCircle className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </div>
               </TarjetaEncabezado>
-              <TarjetaContenido>
+              <TarjetaContenido className="flex-1 overflow-y-auto">
                 <CreateDoctorForm
                   onSuccess={() => {
                     setShowCreateModal(false);
@@ -757,23 +755,25 @@ export default function Doctors() {
       )}
 
       {showDetailsModal && selectedDoctor && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-2xl">
-            <Tarjeta className="border border-border shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4">
+          <div className="relative flex w-full max-w-2xl flex-col overflow-hidden max-h-[100dvh] sm:max-h-[90vh]">
+            <Tarjeta className="flex flex-1 flex-col overflow-hidden border border-border shadow-2xl">
               <TarjetaEncabezado>
                 <div className="flex justify-between items-center">
                   <TarjetaTitulo className="text-xl font-semibold text-foreground">
                     Detalles del doctor
                   </TarjetaTitulo>
                   <button
+                    type="button"
                     onClick={() => setShowDetailsModal(false)}
-                    className="text-gray-400 hover:text-muted-foreground transition-colors"
+                    aria-label="Cerrar"
+                    className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <XCircle className="h-6 w-6" />
+                    <XCircle className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </div>
               </TarjetaEncabezado>
-              <TarjetaContenido>
+              <TarjetaContenido className="flex-1 overflow-y-auto">
                 <DoctorDetailsView doctor={selectedDoctor} />
               </TarjetaContenido>
             </Tarjeta>
@@ -782,23 +782,25 @@ export default function Doctors() {
       )}
 
       {showEditModal && selectedDoctor && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-2xl">
-            <Tarjeta className="border border-border shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4">
+          <div className="relative flex w-full max-w-2xl flex-col overflow-hidden max-h-[100dvh] sm:max-h-[90vh]">
+            <Tarjeta className="flex flex-1 flex-col overflow-hidden border border-border shadow-2xl">
               <TarjetaEncabezado>
                 <div className="flex justify-between items-center">
                   <TarjetaTitulo className="text-xl font-semibold text-foreground">
                     Editar doctor
                   </TarjetaTitulo>
                   <button
+                    type="button"
                     onClick={() => setShowEditModal(false)}
-                    className="text-gray-400 hover:text-muted-foreground transition-colors"
+                    aria-label="Cerrar"
+                    className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <XCircle className="h-6 w-6" />
+                    <XCircle className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </div>
               </TarjetaEncabezado>
-              <TarjetaContenido>
+              <TarjetaContenido className="flex-1 overflow-y-auto">
                 <EditDoctorForm
                   doctor={selectedDoctor}
                   onSuccess={() => {
@@ -814,7 +816,7 @@ export default function Doctors() {
       )}
 
       {showDeleteModal && selectedDoctor && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4">
           <div className="relative w-full max-w-md">
             <Tarjeta className="border border-red-200 shadow-2xl">
               <TarjetaContenido className="p-6">

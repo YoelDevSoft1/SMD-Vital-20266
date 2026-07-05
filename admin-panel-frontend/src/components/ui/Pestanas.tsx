@@ -137,7 +137,7 @@ export function Pestanas({
               disabled={item.disabled}
               onClick={() => !item.disabled && onValueChange(item.value)}
               className={cn(
-                'relative inline-flex h-9 flex-shrink-0 items-center gap-2 whitespace-nowrap px-3 text-sm font-medium transition-colors',
+                'relative inline-flex h-11 flex-shrink-0 items-center gap-2 whitespace-nowrap px-3 text-sm font-medium transition-colors sm:h-10',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                 variant === 'underline' && (selected
                   ? 'text-foreground'

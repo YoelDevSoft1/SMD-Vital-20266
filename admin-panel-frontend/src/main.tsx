@@ -50,12 +50,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         >
           <App />
           <Toaster
-            position="top-right"
+            position="top-center"
             toastOptions={{
               duration: 4000,
               style: {
                 background: '#111827',
                 color: '#f8fafc',
+                marginTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)',
               },
               success: {
                 duration: 3000,

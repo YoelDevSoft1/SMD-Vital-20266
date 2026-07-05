@@ -938,7 +938,7 @@ export default function DoctorAppointments() {
                         <div className="flex items-start gap-2">
                           {item.done ? <CheckCircle2 className="mt-0.5 h-4 w-4" /> : <AlertCircle className="mt-0.5 h-4 w-4" />}
                           <div>
-                            <p className="font-semibold">{item.etiqueta}</p>
+                            <p className="font-semibold">{item.label}</p>
                             <p className="mt-1 text-xs opacity-80">{item.detail}</p>
                           </div>
                         </div>

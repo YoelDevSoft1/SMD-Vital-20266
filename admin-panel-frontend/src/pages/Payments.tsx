@@ -114,9 +114,9 @@ export default function Payments() {
   return (
     <div className="space-y-6">
       <Encabezado
-        titulo="Gestión de Pagos"
-        subtitulo="Administra todos los pagos del sistema."
-        acciones={
+        title="Gestión de Pagos"
+        subtitle="Administra todos los pagos del sistema."
+        actions={
           <>
             <Boton
               variant="outline"
@@ -180,7 +180,12 @@ export default function Payments() {
                 <Esqueleto className="h-full w-full" />
               </div>
             ) : (
-              <RevenueChart data={(datosAnalytics as { revenue?: unknown[] })?.revenue ?? []} />
+              <RevenueChart
+                data={
+                  (datosAnalytics as { revenue?: { labels: string[]; datasets: { label: string; data: number[]; borderColor: string; backgroundColor: string; fill: boolean }[] } } | undefined)
+                    ?.revenue
+                }
+              />
             )}
           </TarjetaContenido>
         </Tarjeta>
@@ -232,9 +237,9 @@ export default function Payments() {
           ) : pagos.length === 0 ? (
             <EstadoVacio
               icon={CreditCard}
-              titulo="Sin pagos registrados"
-              descripcion="Cuando se registren pagos en el sistema aparecerán aquí."
-              accion={
+              title="Sin pagos registrados"
+              description="Cuando se registren pagos en el sistema aparecerán aquí."
+              action={
                 <Boton
                   onClick={() => setMostrarFormulario(true)}
                   leftIcon={<Plus className="h-4 w-4" />}

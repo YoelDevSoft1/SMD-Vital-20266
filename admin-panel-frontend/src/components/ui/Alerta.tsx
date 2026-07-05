@@ -100,7 +100,7 @@ export function Alerta({
           }}
           aria-label="Cerrar mensaje"
           className={cn(
-            'inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md',
+            'inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-md sm:h-9 sm:w-9',
             'text-foreground/60 transition-colors hover:bg-foreground/10 hover:text-foreground',
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           )}

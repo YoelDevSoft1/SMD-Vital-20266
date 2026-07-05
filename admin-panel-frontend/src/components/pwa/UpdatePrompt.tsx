@@ -60,7 +60,7 @@ export default function UpdatePrompt() {
       <div
         role="alert"
         className={cn(
-          'fixed inset-x-3 bottom-20 z-50 sm:bottom-4 sm:right-4 sm:left-auto sm:max-w-sm',
+          'fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-[60] sm:bottom-4 sm:right-4 sm:left-auto sm:max-w-sm',
           'flex items-center gap-3 rounded-2xl border border-blue-200 bg-white/95 p-4 shadow-2xl backdrop-blur-xl',
           'animate-in slide-in-from-bottom-4 fade-in duration-300',
           'dark:border-slate-700 dark:bg-slate-900/95'
@@ -102,7 +102,7 @@ export default function UpdatePrompt() {
       <div
         role="status"
         className={cn(
-          'fixed bottom-20 left-3 right-3 z-50 sm:bottom-4 sm:left-auto sm:max-w-xs',
+          'fixed bottom-[calc(env(safe-area-inset-bottom)+5rem)] left-3 right-3 z-[60] sm:bottom-4 sm:left-auto sm:max-w-xs',
           'flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 shadow-lg',
           'animate-in slide-in-from-bottom-4 fade-in duration-300',
           'dark:border-emerald-700 dark:bg-emerald-900/40'

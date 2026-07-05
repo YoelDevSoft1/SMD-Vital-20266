@@ -61,7 +61,7 @@ export function Paginacion({
   const canNext = page < totalPages;
 
   const baseBtn =
-    'inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1';
+    'inline-flex h-11 w-11 items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 sm:h-10 sm:w-10';
 
   return (
     <nav
@@ -97,7 +97,7 @@ export function Paginacion({
             <li
               key={`e-${idx}`}
               aria-hidden="true"
-              className="inline-flex h-9 w-9 items-center justify-center text-muted-foreground"
+              className="inline-flex h-11 w-11 items-center justify-center text-muted-foreground sm:h-10 sm:w-10"
             >
               <MoreHorizontal className="h-4 w-4" />
             </li>

@@ -31,7 +31,7 @@ export function DialogoConfirmacion({
       onClose={onCancel}
       size="sm"
       variant="elevated"
-      overlayClassName="z-[1400] bg-slate-950/70"
+      overlayClassName="z-[60] bg-slate-950/70"
       containerClassName="rounded-xl"
     >
       <div className="p-5">

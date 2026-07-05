@@ -116,8 +116,9 @@ export function Modal({
         onKeyDown={handleKeyDown}
         className={cn('flex h-full flex-col', className)}
       >
-        {/* Header */}
-        <header className="flex items-start justify-between gap-4 border-b border-border/60 px-5 py-4 sm:px-6">
+        {/* Header — sticky para que el título no se pierda al scrollear en mobile.
+            pb-[env(safe-area-inset-top)] cuando es bottom-sheet (en desktop pt-0). */}
+        <header className="sticky top-0 z-[1] flex items-start justify-between gap-4 border-b border-border/60 bg-inherit px-5 py-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 sm:pt-4">
           <div className="min-w-0 flex-1">
             <h2
               id={`${baseId}-title`}
@@ -140,7 +141,7 @@ export function Modal({
               onClick={onClose}
               aria-label="Cerrar"
               className={cn(
-                'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md',
+                'inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-md sm:h-10 sm:w-10',
                 'text-muted-foreground transition-colors',
                 'hover:bg-muted hover:text-foreground',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
@@ -161,11 +162,11 @@ export function Modal({
           {children}
         </div>
 
-        {/* Footer */}
+        {/* Footer — sticky con safe-area-bottom para iOS. */}
         {footer ? (
           <footer
             className={cn(
-              'flex flex-col-reverse items-stretch gap-2 border-t border-border/60 px-5 py-3 sm:flex-row sm:items-center sm:justify-end sm:px-6',
+              'sticky bottom-0 z-[1] flex flex-col-reverse items-stretch gap-2 border-t border-border/60 bg-inherit px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex-row sm:items-center sm:justify-end sm:px-6 sm:pb-3',
             )}
           >
             {Children.map(footer, (child) =>

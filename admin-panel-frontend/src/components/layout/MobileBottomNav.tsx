@@ -50,7 +50,7 @@ export default function MobileBottomNav() {
             end={rootPaths.has(ruta)}
             className={({ isActive }) =>
               cn(
-                'flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px] font-medium',
+                'relative flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px] font-medium',
                 'motion-safe:transition-colors motion-safe:duration-150',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                 isActive

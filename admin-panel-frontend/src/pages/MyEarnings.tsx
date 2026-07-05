@@ -205,7 +205,7 @@ export default function MyEarnings() {
                           {apt.service?.name ?? 'Servicio'}
                         </span>
                         <Insignia variant={status.variant} size="sm">
-                          {status.label}
+                          {status.etiqueta}
                         </Insignia>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">

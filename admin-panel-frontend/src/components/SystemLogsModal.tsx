@@ -112,8 +112,8 @@ export default function SystemLogsModal({ isOpen, onClose }: SystemLogsModalProp
   const currentLevelColor = (level: string) => levelColors[level] ?? 'bg-gray-100 text-gray-800';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-6 backdrop-blur-sm">
-      <div className="relative flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 backdrop-blur-sm sm:items-center sm:p-6">
+      <div className="relative flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden rounded-t-2xl rounded-b-none bg-white shadow-xl dark:bg-gray-800 sm:h-[90vh] sm:rounded-2xl">
         <header className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Logs del Sistema</h2>

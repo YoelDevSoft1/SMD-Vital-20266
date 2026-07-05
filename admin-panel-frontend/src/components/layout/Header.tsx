@@ -39,7 +39,7 @@ const HEADER_COPY: Record<UserRole, { badge: string; subtitle: string }> = {
 };
 
 const HEADER_BUTTON =
-  'inline-flex items-center justify-center rounded-lg border border-border bg-card/80 p-2.5 text-muted-foreground shadow-soft-sm transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:p-3 dark:bg-card/60 dark:hover:bg-muted dark:hover:text-foreground';
+  'inline-flex items-center justify-center rounded-lg border border-border bg-card/80 p-3 text-muted-foreground shadow-soft-sm transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:p-2.5 dark:bg-card/60 dark:hover:bg-muted dark:hover:text-foreground';
 
 export default function Header({ onToggleSidebar }: HeaderProps) {
   const { user, logout } = useAuthStore();
@@ -127,7 +127,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         <div className="flex items-center gap-2 rounded-lg border border-border bg-card/80 px-1.5 py-1.5 shadow-soft-sm dark:bg-card/60">
           <div
             aria-hidden="true"
-            className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-to-br from-brand-500 via-info to-role-super text-sm font-semibold text-white shadow-inner sm:h-10 sm:w-10 sm:rounded-lg"
+            className="flex h-11 w-11 items-center justify-center rounded-md bg-gradient-to-br from-brand-500 via-info to-role-super text-sm font-semibold text-white shadow-inner sm:h-10 sm:w-10 sm:rounded-lg"
           >
             {initials || <User className="h-5 w-5" />}
           </div>
@@ -141,7 +141,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
             aria-label="Cerrar sesión"
             title="Cerrar sesión"
             className={cn(
-              'inline-flex items-center justify-center rounded-md p-2',
+              'inline-flex items-center justify-center rounded-md p-2.5',
               'border border-danger/30 bg-danger-muted text-danger',
               'transition-colors hover:bg-danger hover:text-danger-foreground',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-background',

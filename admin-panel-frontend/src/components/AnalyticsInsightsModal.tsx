@@ -210,8 +210,8 @@ const AnalyticsInsightsModal = ({ isOpen, onClose }: AnalyticsInsightsModalProps
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-6 backdrop-blur-sm">
-      <div className="relative flex h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 backdrop-blur-sm sm:items-center sm:p-6">
+      <div className="relative flex h-[100dvh] w-full max-w-6xl flex-col overflow-hidden rounded-t-2xl rounded-b-none bg-white shadow-2xl sm:h-[92vh] sm:rounded-2xl">
         <header className="flex items-center justify-between border-b border-border px-6 py-4">
           <div>
             <h2 className="text-xl font-semibold text-foreground">Analíticas Avanzadas</h2>

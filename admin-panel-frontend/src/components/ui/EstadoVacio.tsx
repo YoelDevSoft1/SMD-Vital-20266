@@ -111,7 +111,7 @@ export function EstadoVacio({
                 type="button"
                 onClick={action.onClick}
                 className={cn(
-                  'inline-flex h-9 items-center justify-center rounded-md px-4',
+                  'inline-flex h-11 items-center justify-center rounded-md px-4 sm:h-10',
                   'bg-primary text-primary-foreground text-sm font-medium',
                   'hover:bg-primary/90 transition-colors',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',

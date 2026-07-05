@@ -75,13 +75,13 @@ export default function Register() {
   const validateForm = (): boolean => {
     const newErrors: ErroresFormulario = {};
 
-    if (!formData.firstName.trim()) newErrors.firstName = 'El firstName es required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'El lastName es required';
+    if (!formData.firstName.trim()) newErrors.firstName = 'El nombre es obligatorio';
+    if (!formData.lastName.trim()) newErrors.lastName = 'El apellido es obligatorio';
 
     if (!formData.email.trim()) {
-      newErrors.email = 'El email es required';
+      newErrors.email = 'El correo electrónico es obligatorio';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'El email no es válido';
+      newErrors.email = 'El correo electrónico no es válido';
     }
 
     if (!formData.password) {

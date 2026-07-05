@@ -270,7 +270,7 @@ export default function Users() {
                 <Etiqueta htmlFor="users-role">Rol</Etiqueta>
                 <select
                   id="users-role"
-                  className="h-11 w-full rounded-lg border border-input bg-card px-3 text-sm text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card"
+                  className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm dark:bg-card"
                   value={filters.role ?? ''}
                   onChange={(e) =>
                     handleFilterChange('role', e.target.value ? (e.target.value as UserRole) : undefined)
@@ -289,7 +289,7 @@ export default function Users() {
                 <Etiqueta htmlFor="users-status">Estado</Etiqueta>
                 <select
                   id="users-status"
-                  className="h-11 w-full rounded-lg border border-input bg-card px-3 text-sm text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card"
+                  className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm dark:bg-card"
                   value={filters.isActive === undefined ? '' : String(filters.isActive)}
                   onChange={(e) =>
                     handleFilterChange(
@@ -307,7 +307,7 @@ export default function Users() {
                 <Etiqueta htmlFor="users-verified">Verificación</Etiqueta>
                 <select
                   id="users-verified"
-                  className="h-11 w-full rounded-lg border border-input bg-card px-3 text-sm text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card"
+                  className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm dark:bg-card"
                   value={filters.isVerified === undefined ? '' : String(filters.isVerified)}
                   onChange={(e) =>
                     handleFilterChange(
@@ -604,11 +604,11 @@ export default function Users() {
         variant="solid"
       >
         <CreateUserForm
-          onSuccess={() => {
+          alExito={() => {
             setShowCreateModal(false);
             queryClient.invalidateQueries({ queryKey: ['users'] });
           }}
-          onCancel={() => setShowCreateModal(false)}
+          alCancelar={() => setShowCreateModal(false)}
         />
       </Modal>
 
@@ -632,11 +632,11 @@ export default function Users() {
         {selectedUser ? (
           <EditUserForm
             user={selectedUser}
-            onSuccess={() => {
+            alExito={() => {
               setShowEditModal(false);
               queryClient.invalidateQueries({ queryKey: ['users'] });
             }}
-            onCancel={() => setShowEditModal(false)}
+            alCancelar={() => setShowEditModal(false)}
           />
         ) : null}
       </Modal>

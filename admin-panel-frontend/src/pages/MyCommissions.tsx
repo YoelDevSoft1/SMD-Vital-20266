@@ -287,7 +287,7 @@ function AgentAppointmentRow({ apt }: { apt: Appointment }) {
           </span>
           <span className="text-sm text-foreground">{apt.service?.name}</span>
           <Insignia variant={status.variant} size="sm">
-            {status.label}
+            {status.etiqueta}
           </Insignia>
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">

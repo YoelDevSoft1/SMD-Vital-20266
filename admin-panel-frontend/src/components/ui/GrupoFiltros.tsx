@@ -62,7 +62,7 @@ export function GrupoFiltros<V extends string = string>({
             disabled={opt.disabled}
             onClick={() => !opt.disabled && onChange(opt.value)}
             className={cn(
-              'inline-flex h-8 flex-shrink-0 items-center gap-1.5 rounded-md px-3 text-xs font-medium',
+              'inline-flex h-11 flex-shrink-0 items-center gap-1.5 rounded-md px-3 text-sm font-medium sm:h-10 sm:text-xs',
               'whitespace-nowrap transition-colors duration-150',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               variant === 'segmented' && selected

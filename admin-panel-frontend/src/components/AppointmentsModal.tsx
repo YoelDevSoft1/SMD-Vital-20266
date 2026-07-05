@@ -162,8 +162,8 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-xl sm:p-6">
-      <div className="relative flex h-[90vh] w-full max-w-7xl flex-col overflow-hidden rounded-3xl border border-white/30 bg-white/80 shadow-[0_25px_80px_-20px_rgba(15,118,230,0.45)] backdrop-blur-2xl">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/80 p-0 backdrop-blur-xl sm:items-center sm:p-6">
+      <div className="relative flex h-[100dvh] w-full max-w-7xl flex-col overflow-hidden rounded-t-2xl rounded-b-none border border-white/30 bg-white/80 shadow-[0_25px_80px_-20px_rgba(15,118,230,0.45)] backdrop-blur-2xl sm:h-auto sm:max-h-[90vh] sm:rounded-3xl">
         <div className="pointer-events-none absolute inset-0 opacity-50">
           <div className="absolute -left-24 top-12 h-56 w-56 rounded-full bg-cyan-400/30 blur-3xl" />
           <div className="absolute right-0 bottom-0 h-72 w-72 rounded-full bg-blue-500/25 blur-3xl" />

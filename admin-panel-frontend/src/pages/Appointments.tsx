@@ -272,7 +272,7 @@ export default function Appointments() {
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{item.etiqueta}</p>
                     <p className="mt-2 text-2xl font-semibold tabular-nums text-foreground">{item.count}</p>
                   </div>
-                  <Insignia variante={item.variant} tamaño="sm" />
+                  <Insignia variant={item.variant} size="sm" />
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">{item.description}</p>
               </button>
@@ -369,7 +369,7 @@ export default function Appointments() {
                               {formatearHora(appointment.scheduledAt)} - Dr. {appointment.doctor?.user?.firstName} {appointment.doctor?.user?.lastName}
                             </p>
                           </div>
-                          <Insignia variante={obtenerMetaEstadoCita(appointment.status).variant} tamaño="sm" icon={obtenerMetaEstadoCita(appointment.status).icon}>
+                          <Insignia variant={obtenerMetaEstadoCita(appointment.status).variant} size="sm" icon={obtenerMetaEstadoCita(appointment.status).icon}>
                             {obtenerMetaEstadoCita(appointment.status).etiqueta}
                           </Insignia>
                         </div>
@@ -798,7 +798,7 @@ export default function Appointments() {
                             const meta = obtenerMetaEstadoCita(appointment.status);
                             const Icono = meta.icon;
                             return (
-                              <Insignia variante={meta.variant} tamaño="sm" icon={Icono}>
+                              <Insignia variant={meta.variant} size="sm" icon={Icono}>
                                 {meta.etiqueta}
                               </Insignia>
                             );

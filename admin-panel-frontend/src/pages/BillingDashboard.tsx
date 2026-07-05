@@ -326,6 +326,10 @@ export default function BillingDashboard() {
           queryClient.invalidateQueries({ queryKey: ['payout-batches'] });
           queryClient.invalidateQueries({ queryKey: ['acks-paid'] });
         }}
+        onError={() => {
+          queryClient.invalidateQueries({ queryKey: ['payout-batches'] });
+          queryClient.invalidateQueries({ queryKey: ['acks-paid'] });
+        }}
       />
     </div>
   );
@@ -476,7 +480,7 @@ function BatchRow({
               {batch.recipient?.firstName} {batch.recipient?.lastName}
             </p>
             <Insignia variant={statusMeta.variant} size="sm">
-              {statusMeta.label}
+              {statusMeta.etiqueta}
             </Insignia>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -540,10 +544,12 @@ function GenerateBatchModal({
   open,
   onClose,
   onSuccess,
+  onError,
 }: {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  onError?: (error: unknown) => void;
 }) {
   const monday = startOfWeek();
   const sunday = new Date(monday);
@@ -563,11 +569,13 @@ function GenerateBatchModal({
       toast.success(`${data.batchesCreated} lotes generados · ${formatearCOP(data.totalAmount)}`);
       onSuccess();
     },
-    onError: (e: unknown) =>
+    onError: (e: unknown) => {
+      onError?.(e);
       toast.error(
         (e as { response?: { data?: { message?: string } } })?.response?.data?.message ??
           'Error al generar',
-      ),
+      );
+    },
   });
 
   return (
