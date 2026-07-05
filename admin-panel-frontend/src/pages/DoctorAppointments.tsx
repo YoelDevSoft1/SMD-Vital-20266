@@ -1266,7 +1266,7 @@ export default function DoctorAppointments() {
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6">
+          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6" />
           <div className="grid gap-6">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700 dark:text-foreground">
@@ -1485,7 +1485,7 @@ export default function DoctorAppointments() {
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6">
+          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6" />
           <div className="grid gap-6">
             <div className="rounded-2xl border border-border bg-muted p-4 dark:border-border dark:bg-card/60">
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
@@ -1845,7 +1845,7 @@ export default function DoctorAppointments() {
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6">
+          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6" />
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <Entrada
