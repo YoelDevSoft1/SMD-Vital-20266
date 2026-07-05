@@ -736,15 +736,15 @@ export default function DoctorAppointments() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Citas asignadas</h1>
-          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold text-foreground dark:text-foreground sm:text-3xl">Citas asignadas</h1>
+          <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
             Gestiona tus citas y finaliza historias clinicas.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
           {(user?.role === 'DOCTOR' || user?.role === 'NURSE') && (
-            <Boton onClick={handleOpenEmailRecordModal}>
+            <Boton onClick={handleOpenEmailRecordModal} className="w-full justify-center sm:w-auto">
               <MailPlus className="h-4 w-4" />
               Historia por email
             </Boton>
@@ -753,7 +753,7 @@ export default function DoctorAppointments() {
             variant="outline"
             onClick={() => refetch()}
             isLoading={isFetching}
-            className="dark:text-foreground dark:border-border dark:hover:bg-muted"
+            className="w-full justify-center dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
           >
             <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
             Actualizar
@@ -761,7 +761,7 @@ export default function DoctorAppointments() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <Tarjeta className="border border-border shadow-sm dark:border-border">
           <TarjetaContenido className="p-6">
             <div className="flex items-center justify-between">
@@ -829,9 +829,9 @@ export default function DoctorAppointments() {
 
       <Tarjeta className="border border-border shadow-sm dark:border-border">
         <TarjetaEncabezado className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-          <div>
+          <div className="min-w-0">
             <TarjetaTitulo className="flex items-center gap-2 text-lg font-semibold text-foreground dark:text-foreground">
-              <Stethoscope className="h-5 w-5 text-blue-600" />
+              <Stethoscope className="h-5 w-5 shrink-0 text-blue-600" />
               Puesto de atencion clinica
             </TarjetaTitulo>
             <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
@@ -841,7 +841,7 @@ export default function DoctorAppointments() {
           {activeAppointment && (
             <span
               className={cn(
-                'inline-flex w-fit items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold',
+                'inline-flex w-fit items-center gap-1 self-start rounded-full border px-2.5 py-1 text-xs font-semibold sm:self-auto',
                 statusColors[activeAppointment.status] || 'bg-muted text-foreground border-border'
               )}
             >
@@ -855,7 +855,7 @@ export default function DoctorAppointments() {
               No hay citas asignadas para seguimiento clinico.
             </div>
           ) : (
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px] [&>*]:min-w-0">
               <div className="space-y-4">
                 <section className="rounded-md border border-border p-4 dark:border-border">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -873,7 +873,7 @@ export default function DoctorAppointments() {
                         {activeAppointment.address}, {activeAppointment.city}
                       </p>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                       {(activeAppointment.status === 'PENDING' || activeAppointment.status === 'CONFIRMED') && (
                         <Boton
                           size="sm"
@@ -1065,7 +1065,7 @@ export default function DoctorAppointments() {
 
       <Tarjeta className="border border-border shadow-sm dark:border-border">
         <TarjetaEncabezado className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+          <div className="min-w-0">
             <TarjetaTitulo className="text-lg font-semibold text-foreground dark:text-foreground">
               Lista de citas
             </TarjetaTitulo>
@@ -1073,10 +1073,14 @@ export default function DoctorAppointments() {
               {isLoading ? 'Cargando...' : `${pagination?.total ?? appointments.length} citas registradas`}
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <div className="min-w-[200px]">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+            <div className="min-w-0 sm:min-w-[200px]">
+              <label htmlFor="appointments-status-filter" className="sr-only">
+                Filtrar por estado
+              </label>
               <select
-                className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
+                id="appointments-status-filter"
+                className="min-h-[44px] w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-border dark:bg-card dark:text-foreground"
                 value={filters.status}
                 onChange={(event) => handleFilterChange('status', event.target.value)}
               >
@@ -1090,15 +1094,19 @@ export default function DoctorAppointments() {
                 <option value="RESCHEDULED">Reprogramada</option>
               </select>
             </div>
-            <div className="min-w-[120px]">
+            <div className="min-w-0 sm:min-w-[120px]">
+              <label htmlFor="appointments-limit-filter" className="sr-only">
+                Resultados por pagina
+              </label>
               <select
-                className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
+                id="appointments-limit-filter"
+                className="min-h-[44px] w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-border dark:bg-card dark:text-foreground"
                 value={filters.limit}
                 onChange={(event) => handleFilterChange('limit', Number(event.target.value))}
               >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
+                <option value={5}>5 por pagina</option>
+                <option value={10}>10 por pagina</option>
+                <option value={20}>20 por pagina</option>
               </select>
             </div>
           </div>
@@ -1118,17 +1126,27 @@ export default function DoctorAppointments() {
                 <div
                   key={appointment.id}
                   className={cn(
-                    'flex flex-col gap-4 p-6 transition sm:flex-row sm:items-center sm:justify-between',
+                    'flex flex-col gap-3 p-4 transition sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-6',
                     activeAppointment?.id === appointment.id
                       ? 'bg-blue-50/70 dark:bg-blue-900/20'
                       : 'hover:bg-muted/70 dark:hover:bg-card/40'
                   )}
                 >
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
-                      {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName}
-                    </h3>
-                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
+                        {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName}
+                      </h3>
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium sm:hidden',
+                          statusColors[appointment.status] || 'bg-muted text-foreground border-border'
+                        )}
+                      >
+                        {statusLabels[appointment.status] || appointment.status}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
                       {appointment.service?.name || 'Servicio no definido'} ·{' '}
                       {formatearFechaHora(appointment.scheduledAt)}
                     </p>
@@ -1136,7 +1154,7 @@ export default function DoctorAppointments() {
                       {appointment.address}, {appointment.city}
                     </p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
                     <Boton
                       size="sm"
                       variant="outline"
@@ -1204,8 +1222,8 @@ export default function DoctorAppointments() {
         </TarjetaContenido>
 
         {pagination && pagination.totalPages > 1 && (
-          <div className="border-t border-border dark:border-border bg-muted dark:bg-card px-6 py-4">
-            <div className="flex items-center justify-between">
+          <div className="border-t border-border dark:border-border bg-muted dark:bg-card px-4 py-4 sm:px-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-sm text-muted-foreground dark:text-muted-foreground">
                 Pagina {pagination.page} de {pagination.totalPages}
               </div>
@@ -1215,7 +1233,7 @@ export default function DoctorAppointments() {
                   size="sm"
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={!pagination.hasPrev}
-                  className="dark:text-foreground dark:border-border dark:hover:bg-muted"
+                  className="min-h-[40px] flex-1 dark:text-foreground dark:border-border dark:hover:bg-muted sm:flex-none"
                 >
                   Anterior
                 </Boton>
@@ -1224,7 +1242,7 @@ export default function DoctorAppointments() {
                   size="sm"
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={!pagination.hasNext}
-                  className="dark:text-foreground dark:border-border dark:hover:bg-muted"
+                  className="min-h-[40px] flex-1 dark:text-foreground dark:border-border dark:hover:bg-muted sm:flex-none"
                 >
                   Siguiente
                 </Boton>
@@ -1235,22 +1253,21 @@ export default function DoctorAppointments() {
       </Tarjeta>
 
       <ModalCristal isOpen={showFinishModal} onClose={handleCloseFinishModal} size="lg">
-        <div className="p-6 sm:p-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
-                Finalizar cita
-              </h2>
-              <p className="text-sm text-slate-600 dark:text-muted-foreground">
-                Completa la historia clinica para cerrar la atencion.
-              </p>
-              <p className="mt-1 text-xs text-foreground0 dark:text-muted-foreground">
-                El borrador se guarda en este dispositivo hasta finalizar la cita.
-              </p>
-            </div>
+        <div className="flex max-h-[90vh] flex-col">
+          <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-6 py-4 backdrop-blur sm:px-8">
+            <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
+              Finalizar cita
+            </h2>
+            <p className="mt-1 text-sm text-slate-600 dark:text-muted-foreground">
+              Completa la historia clinica para cerrar la atencion.
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
+              El borrador se guarda en este dispositivo hasta finalizar la cita.
+            </p>
           </div>
 
-          <div className="mt-6 grid gap-6">
+          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6">
+          <div className="grid gap-6">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                 Resumen clinico
@@ -1440,31 +1457,36 @@ export default function DoctorAppointments() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Boton variant="outline" onClick={handleCloseFinishModal}>
-              Cancelar
-            </Boton>
-            <Boton onClick={handleFinishSubmit} isLoading={finishEncounterMutation.isPending}>
-              Guardar y finalizar
-            </Boton>
+          <div className="sticky bottom-0 z-10 -mx-6 mt-0 border-t border-border bg-background/95 px-6 py-4 backdrop-blur sm:-mx-8 sm:px-8">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Boton variant="outline" onClick={handleCloseFinishModal} className="w-full sm:w-auto">
+                Cancelar
+              </Boton>
+              <Boton
+                onClick={handleFinishSubmit}
+                isLoading={finishEncounterMutation.isPending}
+                className="w-full sm:w-auto"
+              >
+                Guardar y finalizar
+              </Boton>
+            </div>
           </div>
         </div>
       </ModalCristal>
 
       <ModalCristal isOpen={showEmailRecordModal} onClose={handleCloseEmailRecordModal} size="lg">
-        <div className="p-6 sm:p-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
-                Historia por email
-              </h2>
-              <p className="text-sm text-slate-600 dark:text-muted-foreground">
-                Crea historias clinicas para pacientes aun sin registro.
-              </p>
-            </div>
+        <div className="flex max-h-[90vh] flex-col">
+          <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-6 py-4 backdrop-blur sm:px-8">
+            <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
+              Historia por email
+            </h2>
+            <p className="mt-1 text-sm text-slate-600 dark:text-muted-foreground">
+              Crea historias clinicas para pacientes aun sin registro.
+            </p>
           </div>
 
-          <div className="mt-6 grid gap-6">
+          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6">
+          <div className="grid gap-6">
             <div className="rounded-2xl border border-border bg-muted p-4 dark:border-border dark:bg-card/60">
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                 Datos del paciente
@@ -1795,27 +1817,35 @@ export default function DoctorAppointments() {
             )}
           </div>
 
-          <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Boton variant="outline" onClick={handleCloseEmailRecordModal}>
-              Cancelar
-            </Boton>
-            <Boton onClick={handleEmailRecordSubmit} isLoading={createRecordByEmailMutation.isPending}>
-              Guardar historia
-            </Boton>
+          <div className="sticky bottom-0 z-10 -mx-6 mt-0 border-t border-border bg-background/95 px-6 py-4 backdrop-blur sm:-mx-8 sm:px-8">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Boton variant="outline" onClick={handleCloseEmailRecordModal} className="w-full sm:w-auto">
+                Cancelar
+              </Boton>
+              <Boton
+                onClick={handleEmailRecordSubmit}
+                isLoading={createRecordByEmailMutation.isPending}
+                className="w-full sm:w-auto"
+              >
+                Guardar historia
+              </Boton>
+            </div>
           </div>
         </div>
       </ModalCristal>
 
       <ModalCristal isOpen={showVitalsModal} onClose={handleCloseVitalsModal} size="md">
-        <div className="p-6 sm:p-8">
-          <div>
+        <div className="flex max-h-[90vh] flex-col">
+          <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-6 py-4 backdrop-blur sm:px-8">
             <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
               Registrar signos vitales
             </h2>
-            <p className="text-sm text-slate-600 dark:text-muted-foreground">
+            <p className="mt-1 text-sm text-slate-600 dark:text-muted-foreground">
               Registra los valores tomados durante la atencion.
             </p>
           </div>
+
+          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6">
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <Entrada
@@ -1874,13 +1904,19 @@ export default function DoctorAppointments() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Boton variant="outline" onClick={handleCloseVitalsModal}>
-              Cancelar
-            </Boton>
-            <Boton onClick={handleVitalsSubmit} isLoading={recordVitalsMutation.isPending}>
-              Guardar signos
-            </Boton>
+          <div className="sticky bottom-0 z-10 -mx-6 mt-0 border-t border-border bg-background/95 px-6 py-4 backdrop-blur sm:-mx-8 sm:px-8">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Boton variant="outline" onClick={handleCloseVitalsModal} className="w-full sm:w-auto">
+                Cancelar
+              </Boton>
+              <Boton
+                onClick={handleVitalsSubmit}
+                isLoading={recordVitalsMutation.isPending}
+                className="w-full sm:w-auto"
+              >
+                Guardar signos
+              </Boton>
+            </div>
           </div>
         </div>
       </ModalCristal>

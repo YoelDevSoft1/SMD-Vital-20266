@@ -19,7 +19,9 @@
       "Bash(grep -E \"\\\\.\\(ts|js|json\\)$\")",
       "Bash(docker compose *)",
       "Bash(npx jest *)",
-      "Bash(git config *)"
+      "Bash(git config *)",
+      "Bash(git checkout *)",
+      "Bash(npx tsc *)"
     ],
     "deny": [],
     "ask": []
