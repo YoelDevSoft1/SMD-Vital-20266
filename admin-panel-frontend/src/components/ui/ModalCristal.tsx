@@ -195,6 +195,11 @@ export function ModalCristal({
           modalVariants[variant],
           containerClassName
         )}
+        // Mobile: garantizar altura mínima para que el sheet siempre se vea como
+        // bottom-sheet y los consumidores (BottomPicker, etc.) tengan espacio
+        // suficiente para flex-layout. Sin esto, modales con poco contenido
+        // pueden colapsar a 100-150px y parecer hojas de papel.
+        style={{ minHeight: 'min(60dvh, 480px)' }}
       >
         {/* Animated blobs for glass variant */}
         {withBlobs && variant === 'glass' && (
@@ -212,8 +217,10 @@ export function ModalCristal({
         )}
 
         {/* Body con scroll. flex-1 para que ocupe el alto del contenedor flex-col
-            y permita header/footer sticky en los consumidores (e.g. Modal.tsx). */}
-        <div className="relative flex-1 overflow-y-auto">{children}</div>
+            y permita header/footer sticky en los consumidores (e.g. Modal.tsx).
+            min-h-0 garantiza que el contenido flex-children (como BottomPicker) puedan
+            hacer `flex-1` correctamente y no se desborden por overflow natural. */}
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
       </div>
     </div>
   );
