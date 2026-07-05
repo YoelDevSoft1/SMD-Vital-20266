@@ -346,7 +346,7 @@ export default function Sidebar({ open, isDesktop, onClose, collapsed, onToggleC
                   ) : (
                     <div className="my-2 h-px bg-border" aria-hidden="true" />
                   )}
-                  <ul className="space-y-1">{grupo.elementos.map(renderItem)}</ul>
+                  <ul className="space-y-1">{(grupo.elementos ?? []).map(renderItem)}</ul>
                 </div>
               ))
             : // Otros roles: lista plana

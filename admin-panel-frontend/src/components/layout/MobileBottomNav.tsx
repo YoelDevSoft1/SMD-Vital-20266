@@ -20,9 +20,10 @@ const ROOT_PATHS = new Set(['/', '/doctor', '/patient', '/agent']);
 
 export default function MobileBottomNav() {
   const { user } = useAuthStore();
-  const { elementos } = obtenerConfiguracionSidebar(user?.role);
+  const { elementos = [] } = obtenerConfiguracionSidebar(user?.role);
 
-  // Mapa ruta → elemento del sidebar (para reusar iconos/etiquetas)
+  // Mapa ruta → elemento del sidebar (para reusar iconos/etiquetas).
+  // `elementos` es undefined para roles que solo definen `grupos` (e.g. ADMIN).
   const itemsByRuta = new Map(elementos.map((e) => [e.ruta, e]));
 
   let order: string[] = PRIORIDAD_DOCTOR;
