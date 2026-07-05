@@ -851,11 +851,17 @@ export class AdminPanelController {
    * @desc    Reset user password
    * @route   PATCH /api/v1/admin-panel/users/:id/reset-password
    * @access  Private/SuperAdmin
+   *
+   * @body    { password: string } or { newPassword: string }
+   *          Aceptamos ambos nombres por retro-compat. Preferimos `password`.
    */
   public resetUserPassword = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const { password } = req.body;
+      // Aceptar `password` (canonical) o `newPassword` (intuitivo) para no
+      // romper integraciones existentes. `newPassword` se mantiene por
+      // consistencia con los endpoints de auth change/reset-password.
+      const password: unknown = req.body?.password ?? req.body?.newPassword;
 
       if (!id) {
         res.status(400).json({
