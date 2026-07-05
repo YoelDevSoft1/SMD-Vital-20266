@@ -15,6 +15,46 @@ export class AdminPanelController {
   }
 
   /**
+   * @desc    One-off: siembra disponibilidad default (L-V 8-12 + 14-18) a
+   *          todos los doctores activos que no tengan bloques para los proximos
+   *          N dias. Pensado para correr una sola vez despues del fix.
+   * @route   POST /api/v1/admin-panel/doctors/seed-default-availability
+   * @access  Private/SUPER_ADMIN|ADMIN
+   * @body    { daysAhead?: number (default 14) }
+   */
+  public seedDefaultAvailabilityForAll = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const daysAhead = Math.min(
+        Math.max(Number(req.body?.daysAhead ?? 14), 1),
+        60
+      );
+
+      const result = await this.adminService.seedDefaultAvailabilityForAllDoctors(daysAhead);
+
+      logger.info('seedDefaultAvailabilityForAllDoctors completed', result);
+
+      const response: ApiResponse = {
+        success: true,
+        message:
+          `Disponibilidad sembrada para ${result.doctorsProcessed} doctor(es), ` +
+          `${result.daysSeeded} dia(s) nuevo(s).`,
+        data: result,
+        timestamp: new Date().toISOString(),
+      };
+      res.status(200).json(response);
+    } catch (error) {
+      logger.error('Error seeding default availability:', error);
+      const response: ApiResponse = {
+        success: false,
+        message: 'Error sembrando disponibilidad default',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      };
+      res.status(500).json(response);
+    }
+  };
+
+  /**
    * @desc    Get dashboard statistics
    * @route   GET /api/v1/admin-panel/dashboard
    * @access  Private/Admin

@@ -102,6 +102,14 @@ router
   .get(adminPanelController.getDoctors)
   .post(adminPanelController.createDoctor);
 
+/**
+ * @route   POST /api/v1/admin-panel/doctors/seed-default-availability
+ * One-off: siembra disponibilidad L-V 8-12 + 14-18 a todos los doctores
+ * activos que no tengan bloques registrados para los proximos N dias.
+ */
+router
+  .post('/doctors/seed-default-availability', adminPanelController.seedDefaultAvailabilityForAll);
+
 router
   .route('/doctors/:id')
   .put(adminPanelController.updateDoctor)

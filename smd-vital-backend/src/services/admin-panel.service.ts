@@ -880,11 +880,117 @@ export class AdminPanelService {
         }
       });
 
+      // Seed default availability: L-V 8-12 and 14-18 for the next 14 days.
+      // Without this the agent dashboard shows "doctor hasn't registered
+      // availability" the moment a new doctor is created and the team has
+      // to manually open the doctor panel and add hours per day.
+      try {
+        await this.seedDefaultAvailability(doctor.id);
+      } catch (seedError) {
+        logger.warn('Doctor created but seed-default-availability failed:', seedError);
+        // No-op: the doctor exists, admin can re-trigger the seed later.
+      }
+
       return doctor;
     } catch (error) {
       logger.error('Error creating doctor:', error);
       throw error;
     }
+  }
+
+  /**
+   * Siembra disponibilidad Lun-Vie 8-12 y 14-18 para los proximos N dias.
+   * Omite dias que ya tienen bloques activos (no sobreescribe lo del doctor).
+   *
+   * Usado por createDoctor (automatico) y por el endpoint one-off
+   * POST /admin-panel/doctors/seed-default-availability (manual).
+   */
+  public async seedDefaultAvailability(
+    doctorId: string,
+    daysAhead = 14,
+    blocks: Array<{ startTime: string; endTime: string }> = [
+      { startTime: '08:00', endTime: '12:00' },
+      { startTime: '14:00', endTime: '18:00' },
+    ]
+  ): Promise<{ seededDays: number; skippedDays: number }> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let seededDays = 0;
+    let skippedDays = 0;
+
+    for (let i = 0; i < daysAhead; i++) {
+      const day = new Date(today);
+      day.setDate(today.getDate() + i);
+      const dayOfWeek = day.getDay(); // 0 = Sun, 6 = Sat
+
+      // Skip weekends (0 = Sun, 6 = Sat)
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        skippedDays++;
+        continue;
+      }
+
+      // Skip days that already have any active block
+      const existing = await prisma.doctorAvailability.findFirst({
+        where: {
+          doctorId,
+          date: day,
+          isActive: true,
+        },
+      });
+      if (existing) {
+        skippedDays++;
+        continue;
+      }
+
+      // createMany para insertar todos los bloques en una sola query
+      await prisma.doctorAvailability.createMany({
+        data: blocks.map((block) => ({
+          doctorId,
+          date: day,
+          startTime: block.startTime,
+          endTime: block.endTime,
+          isActive: true,
+          notes: 'Auto-seeded at doctor creation',
+        })),
+      });
+      seededDays++;
+    }
+
+    logger.info(
+      `seedDefaultAvailability(${doctorId}): ${seededDays} days seeded, ${skippedDays} skipped`,
+      { doctorId, seededDays, skippedDays, daysAhead }
+    );
+
+    return { seededDays, skippedDays };
+  }
+
+  /**
+   * One-off: siembra disponibilidad a todos los doctores activos que
+   * no tengan bloques para los proximos 14 dias. Pensado para correrlo
+   * una vez despues de aplicar este fix y luego "olvidarlo".
+   */
+  public async seedDefaultAvailabilityForAllDoctors(
+    daysAhead = 14
+  ): Promise<{
+    doctorsProcessed: number;
+    daysSeeded: number;
+  }> {
+    const doctors = await prisma.doctor.findMany({
+      where: { isAvailable: true },
+      select: { id: true },
+    });
+
+    let daysSeeded = 0;
+    for (const doctor of doctors) {
+      const result = await this.seedDefaultAvailability(doctor.id, daysAhead);
+      daysSeeded += result.seededDays;
+    }
+
+    return {
+      doctorsProcessed: doctors.length,
+      daysSeeded,
+    };
   }
 
   /**
