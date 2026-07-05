@@ -201,7 +201,7 @@ export default function Appointments() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold text-foreground dark:text-foreground sm:text-3xl">Gestión de citas</h1>
           <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             Administra todas las citas médicas del sistema SMD Vital
@@ -213,15 +213,15 @@ export default function Appointments() {
             onClick={() => refetch()}
             isLoading={isFetching}
             disabled={isFetching}
-            className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
+            className="min-h-[44px] w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
           >
             <RefreshCw className={cn("mr-2 h-4 w-4", isFetching && "animate-spin")} />
             Actualizar
           </Boton>
-          <Boton 
-            variant="outline" 
+          <Boton
+            variant="outline"
             onClick={() => setShowModal(true)}
-            className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
+            className="min-h-[44px] w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
           >
             <Calendar className="h-4 w-4" />
             Ver todas
@@ -231,7 +231,7 @@ export default function Appointments() {
               setSelectedAppointment(null);
               setShowCreateForm(true);
             }}
-            className="col-span-2 w-full sm:col-span-1 sm:w-auto"
+            className="col-span-2 min-h-[44px] w-full sm:col-span-1 sm:w-auto"
           >
             <CalendarPlus className="h-4 w-4" />
             Nueva cita
@@ -521,15 +521,15 @@ export default function Appointments() {
       </Tarjeta>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Tarjeta className="border border-border shadow-sm dark:border-border">
-          <TarjetaContenido className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Total citas</p>
-                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">{totalCitas}</p>
+          <TarjetaContenido className="p-3 sm:p-6">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground dark:text-muted-foreground sm:text-sm">Total citas</p>
+                <p className="mt-1 text-xl font-semibold text-foreground dark:text-foreground sm:mt-2 sm:text-2xl">{totalCitas}</p>
               </div>
-              <div className="rounded-xl bg-blue-50 dark:bg-blue-900/20 p-3">
+              <div className="shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/20 p-2.5 sm:p-3">
                 <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
@@ -537,13 +537,13 @@ export default function Appointments() {
         </Tarjeta>
 
         <Tarjeta className="border border-border shadow-sm dark:border-border">
-          <TarjetaContenido className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Pendientes</p>
-                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">{pendientes}</p>
+          <TarjetaContenido className="p-3 sm:p-6">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground dark:text-muted-foreground sm:text-sm">Pendientes</p>
+                <p className="mt-1 text-xl font-semibold text-foreground dark:text-foreground sm:mt-2 sm:text-2xl">{pendientes}</p>
               </div>
-              <div className="rounded-xl bg-amber-50 dark:bg-amber-900/20 p-3">
+              <div className="shrink-0 rounded-xl bg-amber-50 dark:bg-amber-900/20 p-2.5 sm:p-3">
                 <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
               </div>
             </div>
@@ -551,13 +551,13 @@ export default function Appointments() {
         </Tarjeta>
 
         <Tarjeta className="border border-border shadow-sm dark:border-border">
-          <TarjetaContenido className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Completadas</p>
-                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">{completadas}</p>
+          <TarjetaContenido className="p-3 sm:p-6">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground dark:text-muted-foreground sm:text-sm">Completadas</p>
+                <p className="mt-1 text-xl font-semibold text-foreground dark:text-foreground sm:mt-2 sm:text-2xl">{completadas}</p>
               </div>
-              <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 p-3">
+              <div className="shrink-0 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 p-2.5 sm:p-3">
                 <CalendarCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
@@ -565,15 +565,15 @@ export default function Appointments() {
         </Tarjeta>
 
         <Tarjeta className="border border-border shadow-sm dark:border-border">
-          <TarjetaContenido className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Tasa de éxito</p>
-                <p className="mt-2 text-2xl font-semibold text-foreground dark:text-foreground">
+          <TarjetaContenido className="p-3 sm:p-6">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground dark:text-muted-foreground sm:text-sm">Tasa de exito</p>
+                <p className="mt-1 text-xl font-semibold text-foreground dark:text-foreground sm:mt-2 sm:text-2xl">
                   {tasaExito.toFixed(1)}<span className="text-sm text-muted-foreground dark:text-muted-foreground">%</span>
                 </p>
               </div>
-              <div className="rounded-xl bg-indigo-50 dark:bg-indigo-900/20 p-3">
+              <div className="shrink-0 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 p-2.5 sm:p-3">
                 <TrendingUp className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
             </div>
@@ -707,20 +707,21 @@ export default function Appointments() {
               <EsqueletoTabla rows={8} columns={6} />
             </div>
           ) : appointments.length === 0 ? (
-            <div className="p-12 text-center">
+            <div className="flex flex-col items-center gap-3 px-4 py-10 text-center sm:p-12">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted dark:bg-card">
                 <Calendar className="h-6 w-6 text-gray-400 dark:text-muted-foreground" />
               </div>
-              <h3 className="mt-4 text-sm font-medium text-foreground dark:text-foreground">No hay citas</h3>
-              <p className="mt-2 text-sm text-muted-foreground dark:text-muted-foreground">
+              <h3 className="text-sm font-medium text-foreground dark:text-foreground">No hay citas</h3>
+              <p className="max-w-sm text-sm text-muted-foreground dark:text-muted-foreground">
                 No se encontraron citas con los filtros aplicados.
               </p>
-              <div className="mt-6">
+              <div className="mt-2 w-full max-w-xs">
                 <Boton
                   onClick={() => {
                     setSelectedAppointment(null);
                     setShowCreateForm(true);
                   }}
+                  className="w-full sm:w-auto"
                 >
                   <CalendarPlus className="h-4 w-4" />
                   Crear primera cita
@@ -740,7 +741,7 @@ export default function Appointments() {
                       type="checkbox"
                       checked={selectedAppointments.includes(appointment.id)}
                       onChange={() => handleSelectAppointment(appointment.id)}
-                      className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-border rounded cursor-pointer"
+                      className="mt-1 h-4 w-4 shrink-0 text-indigo-600 focus:ring-indigo-500 border-border rounded cursor-pointer"
                     />
 
                     {/* Icon */}
@@ -753,7 +754,7 @@ export default function Appointments() {
                     {/* Appointment Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                               {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName}
@@ -765,18 +766,18 @@ export default function Appointments() {
                           </div>
 
                           <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground dark:text-muted-foreground">
-                            <span className="inline-flex items-center gap-1">
-                              <Activity className="h-3 w-3" />
-                              {appointment.service?.name || 'Servicio no especificado'}
+                            <span className="inline-flex items-center gap-1 min-w-0">
+                              <Activity className="h-3 w-3 shrink-0" />
+                              <span className="truncate">{appointment.service?.name || 'Servicio no especificado'}</span>
                             </span>
                             <span className="inline-flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
+                              <Clock className="h-3 w-3 shrink-0" />
                               {formatearFechaHora(appointment.scheduledAt)}
                             </span>
                             {appointment.location && (
-                              <span className="inline-flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {appointment.location}
+                              <span className="inline-flex items-center gap-1 min-w-0">
+                                <MapPin className="h-3 w-3 shrink-0" />
+                                <span className="truncate">{appointment.location}</span>
                               </span>
                             )}
                           </div>
@@ -793,7 +794,7 @@ export default function Appointments() {
                         </div>
 
                         {/* Status Insignia */}
-                        <div className="flex flex-wrap gap-2 justify-end">
+                        <div className="flex shrink-0 flex-wrap items-start gap-2 sm:justify-end">
                           {(() => {
                             const meta = obtenerMetaEstadoCita(appointment.status);
                             const Icono = meta.icon;
@@ -803,28 +804,33 @@ export default function Appointments() {
                               </Insignia>
                             );
                           })()}
+                          {appointment.isUrgent && (
+                            <Insignia variant="danger" size="sm" icon={AlertCircle}>
+                              Urgente
+                            </Insignia>
+                          )}
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="mt-4 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
+                      <div className="mt-4 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
                         <Boton
-                          size="sm"
                           variant="outline"
                           onClick={() => handleViewDetails(appointment)}
-                          className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
+                          className="col-span-3 min-h-[44px] dark:text-foreground dark:border-border dark:hover:bg-muted sm:col-span-1 sm:w-auto"
                         >
-                          <Eye className="h-3.5 w-3.5" />
+                          <Eye className="h-4 w-4" />
                           Ver detalles
                         </Boton>
                         <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => setSelectedTimelineAppointment(appointment)}
-                          className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
+                          aria-label="Trazabilidad"
+                          className="min-h-[44px] min-w-[44px] justify-center dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
                         >
-                          <ListChecks className="h-3.5 w-3.5" />
-                          Trazabilidad
+                          <ListChecks className="h-4 w-4" />
+                          <span className="sr-only sm:not-sr-only sm:ml-1">Trazabilidad</span>
                         </Boton>
                         <Boton
                           size="sm"
@@ -833,19 +839,21 @@ export default function Appointments() {
                             setSelectedAppointment(appointment);
                             setShowCreateForm(true);
                           }}
-                          className="w-full dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
+                          aria-label="Editar"
+                          className="min-h-[44px] min-w-[44px] justify-center dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
                         >
-                          <Edit2 className="h-3.5 w-3.5" />
-                          Editar
+                          <Edit2 className="h-4 w-4" />
+                          <span className="sr-only sm:not-sr-only sm:ml-1">Editar</span>
                         </Boton>
                         <Boton
                           size="sm"
                           variant="outline"
                           onClick={() => handleDeleteAppointment(appointment)}
-                          className="w-full text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-border dark:hover:bg-muted sm:w-auto"
+                          aria-label="Eliminar"
+                          className="min-h-[44px] min-w-[44px] justify-center text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-border dark:hover:bg-muted sm:w-auto"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
-                          Eliminar
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only sm:not-sr-only sm:ml-1">Eliminar</span>
                         </Boton>
                       </div>
                     </div>
@@ -860,26 +868,34 @@ export default function Appointments() {
         {pagination && pagination.totalPages > 1 && (
           <div className="border-t border-border bg-muted px-4 py-4 dark:border-border dark:bg-card sm:px-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="text-sm text-muted-foreground dark:text-muted-foreground">
-                Mostrando{' '}
-                <span className="font-medium text-foreground dark:text-foreground">
-                  {((filters.page || 1) - 1) * (filters.limit || 10) + 1}
+              <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground dark:text-muted-foreground sm:justify-start">
+                <span>
+                  Mostrando{' '}
+                  <span className="font-medium text-foreground dark:text-foreground">
+                    {((filters.page || 1) - 1) * (filters.limit || 10) + 1}
+                  </span>
+                  {' '}-{' '}
+                  <span className="font-medium text-foreground dark:text-foreground">
+                    {Math.min((filters.page || 1) * (filters.limit || 10), pagination.total)}
+                  </span>
+                  {' '}de{' '}
+                  <span className="font-medium text-foreground dark:text-foreground">{pagination.total}</span>
+                  {' '}resultados
                 </span>
-                {' '}-{' '}
-                <span className="font-medium text-foreground dark:text-foreground">
-                  {Math.min((filters.page || 1) * (filters.limit || 10), pagination.total)}
+                <span
+                  className="ml-2 inline-flex min-h-[28px] items-center rounded-full border border-border bg-card px-2.5 py-1 text-xs font-semibold text-foreground dark:border-border dark:bg-background sm:hidden"
+                  aria-live="polite"
+                >
+                  Pagina {(filters.page || 1)} de {pagination.totalPages}
                 </span>
-                {' '}de{' '}
-                <span className="font-medium text-foreground dark:text-foreground">{pagination.total}</span>
-                {' '}resultados
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="-mx-4 flex flex-nowrap items-center gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
                 <Boton
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange((filters.page || 1) - 1)}
                   disabled={!pagination.hasPrev}
-                  className="dark:text-foreground dark:border-border dark:hover:bg-muted"
+                  className="min-h-[40px] shrink-0 dark:text-foreground dark:border-border dark:hover:bg-muted"
                 >
                   Anterior
                 </Boton>
@@ -901,7 +917,12 @@ export default function Appointments() {
                       variant={page === currentPage ? 'primary' : 'outline'}
                       size="sm"
                       onClick={() => handlePageChange(page)}
-                      className={page === currentPage ? '' : 'dark:text-foreground dark:border-border dark:hover:bg-muted'}
+                      className={cn(
+                        'min-h-[40px] min-w-[40px] shrink-0',
+                        page === currentPage
+                          ? ''
+                          : 'dark:text-foreground dark:border-border dark:hover:bg-muted',
+                      )}
                     >
                       {page}
                     </Boton>
@@ -912,7 +933,7 @@ export default function Appointments() {
                   size="sm"
                   onClick={() => handlePageChange((filters.page || 1) + 1)}
                   disabled={!pagination.hasNext}
-                  className="dark:text-foreground dark:border-border dark:hover:bg-muted"
+                  className="min-h-[40px] shrink-0 dark:text-foreground dark:border-border dark:hover:bg-muted"
                 >
                   Siguiente
                 </Boton>
@@ -958,7 +979,7 @@ export default function Appointments() {
       <DialogoConfirmacion
         isOpen={Boolean(appointmentToDelete)}
         title="Eliminar cita"
-        message={`Esta accion eliminara la cita de ${appointmentToDelete?.patient?.user?.firstName ?? 'este paciente'}.`}
+        message={`Esta acción eliminará la cita de ${appointmentToDelete?.patient?.user?.firstName ?? 'este paciente'}.`}
         confirmLabel="Eliminar"
         cancelLabel="Cancelar"
         isDanger

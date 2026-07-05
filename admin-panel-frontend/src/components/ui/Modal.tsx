@@ -3,7 +3,7 @@
  *
  * Adds:
  *   - title + description as proper ARIA-labelled parts
- *   - role="dialog" + aria-modal="true"
+ *   - role="dialog" + aria-modal="true" (forwarded to ModalCristal's panel)
  *   - Focus trap (Tab/Shift+Tab cycles within the dialog)
  *   - Save & restore focus (focus returns to the trigger on close)
  *   - ESC handling + scroll lock (delegated to ModalCristal)
@@ -17,9 +17,7 @@ import {
   cloneElement,
   isValidElement,
   ReactElement,
-  ReactNode,
   useCallback,
-  useEffect,
   useId,
   useRef,
 } from 'react';
@@ -62,18 +60,10 @@ export function Modal({
 }: ModalProps) {
   const baseId = useId().replace(/:/g, '');
   const dialogRef = useRef<HTMLDivElement>(null);
-  const previouslyFocused = useRef<HTMLElement | null>(null);
 
-  // Save & restore focus
-  useEffect(() => {
-    if (!open) return;
-    previouslyFocused.current = document.activeElement as HTMLElement | null;
-    return () => {
-      previouslyFocused.current?.focus?.();
-    };
-  }, [open]);
-
-  // Move focus into dialog on open + trap Tab
+  // Tab focus trap. ModalCristal already handles ESC, body scroll lock,
+  // initial focus, and restoring focus to the trigger on close — so this
+  // component only owns the keyboard navigation inside the dialog.
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'Tab') return;
     const root = dialogRef.current;
@@ -83,6 +73,7 @@ export function Modal({
     );
     if (focusables.length === 0) {
       e.preventDefault();
+      root.focus();
       return;
     }
     const first = focusables[0]!;
@@ -98,6 +89,8 @@ export function Modal({
     }
   }, []);
 
+  // The dialog div sits inside ModalCristal's panel; we use a regular ref
+  // because ModalCristal already owns focus-on-open / restore-on-close.
   return (
     <ModalCristal
       isOpen={open}
@@ -106,15 +99,17 @@ export function Modal({
       size={size}
       closeOnOverlayClick={closeOnOverlayClick}
       withBlobs={variant === 'glass'}
+      initialFocusRef={dialogRef}
+      ariaLabelledBy={`${baseId}-title`}
+      ariaDescribedBy={description ? `${baseId}-desc` : undefined}
     >
       <div
         ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={`${baseId}-title`}
-        aria-describedby={description ? `${baseId}-desc` : undefined}
+        // tabIndex={-1} lets us programmatically focus this container from
+        // ModalCristal even when it has no focusable descendants.
+        tabIndex={-1}
         onKeyDown={handleKeyDown}
-        className={cn('flex h-full flex-col', className)}
+        className={cn('flex h-full flex-col outline-none', className)}
       >
         {/* Header — sticky para que el título no se pierda al scrollear en mobile.
             pb-[env(safe-area-inset-top)] cuando es bottom-sheet (en desktop pt-0). */}

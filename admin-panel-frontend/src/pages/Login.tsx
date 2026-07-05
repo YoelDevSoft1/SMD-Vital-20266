@@ -8,13 +8,30 @@ import { Boton } from '@/components/ui/Boton';
 import { Entrada } from '@/components/ui/Entrada';
 import { Etiqueta } from '@/components/ui/Etiqueta';
 import { Insignia } from '@/components/ui/Insignia';
+import { Alerta } from '@/components/ui/Alerta';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, HeartPulse, ShieldCheck, Sparkles, Stethoscope } from 'lucide-react';
+import {
+  AlertCircle,
+  Eye,
+  EyeOff,
+  HeartPulse,
+  ShieldCheck,
+  Sparkles,
+  Stethoscope,
+} from 'lucide-react';
+
+interface ErroresLogin {
+  email?: string;
+  password?: string;
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setMostrarContrasena] = useState(false);
+  const [errores, setErrores] = useState<ErroresLogin>({});
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
 
@@ -26,16 +43,42 @@ export default function Login() {
       toast.success(`¡Bienvenido${user.firstName ? `, ${user.firstName}` : ''}!`);
       navigate(obtenerRutaInicio(user.role));
     },
-    onError: (e: unknown) =>
-      toast.error(
+    onError: (e: unknown) => {
+      const message =
         (e as { response?: { data?: { message?: string } } })?.response?.data?.message ??
-          'Credenciales inválidas',
-      ),
+        'Credenciales inválidas';
+      setErrores({ email: undefined, password: message });
+      toast.error(message);
+    },
   });
+
+  const validar = (): boolean => {
+    const nuevosErrores: ErroresLogin = {};
+    if (!email.trim()) {
+      nuevosErrores.email = 'Ingresa tu correo electrónico';
+    } else if (!EMAIL_RE.test(email.trim())) {
+      nuevosErrores.email = 'El formato del correo no es válido';
+    }
+    if (!password) {
+      nuevosErrores.password = 'Ingresa tu contraseña';
+    }
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validar()) return;
     loginMutacion.mutate({ email, password });
+  };
+
+  const handleEmailChange = (valor: string) => {
+    setEmail(valor);
+    if (errores.email) setErrores((p) => ({ ...p, email: undefined }));
+  };
+  const handlePasswordChange = (valor: string) => {
+    setPassword(valor);
+    if (errores.password) setErrores((p) => ({ ...p, password: undefined }));
   };
 
   const benefits = useMemo(
@@ -140,36 +183,61 @@ export default function Login() {
               </div>
 
               <form onSubmit={handleSubmit} className="mt-7 space-y-5" noValidate>
+                {loginMutacion.isError ? (
+                  <Alerta variant="danger" icon={AlertCircle}>
+                    {(loginMutacion.error as { response?: { data?: { message?: string } } })?.response
+                      ?.data?.message ?? 'No pudimos validar tus credenciales. Inténtalo nuevamente.'}
+                  </Alerta>
+                ) : null}
+
                 <div className="space-y-1.5">
-                  <Etiqueta htmlFor="email">Correo electrónico</Etiqueta>
+                  <Etiqueta htmlFor="email" required>
+                    Correo electrónico
+                  </Etiqueta>
                   <Entrada
                     id="email"
                     type="email"
+                    inputMode="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => handleEmailChange(e.target.value)}
                     placeholder="admin@smdvital.com"
                     autoComplete="email"
                     required
+                    error={errores.email}
+                    aria-invalid={Boolean(errores.email) || undefined}
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Etiqueta htmlFor="password">Contraseña</Etiqueta>
+                  <div className="flex items-center justify-between gap-2">
+                    <Etiqueta htmlFor="password" required>
+                      Contraseña
+                    </Etiqueta>
+                    <Link
+                      to="/recuperar-contrasena"
+                      className="text-xs font-medium text-brand-600 hover:text-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card dark:text-brand-300 dark:hover:text-brand-200"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
                   <div className="relative">
                     <Entrada
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => handlePasswordChange(e.target.value)}
                       placeholder="Ingresa tu contraseña"
                       autoComplete="current-password"
                       required
+                      error={errores.password}
+                      aria-invalid={Boolean(errores.password) || undefined}
                       className="pr-12"
                     />
                     <button
                       type="button"
                       onClick={() => setMostrarContrasena((p) => !p)}
                       aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                      aria-pressed={showPassword}
                       className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-lg text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                       {showPassword ? (
@@ -203,6 +271,7 @@ export default function Login() {
                   leftIcon={!loginMutacion.isPending ? <ShieldCheck className="h-4 w-4" /> : undefined}
                   size="lg"
                   className="w-full"
+                  disabled={loginMutacion.isPending}
                 >
                   {loginMutacion.isPending ? 'Iniciando sesión…' : 'Acceder al panel'}
                 </Boton>
