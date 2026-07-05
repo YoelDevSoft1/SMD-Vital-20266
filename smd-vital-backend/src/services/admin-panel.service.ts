@@ -599,6 +599,34 @@ export class AdminPanelService {
     }
   }
 
+  public async resetUserPassword(id: string, newPassword: string) {
+    try {
+      const bcrypt = require('bcryptjs');
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+      return await prisma.user.update({
+        where: { id },
+        data: { password: hashedPassword },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          role: true,
+          isActive: true,
+          isVerified: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      });
+    } catch (error) {
+      logger.error('Error resetting user password:', error);
+      throw error;
+    }
+  }
+
   public async deleteUser(id: string) {
     try {
       await prisma.user.delete({
@@ -1922,6 +1950,90 @@ export class AdminPanelService {
         }),
         prisma.payment.count({ where })
       ]);
+
+      if (total === 0 && (!filters.method || filters.method === 'SMD_VITAL')) {
+        const snapshotWhere: Prisma.MarginSnapshotWhereInput = {
+          appointment: {
+            status: { in: [...CLOSED_APPOINTMENT_STATUSES] }
+          }
+        };
+
+        if (filters.status && filters.status !== 'COMPLETED') {
+          return {
+            data: [],
+            pagination: {
+              page: filters.page,
+              limit: filters.limit,
+              total: 0,
+              totalPages: 0,
+              hasNext: false,
+              hasPrev: filters.page > 1
+            }
+          };
+        }
+
+        if (filters.dateFrom || filters.dateTo) {
+          snapshotWhere.frozenAt = {};
+          if (filters.dateFrom) snapshotWhere.frozenAt.gte = new Date(filters.dateFrom);
+          if (filters.dateTo) snapshotWhere.frozenAt.lte = new Date(filters.dateTo);
+        }
+
+        if (filters.search) {
+          snapshotWhere.OR = [
+            { appointment: { patient: { user: { firstName: { contains: filters.search, mode: 'insensitive' } } } } },
+            { appointment: { patient: { user: { lastName: { contains: filters.search, mode: 'insensitive' } } } } },
+            { appointment: { patient: { user: { email: { contains: filters.search, mode: 'insensitive' } } } } },
+            { appointment: { doctor: { user: { firstName: { contains: filters.search, mode: 'insensitive' } } } } },
+            { appointment: { doctor: { user: { lastName: { contains: filters.search, mode: 'insensitive' } } } } },
+            { appointment: { service: { name: { contains: filters.search, mode: 'insensitive' } } } }
+          ];
+        }
+
+        const [snapshots, snapshotTotal] = await Promise.all([
+          prisma.marginSnapshot.findMany({
+            where: snapshotWhere,
+            skip,
+            take: filters.limit,
+            orderBy: { frozenAt: 'desc' },
+            include: {
+              appointment: {
+                include: {
+                  patient: { include: { user: true } },
+                  doctor: { include: { user: true } },
+                  service: true
+                }
+              }
+            }
+          }),
+          prisma.marginSnapshot.count({ where: snapshotWhere })
+        ]);
+
+        const platformPayments = snapshots.map((snapshot) => ({
+          id: `smd-${snapshot.id}`,
+          appointmentId: snapshot.appointmentId,
+          amount: snapshot.smdVitalAmount,
+          currency: 'COP',
+          method: 'SMD_VITAL',
+          status: 'COMPLETED',
+          transactionId: `SMD-${snapshot.appointmentId.slice(-8).toUpperCase()}`,
+          description: 'Ingreso neto SMD Vital',
+          createdAt: snapshot.frozenAt,
+          updatedAt: snapshot.frozenAt,
+          appointment: snapshot.appointment
+        }));
+
+        return {
+          data: platformPayments,
+          pagination: {
+            page: filters.page,
+            limit: filters.limit,
+            total: snapshotTotal,
+            totalPages: Math.ceil(snapshotTotal / filters.limit),
+            hasNext: filters.page * filters.limit < snapshotTotal,
+            hasPrev: filters.page > 1
+          }
+        };
+      }
 
       return {
         data: payments,

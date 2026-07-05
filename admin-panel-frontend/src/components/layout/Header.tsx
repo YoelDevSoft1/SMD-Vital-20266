@@ -60,9 +60,9 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
   return (
     <header
       className={cn(
-        'relative z-20 flex h-16 shrink-0 items-center justify-between',
+        'relative z-20 flex h-[calc(4rem+env(safe-area-inset-top))] shrink-0 items-center justify-between pt-[env(safe-area-inset-top)]',
         'border-b border-border/70 bg-card/85 backdrop-blur-2xl',
-        'px-3 sm:h-20 sm:px-6 lg:px-8',
+        'px-3 sm:h-20 sm:px-6 sm:pt-0 lg:px-8',
       )}
     >
       <div className="pointer-events-none absolute inset-0">
@@ -82,11 +82,11 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         </button>
 
         <div className="flex min-w-0 flex-col">
-          <span className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-brand-600 dark:text-brand-300">
+          <span className="inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-brand-600 dark:text-brand-300 sm:text-xs sm:tracking-[0.28em]">
             <Sparkles className="hidden h-3.5 w-3.5 sm:block" aria-hidden="true" />
             {headerCopy.badge}
           </span>
-          <h2 className="truncate text-sm font-semibold text-foreground sm:text-lg">
+          <h2 className="truncate text-base font-semibold leading-tight text-foreground sm:text-lg">
             Bienvenido{user?.firstName ? `, ${user.firstName}` : ''}
           </h2>
           <p className="hidden text-xs text-muted-foreground sm:block">

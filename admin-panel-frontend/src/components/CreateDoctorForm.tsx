@@ -81,8 +81,15 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al crear doctor');
+        let errorMessage = 'Error al crear doctor';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // Si no es JSON, usar el status text
+          errorMessage = `Error ${response.status}: ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
       return response.json();

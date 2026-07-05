@@ -3,7 +3,6 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import MobileBottomNav from './MobileBottomNav';
-import PwaStatusIndicator from '@/components/PwaStatusIndicator';
 import InstallBanner from '@/components/pwa/InstallBanner';
 import UpdatePrompt from '@/components/pwa/UpdatePrompt';
 import ConnectivityIndicator from '@/components/pwa/ConnectivityIndicator';
@@ -45,10 +44,6 @@ export default function DashboardLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Header onToggleSidebar={onToggleSidebar} />
-
-        <div className="border-b border-border bg-card/80 px-3 py-2 backdrop-blur sm:hidden">
-          <PwaStatusIndicator className="w-full justify-center" />
-        </div>
 
         <main
           className={cn(

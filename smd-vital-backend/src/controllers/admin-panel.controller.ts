@@ -847,6 +847,59 @@ export class AdminPanelController {
     }
   };
 
+  /**
+   * @desc    Reset user password
+   * @route   PATCH /api/v1/admin-panel/users/:id/reset-password
+   * @access  Private/SuperAdmin
+   */
+  public resetUserPassword = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { password } = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          message: 'User ID is required',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      if (typeof password !== 'string' || password.length < 8) {
+        res.status(400).json({
+          success: false,
+          message: 'Password must be at least 8 characters',
+          timestamp: new Date().toISOString(),
+          requestId: req.id || 'unknown'
+        });
+        return;
+      }
+
+      const user = await this.adminService.resetUserPassword(id, password);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'User password reset successfully',
+        data: user,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Error resetting user password:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error resetting user password',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: req.id || 'unknown'
+      });
+    }
+  };
+
 
 
 

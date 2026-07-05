@@ -54,7 +54,7 @@ export default function ConnectivityIndicator() {
         role="status"
         aria-live="polite"
         className={cn(
-          'fixed inset-x-0 top-0 z-50 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium shadow-md transition-all',
+          'fixed inset-x-0 top-0 z-50 flex items-center justify-center gap-2 px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)] text-sm font-medium shadow-md transition-all',
           online
             ? 'bg-emerald-600 text-white'
             : 'bg-amber-500 text-white'

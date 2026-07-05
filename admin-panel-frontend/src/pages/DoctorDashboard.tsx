@@ -180,7 +180,17 @@ export default function DoctorDashboard() {
                   className="w-full sm:w-40"
                 />
                 <Boton
-                  onClick={() => availabilityMutation.mutate()}
+                  onClick={() => {
+                    // Validar que endTime sea mayor que startTime
+                    const invalidBlock = availabilityBlocks.find(
+                      (block) => block.startTime >= block.endTime
+                    );
+                    if (invalidBlock) {
+                      toast.error('La hora de fin debe ser mayor que la hora de inicio');
+                      return;
+                    }
+                    availabilityMutation.mutate();
+                  }}
                   isLoading={availabilityMutation.isPending}
                   disabled={isFetchingAvailability || availabilityMutation.isPending}
                 >

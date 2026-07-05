@@ -7,6 +7,7 @@ import {
   Edit2,
   Eye,
   Filter,
+  KeyRound,
   Mail,
   Phone,
   RefreshCw,
@@ -17,6 +18,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
+import { useAuthStore } from '@/store/auth.store';
 import { User, UserFilters, UserRole } from '@/types';
 import { Boton } from '@/components/ui/Boton';
 import { Entrada } from '@/components/ui/Entrada';
@@ -41,6 +43,7 @@ import toast from 'react-hot-toast';
 
 export default function Users() {
   const queryClient = useQueryClient();
+  const { user: currentUser } = useAuthStore();
   const [filters, setFilters] = useState<UserFilters>({
     page: 1,
     limit: 10,
@@ -55,6 +58,8 @@ export default function Users() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -100,6 +105,19 @@ export default function Users() {
     onError: () => toast.error('Error al eliminar usuario'),
   });
 
+  const resetPasswordMutation = useMutation({
+    mutationFn: ({ id, password }: { id: string; password: string }) =>
+      adminService.resetUserPassword(id, password),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success('Contraseña restablecida');
+      setShowResetPasswordModal(false);
+      setSelectedUser(null);
+      setNewPassword('');
+    },
+    onError: () => toast.error('Error al restablecer la contraseña'),
+  });
+
   const handleFilterChange = (key: keyof UserFilters, value: unknown) => {
     setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
   };
@@ -128,8 +146,24 @@ export default function Users() {
     setShowDeleteModal(true);
   };
 
+  const handleResetPassword = (user: User) => {
+    setSelectedUser(user);
+    setNewPassword('');
+    setShowResetPasswordModal(true);
+  };
+
   const confirmDelete = () => {
     if (selectedUser) deleteUserMutation.mutate(selectedUser.id);
+  };
+
+  const confirmResetPassword = () => {
+    if (!selectedUser) return;
+    if (newPassword.length < 8) {
+      toast.error('La contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+
+    resetPasswordMutation.mutate({ id: selectedUser.id, password: newPassword });
   };
 
   // Data extraction (defensive against API shape changes)
@@ -140,6 +174,7 @@ export default function Users() {
   const allUsersTotal = allUsersData?.data?.data?.pagination?.total ?? 0;
   const activeCount = allUsers.filter((u) => u.isActive).length;
   const verifiedCount = allUsers.filter((u) => u.isVerified).length;
+  const canResetPasswords = currentUser?.role === 'SUPER_ADMIN';
 
   /* ============================================================
      Error state — full-page friendly alert with retry
@@ -508,6 +543,17 @@ export default function Users() {
                               Verificar
                             </Boton>
                           ) : null}
+                          {canResetPasswords ? (
+                            <Boton
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleResetPassword(user)}
+                              isLoading={resetPasswordMutation.isPending && selectedUser?.id === user.id}
+                              leftIcon={<KeyRound className="h-3.5 w-3.5" />}
+                            >
+                              Restablecer
+                            </Boton>
+                          ) : null}
                           <Boton
                             size="sm"
                             variant="danger"
@@ -593,6 +639,62 @@ export default function Users() {
             onCancel={() => setShowEditModal(false)}
           />
         ) : null}
+      </Modal>
+
+      <Modal
+        open={showResetPasswordModal && Boolean(selectedUser)}
+        onClose={() => {
+          setShowResetPasswordModal(false);
+          setNewPassword('');
+        }}
+        title="Restablecer contraseña"
+        size="sm"
+        variant="solid"
+        footer={
+          <>
+            <Boton
+              variant="outline"
+              onClick={() => {
+                setShowResetPasswordModal(false);
+                setNewPassword('');
+              }}
+            >
+              Cancelar
+            </Boton>
+            <Boton
+              onClick={confirmResetPassword}
+              isLoading={resetPasswordMutation.isPending}
+              leftIcon={<KeyRound className="h-4 w-4" />}
+            >
+              Guardar contraseña
+            </Boton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <Alerta variant="warning" title="Cambio inmediato" icon={AlertCircle}>
+            La nueva contraseña reemplazará la actual para{' '}
+            <span className="font-semibold">
+              {selectedUser?.firstName} {selectedUser?.lastName}
+            </span>
+            . Compártela por un canal seguro.
+          </Alerta>
+
+          <div className="space-y-2">
+            <Etiqueta htmlFor="reset-password">Nueva contraseña</Etiqueta>
+            <Entrada
+              id="reset-password"
+              type="password"
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              placeholder="Mínimo 8 caracteres"
+              autoComplete="new-password"
+            />
+            <p className="text-xs text-muted-foreground">
+              Mínimo 8 caracteres. El usuario podrá cambiarla luego desde su cuenta.
+            </p>
+          </div>
+        </div>
       </Modal>
 
       <Modal

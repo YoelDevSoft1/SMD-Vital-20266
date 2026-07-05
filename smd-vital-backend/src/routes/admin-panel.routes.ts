@@ -72,6 +72,7 @@ router.patch('/users/:id/status', adminPanelController.updateUserStatus);
  * @access  Private/Admin
  */
 router.patch('/users/:id/verify', adminPanelController.verifyUser);
+router.patch('/users/:id/reset-password', requireRole(['SUPER_ADMIN']), adminPanelController.resetUserPassword);
 
 // ========================================
 // DOCTOR MANAGEMENT

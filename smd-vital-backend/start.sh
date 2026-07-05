@@ -23,7 +23,10 @@ if [ -n "$missing" ]; then
 fi
 
 echo "Running database migrations..."
-npx prisma migrate deploy
+# `prisma` CLI is not in `dependencies` (kept in devDependencies to slim the
+# production image). Invoke the binary directly from node_modules, which is
+# populated at build time by copying from the builder stage in the Dockerfile.
+node ./node_modules/prisma/build/index.js migrate deploy
 
 echo "Ensuring production seed data..."
 node dist/scripts/ensure-production-seed.js

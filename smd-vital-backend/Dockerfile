@@ -48,14 +48,27 @@ COPY prisma ./prisma/
 # Instalar solo dependencias de producción
 RUN npm ci --only=production && npm cache clean --force
 
-# Copiar artefactos construidos desde la etapa builder
+# Copiar artefactos construidos desde la etapa builder.
+# Importante: `npm ci --only=production` reinstala `@prisma/client` desde npm
+# y borra el cliente generado por `prisma generate` en el builder. Hay que
+# restaurar AMBOS: el paquete `@prisma` (cliente + CLI + engines) y `.prisma`
+# (carpeta con los binarios del cliente generado). Si solo se restaura `.prisma`,
+# cualquier script que importe `@prisma/client` falla con "Cannot find module".
+# Tambien copiamos `node_modules/prisma` (la CLI standalone, fuera del scope
+# @prisma) porque `prisma` esta en devDependencies y `start.sh` la invoca
+# directamente desde alli para `migrate deploy`.
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/prisma ./prisma
 
 # Copiar script de inicio
 COPY --chown=nodejs:nodejs start.sh ./start.sh
 RUN chmod +x start.sh
+# Defensivo: si el contexto llega con CRLF (Windows host con core.autocrlf=true),
+# busybox sh rompe con "set: illegal option -". Forzar LF antes de ejecutar.
+RUN sed -i 's/\r$//' /app/start.sh
 
 # Crear directorios necesarios
 RUN mkdir -p logs uploads && \

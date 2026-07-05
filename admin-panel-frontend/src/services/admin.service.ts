@@ -69,6 +69,9 @@ export const adminService = {
   verifyUser: (id: string) =>
     api.patch<ApiResponse<User>>(`/admin-panel/users/${id}/verify`),
 
+  resetUserPassword: (id: string, password: string) =>
+    api.patch<ApiResponse<User>>(`/admin-panel/users/${id}/reset-password`, { password }),
+
   deleteUser: (id: string) =>
     api.delete<ApiResponse<null>>(`/admin-panel/users/${id}`),
 

@@ -1,2 +1,19 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Shell scripts MUST be LF — Alpine/busybox sh chokes on CRLF ("illegal option -").
+*.sh text eol=lf
+
+# Docker / compose / CI files — must stay LF for container builds.
+Dockerfile* text eol=lf
+*.dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+docker-compose*.yaml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# JSON config files — LF keeps tooling predictable.
+*.json text eol=lf
+
+# Prisma schema — generated clients assume LF.
+*.prisma text eol=lf

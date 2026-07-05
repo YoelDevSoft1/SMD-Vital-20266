@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
-const enablePwa = process.env.VITE_ENABLE_PWA === 'true';
+const enablePwa = process.env.VITE_ENABLE_PWA !== 'false';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,8 +16,9 @@ export default defineConfig({
       injectRegister: 'auto',
       // Usar el manifest existente (con iconos maskable)
       manifest: false, // false → usa public/manifest.webmanifest
-      // Workbox strategies
       workbox: {
+        clientsClaim: true,
+        skipWaiting: true,
         // Pre-cache: app shell crítico
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
         // Tamaños máximos de caché

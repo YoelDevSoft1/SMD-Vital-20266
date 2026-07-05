@@ -21,7 +21,7 @@ export default function UpdatePrompt() {
 
   useEffect(() => {
     // Solo intentar registrar en producción cuando PWA esté activada explícitamente.
-    if (import.meta.env.PROD && import.meta.env.VITE_ENABLE_PWA === 'true') {
+    if (import.meta.env.PROD && import.meta.env.VITE_ENABLE_PWA !== 'false') {
       const loadRegister = new Function("return import('virtual:pwa-register')");
       loadRegister().then(({ registerSW }: typeof import('virtual:pwa-register')) => {
         const updateSW = registerSW({
