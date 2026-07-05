@@ -6,9 +6,22 @@ import { uploadDoctorMedia } from '../middleware/upload.middleware';
 const router = Router();
 const adminPanelController = new AdminPanelController();
 
-// Apply authentication and authorization to all routes
+// Apply authentication to all routes
 router.use(authMiddleware);
-router.use(requireRole(['ADMIN', 'SUPER_ADMIN']));
+
+// Authorization: by default only ADMIN/SUPER_ADMIN. AGENT is allowed ONLY on
+// read-only doctor routes (list + availability + route) so call-center agents
+// can schedule appointments without being able to mutate doctor records.
+// Everything else (users, appointments mutations, payments, services, reviews,
+// system, exports, etc.) stays restricted to ADMIN/SUPER_ADMIN.
+const AGENT_READONLY_PATH =
+  /^\/doctors(?:\/(?:[^\/]+\/(?:daily-availability|daily-route)))?$/;
+router.use((req, res, next) => {
+  const agentAllowed = AGENT_READONLY_PATH.test(req.path);
+  return requireRole(
+    agentAllowed ? ['AGENT', 'ADMIN', 'SUPER_ADMIN'] : ['ADMIN', 'SUPER_ADMIN'],
+  )(req, res, next);
+});
 
 // ========================================
 // DASHBOARD & ANALYTICS

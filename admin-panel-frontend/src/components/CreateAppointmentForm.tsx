@@ -747,7 +747,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => handleDateChange(e.target.value)}
-                className={errors.scheduledAt ? 'border-red-500' : ''}
+                min={new Date().toISOString().split('T')[0]}
+                placeholder="Selecciona una fecha"
+                className={`min-h-[44px] ${errors.scheduledAt ? 'border-red-500' : ''}`}
               />
               {errors.scheduledAt && <p className="text-red-500 text-sm mt-1">{errors.scheduledAt}</p>}
             </div>

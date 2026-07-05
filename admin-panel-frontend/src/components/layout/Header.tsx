@@ -98,10 +98,13 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
       <div className="relative flex shrink-0 items-center gap-2 sm:gap-3">
         <PwaStatusIndicator className="hidden sm:inline-flex" />
 
+        {/* Notificaciones y toggle de tema: solo desktop. En móvil el header
+            se llena con demasiados controles y se desborda el título "Bienvenido".
+            El avatar/logout se mantiene visible siempre. */}
         <button
           type="button"
           aria-label="Notificaciones"
-          className={cn(HEADER_BUTTON, 'relative')}
+          className={cn(HEADER_BUTTON, 'relative hidden sm:inline-flex')}
         >
           <Bell className="h-5 w-5" aria-hidden="true" />
           {/* Notifications badge — empty by default. Use a store query when available. */}
@@ -116,7 +119,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
           onClick={toggleTheme}
           aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
           aria-pressed={theme === 'dark'}
-          className={HEADER_BUTTON}
+          className={cn(HEADER_BUTTON, 'hidden sm:inline-flex')}
         >
           {theme === 'dark' ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
         </button>
