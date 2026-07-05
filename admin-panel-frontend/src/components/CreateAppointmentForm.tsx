@@ -235,8 +235,8 @@ export default function CreateAppointmentForm({ isOpen, onClose, appointment }: 
               slots: result.slots.map((slot) => ({
                 startTime: new Date(slot.start).toTimeString().slice(0, 5),
                 endTime: new Date(slot.end).toTimeString().slice(0, 5),
-                isAvailable: true,
-                reason: undefined,
+                isAvailable: slot.isAvailable ?? true,
+                reason: slot.reason,
               })),
             },
           },

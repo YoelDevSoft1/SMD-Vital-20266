@@ -22,6 +22,8 @@ import api from './api';
 export interface AvailableSlot {
   start: string;
   end: string;
+  isAvailable?: boolean;
+  reason?: string;
 }
 
 export interface AppointmentMargin {

@@ -119,8 +119,9 @@ async function findAvailableSlots(
     duration: a.duration,
   }));
 
-  const slots: { start: string; end: string }[] = [];
+  const slots: { start: string; end: string; isAvailable: boolean; reason?: string }[] = [];
   const stepMin = 30;
+  const now = new Date();
 
   for (const win of windows) {
     const [sh, sm] = win.start.split(':').map(Number) as [number, number];
@@ -142,12 +143,15 @@ async function findAvailableSlots(
         );
       });
 
-      if (!conflict && slotStart > new Date()) {
-        slots.push({
-          start: slotStart.toISOString(),
-          end: slotEnd.toISOString(),
-        });
-      }
+      if (conflict) continue;
+
+      const isPast = slotStart <= now;
+      slots.push({
+        start: slotStart.toISOString(),
+        end: slotEnd.toISOString(),
+        isAvailable: !isPast,
+        ...(isPast ? { reason: 'Horario ya paso' } : {}),
+      });
     }
   }
 
