@@ -1877,13 +1877,25 @@ export class ClinicalService {
       }
 
       let user = existingUser;
-      if (existingUser.isPlaceholder) {
+
+      // Reactivar placeholder inactivo. Antes (cuando isPlaceholder=true,
+      // isActive=false) perdiamos el path y creabamos un row nuevo con la
+      // misma email — perdiendo la historia clinica del paciente. Ahora
+      // actualizamos in-situ y devolvemos el mismo id para que las FKs
+      // (appointments, medical_records, prescriptions) sigan apuntando al
+      // mismo row.
+      const wasSoftDeleted = !existingUser.isActive;
+      if (existingUser.isPlaceholder || wasSoftDeleted) {
         const updateData: Prisma.UserUpdateInput = {};
         if (data.firstName && data.firstName !== existingUser.firstName) {
           updateData.firstName = data.firstName;
         }
         if (data.lastName && data.lastName !== existingUser.lastName) {
           updateData.lastName = data.lastName;
+        }
+        // Reactivar si estaba soft-deleted
+        if (wasSoftDeleted) {
+          updateData.isActive = true;
         }
 
         if (Object.keys(updateData).length > 0) {
@@ -1932,6 +1944,7 @@ export class ClinicalService {
       return { user, patient: user.patient, createdUser: false, createdPatient: false };
     }
 
+    // No existe — crear placeholder nuevo (flujo original, sin cambios).
     const randomPassword = randomBytes(16).toString('hex');
     const hashedPassword = await bcrypt.hash(randomPassword, config.security.bcryptRounds);
 
@@ -1950,7 +1963,7 @@ export class ClinicalService {
         firstName: data.firstName,
         lastName: data.lastName,
         role: 'PATIENT',
-        isActive: false,
+        isActive: true,
         isVerified: false,
         isPlaceholder: true,
         patient: {

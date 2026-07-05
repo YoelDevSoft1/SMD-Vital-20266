@@ -258,12 +258,13 @@ export class AdminPanelController {
         return;
       }
 
-      await this.adminService.deleteUser(id);
+      const result = await this.adminService.deleteUser(id);
 
       const response: ApiResponse = {
         success: true,
-        message: 'User deleted successfully',
-        data: null,
+        // El service decide el mensaje segun hard vs soft delete.
+        message: result.message ?? 'User deleted successfully',
+        data: result,
         timestamp: new Date().toISOString(),
         requestId: req.id || 'unknown'
       };
