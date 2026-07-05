@@ -1,0 +1,93 @@
+# Render Blueprint — SMD Vital Bogotá
+#
+# Recrea los dos servicios web que mantienen la app operativa:
+#   - smdvital-backend   → API Node/Express/Prisma en Docker
+#   - smd-vital-admin    → Admin panel React/Vite (PWA) servido estático
+#
+# NO incluye PostgreSQL ni Redis — Render free tier los borra a 90 días.
+# Usa Neon, Supabase o el Postgres de Render (plan Starter) y configúralo
+# en DATABASE_URL/REDIS_URL después de aplicar el blueprint.
+#
+# CÓMO USAR:
+#   1. Render dashboard → New → Blueprint
+#   2. Conecta el repo `YoelDevSoft1/SMD-Vital-2026` (o este fork)
+#   3. Render detecta este render.yaml y muestra los 2 servicios
+#   4. Para DATABASE_URL y REDIS_URL: sync:false → Render te pide llenarlos
+#   5. Apply → espera a que ambos servicios queden "Live"
+
+services:
+  # ----------------------------------------------------------------
+  # 1) Backend API (Node + Express + Prisma + Bull + Socket.io)
+  # ----------------------------------------------------------------
+  - type: web
+    name: smdvital-backend
+    runtime: docker
+    plan: free
+    rootDir: ./smd-vital-backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: API_VERSION
+        value: v1
+      # --- Críticos: el dashboard te los pide antes de Apply ---
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      # --- Secrets: Render los genera aleatoriamente ---
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      # --- JWT ---
+      - key: JWT_EXPIRES_IN
+        value: "24h"
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: "7d"
+      # --- CORS ---
+      - key: CORS_ORIGIN
+        value: "https://smd-vital-admin.onrender.com,https://smdvitalbogota.com"
+      - key: CORS_CREDENTIALS
+        value: "true"
+      # --- Rate limit / logging ---
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "900000"
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: "100"
+      - key: LOG_LEVEL
+        value: "info"
+      - key: LOG_FILE
+        value: logs/app.log
+      # --- Uploads / crypto ---
+      - key: MAX_FILE_SIZE
+        value: "10485760"
+      - key: UPLOAD_PATH
+        value: ./uploads
+      - key: BCRYPT_ROUNDS
+        value: "10"
+
+  # ----------------------------------------------------------------
+  # 2) Admin Panel (React + Vite + PWA)
+  # ----------------------------------------------------------------
+  - type: web
+    name: smd-vital-admin
+    runtime: static
+    plan: free
+    rootDir: ./admin-panel-frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    autoDeploy: true
+    envVars:
+      # URL que el bundle de Vite usa al hacer fetch desde el cliente.
+      # Tiene que ser el dominio EXTERNO del backend, no localhost.
+      - key: VITE_API_URL
+        value: https://smdvital-backend.onrender.com/api/v1
+      - key: VITE_ENABLE_PWA
+        value: "true"
