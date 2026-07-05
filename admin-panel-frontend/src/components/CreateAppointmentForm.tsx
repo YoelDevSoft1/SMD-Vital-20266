@@ -139,6 +139,28 @@ interface NewPatientData {
   phone: string;
 }
 
+/**
+ * Estilo unificado para los <select> nativos. appearance-none quita el chrome
+ * del navegador y agregamos un chevron via background-image SVG inline para que
+ * se vea consistente con el resto del form (incluido dark mode).
+ */
+const selectClassName = (hasError: boolean) =>
+  [
+    'appearance-none w-full min-h-[44px] rounded-lg border bg-white pl-4 pr-10 py-2.5 text-sm',
+    'text-slate-900',
+    'focus:outline-none focus:ring-2 focus:ring-offset-1',
+    'transition-all duration-200',
+    hasError
+      ? 'border-red-500/70 focus:border-red-500 focus:ring-red-500/30'
+      : 'border-slate-300 focus:border-blue-500 focus:ring-blue-500/30',
+    "dark:bg-slate-800/80 dark:text-white dark:border-slate-600/80",
+    'dark:focus:border-blue-500 dark:focus:ring-blue-500/40',
+    // chevron SVG inline (apunta hacia abajo)
+    "bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22/></svg>')]",
+    "dark:bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cbd5e1%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22/></svg>')]",
+    'bg-no-repeat bg-[right_0.75rem_center]',
+  ].join(' ');
+
 export default function CreateAppointmentForm({ isOpen, onClose, appointment }: CreateAppointmentFormProps) {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
@@ -588,7 +610,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4 sm:space-y-6 sm:p-6">
+          <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:space-y-6 sm:p-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
             {/* Paciente */}
             <div className="md:col-span-2">
@@ -667,9 +689,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     id="patientId"
                     value={formData.patientId}
                     onChange={(e) => handleInputChange('patientId', e.target.value)}
-                    className={`w-full rounded-md border bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:bg-slate-900 dark:text-slate-100 ${
-                      errors.patientId ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    className={selectClassName(Boolean(errors.patientId))}
                   >
                     <option value="">Selecciona un paciente</option>
                     {patients.map((patient: Patient) => (
@@ -693,9 +713,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 id="doctorId"
                 value={formData.doctorId}
                 onChange={(e) => handleInputChange('doctorId', e.target.value)}
-                className={`w-full rounded-md border bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:bg-slate-900 dark:text-slate-100 ${
-                  errors.doctorId ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={selectClassName(Boolean(errors.doctorId))}
               >
                 <option value="">Selecciona un doctor</option>
                 {doctors.map((doctor: Doctor) => (
@@ -717,9 +735,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 id="serviceId"
                 value={formData.serviceId}
                 onChange={(e) => handleServiceChange(e.target.value)}
-                className={`w-full rounded-md border bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:bg-slate-900 dark:text-slate-100 ${
-                  errors.serviceId ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={selectClassName(Boolean(errors.serviceId))}
               >
                 <option value="">Selecciona un servicio</option>
                 {services.map((service: Service) => (
@@ -764,7 +780,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 id="duration"
                 value={formData.duration}
                 onChange={(e) => handleInputChange('duration', parseInt(e.target.value))}
-                className="w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                className={selectClassName(false)}
               >
                 {durationOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -827,49 +843,56 @@ const handleSubmit = async (e: React.FormEvent) => {
               </datalist>
               {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
             </div>
-
-            <div>
-              <Etiqueta htmlFor="latitude">Latitud para mapa</Etiqueta>
-              <Entrada
-                id="latitude"
-                type="number"
-                step="0.000001"
-                value={formData.coordinates.lat}
-                onChange={(e) =>
-                  handleInputChange('coordinates', {
-                    ...formData.coordinates,
-                    lat: parseFloat(e.target.value) || 0,
-                  })
-                }
-                placeholder="4.711000"
-              />
-            </div>
-
-            <div>
-              <Etiqueta htmlFor="longitude">Longitud para mapa</Etiqueta>
-              <Entrada
-                id="longitude"
-                type="number"
-                step="0.000001"
-                value={formData.coordinates.lng}
-                onChange={(e) =>
-                  handleInputChange('coordinates', {
-                    ...formData.coordinates,
-                    lng: parseFloat(e.target.value) || 0,
-                  })
-                }
-                placeholder="-74.072100"
-              />
-            </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-slate-800 dark:bg-slate-900/70 sm:p-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Ubicacion en mapa</h3>
-                <p className="text-xs text-gray-600 dark:text-slate-400">
-                  Se calcula automaticamente con direccion y localidad. Puedes reintentar si corriges la direccion.
-                </p>
+          <details className="group rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 open:bg-slate-50 dark:border-slate-700 dark:bg-slate-900/40 dark:open:bg-slate-900/60 sm:px-4 sm:py-3">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
+              <span className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Ubicacion en mapa (opcional)
+              </span>
+              <span className="text-xs text-muted-foreground group-open:hidden">Mostrar</span>
+              <span className="text-xs text-muted-foreground hidden group-open:inline">Ocultar</span>
+            </summary>
+            <div className="mt-3 space-y-3">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                Se calcula automaticamente con direccion y localidad. Puedes reintentar si corriges la direccion.
+              </p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <Etiqueta htmlFor="latitude-advanced">Latitud</Etiqueta>
+                  <Entrada
+                    id="latitude-advanced"
+                    type="number"
+                    step="0.000001"
+                    forceColorScheme="dark"
+                    value={formData.coordinates.lat}
+                    onChange={(e) =>
+                      handleInputChange('coordinates', {
+                        ...formData.coordinates,
+                        lat: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    placeholder="4.711000"
+                  />
+                </div>
+                <div>
+                  <Etiqueta htmlFor="longitude-advanced">Longitud</Etiqueta>
+                  <Entrada
+                    id="longitude-advanced"
+                    type="number"
+                    step="0.000001"
+                    forceColorScheme="dark"
+                    value={formData.coordinates.lng}
+                    onChange={(e) =>
+                      handleInputChange('coordinates', {
+                        ...formData.coordinates,
+                        lng: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    placeholder="-74.072100"
+                  />
+                </div>
               </div>
               <Boton
                 type="button"
@@ -879,18 +902,18 @@ const handleSubmit = async (e: React.FormEvent) => {
                 className="w-full sm:w-auto"
               >
                 <MapPin className="h-4 w-4" />
-                {isGeocoding ? 'Ubicando...' : 'Ubicar'}
+                {isGeocoding ? 'Ubicando...' : 'Ubicar automaticamente'}
               </Boton>
+              {(geocodeStatus || formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0) && (
+                <div className="rounded-md bg-white p-2 text-xs text-slate-700 dark:bg-slate-800/80 dark:text-slate-300">
+                  <p>{geocodeStatus || 'Coordenadas listas.'}</p>
+                  <p className="mt-1 font-mono font-medium">
+                    {formData.coordinates.lat.toFixed(6)}, {formData.coordinates.lng.toFixed(6)}
+                  </p>
+                </div>
+              )}
             </div>
-            {(geocodeStatus || formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0) && (
-              <div className="mt-3 text-xs text-gray-700 dark:text-slate-300">
-                <p>{geocodeStatus || 'Coordenadas listas.'}</p>
-                <p className="mt-1 font-medium">
-                  {formData.coordinates.lat.toFixed(6)}, {formData.coordinates.lng.toFixed(6)}
-                </p>
-              </div>
-            )}
-          </div>
+          </details>
 
           <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-3 dark:border-blue-900 dark:bg-blue-950/30 sm:p-4">
             <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">

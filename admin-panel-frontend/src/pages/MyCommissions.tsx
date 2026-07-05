@@ -85,7 +85,7 @@ export default function MyCommissions() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 scroll-mt-24 sm:space-y-6">
       <Encabezado
         title="Mi panel"
         subtitle="Comisiones y servicios que agendé. Refresca cada 30 s."

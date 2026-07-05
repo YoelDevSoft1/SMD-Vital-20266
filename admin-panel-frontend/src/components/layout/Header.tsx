@@ -141,7 +141,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
             aria-label="Cerrar sesión"
             title="Cerrar sesión"
             className={cn(
-              'inline-flex items-center justify-center rounded-md p-2.5',
+              'inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md p-2.5',
               'border border-danger/30 bg-danger-muted text-danger',
               'transition-colors hover:bg-danger hover:text-danger-foreground',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-background',

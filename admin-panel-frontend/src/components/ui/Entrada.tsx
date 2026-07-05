@@ -1,14 +1,24 @@
 import * as React from 'react';
 import { cn } from '@/utils/cn';
+import { useTheme } from '@/context/theme';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
   variant?: 'glass' | 'solid';
+  /** Forzar color-scheme para inputs nativos problemáticos (date, time, number). */
+  forceColorScheme?: 'dark' | 'light';
 }
 
-export function Entrada({ label, error, helperText, variant = 'glass', className, ...props }: InputProps) {
+export function Entrada({ label, error, helperText, variant = 'solid', className, forceColorScheme, ...props }: InputProps) {
+  const { theme } = useTheme();
+  // Auto-aplicar color-scheme oscuro/claro cuando NO se especifica forzadamente,
+  // salvo para tipos nativos donde el navegador lo ignora (date/time/number).
+  const needsAutoScheme = !forceColorScheme && ['date', 'time', 'datetime-local', 'month', 'week'].includes(String(props.type ?? ''));
+  const resolvedColorScheme =
+    forceColorScheme ?? (needsAutoScheme ? (theme === 'dark' ? 'dark' : 'light') : undefined);
+
   const baseStyles = [
     'w-full px-4 py-2.5 rounded-lg text-sm',
     'focus:outline-none focus:ring-2 focus:ring-offset-1',
@@ -24,24 +34,27 @@ export function Entrada({ label, error, helperText, variant = 'glass', className
       'text-slate-900',
       'focus:bg-white/70 focus:border-blue-400/70 focus:ring-blue-400/50',
       'disabled:bg-slate-100/50 disabled:text-slate-400',
-      'dark:bg-slate-900/30 dark:border-slate-700/60',
+      'dark:bg-slate-900/40 dark:border-slate-700/60',
       'dark:text-white',
-      'dark:focus:bg-slate-900/50 dark:focus:border-blue-500/70 dark:focus:ring-blue-500/50',
+      'dark:focus:bg-slate-900/60 dark:focus:border-blue-500/70 dark:focus:ring-blue-500/50',
       'dark:disabled:bg-slate-800/30 dark:disabled:text-slate-500',
     ].join(' '),
     solid: [
       'bg-white',
       'border border-slate-300',
       'text-slate-900',
-      'focus:border-blue-500 focus:ring-blue-500/50',
+      'focus:border-blue-500 focus:ring-blue-500/40',
       'disabled:bg-slate-100 disabled:text-slate-400',
-      'dark:bg-slate-800',
-      'dark:border-slate-600',
+      'dark:bg-slate-800/80',
+      'dark:border-slate-600/80',
       'dark:text-white',
-      'dark:focus:border-blue-500 dark:focus:ring-blue-500/50',
+      'dark:focus:border-blue-500 dark:focus:ring-blue-500/40',
       'dark:disabled:bg-slate-700 dark:disabled:text-slate-500',
     ].join(' '),
   };
+
+  // height mínimo móvil-friendly para inputs densos
+  const minHeight = props.type === 'date' || props.type === 'time' || props.type === 'number' ? 'min-h-[44px]' : '';
 
   const errorStyles = error
     ? 'border-red-400/70 focus:border-red-500/70 focus:ring-red-500/50 dark:border-red-500/70 dark:focus:border-red-500/70 dark:focus:ring-red-500/50'
@@ -55,7 +68,8 @@ export function Entrada({ label, error, helperText, variant = 'glass', className
         </label>
       )}
       <input
-        className={cn(baseStyles, variantStyles[variant], errorStyles, className)}
+        style={resolvedColorScheme ? { colorScheme: resolvedColorScheme } : undefined}
+        className={cn(baseStyles, variantStyles[variant], errorStyles, minHeight, className)}
         {...props}
       />
       {error && (
