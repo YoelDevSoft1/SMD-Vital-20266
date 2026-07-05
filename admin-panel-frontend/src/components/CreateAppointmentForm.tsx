@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { localInputToColombiaISO, utcToColombiaInputValue } from '@/utils/dateFormat';
-import { X, Calendar, Clock, User, Stethoscope, MapPin, DollarSign, FileText, UserPlus } from 'lucide-react';
+import { localInputToColombiaISO, utcToColombiaInputValue, obtenerProximosDias, etiquetaCortaFecha } from '@/utils/dateFormat';
+import { X, Calendar, Clock, User, Stethoscope, MapPin, DollarSign, FileText, UserPlus, ChevronDown, AlertCircle } from 'lucide-react';
 import { Boton } from '@/components/ui/Boton';
 import { Entrada } from '@/components/ui/Entrada';
 import { Etiqueta } from '@/components/ui/Etiqueta';
@@ -398,6 +398,30 @@ onError: (error: any) => {
     handleInputChange('scheduledAt', `${selectedDate}T${slot.startTime}`);
   };
 
+  const selectedPatient = useMemo(
+    () => patients.find((patient: Patient) => patient.id === formData.patientId) ?? null,
+    [formData.patientId, patients]
+  );
+
+  const handlePatientChange = (patientId: string) => {
+    const next = patients.find((patient: Patient) => patient.id === patientId) ?? null;
+    setFormData((prev) => ({
+      ...prev,
+      patientId,
+      // Auto-rellenar desde el registro del paciente cuando existe; editable después.
+      address: next?.address && next.address.trim() ? next.address : prev.address,
+      city: next?.city && next.city.trim() ? next.city : prev.city,
+    }));
+    if (errors.patientId) {
+      setErrors((prev) => ({ ...prev, patientId: '' }));
+    }
+  };
+
+  const handleDateChipSelect = (date: string) => {
+    const currentTime = formData.scheduledAt?.slice(11, 16) || '';
+    handleInputChange('scheduledAt', currentTime ? `${date}T${currentTime}` : `${date}T`);
+  };
+
   const geocodeAddress = async (showToast = false) => {
     if (!formData.address.trim() || !formData.city.trim()) {
       if (showToast) {
@@ -611,10 +635,10 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:space-y-6 sm:p-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+          <div className="space-y-3">
             {/* Paciente */}
-            <div className="md:col-span-2">
-              <div className="flex items-center justify-between mb-2">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
                 <Etiqueta className="flex items-center space-x-2">
                   <User className="w-4 h-4" />
                   <span>Paciente *</span>
@@ -688,7 +712,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <select
                     id="patientId"
                     value={formData.patientId}
-                    onChange={(e) => handleInputChange('patientId', e.target.value)}
+                    onChange={(e) => handlePatientChange(e.target.value)}
                     className={selectClassName(Boolean(errors.patientId))}
                   >
                     <option value="">Selecciona un paciente</option>
@@ -701,28 +725,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                   {errors.patientId && <p className="text-red-500 text-sm mt-1">{errors.patientId}</p>}
                 </>
               )}
-            </div>
-
-            {/* Doctor */}
-            <div>
-              <Etiqueta htmlFor="doctorId" className="flex items-center space-x-2">
-                <Stethoscope className="w-4 h-4" />
-                <span>Doctor *</span>
-              </Etiqueta>
-              <select
-                id="doctorId"
-                value={formData.doctorId}
-                onChange={(e) => handleInputChange('doctorId', e.target.value)}
-                className={selectClassName(Boolean(errors.doctorId))}
-              >
-                <option value="">Selecciona un doctor</option>
-                {doctors.map((doctor: Doctor) => (
-                  <option key={doctor.id} value={doctor.id}>
-                    {doctor?.user?.firstName} {doctor?.user?.lastName} - {doctor?.specialty}
-                  </option>
-                ))}
-              </select>
-              {errors.doctorId && <p className="text-red-500 text-sm mt-1">{errors.doctorId}</p>}
             </div>
 
             {/* Servicio */}
@@ -746,67 +748,70 @@ const handleSubmit = async (e: React.FormEvent) => {
               </select>
               {errors.serviceId && <p className="text-red-500 text-sm mt-1">{errors.serviceId}</p>}
               {selectedService && (
-                <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
-                  Duracion sugerida: {selectedService.duration} min - Precio base: ${selectedService.basePrice}
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {selectedService.duration} min · ${Number(selectedService.basePrice).toLocaleString('es-CO')}
                 </p>
               )}
             </div>
 
-            {/* Fecha */}
+            {/* Doctor */}
             <div>
-              <Etiqueta htmlFor="appointmentDate" className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4" />
-                <span>Fecha *</span>
-              </Etiqueta>
-              <Entrada
-                id="appointmentDate"
-                type="date"
-                value={selectedDate}
-                onChange={(e) => handleDateChange(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-                placeholder="Selecciona una fecha"
-                className={`min-h-[44px] ${errors.scheduledAt ? 'border-red-500' : ''}`}
-              />
-              {errors.scheduledAt && <p className="text-red-500 text-sm mt-1">{errors.scheduledAt}</p>}
-            </div>
-
-            {/* Duración */}
-            <div>
-              <Etiqueta htmlFor="duration" className="flex items-center space-x-2">
-                <Clock className="w-4 h-4" />
-                <span>Duración</span>
+              <Etiqueta htmlFor="doctorId" className="flex items-center space-x-2">
+                <Stethoscope className="w-4 h-4" />
+                <span>Doctor *</span>
               </Etiqueta>
               <select
-                id="duration"
-                value={formData.duration}
-                onChange={(e) => handleInputChange('duration', parseInt(e.target.value))}
-                className={selectClassName(false)}
+                id="doctorId"
+                value={formData.doctorId}
+                onChange={(e) => handleInputChange('doctorId', e.target.value)}
+                className={selectClassName(Boolean(errors.doctorId))}
               >
-                {durationOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
+                <option value="">Selecciona un doctor</option>
+                {doctors.map((doctor: Doctor) => (
+                  <option key={doctor.id} value={doctor.id}>
+                    Dr. {doctor?.user?.firstName} {doctor?.user?.lastName} - {doctor?.specialty}
                   </option>
                 ))}
               </select>
+              {errors.doctorId && <p className="text-red-500 text-sm mt-1">{errors.doctorId}</p>}
             </div>
 
-            {/* Precio */}
+            {/* Fecha — chips de los próximos 7 días */}
             <div>
-              <Etiqueta htmlFor="totalPrice" className="flex items-center space-x-2">
-                <DollarSign className="w-4 h-4" />
-                <span>Precio Total *</span>
+              <Etiqueta className="flex items-center space-x-2">
+                <Calendar className="w-4 h-4" />
+                <span>Fecha *</span>
               </Etiqueta>
-              <Entrada
-                id="totalPrice"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.totalPrice}
-                onChange={(e) => handleInputChange('totalPrice', parseFloat(e.target.value) || 0)}
-                className={errors.totalPrice ? 'border-red-500' : ''}
-                placeholder="0.00"
-              />
-              {errors.totalPrice && <p className="text-red-500 text-sm mt-1">{errors.totalPrice}</p>}
+              <div className="-mx-1 mt-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+                {obtenerProximosDias(7).map((dia) => {
+                  const selected = selectedDate === dia.value;
+                  return (
+                    <button
+                      key={dia.value}
+                      type="button"
+                      onClick={() => handleDateChipSelect(dia.value)}
+                      className={`flex min-h-[56px] min-w-[64px] flex-col items-center justify-center rounded-lg border px-2 py-1.5 text-xs transition ${
+                        selected
+                          ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-blue-400 hover:bg-blue-50/40 dark:border-slate-600/80 dark:bg-slate-800/60 dark:text-slate-100 dark:hover:border-blue-500/60 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <span className="text-[10px] font-medium uppercase tracking-wide opacity-80">
+                        {dia.etiqueta.split(' ')[0]}
+                      </span>
+                      <span className="text-sm font-semibold">
+                        {dia.etiqueta.split(' ').slice(1).join(' ') || dia.etiqueta}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              {errors.scheduledAt && (
+                <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  {errors.scheduledAt}
+                </p>
+              )}
             </div>
 
             {/* Dirección */}
@@ -815,112 +820,73 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <MapPin className="w-4 h-4" />
                 <span>Dirección *</span>
               </Etiqueta>
-              <Entrada
-                id="address"
-                value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                className={errors.address ? 'border-red-500' : ''}
-                placeholder="Calle 123 #45-67"
-              />
+              {selectedPatient?.address ? (
+                <select
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  className={selectClassName(Boolean(errors.address))}
+                >
+                  <option value="">Selecciona una opción</option>
+                  <option value={selectedPatient.address}>
+                    Usar guardada · {selectedPatient.address}
+                  </option>
+                  <option value="__manual__">+ Ingresar otra dirección</option>
+                </select>
+              ) : null}
+              {(formData.address === '__manual__' || !selectedPatient?.address) && (
+                <Entrada
+                  id="address-input"
+                  value={formData.address === '__manual__' ? '' : formData.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  className={errors.address ? 'mt-2 border-red-500' : 'mt-2'}
+                  placeholder="Calle 123 #45-67"
+                />
+              )}
               {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
             </div>
 
             {/* Localidad */}
             <div>
-              <Etiqueta htmlFor="city">Localidad *</Etiqueta>
-              <Entrada
+              <Etiqueta htmlFor="city" className="flex items-center space-x-2">
+                <MapPin className="w-4 h-4" />
+                <span>Localidad *</span>
+              </Etiqueta>
+              <select
                 id="city"
-                list="bogota-localities"
                 value={formData.city}
                 onChange={(e) => handleInputChange('city', e.target.value)}
-                className={errors.city ? 'border-red-500' : ''}
-                placeholder="Chapinero, Suba, Kennedy..."
-              />
-              <datalist id="bogota-localities">
+                className={selectClassName(Boolean(errors.city))}
+              >
+                <option value="">Selecciona una localidad</option>
                 {bogotaLocalities.map((locality) => (
-                  <option key={locality} value={locality} />
+                  <option key={locality} value={locality}>
+                    {locality}
+                  </option>
                 ))}
-              </datalist>
+              </select>
               {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
             </div>
+
+            {/* Urgente */}
+            <div className="flex items-center space-x-2 pt-1">
+              <Interruptor
+                id="isUrgent"
+                checked={formData.isUrgent}
+                onCheckedChange={(checked) => handleInputChange('isUrgent', checked)}
+              />
+              <Etiqueta htmlFor="isUrgent" className="!mb-0 cursor-pointer">Marcar como urgente</Etiqueta>
+            </div>
+          </div>
           </div>
 
-          <details className="group rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 open:bg-slate-50 dark:border-slate-700 dark:bg-slate-900/40 dark:open:bg-slate-900/60 sm:px-4 sm:py-3">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
-              <span className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Ubicacion en mapa (opcional)
-              </span>
-              <span className="text-xs text-muted-foreground group-open:hidden">Mostrar</span>
-              <span className="text-xs text-muted-foreground hidden group-open:inline">Ocultar</span>
-            </summary>
-            <div className="mt-3 space-y-3">
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                Se calcula automaticamente con direccion y localidad. Puedes reintentar si corriges la direccion.
-              </p>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div>
-                  <Etiqueta htmlFor="latitude-advanced">Latitud</Etiqueta>
-                  <Entrada
-                    id="latitude-advanced"
-                    type="number"
-                    step="0.000001"
-                    forceColorScheme="dark"
-                    value={formData.coordinates.lat}
-                    onChange={(e) =>
-                      handleInputChange('coordinates', {
-                        ...formData.coordinates,
-                        lat: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                    placeholder="4.711000"
-                  />
-                </div>
-                <div>
-                  <Etiqueta htmlFor="longitude-advanced">Longitud</Etiqueta>
-                  <Entrada
-                    id="longitude-advanced"
-                    type="number"
-                    step="0.000001"
-                    forceColorScheme="dark"
-                    value={formData.coordinates.lng}
-                    onChange={(e) =>
-                      handleInputChange('coordinates', {
-                        ...formData.coordinates,
-                        lng: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                    placeholder="-74.072100"
-                  />
-                </div>
-              </div>
-              <Boton
-                type="button"
-                variant="outline"
-                onClick={() => geocodeAddress(true)}
-                disabled={isGeocoding || !formData.address || !formData.city}
-                className="w-full sm:w-auto"
-              >
-                <MapPin className="h-4 w-4" />
-                {isGeocoding ? 'Ubicando...' : 'Ubicar automaticamente'}
-              </Boton>
-              {(geocodeStatus || formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0) && (
-                <div className="rounded-md bg-white p-2 text-xs text-slate-700 dark:bg-slate-800/80 dark:text-slate-300">
-                  <p>{geocodeStatus || 'Coordenadas listas.'}</p>
-                  <p className="mt-1 font-mono font-medium">
-                    {formData.coordinates.lat.toFixed(6)}, {formData.coordinates.lng.toFixed(6)}
-                  </p>
-                </div>
-              )}
-            </div>
-          </details>
-
+          {/* Slots disponibles */}
           <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-3 dark:border-blue-900 dark:bg-blue-950/30 sm:p-4">
             <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Horas disponibles del medico</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Hora disponible</h3>
                 <p className="text-xs text-gray-600 dark:text-slate-400">
-                  Selecciona medico, servicio y fecha para reservar un horario disponible.
+                  Toca un slot para reservar. Si no ves opciones, completa doctor y fecha.
                 </p>
               </div>
               {isFetchingAvailability && <span className="text-xs text-blue-700">Cargando...</span>}
@@ -937,11 +903,13 @@ const handleSubmit = async (e: React.FormEvent) => {
                   </span>
                 ))}
               </div>
-            ) : (
+            ) : formData.doctorId && selectedDate ? (
               <p className="mb-3 text-xs text-amber-700 dark:text-amber-300">
-                {formData.doctorId && selectedDate
-                  ? 'Este medico aun no registro disponibilidad para este dia.'
-                  : 'Pendiente seleccionar medico y fecha.'}
+                Este medico aun no registro disponibilidad para este dia.
+              </p>
+            ) : (
+              <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
+                Pendiente seleccionar doctor y fecha.
               </p>
             )}
 
@@ -976,56 +944,165 @@ const handleSubmit = async (e: React.FormEvent) => {
             )}
           </div>
 
-          {/* Notas */}
-          <div>
-            <Etiqueta htmlFor="notes">Notas</Etiqueta>
-            <textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => handleInputChange('notes', e.target.value)}
-              className="min-h-24 w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-              rows={3}
-              placeholder="Notas adicionales sobre la cita..."
-            />
-          </div>
+          {/* Detalles opcionales — todo lo no esencial en una sola sección colapsable */}
+          <details className="group rounded-lg border border-slate-200 bg-slate-50/50 dark:border-slate-700 dark:bg-slate-900/40">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-200">
+              <span className="flex items-center gap-2">
+                <ChevronDown className="h-4 w-4 transition group-open:rotate-180" />
+                Avanzado (duracion, precio, notas clinicas)
+              </span>
+              <span className="text-xs text-muted-foreground group-open:hidden">Mostrar</span>
+              <span className="text-xs text-muted-foreground hidden group-open:inline">Ocultar</span>
+            </summary>
+            <div className="space-y-3 px-4 pb-4">
+              {/* Duración + Precio (derivados del servicio) */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <Etiqueta htmlFor="duration" className="flex items-center space-x-2">
+                    <Clock className="w-4 h-4" />
+                    <span>Duracion</span>
+                  </Etiqueta>
+                  <select
+                    id="duration"
+                    value={formData.duration}
+                    onChange={(e) => handleInputChange('duration', parseInt(e.target.value))}
+                    className={selectClassName(false)}
+                  >
+                    {durationOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                    Prefijada del servicio seleccionado.
+                  </p>
+                </div>
+                <div>
+                  <Etiqueta htmlFor="totalPrice" className="flex items-center space-x-2">
+                    <DollarSign className="w-4 h-4" />
+                    <span>Precio total</span>
+                  </Etiqueta>
+                  <Entrada
+                    id="totalPrice"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    forceColorScheme="dark"
+                    value={formData.totalPrice}
+                    onChange={(e) => handleInputChange('totalPrice', parseFloat(e.target.value) || 0)}
+                    className={errors.totalPrice ? 'border-red-500' : ''}
+                    placeholder="0.00"
+                  />
+                  <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                    Prefijado del servicio. Modifica solo si hay cambio acordado.
+                  </p>
+                </div>
+              </div>
 
-          {/* Diagnóstico */}
-          <div>
-            <Etiqueta htmlFor="diagnosis">Diagnóstico</Etiqueta>
-            <textarea
-              id="diagnosis"
-              value={formData.diagnosis}
-              onChange={(e) => handleInputChange('diagnosis', e.target.value)}
-              className="min-h-24 w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-              rows={3}
-              placeholder="Diagnóstico médico..."
-            />
-          </div>
+              {/* Ubicación en mapa (lat/lng opcionales) */}
+              <div className="rounded-md border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800/60">
+                <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Ubicacion en mapa</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Se calcula automaticamente con direccion y localidad.
+                    </p>
+                  </div>
+                  <Boton
+                    type="button"
+                    variant="outline"
+                    onClick={() => geocodeAddress(true)}
+                    disabled={isGeocoding || !formData.address || !formData.city}
+                    className="w-full sm:w-auto"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    {isGeocoding ? 'Ubicando...' : 'Ubicar'}
+                  </Boton>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <Etiqueta htmlFor="latitude-advanced">Latitud</Etiqueta>
+                    <Entrada
+                      id="latitude-advanced"
+                      type="number"
+                      step="0.000001"
+                      forceColorScheme="dark"
+                      value={formData.coordinates.lat}
+                      onChange={(e) =>
+                        handleInputChange('coordinates', {
+                          ...formData.coordinates,
+                          lat: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                      placeholder="4.711000"
+                    />
+                  </div>
+                  <div>
+                    <Etiqueta htmlFor="longitude-advanced">Longitud</Etiqueta>
+                    <Entrada
+                      id="longitude-advanced"
+                      type="number"
+                      step="0.000001"
+                      forceColorScheme="dark"
+                      value={formData.coordinates.lng}
+                      onChange={(e) =>
+                        handleInputChange('coordinates', {
+                          ...formData.coordinates,
+                          lng: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                      placeholder="-74.072100"
+                    />
+                  </div>
+                </div>
+                {(geocodeStatus || formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0) && (
+                  <p className="mt-2 font-mono text-xs text-slate-600 dark:text-slate-300">
+                    {formData.coordinates.lat.toFixed(6)}, {formData.coordinates.lng.toFixed(6)}
+                  </p>
+                )}
+              </div>
 
-          {/* Prescripción */}
-          <div>
-            <Etiqueta htmlFor="prescription">Prescripción</Etiqueta>
-            <textarea
-              id="prescription"
-              value={formData.prescription}
-              onChange={(e) => handleInputChange('prescription', e.target.value)}
-              className="min-h-24 w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-              rows={3}
-              placeholder="Medicamentos y tratamientos prescritos..."
-            />
-          </div>
-
-          {/* Urgente */}
-          <div className="flex items-center space-x-2">
-            <Interruptor
-              id="isUrgent"
-              checked={formData.isUrgent}
-              onCheckedChange={(checked) => handleInputChange('isUrgent', checked)}
-            />
-            <Etiqueta htmlFor="isUrgent">Cita urgente</Etiqueta>
-          </div>
-
-          </div>
+              {/* Notas / Diagnóstico / Prescripción — solo doctor y modo edición */}
+              {(appointment || !isAgent) && (
+                <>
+                  <div>
+                    <Etiqueta htmlFor="notes">Notas operativas</Etiqueta>
+                    <textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => handleInputChange('notes', e.target.value)}
+                      className="min-h-20 w-full rounded-md border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-100"
+                      rows={2}
+                      placeholder="Contexto adicional para el equipo..."
+                    />
+                  </div>
+                  <div>
+                    <Etiqueta htmlFor="diagnosis">Diagnostico medico</Etiqueta>
+                    <textarea
+                      id="diagnosis"
+                      value={formData.diagnosis}
+                      onChange={(e) => handleInputChange('diagnosis', e.target.value)}
+                      className="min-h-20 w-full rounded-md border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-100"
+                      rows={2}
+                      placeholder="Diagnostico..."
+                    />
+                  </div>
+                  <div>
+                    <Etiqueta htmlFor="prescription">Prescripcion</Etiqueta>
+                    <textarea
+                      id="prescription"
+                      value={formData.prescription}
+                      onChange={(e) => handleInputChange('prescription', e.target.value)}
+                      className="min-h-20 w-full rounded-md border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-100"
+                      rows={2}
+                      placeholder="Medicamentos y tratamientos..."
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </details>
 
           {/* Botones */}
           <div className="sticky bottom-0 z-10 flex flex-col-reverse gap-3 border-t border-gray-200 bg-white/95 px-4 py-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 sm:flex-row sm:justify-end sm:p-6 sm:shadow-none">

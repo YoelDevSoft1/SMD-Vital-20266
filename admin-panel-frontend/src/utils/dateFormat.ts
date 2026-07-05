@@ -46,3 +46,35 @@ export function utcToColombiaInputValue(utcDateString: string): string {
   const adjusted = new Date(date.getTime() + (localOffset + colombiaOffset) * 60000);
   return adjusted.toISOString().slice(0, 16);
 }
+
+/**
+ * Etiqueta humana para un día cercano: "Hoy", "Mañana", "Mar 8 jul"
+ * @param dateOffset 0=hoy, 1=mañana, etc.
+ */
+export function etiquetaCortaFecha(dateOffset: number): string {
+  const base = new Date();
+  base.setHours(0, 0, 0, 0);
+  base.setDate(base.getDate() + dateOffset);
+  if (dateOffset === 0) return 'Hoy';
+  if (dateOffset === 1) return 'Mañana';
+  return new Intl.DateTimeFormat('es-CO', {
+    timeZone: TZ,
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  }).format(base);
+}
+
+/** Devuelve los próximos N días como strings 'YYYY-MM-DD' en hora local. */
+export function obtenerProximosDias(cantidad = 7): Array<{ value: string; etiqueta: string }> {
+  const out: Array<{ value: string; etiqueta: string }> = [];
+  const base = new Date();
+  base.setHours(0, 0, 0, 0);
+  for (let i = 0; i < cantidad; i++) {
+    const d = new Date(base);
+    d.setDate(base.getDate() + i);
+    const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    out.push({ value: ymd, etiqueta: etiquetaCortaFecha(i) });
+  }
+  return out;
+}

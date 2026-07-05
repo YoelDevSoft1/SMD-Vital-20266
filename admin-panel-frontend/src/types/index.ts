@@ -162,6 +162,8 @@ export interface Patient {
   emergencyContact: string;
   medicalHistory?: string;
   allergies?: string;
+  address?: string | null;
+  city?: string | null;
   user: User;
   _count?: {
     appointments: number;
