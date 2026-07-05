@@ -6,11 +6,15 @@
  *  - "Actualizar ahora" → skipWaiting() + reload
  *  - "Más tarde" → cierra el prompt (la próxima vez que cargue se actualizará)
  *
- * Solo funciona en producción (vite-plugin-pwa registerType: 'autoUpdate'
- * pone el SW en waiting hasta que el usuario acepte).
+ * REGLA DURA PARA OPERACIONES EN CELULAR:
+ *  - Si el SW nuevo está esperando y el usuario no interactúa en 5s, actualizamos
+ *    automáticamente (sin esperar el click). Esto es crítico para que Jesmeiry/Omar
+ *    en el celular SIEMPRE tengan la versión actual sin tocar nada.
+ *  - Si el nuevo SW ya está controlando la página (skipWaiting+clientsClaim
+ *    dispararon controllerchange), recargamos inmediatamente.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RefreshCw, X } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -18,41 +22,104 @@ export default function UpdatePrompt() {
   const [needRefresh, setNeedRefresh] = useState(false);
   const [offlineReady, setOfflineReady] = useState(false);
   const [showOfflineReady, setShowOfflineReady] = useState(false);
+  const [countdown, setCountdown] = useState(5);
+  const updateSWRef = useRef<((reload?: boolean) => Promise<void>) | null>(null);
+  const autoUpdateTimerRef = useRef<number | null>(null);
+  const countdownIntervalRef = useRef<number | null>(null);
+  const refreshingRef = useRef(false);
 
   useEffect(() => {
-    // Solo intentar registrar en producción cuando PWA esté activada explícitamente.
     if (import.meta.env.PROD && import.meta.env.VITE_ENABLE_PWA !== 'false') {
       const loadRegister = new Function("return import('virtual:pwa-register')");
-      loadRegister().then(({ registerSW }: typeof import('virtual:pwa-register')) => {
-        const updateSW = registerSW({
-        immediate: true,
-        onNeedRefresh() {
-          setNeedRefresh(true);
-        },
-        onOfflineReady() {
-          setOfflineReady(true);
-          setShowOfflineReady(true);
-          setTimeout(() => setShowOfflineReady(false), 4000);
-        },
-        onRegisterError(error) {
-          console.warn('SW registration error:', error);
-        },
-      });
-
-        // Exponer para debug
-        (window as any).__updateSW = updateSW;
-      }).catch((error) => {
-        console.warn('SW registration module unavailable:', error);
-      });
+      loadRegister()
+        .then(({ registerSW }: typeof import('virtual:pwa-register')) => {
+          const updateSW = registerSW({
+            immediate: true,
+            onNeedRefresh() {
+              setNeedRefresh(true);
+              setCountdown(5);
+            },
+            onOfflineReady() {
+              setOfflineReady(true);
+              setShowOfflineReady(true);
+              setTimeout(() => setShowOfflineReady(false), 4000);
+            },
+            onRegisterError(error) {
+              console.warn('SW registration error:', error);
+            },
+          });
+          updateSWRef.current = updateSW;
+          (window as any).__updateSW = updateSW;
+        })
+        .catch((error) => {
+          console.warn('SW registration module unavailable:', error);
+        });
     }
+
+    // Cuando el SW nuevo toma control (skipWaiting+clientsClaim disparado),
+    // recargamos la página para servir la versión actualizada.
+    if ('serviceWorker' in navigator) {
+      const onControllerChange = () => {
+        if (refreshingRef.current) return;
+        refreshingRef.current = true;
+        window.setTimeout(() => window.location.reload(), 250);
+      };
+      navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+
+      // Forzar check de actualización cuando la página vuelve a primer plano.
+      // Si el usuario dejó la app abierta mientras hacíamos push, detectamos el
+      // SW nuevo sin necesidad de refresh manual.
+      const onVisibilityChange = () => {
+        if (document.visibilityState === 'visible' && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.getRegistration().then((reg) => {
+            reg?.update().catch(() => undefined);
+          });
+        }
+      };
+      document.addEventListener('visibilitychange', onVisibilityChange);
+    }
+
+    return () => {
+      if (autoUpdateTimerRef.current) window.clearTimeout(autoUpdateTimerRef.current);
+      if (countdownIntervalRef.current) window.clearInterval(countdownIntervalRef.current);
+    };
   }, []);
 
+  // Auto-update countdown: si hay SW nuevo y nadie toca en 5s, forzamos reload.
+  useEffect(() => {
+    if (!needRefresh) return;
+    countdownIntervalRef.current = window.setInterval(() => {
+      setCountdown((c) => (c > 0 ? c - 1 : 0));
+    }, 1000);
+    autoUpdateTimerRef.current = window.setTimeout(() => {
+      const updateSW = updateSWRef.current;
+      if (updateSW) {
+        void updateSW(true);
+      } else {
+        window.location.reload();
+      }
+    }, 5000);
+    return () => {
+      if (autoUpdateTimerRef.current) window.clearTimeout(autoUpdateTimerRef.current);
+      if (countdownIntervalRef.current) window.clearInterval(countdownIntervalRef.current);
+    };
+  }, [needRefresh]);
+
   const handleUpdate = async () => {
-    const updateSW = (window as any).__updateSW;
+    if (autoUpdateTimerRef.current) window.clearTimeout(autoUpdateTimerRef.current);
+    if (countdownIntervalRef.current) window.clearInterval(countdownIntervalRef.current);
+    const updateSW = updateSWRef.current;
     if (updateSW) {
       await updateSW(true);
-      // El SW activa y recarga
+    } else {
+      window.location.reload();
     }
+  };
+
+  const handleDismiss = () => {
+    if (autoUpdateTimerRef.current) window.clearTimeout(autoUpdateTimerRef.current);
+    if (countdownIntervalRef.current) window.clearInterval(countdownIntervalRef.current);
+    setNeedRefresh(false);
   };
 
   if (needRefresh) {
@@ -67,14 +134,14 @@ export default function UpdatePrompt() {
         )}
       >
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 text-white shadow-md">
-          <RefreshCw className="h-5 w-5" />
+          <RefreshCw className="h-5 w-5 animate-spin" />
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-            Nueva versión disponible
+            Actualizando en {countdown}s
           </h3>
           <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
-            Hay mejoras listas. Recarga para aplicar.
+            Nueva version lista. Toca Actualizar para aplicar ya.
           </p>
         </div>
         <div className="flex flex-col gap-1">
@@ -87,10 +154,10 @@ export default function UpdatePrompt() {
           </button>
           <button
             type="button"
-            onClick={() => setNeedRefresh(false)}
+            onClick={handleDismiss}
             className="rounded-lg px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
-            Luego
+            Esperar
           </button>
         </div>
       </div>

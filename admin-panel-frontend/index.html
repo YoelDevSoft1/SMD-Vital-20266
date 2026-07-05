@@ -45,6 +45,38 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- PWA: SW auto-update + reload ultra-temprano antes de que React monte.
+         Garantiza que el celular del agente y del doctor siempre reciba la
+         nueva versión sin que tengan que hacer refresh manual ni ir a DevTools. -->
+    <script>
+      (function () {
+        if (!('serviceWorker' in navigator)) return;
+        var refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (refreshing) return;
+          refreshing = true;
+          // El SW nuevo tomó control → recargar para usar sus assets.
+          window.setTimeout(function () { window.location.reload(); }, 250);
+        });
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.getRegistration().then(function (reg) {
+            if (!reg) return;
+            // Forzar check de updates en cada load. Si el operador acaba de
+            // hacer push, el celular detecta el SW nuevo sin esperar al
+            // próximo ciclo del navegador (que puede tardar horas).
+            reg.update().catch(function () { /* offline */ });
+          }).catch(function () { /* offline */ });
+        });
+        // ?update=1 fuerza reload para casos extremos (operador del backoffice).
+        if (window.location.search.indexOf('update=1') !== -1) {
+          navigator.serviceWorker.getRegistration().then(function (reg) {
+            if (reg && reg.waiting) {
+              reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+          });
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
