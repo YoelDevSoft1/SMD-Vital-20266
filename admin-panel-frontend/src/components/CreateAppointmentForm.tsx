@@ -42,7 +42,6 @@ import {
   Calendar,
   Check,
   ChevronDown,
-  CircleAlert,
   Clock,
   DollarSign,
   FileText,
@@ -1447,7 +1446,7 @@ const FieldBlock = React.forwardRef<HTMLDivElement, {
       ) : null}
       {error ? (
         <p className="flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400">
-          <CircleAlert className="h-3.5 w-3.5" aria-hidden />
+          <AlertCircle className="h-3.5 w-3.5" aria-hidden />
           {error}
         </p>
       ) : null}
