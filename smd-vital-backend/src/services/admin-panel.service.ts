@@ -1425,7 +1425,7 @@ export class AdminPanelService {
 
     logger.warn('Creating fallback doctor profile for DOCTOR user', { userId });
 
-    return prisma.doctor.create({
+    const newDoctor = await prisma.doctor.create({
       data: {
         userId,
         licenseNumber: `AUTO-${userId.slice(-10)}`,
@@ -1441,6 +1441,17 @@ export class AdminPanelService {
       },
       select: { id: true }
     });
+
+    // Sembrar disponibilidad default para que el agente pueda agendar
+    // inmediatamente sin tener que esperar a que el doctor abra el panel
+    // y configure horarios manualmente.
+    try {
+      await this.seedDefaultAvailability(newDoctor.id);
+    } catch (seedError) {
+      logger.warn('seedDefaultAvailability failed for new doctor:', seedError);
+    }
+
+    return newDoctor;
   }
 
 
