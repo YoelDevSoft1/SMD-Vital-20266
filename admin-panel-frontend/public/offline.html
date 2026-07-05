@@ -33,24 +33,27 @@
       }
       .actions {
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 12px;
-        justify-content: center;
         margin-top: 24px;
+        align-items: stretch;
       }
-      button, a {
+      button {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 6px;
-        padding: 12px 20px;
+        padding: 14px 20px;
         border-radius: 999px;
         font-weight: 700;
-        font-size: 14px;
-        text-decoration: none;
+        font-size: 15px;
         cursor: pointer;
         border: 0;
         font-family: inherit;
+        transition: opacity 200ms, transform 200ms;
       }
+      button:active { transform: scale(0.97); }
+      button:disabled { opacity: 0.5; cursor: progress; }
       .primary {
         background: #06b6d4;
         color: #0f172a;
@@ -60,90 +63,124 @@
         background: transparent;
         color: #67e8f9;
         border: 1px solid rgba(103, 232, 249, 0.4);
+        font-size: 13px;
+        padding: 10px 16px;
       }
       .ghost:hover { background: rgba(103, 232, 249, 0.1); }
       .hint {
-        margin-top: 18px;
-        font-size: 12px;
+        margin-top: 24px;
+        font-size: 11px;
         color: #94a3b8;
+        line-height: 1.5;
       }
+      .status {
+        margin-top: 18px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #cbd5e1;
+        display: none;
+        white-space: pre-wrap;
+      }
+      .status.show { display: block; }
+      .status.success { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+      .status.error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
     </style>
   </head>
   <body>
     <main>
       <h1>Sin conexion</h1>
-      <p id="msg">SMD Vital no puede conectarse en este momento. Revisa la senal e intenta de nuevo; las pantallas visitadas recientemente pueden abrirse al volver.</p>
+      <p id="msg">
+        No pudimos cargar la app. Si Render free tier se estaba
+        despertando, espera unos segundos y toca <strong>Reintentar</strong>.
+      </p>
       <div class="actions">
         <button type="button" class="primary" id="retry">Reintentar</button>
         <button type="button" class="ghost" id="clear-sw">Limpiar cache y reintentar</button>
       </div>
-      <p class="hint" id="hint">Si Render free tier se esta despertando, espera 5-10s y reintenta automaticamente.</p>
+      <div id="status" class="status"></div>
+      <p class="hint">
+        Si el boton "Reintentar" no funciona, prueba "Limpiar cache".
+        Eso desinstala la version vieja del cache del navegador.
+      </p>
     </main>
     <script>
       (function () {
         var retry = document.getElementById('retry');
         var clearSW = document.getElementById('clear-sw');
         var msg = document.getElementById('msg');
-        var hint = document.getElementById('hint');
-        var reloadTimer = null;
+        var statusEl = document.getElementById('status');
 
-        function scheduleAutoReload() {
-          // Si en 8s vuelve online, recargamos solos para salir del offline.html
-          // automaticamente sin que el usuario tenga que tocar nada.
-          clearTimeout(reloadTimer);
-          reloadTimer = setTimeout(function () {
-            if (navigator.onLine) {
-              window.location.replace('/login?_=' + Date.now());
-            }
-          }, 8000);
+        function showStatus(text, kind) {
+          statusEl.textContent = text;
+          statusEl.classList.remove('success', 'error');
+          if (kind) statusEl.classList.add(kind);
+          statusEl.classList.add('show');
         }
 
-        function pingBackend() {
-          // Hacemos un fetch lightweight al health del backend para decidir
-          // si Render ya desperto. Si responde 200, recargamos.
-          fetch('https://smdvital-backend.onrender.com/api/v1/health', {
-            cache: 'no-store',
-            mode: 'cors',
-          })
-            .then(function (r) {
-              if (r.ok) {
-                msg.textContent = 'Conexion recuperada. Volvemos a la app...';
-                window.location.replace('/login?_=' + Date.now());
-              } else {
-                scheduleAutoReload();
-              }
-            })
-            .catch(function () {
-              scheduleAutoReload();
-            });
+        // Recarga dura con cache-busting query param. Asi evitamos que el SW
+        // sirva una version vieja del index.html.
+        function hardReload() {
+          // Vamos a una URL nueva con ?_=timestamp para que NINGUN cache
+          // (browser ni SW) la confunda con una navegacion cacheada.
+          window.location.replace('/?_cb=' + Date.now());
+        }
+
+        function setButtonsBusy(busy) {
+          retry.disabled = busy;
+          clearSW.disabled = busy;
         }
 
         retry.addEventListener('click', function () {
-          pingBackend();
+          setButtonsBusy(true);
+          showStatus('Reintentando...', null);
+          // No fechamos al backend primero. Vamos directo a la app. Si la
+          // app falla de nuevo, el usuario vera el error real y puede
+          // elegir Limpiar cache.
+          setTimeout(hardReload, 100);
         });
+
         clearSW.addEventListener('click', function () {
+          setButtonsBusy(true);
+          showStatus('Limpiando cache...', null);
+          // IMPORTANTE: NO auto-recargar antes de terminar el cleanup. El
+          // antiguo codigo recargaba despues de unregister(), lo que causaba
+          // un loop infinito con el SW atrapado.
           if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function (regs) {
-              return Promise.all(regs.map(function (r) { return r.unregister(); }));
-            }).then(function () {
-              return caches.keys();
-            }).then(function (keys) {
-              return Promise.all(keys.map(function (k) { return caches.delete(k); }));
-            }).then(function () {
-              window.location.replace('/login?_=' + Date.now());
-            });
+            navigator.serviceWorker.getRegistrations()
+              .then(function (regs) {
+                return Promise.all(regs.map(function (r) {
+                  return r.unregister().catch(function () { return null; });
+                }));
+              })
+              .then(function () {
+                if ('caches' in window) {
+                  return caches.keys().then(function (keys) {
+                    return Promise.all(keys.map(function (k) {
+                      return caches.delete(k).catch(function () { return null; });
+                    }));
+                  });
+                }
+                return null;
+              })
+              .then(function () {
+                showStatus('Cache limpio. Recargando...', 'success');
+                // Pequeño delay para que el usuario vea el exito.
+                setTimeout(hardReload, 600);
+              })
+              .catch(function (err) {
+                showStatus('Error limpiando: ' + (err && err.message || err), 'error');
+                setButtonsBusy(false);
+              });
           } else {
-            window.location.replace('/login?_=' + Date.now());
+            setTimeout(hardReload, 600);
           }
         });
 
-        // Auto-intento: si el navegador detecta online, pinguea el backend.
-        window.addEventListener('online', pingBackend);
-        if (navigator.onLine) {
-          pingBackend();
-        } else {
-          scheduleAutoReload();
-        }
+        // NO auto-ping, NO auto-reload, NO listeners que disparen recargas.
+        // El usuario debe tocar un boton. iOS Safari atrapado en SW + Render
+        // dormido = loop infinito garantizado si recargas automaticamente.
       })();
     </script>
   </body>

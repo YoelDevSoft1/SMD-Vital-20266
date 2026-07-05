@@ -55,24 +55,48 @@
         navigator.serviceWorker.addEventListener('controllerchange', function () {
           if (refreshing) return;
           refreshing = true;
-          // El SW nuevo tomó control → recargar para usar sus assets.
           window.setTimeout(function () { window.location.reload(); }, 250);
         });
         window.addEventListener('load', function () {
           navigator.serviceWorker.getRegistration().then(function (reg) {
             if (!reg) return;
-            // Forzar check de updates en cada load. Si el operador acaba de
-            // hacer push, el celular detecta el SW nuevo sin esperar al
-            // próximo ciclo del navegador (que puede tardar horas).
             reg.update().catch(function () { /* offline */ });
           }).catch(function () { /* offline */ });
         });
-        // ?update=1 fuerza reload para casos extremos (operador del backoffice).
+        // ?update=1 fuerza SKIP_WAITING para que el operador del backoffice
+        // pueda forzar el upgrade manual.
         if (window.location.search.indexOf('update=1') !== -1) {
           navigator.serviceWorker.getRegistration().then(function (reg) {
             if (reg && reg.waiting) {
               reg.waiting.postMessage({ type: 'SKIP_WAITING' });
             }
+          });
+        }
+        // ?_cb=<ts> es la salida nuclear: desregistrar TODOS los SW y borrar
+        // TODAS las caches. Usado cuando el celular se queda atrapado en
+        // offline.html con un SW pegado. Tambien limpia el param de la URL
+        // para que no se gatille en cada reload.
+        if (window.location.search.indexOf('_cb=') !== -1) {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            return Promise.all(regs.map(function (r) {
+              return r.unregister().catch(function () { return null; });
+            }));
+          }).then(function () {
+            if ('caches' in window) {
+              return caches.keys().then(function (keys) {
+                return Promise.all(keys.map(function (k) {
+                  return caches.delete(k).catch(function () { return null; });
+                }));
+              });
+            }
+            return null;
+          }).then(function () {
+            // Limpiar el query param de la URL sin recargar la pagina.
+            try {
+              var url = new URL(window.location.href);
+              url.searchParams.delete('_cb');
+              window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+            } catch (e) { /* ignore */ }
           });
         }
       })();
