@@ -72,7 +72,7 @@ export function ModalCristal({
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     };
   }, [isOpen, onClose]);
 
@@ -87,9 +87,11 @@ export function ModalCristal({
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 flex items-center justify-center',
+        // Mobile: bottom-sheet edge-to-edge (items-end, sin padding).
+        // Desktop: modal centrado con respiro (items-center, padding 24).
+        'fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:justify-center',
         'bg-slate-950/80 backdrop-blur-xl',
-        'px-4 py-6 sm:px-6',
+        'p-0 sm:px-6 sm:py-6',
         'animate-[fadeIn_0.2s_ease-out]',
         overlayClassName
       )}
@@ -97,7 +99,13 @@ export function ModalCristal({
     >
       <div
         className={cn(
-          'relative w-full overflow-hidden rounded-2xl',
+          'relative flex w-full flex-col overflow-hidden',
+          // Mobile: 100dvh = fullscreen real (respeta viewport dinámico iOS).
+          // Desktop: 90vh con aire arriba/abajo para que se vea como modal.
+          'max-h-[100dvh] sm:max-h-[90vh]',
+          // Mobile: solo esquinas superiores redondeadas (bottom-sheet).
+          // Desktop: esquinas completas.
+          'rounded-t-2xl rounded-b-none sm:rounded-2xl',
           'animate-[slideUp_0.3s_ease-out]',
           modalSizes[size],
           modalVariants[variant],
@@ -119,7 +127,9 @@ export function ModalCristal({
           </div>
         )}
 
-        <div className="relative h-full max-h-[90vh] overflow-y-auto">{children}</div>
+        {/* Body con scroll. flex-1 para que ocupe el alto del contenedor flex-col
+            y permita header/footer sticky en los consumidores (e.g. Modal.tsx). */}
+        <div className="relative flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>
   );
