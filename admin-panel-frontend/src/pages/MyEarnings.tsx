@@ -11,7 +11,7 @@
  * Modal, GrupoFiltros, formatearCOP, obtenerMetaEstadoAck).
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle,
@@ -383,7 +383,7 @@ function DisputeModal({
   const [reason, setReason] = useState('');
 
   // Reset reason whenever a new ack is set
-  useMemo(() => {
+  useEffect(() => {
     setReason('');
   }, [ack?.id]);
 

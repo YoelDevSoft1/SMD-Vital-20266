@@ -93,7 +93,7 @@ export default function MyCommissions() {
           <Boton
             onClick={() => setShowCreateForm(true)}
             leftIcon={<Plus className="h-4 w-4" />}
-            className="w-full bg-slate-950 text-white shadow-soft-md hover:bg-slate-800 sm:w-auto dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+            className="w-full sm:w-auto"
           >
             <span className="hidden sm:inline">Agendar cita</span>
             <span className="sm:hidden">Agendar</span>
