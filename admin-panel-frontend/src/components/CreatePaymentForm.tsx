@@ -112,11 +112,11 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
     }
 
     if (!formData.method) {
-      newErrors.method = 'El método de pago es required';
+      newErrors.method = 'El método de pago es requerido';
     }
 
     if (!formData.status) {
-      newErrors.status = 'El estado es required';
+      newErrors.status = 'El estado es requerido';
     }
 
     setErrors(newErrors);
@@ -157,22 +157,21 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
   return (
     <ModalCristal isOpen={isOpen} onClose={onClose} size="xl" variant="glass">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-white/10 dark:border-white/5">
+      <div className="flex items-center justify-between border-b border-white/10 p-6 dark:border-white/5">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
-              <CreditCard className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900/20">
+              <CreditCard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {isEditing ? 'Editar Pago' : 'Nuevo Pago'}
+              <h2 className="text-2xl font-bold text-foreground dark:text-foreground">
+                {isEditing ? 'Editar pago' : 'Nuevo pago'}
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-muted-foreground dark:text-muted-foreground">
                 {isEditing ? 'Modifica la información del pago' : 'Crea un nuevo pago en el sistema'}
               </p>
             </div>
           </div>
-          <Boton variant="outline" onClick={onClose}>
-            <X className="w-4 h-4" />
+          <Boton variant="outline" onClick={onClose} leftIcon={<X className="h-4 w-4" />}>
             Cerrar
           </Boton>
         </div>
@@ -340,7 +339,7 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end space-x-3 pt-6 border-t">
+          <div className="flex flex-col-reverse items-stretch gap-2 border-t border-white/10 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex-row sm:justify-end dark:border-white/5">
             <Boton
               type="button"
               variant="outline"
@@ -351,19 +350,10 @@ export default function CreatePaymentForm({ isOpen, onClose, payment }: CreatePa
             </Boton>
             <Boton
               type="submit"
-              disabled={paymentMutation.isPending}
+              isLoading={paymentMutation.isPending}
+              leftIcon={<Save className="h-4 w-4" />}
             >
-              {paymentMutation.isPending ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  {isEditing ? 'Actualizando...' : 'Creando...'}
-                </div>
-              ) : (
-                <div className="flex items-center">
-                  <Save className="w-4 h-4" />
-                  {isEditing ? 'Actualizar Pago' : 'Crear Pago'}
-                </div>
-              )}
+              {isEditing ? 'Actualizar pago' : 'Crear pago'}
             </Boton>
           </div>
         </form>

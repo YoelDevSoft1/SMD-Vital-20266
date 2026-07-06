@@ -707,27 +707,24 @@ export default function Appointments() {
               <EsqueletoTabla rows={8} columns={6} />
             </div>
           ) : appointments.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 px-4 py-10 text-center sm:p-12">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted dark:bg-card">
-                <Calendar className="h-6 w-6 text-gray-400 dark:text-muted-foreground" />
-              </div>
-              <h3 className="text-sm font-medium text-foreground dark:text-foreground">No hay citas</h3>
-              <p className="max-w-sm text-sm text-muted-foreground dark:text-muted-foreground">
-                No se encontraron citas con los filtros aplicados.
-              </p>
-              <div className="mt-2 w-full max-w-xs">
+            <EstadoVacio
+              icon={Calendar}
+              title="No hay citas"
+              description="No se encontraron citas con los filtros aplicados."
+              action={
                 <Boton
+                  variant="primary"
                   onClick={() => {
                     setSelectedAppointment(null);
                     setShowCreateForm(true);
                   }}
-                  className="w-full sm:w-auto"
+                  leftIcon={<CalendarPlus className="h-4 w-4" />}
                 >
-                  <CalendarPlus className="h-4 w-4" />
                   Crear primera cita
                 </Boton>
-              </div>
-            </div>
+              }
+              size="md"
+            />
           ) : (
             <div className="divide-y divide-border dark:divide-border">
               {appointments.map((appointment: any) => (
@@ -813,46 +810,43 @@ export default function Appointments() {
                       </div>
 
                       {/* Actions */}
-                      <div className="mt-4 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+                      <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                         <Boton
                           variant="outline"
                           onClick={() => handleViewDetails(appointment)}
-                          className="col-span-3 min-h-[44px] dark:text-foreground dark:border-border dark:hover:bg-muted sm:col-span-1 sm:w-auto"
+                          leftIcon={<Eye className="h-4 w-4" />}
+                          className="col-span-2 min-h-[44px] dark:text-foreground dark:border-border dark:hover:bg-muted sm:col-span-1 sm:w-auto"
                         >
-                          <Eye className="h-4 w-4" />
                           Ver detalles
                         </Boton>
                         <Boton
-                          size="sm"
                           variant="outline"
                           onClick={() => setSelectedTimelineAppointment(appointment)}
                           aria-label="Trazabilidad"
+                          leftIcon={<ListChecks className="h-4 w-4" />}
                           className="min-h-[44px] min-w-[44px] justify-center dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
                         >
-                          <ListChecks className="h-4 w-4" />
                           <span className="sr-only sm:not-sr-only sm:ml-1">Trazabilidad</span>
                         </Boton>
                         <Boton
-                          size="sm"
                           variant="outline"
                           onClick={() => {
                             setSelectedAppointment(appointment);
                             setShowCreateForm(true);
                           }}
                           aria-label="Editar"
+                          leftIcon={<Edit2 className="h-4 w-4" />}
                           className="min-h-[44px] min-w-[44px] justify-center dark:text-foreground dark:border-border dark:hover:bg-muted sm:w-auto"
                         >
-                          <Edit2 className="h-4 w-4" />
                           <span className="sr-only sm:not-sr-only sm:ml-1">Editar</span>
                         </Boton>
                         <Boton
-                          size="sm"
                           variant="outline"
                           onClick={() => handleDeleteAppointment(appointment)}
                           aria-label="Eliminar"
+                          leftIcon={<Trash2 className="h-4 w-4" />}
                           className="min-h-[44px] min-w-[44px] justify-center text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-border dark:hover:bg-muted sm:w-auto"
                         >
-                          <Trash2 className="h-4 w-4" />
                           <span className="sr-only sm:not-sr-only sm:ml-1">Eliminar</span>
                         </Boton>
                       </div>

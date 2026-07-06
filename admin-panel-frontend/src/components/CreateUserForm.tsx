@@ -170,7 +170,7 @@ export default function CreateUserForm({ alExito, alCancelar }: Propiedades) {
         </Etiqueta>
         <select
           id="create-role"
-          className="h-11 w-full rounded-lg border border-input bg-card px-3 text-sm text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card"
+          className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm"
           value={datos.role}
           onChange={(e) => alCambiar('role', e.target.value as UserRole)}
         >
@@ -180,6 +180,11 @@ export default function CreateUserForm({ alExito, alCancelar }: Propiedades) {
             </option>
           ))}
         </select>
+        {errores.role ? (
+          <p className="text-sm font-medium text-red-600 dark:text-red-400">
+            {errores.role}
+          </p>
+        ) : null}
       </div>
 
       <fieldset className="space-y-3 rounded-lg border border-border p-3">
@@ -216,7 +221,7 @@ export default function CreateUserForm({ alExito, alCancelar }: Propiedades) {
         </div>
       </fieldset>
 
-      <div className="flex flex-col-reverse items-stretch gap-2 pt-2 sm:flex-row sm:justify-end">
+      <div className="flex flex-col-reverse items-stretch gap-2 border-t border-border pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex-row sm:justify-end">
         <Boton type="button" variant="outline" onClick={alCancelar} disabled={crearUsuarioMutacion.isPending}>
           Cancelar
         </Boton>

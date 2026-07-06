@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import { Boton } from '@/components/ui/Boton';
 import { Entrada } from '@/components/ui/Entrada';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
+import { EsqueletoLista } from '@/components/ui/Esqueleto';
 // import { Etiqueta } from '@/components/ui/Etiqueta';
 // import { Seleccion } from '@/components/ui/Seleccion';
 // import { Interruptor } from '@/components/ui/Interruptor';
@@ -40,7 +42,7 @@ export default function Services() {
   const [selectedService, setSelectedService] = useState(null);
 
   // Fetch services data for recent services display
-  const { data: recentServicesData } = useQuery({
+  const { data: recentServicesData, isLoading: isLoadingRecent } = useQuery({
     queryKey: ['recent-services'],
     queryFn: () => adminService.getServices({ page: 1, limit: 5 })
   });
@@ -138,62 +140,67 @@ export default function Services() {
 
   const getCategoryColor = (category: ServiceCategory) => {
     const colors: { [key in ServiceCategory]: string } = {
-      'CONSULTATION': 'bg-blue-100 text-blue-800',
-      'EMERGENCY': 'bg-red-100 text-red-800',
-      'LABORATORY': 'bg-yellow-100 text-yellow-800',
-      'NURSING': 'bg-green-100 text-green-800',
-      'SPECIALIST': 'bg-purple-100 text-purple-800',
-      'THERAPY': 'bg-pink-100 text-pink-800',
-      'VACCINATION': 'bg-indigo-100 text-indigo-800',
-      'OTHER': 'bg-muted text-muted-foreground'
+      'CONSULTATION': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+      'EMERGENCY': 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+      'LABORATORY': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+      'NURSING': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
+      'SPECIALIST': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300',
+      'THERAPY': 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-300',
+      'VACCINATION': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
+      'OTHER': 'bg-muted text-muted-foreground dark:bg-card dark:text-muted-foreground'
     };
-    return colors[category] || 'bg-muted text-muted-foreground';
+    return colors[category] || 'bg-muted text-muted-foreground dark:bg-card dark:text-muted-foreground';
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Gestión de Servicios</h1>
-          <p className="text-muted-foreground mt-1">Administra todos los servicios médicos del sistema</p>
+          <h1 className="text-2xl font-bold text-foreground sm:text-3xl dark:text-foreground">Gestión de Servicios</h1>
+          <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">Administra todos los servicios médicos del sistema</p>
         </div>
-        <div className="flex items-center space-x-3">
-          <Boton variant="outline" onClick={handleViewAll}>
-            <Filter className="w-4 h-4" />
+        <div className="flex flex-wrap items-center gap-3">
+          <Boton
+            variant="outline"
+            onClick={handleViewAll}
+            leftIcon={<Filter className="h-4 w-4" />}
+          >
             Ver Todos
           </Boton>
-          <Boton onClick={handleCreateNew}>
-            <Plus className="w-4 h-4" />
+          <Boton
+            onClick={handleCreateNew}
+            leftIcon={<Plus className="h-4 w-4" />}
+          >
             Nuevo Servicio
           </Boton>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
         {stats.map((stat, index) => (
-          <div key={index} className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                <div className="flex items-center mt-2">
+          <div key={index} className="rounded-lg border border-border bg-card p-4 shadow-soft-sm sm:p-5 dark:border-border dark:bg-card">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground dark:text-muted-foreground sm:text-sm">{stat.title}</p>
+                <p className="mt-1 text-xl font-semibold text-foreground dark:text-foreground sm:mt-2 sm:text-2xl">{stat.value}</p>
+                <div className="mt-1 flex items-center sm:mt-2">
                   {stat.changeType === 'positive' ? (
-                    <TrendingUp className="w-4 h-4 text-green-500" />
+                    <TrendingUp className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
                   ) : (
-                    <TrendingUp className="w-4 h-4 text-red-500 rotate-180" />
+                    <TrendingUp className="h-4 w-4 text-rose-500 rotate-180 dark:text-rose-400" />
                   )}
                   <span className={`text-sm font-medium ${
-                    stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
+                    stat.changeType === 'positive' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                   }`}>
                     {stat.change}
                   </span>
-                  <span className="text-sm text-muted-foreground ml-1">vs mes anterior</span>
+                  <span className="ml-1 text-sm text-muted-foreground dark:text-muted-foreground">vs mes anterior</span>
                 </div>
               </div>
-              <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                <stat.icon className={`w-6 h-6 ${stat.color}`} />
+              <div className={`shrink-0 rounded-full p-2.5 sm:p-3 ${stat.bgColor} dark:opacity-80`}>
+                <stat.icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.color} dark:opacity-90`} />
               </div>
             </div>
           </div>
@@ -201,65 +208,74 @@ export default function Services() {
       </div>
 
       {/* Recent Services */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Servicios Recientes</h2>
+      <div className="rounded-lg border border-border bg-card shadow-soft-sm dark:border-border dark:bg-card">
+        <div className="border-b border-border p-4 sm:p-6 dark:border-border">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Servicios Recientes</h2>
             <Boton variant="outline" onClick={handleViewAll}>
               Ver todos los servicios
             </Boton>
           </div>
         </div>
-        <div className="p-6">
-          {recentServices.length === 0 ? (
-            <div className="text-center py-12">
-              <Stethoscope className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-medium text-foreground mb-2">No hay servicios</h3>
-              <p className="text-muted-foreground mb-4">No se encontraron servicios recientes.</p>
-              <Boton onClick={handleCreateNew}>
-                <Plus className="w-4 h-4" />
-                Crear Primer Servicio
-              </Boton>
-            </div>
+        <div className="p-4 sm:p-6">
+          {isLoadingRecent ? (
+            <EsqueletoLista rows={4} />
+          ) : recentServices.length === 0 ? (
+            <EstadoVacio
+              icon={Stethoscope}
+              title="No hay servicios"
+              description="No se encontraron servicios recientes."
+              action={
+                <Boton
+                  variant="primary"
+                  onClick={handleCreateNew}
+                  leftIcon={<Plus className="h-4 w-4" />}
+                >
+                  Crear Primer Servicio
+                </Boton>
+              }
+              size="md"
+            />
           ) : (
             <div className="space-y-4">
               {recentServices.slice(0, 5).map((service: any) => (
-                <div key={service.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:shadow-md transition-shadow">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-blue-100 rounded-full">
-                      <Stethoscope className="w-5 h-5 text-blue-600" />
+                <div key={service.id} className="flex flex-col gap-3 rounded-lg border border-border p-4 transition-shadow hover:shadow-soft-md sm:flex-row sm:items-center sm:justify-between dark:border-border">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900/20">
+                      <Stethoscope className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <div>
-                      <p className="font-medium text-foreground">{service.name}</p>
-                      <p className="text-sm text-muted-foreground">{service.description}</p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(service.category)}`}>
+                    <div className="min-w-0">
+                      <p className="font-medium text-foreground dark:text-foreground">{service.name}</p>
+                      <p className="text-sm text-muted-foreground dark:text-muted-foreground">{service.description}</p>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getCategoryColor(service.category)}`}>
                           {getCategoryLabel(service.category)}
                         </span>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-muted-foreground dark:text-muted-foreground">
                           {new Intl.NumberFormat('es-CO', {
                             style: 'currency',
                             currency: 'COP'
                           }).format(service.basePrice)}
                         </span>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-muted-foreground dark:text-muted-foreground">
                           {service.duration} min
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      service.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      service.isActive ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-900/20 dark:text-rose-300'
                     }`}>
                       {service.isActive ? 'Activo' : 'Inactivo'}
                     </span>
                     <Boton
                       variant="outline"
-                      size="sm"
                       onClick={() => handleViewDetails(service)}
+                      aria-label="Ver detalles del servicio"
+                      leftIcon={<Eye className="h-4 w-4" />}
                     >
-                      <Eye className="w-4 h-4" />
+                      Ver
                     </Boton>
                   </div>
                 </div>

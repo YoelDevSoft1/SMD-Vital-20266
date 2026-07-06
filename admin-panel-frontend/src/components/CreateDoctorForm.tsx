@@ -106,22 +106,22 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CreateDoctorData, string>> = {};
 
-    if (!formData.email) newErrors.email = 'El email es required';
+    if (!formData.email) newErrors.email = 'El correo electrónico es requerido';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'El email no es válido';
+      newErrors.email = 'El correo electrónico no es válido';
     }
 
     if (!formData.password) newErrors.password = 'La contraseña es requerida';
-    else if (formData.password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    else if (formData.password.length < 8) {
+      newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
     }
 
-    if (!formData.firstName) newErrors.firstName = 'El firstName es required';
-    if (!formData.lastName) newErrors.lastName = 'El lastName es required';
-    if (!formData.licenseNumber) newErrors.licenseNumber = 'El número de licencia es required';
+    if (!formData.firstName?.trim()) newErrors.firstName = 'El nombre es requerido';
+    if (!formData.lastName?.trim()) newErrors.lastName = 'El apellido es requerido';
+    if (!formData.licenseNumber?.trim()) newErrors.licenseNumber = 'El número de licencia es requerido';
     if (!formData.specialty) newErrors.specialty = 'La especialidad es requerida';
-    if (formData.experience < 0) newErrors.experience = 'La experiencia debe ser mayor a 0';
-    if (formData.consultationFee < 0) newErrors.consultationFee = 'La tarifa debe ser mayor a 0';
+    if (formData.experience < 0) newErrors.experience = 'La experiencia debe ser mayor o igual a 0';
+    if (formData.consultationFee < 0) newErrors.consultationFee = 'La tarifa debe ser mayor o igual a 0';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -188,8 +188,9 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
           type="password"
           value={formData.password}
           onChange={(e) => handleChange('password', e.target.value)}
-          placeholder="Mínimo 6 caracteres"
+          placeholder="Mínimo 8 caracteres"
           error={errors.password}
+          autoComplete="new-password"
         />
       </div>
 
@@ -220,7 +221,7 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
           <Etiqueta htmlFor="specialty">Especialidad *</Etiqueta>
           <select
             id="specialty"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm"
             value={formData.specialty}
             onChange={(e) => handleChange('specialty', e.target.value)}
           >
@@ -230,6 +231,11 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
               </option>
             ))}
           </select>
+          {errors.specialty ? (
+            <p className="text-sm font-medium text-red-600 dark:text-red-400">
+              {errors.specialty}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -264,11 +270,11 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
         <Etiqueta htmlFor="bio">Biografía</Etiqueta>
         <textarea
           id="bio"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           rows={3}
           value={formData.bio}
           onChange={(e) => handleChange('bio', e.target.value)}
-          placeholder="Breve description profesional..."
+          placeholder="Breve descripción profesional..."
+          className="w-full rounded-lg border border-input bg-card px-3 py-2 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm"
         />
       </div>
 
@@ -278,14 +284,14 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
           id="isAvailable"
           checked={formData.isAvailable}
           onChange={(e) => handleChange('isAvailable', e.target.checked)}
-          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          className="h-4 w-4 rounded border-input text-brand-600 focus:ring-2 focus:ring-ring"
         />
-        <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900">
+        <label htmlFor="isAvailable" className="ml-2 block text-sm text-foreground">
           Doctor disponible para citas
         </label>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-4 border-t">
+      <div className="flex flex-col-reverse items-stretch gap-2 border-t border-border pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex-row sm:justify-end">
         <Boton
           type="button"
           variant="outline"
@@ -296,10 +302,9 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
         </Boton>
         <Boton
           type="submit"
-          disabled={createDoctorMutation.isPending}
-          className="bg-blue-600 hover:bg-blue-700"
+          isLoading={createDoctorMutation.isPending}
         >
-          {createDoctorMutation.isPending ? 'Creando...' : 'Crear Doctor'}
+          {createDoctorMutation.isPending ? 'Creando...' : 'Crear doctor'}
         </Boton>
       </div>
     </form>

@@ -334,7 +334,6 @@ export default function Users() {
           action={
             <div className="flex flex-wrap gap-2">
               <Boton
-                size="sm"
                 variant="success"
                 onClick={() => {
                   selectedUsers.forEach((id) =>
@@ -342,12 +341,11 @@ export default function Users() {
                   );
                   setSelectedUsers([]);
                 }}
-                leftIcon={<CheckCircle2 className="h-3.5 w-3.5" />}
+                leftIcon={<CheckCircle2 className="h-4 w-4" />}
               >
                 Activar
               </Boton>
               <Boton
-                size="sm"
                 variant="danger"
                 onClick={() => {
                   selectedUsers.forEach((id) =>
@@ -355,12 +353,12 @@ export default function Users() {
                   );
                   setSelectedUsers([]);
                 }}
-                leftIcon={<XCircle className="h-3.5 w-3.5" />}
+                leftIcon={<XCircle className="h-4 w-4" />}
               >
                 Desactivar
               </Boton>
               <ExportUsersButton users={users} selectedUsers={selectedUsers} />
-              <Boton size="sm" variant="outline" onClick={() => setSelectedUsers([])}>
+              <Boton variant="outline" onClick={() => setSelectedUsers([])}>
                 Cancelar
               </Boton>
             </div>
@@ -496,37 +494,34 @@ export default function Users() {
 
                         <div className="mt-4 flex flex-wrap gap-2">
                           <Boton
-                            size="sm"
                             variant="outline"
                             onClick={() => {
                               setSelectedUser(user);
                               setShowDetailsModal(true);
                             }}
-                            leftIcon={<Eye className="h-3.5 w-3.5" />}
+                            leftIcon={<Eye className="h-4 w-4" />}
                           >
                             Ver detalles
                           </Boton>
                           <Boton
-                            size="sm"
                             variant="outline"
                             onClick={() => {
                               setSelectedUser(user);
                               setShowEditModal(true);
                             }}
-                            leftIcon={<Edit2 className="h-3.5 w-3.5" />}
+                            leftIcon={<Edit2 className="h-4 w-4" />}
                           >
                             Editar
                           </Boton>
                           <Boton
-                            size="sm"
                             variant={user.isActive ? 'danger' : 'success'}
                             onClick={() => handleStatusToggle(user)}
                             isLoading={updateStatusMutation.isPending}
                             leftIcon={
                               user.isActive ? (
-                                <XCircle className="h-3.5 w-3.5" />
+                                <XCircle className="h-4 w-4" />
                               ) : (
-                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                <CheckCircle2 className="h-4 w-4" />
                               )
                             }
                           >
@@ -534,31 +529,28 @@ export default function Users() {
                           </Boton>
                           {!user.isVerified ? (
                             <Boton
-                              size="sm"
                               variant="outline"
                               onClick={() => verifyUserMutation.mutate(user.id)}
                               isLoading={verifyUserMutation.isPending}
-                              leftIcon={<CheckCircle2 className="h-3.5 w-3.5" />}
+                              leftIcon={<CheckCircle2 className="h-4 w-4" />}
                             >
                               Verificar
                             </Boton>
                           ) : null}
                           {canResetPasswords ? (
                             <Boton
-                              size="sm"
                               variant="outline"
                               onClick={() => handleResetPassword(user)}
                               isLoading={resetPasswordMutation.isPending && selectedUser?.id === user.id}
-                              leftIcon={<KeyRound className="h-3.5 w-3.5" />}
+                              leftIcon={<KeyRound className="h-4 w-4" />}
                             >
                               Restablecer
                             </Boton>
                           ) : null}
                           <Boton
-                            size="sm"
                             variant="danger"
                             onClick={() => handleDeleteUser(user)}
-                            leftIcon={<Trash2 className="h-3.5 w-3.5" />}
+                            leftIcon={<Trash2 className="h-4 w-4" />}
                           >
                             Eliminar
                           </Boton>

@@ -72,11 +72,11 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.patientId) {
-      newErrors.patientId = 'El paciente es required';
+      newErrors.patientId = 'El paciente es requerido';
     }
 
     if (!formData.doctorId) {
-      newErrors.doctorId = 'El doctor es required';
+      newErrors.doctorId = 'El doctor es requerido';
     }
 
     if (formData.rating < 1 || formData.rating > 5) {
@@ -186,7 +186,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
                   id="patientId"
                   value={formData.patientId}
                   onChange={(e) => handleInputChange('patientId', e.target.value)}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.patientId ? 'border-red-500' : ''}`}
+                  className={`h-11 w-full rounded-lg border bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm ${errors.patientId ? 'border-red-400' : 'border-input'}`}
                 >
                   <option value="">Seleccionar paciente</option>
                   {(patientsData?.data?.data?.data as any[])?.map((patient: any) => (
@@ -195,7 +195,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
                     </option>
                   ))}
                 </select>
-                {errors.patientId && <p className="text-red-500 text-sm mt-1">{errors.patientId}</p>}
+                {errors.patientId && <p className="mt-1 text-sm font-medium text-red-600 dark:text-red-400">{errors.patientId}</p>}
               </div>
 
               <div>
@@ -204,7 +204,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
                   id="doctorId"
                   value={formData.doctorId}
                   onChange={(e) => handleInputChange('doctorId', e.target.value)}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.doctorId ? 'border-red-500' : ''}`}
+                  className={`h-11 w-full rounded-lg border bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm ${errors.doctorId ? 'border-red-400' : 'border-input'}`}
                 >
                   <option value="">Seleccionar doctor</option>
                   {(doctorsData?.data?.data?.data as any[])?.map((doctor: any) => (
@@ -213,7 +213,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
                     </option>
                   ))}
                 </select>
-                {errors.doctorId && <p className="text-red-500 text-sm mt-1">{errors.doctorId}</p>}
+                {errors.doctorId && <p className="mt-1 text-sm font-medium text-red-600 dark:text-red-400">{errors.doctorId}</p>}
               </div>
             </div>
           </div>
@@ -251,7 +251,7 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
               id="comment"
               value={formData.comment}
               onChange={(e) => handleInputChange('comment', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-input bg-card px-3 py-2 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm"
               rows={4}
               placeholder="Escribe tu comentario sobre la atención recibida..."
             />
@@ -280,20 +280,16 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t">
+          <div className="flex flex-col-reverse items-stretch gap-2 border-t border-white/10 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex-row sm:justify-end dark:border-white/5">
             <Boton type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Boton>
-            <Boton 
-              type="submit" 
-              disabled={createMutation.isPending || updateMutation.isPending}
+            <Boton
+              type="submit"
+              isLoading={createMutation.isPending || updateMutation.isPending}
+              leftIcon={<Save className="h-4 w-4" />}
             >
-              {createMutation.isPending || updateMutation.isPending ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              ) : (
-                <Save className="w-4 h-4" />
-              )}
-              {isEditing ? 'Actualizar Reseña' : 'Crear Reseña'}
+              {isEditing ? 'Actualizar reseña' : 'Crear reseña'}
             </Boton>
           </div>
         </form>
