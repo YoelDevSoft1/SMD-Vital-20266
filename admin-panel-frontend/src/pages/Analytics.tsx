@@ -3,15 +3,17 @@ import { useQuery } from '@tanstack/react-query';
 import { subDays, format } from 'date-fns';
 import {
   Activity,
+  AlertCircle,
   DollarSign,
-  Users,
-  TrendingUp,
-  TrendingDown,
   LineChart,
   RefreshCw,
+  TrendingDown,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
 import type { AnalyticsMetric } from '@/types';
+import { Alerta } from '@/components/ui/Alerta';
 import { Boton } from '@/components/ui/Boton';
 import {
   Tarjeta,
@@ -20,6 +22,11 @@ import {
   TarjetaEncabezado,
   TarjetaTitulo,
 } from '@/components/ui/Tarjeta';
+import {
+  EsqueletoCuadriculaEstadisticas,
+  EsqueletoTarjeta,
+} from '@/components/ui/Esqueleto';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
 import AnalyticsTrendChart from '@/components/AnalyticsTrendChart';
 import AnalyticsInsightsModal from '@/components/AnalyticsInsightsModal';
 
@@ -109,8 +116,8 @@ export default function Analytics() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Analíticas</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Analíticas</h1>
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             Visualiza el desempeño general, métricas claves y tendencias de la plataforma.
           </p>
         </div>
@@ -127,13 +134,25 @@ export default function Analytics() {
       </div>
 
       {isLoading ? (
-        <div className="rounded-xl border border-dashed border-border bg-white p-12 text-center text-sm text-muted-foreground">
-          Cargando métricas...
+        <div className="space-y-6">
+          <EsqueletoCuadriculaEstadisticas count={3} />
+          <EsqueletoTarjeta />
+          <EsqueletoCuadriculaEstadisticas count={3} />
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-600">
-          Ocurrió un error al obtener los formData de analíticas. Intenta nuevamente.
-        </div>
+        <Alerta
+          variant="danger"
+          title="No se pudieron cargar las analíticas"
+          icon={AlertCircle}
+          action={
+            <Boton variant="outline" onClick={() => refetch()}>
+              <RefreshCw className="h-4 w-4" />
+              Reintentar
+            </Boton>
+          }
+        >
+          Verifica tu conexión o vuelve a intentarlo en unos segundos.
+        </Alerta>
       ) : (
         <>
           <div className="grid gap-4 md:grid-cols-3">
@@ -149,25 +168,36 @@ export default function Analytics() {
               const isPositive = change >= 0;
 
               return (
-                <Tarjeta key={metric} className="border border-border shadow-sm">
+                <Tarjeta
+                  key={metric}
+                  className="border border-border shadow-sm dark:border-border dark:bg-card"
+                >
                   <TarjetaEncabezado className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <TarjetaTitulo className="text-sm font-medium text-muted-foreground">
+                    <TarjetaTitulo className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">
                       {metricLabels[metric]}
                     </TarjetaTitulo>
-                    <Icon className="h-5 w-5 text-blue-500" />
+                    <Icon className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                   </TarjetaEncabezado>
                   <TarjetaContenido>
-                    <div className="text-2xl font-semibold text-foreground">{total}</div>
+                    <div className="text-2xl font-semibold text-foreground dark:text-foreground">{total}</div>
                     <p className="mt-2 flex items-center text-sm">
                       {isPositive ? (
-                        <TrendingUp className="mr-1 h-4 w-4 text-emerald-500" />
+                        <TrendingUp className="mr-1 h-4 w-4 text-emerald-500 dark:text-emerald-400" />
                       ) : (
-                        <TrendingDown className="mr-1 h-4 w-4 text-red-500" />
+                        <TrendingDown className="mr-1 h-4 w-4 text-red-500 dark:text-red-400" />
                       )}
-                      <span className={isPositive ? 'text-emerald-600' : 'text-red-600'}>
+                      <span
+                        className={
+                          isPositive
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-red-600 dark:text-red-400'
+                        }
+                      >
                         {formatPercent(change)}
                       </span>
-                      <span className="ml-2 text-muted-foreground">vs inicio del periodo</span>
+                      <span className="ml-2 text-muted-foreground dark:text-muted-foreground">
+                        vs inicio del periodo
+                      </span>
                     </p>
                   </TarjetaContenido>
                 </Tarjeta>
@@ -175,11 +205,13 @@ export default function Analytics() {
             })}
           </div>
 
-          <Tarjeta className="border border-border shadow-sm">
+          <Tarjeta className="border border-border shadow-sm dark:border-border dark:bg-card">
             <TarjetaEncabezado className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <TarjetaTitulo>Tendencias recientes</TarjetaTitulo>
-                <TarjetaDescripcion>
+                <TarjetaTitulo className="text-foreground dark:text-foreground">
+                  Tendencias recientes
+                </TarjetaTitulo>
+                <TarjetaDescripcion className="dark:text-muted-foreground">
                   Evolución de ingresos, citas y usuarios en los últimos 30 días.
                 </TarjetaDescripcion>
               </div>
@@ -197,51 +229,67 @@ export default function Analytics() {
               </div>
             </TarjetaEncabezado>
             <TarjetaContenido>
-              <AnalyticsTrendChart data={trends} visibleMetrics={visibleMetrics} />
+              {trends.length === 0 ? (
+                <EstadoVacio
+                  icon={LineChart}
+                  title="Sin datos de tendencia"
+                  description="No hay datos suficientes para los últimos 30 días."
+                />
+              ) : (
+                <AnalyticsTrendChart data={trends} visibleMetrics={visibleMetrics} />
+              )}
             </TarjetaContenido>
           </Tarjeta>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <Tarjeta className="border border-border bg-muted shadow-sm">
+            <Tarjeta className="border border-border bg-muted shadow-sm dark:border-border dark:bg-card">
               <TarjetaEncabezado>
-                <TarjetaTitulo>Ticket promedio</TarjetaTitulo>
-                <TarjetaDescripcion>Ingresos promedio por cita confirmada.</TarjetaDescripcion>
+                <TarjetaTitulo className="text-foreground dark:text-foreground">Ticket promedio</TarjetaTitulo>
+                <TarjetaDescripcion className="dark:text-muted-foreground">
+                  Ingresos promedio por cita confirmada.
+                </TarjetaDescripcion>
               </TarjetaEncabezado>
               <TarjetaContenido>
-                <p className="text-2xl font-semibold text-foreground">
+                <p className="text-2xl font-semibold text-foreground dark:text-foreground">
                   {formatCurrency(summary.averageOrderValue || 0)}
                 </p>
-                <p className="mt-2 text-xs text-muted-foreground">
+                <p className="mt-2 text-xs text-muted-foreground dark:text-muted-foreground">
                   Basado en {formatearNumero(summary.totalAppointments || 0)} citas del periodo.
                 </p>
               </TarjetaContenido>
             </Tarjeta>
-            <Tarjeta className="border border-emerald-200 bg-emerald-50/80 shadow-sm">
+            <Tarjeta className="border border-emerald-200 bg-emerald-50/80 shadow-sm dark:border-emerald-500/30 dark:bg-emerald-500/10">
               <TarjetaEncabezado>
-                <TarjetaTitulo>Crecimiento neto de usuarios</TarjetaTitulo>
-                <TarjetaDescripcion>Usuarios incorporados durante el periodo medido.</TarjetaDescripcion>
+                <TarjetaTitulo className="text-foreground dark:text-foreground">
+                  Crecimiento neto de usuarios
+                </TarjetaTitulo>
+                <TarjetaDescripcion className="dark:text-muted-foreground">
+                  Usuarios incorporados durante el periodo medido.
+                </TarjetaDescripcion>
               </TarjetaEncabezado>
               <TarjetaContenido>
-                <p className="text-2xl font-semibold text-emerald-900">
+                <p className="text-2xl font-semibold text-emerald-900 dark:text-emerald-300">
                   {formatearNumero(summary.totalUsers || 0)}
                 </p>
-                <p className="mt-2 text-xs text-emerald-700">
+                <p className="mt-2 text-xs text-emerald-700 dark:text-emerald-400/80">
                   Mantén campañas activas si la tendencia es positiva.
                 </p>
               </TarjetaContenido>
             </Tarjeta>
-            <Tarjeta className="border border-indigo-200 bg-indigo-50/80 shadow-sm">
+            <Tarjeta className="border border-indigo-200 bg-indigo-50/80 shadow-sm dark:border-indigo-500/30 dark:bg-indigo-500/10">
               <TarjetaEncabezado>
-                <TarjetaTitulo>Ritmo operativo</TarjetaTitulo>
-                <TarjetaDescripcion>Citas promedio gestionadas por día.</TarjetaDescripcion>
+                <TarjetaTitulo className="text-foreground dark:text-foreground">Ritmo operativo</TarjetaTitulo>
+                <TarjetaDescripcion className="dark:text-muted-foreground">
+                  Citas promedio gestionadas por día.
+                </TarjetaDescripcion>
               </TarjetaEncabezado>
               <TarjetaContenido>
-                <p className="text-2xl font-semibold text-indigo-900">
+                <p className="text-2xl font-semibold text-indigo-900 dark:text-indigo-300">
                   {trends.length > 0
                     ? formatearNumero(summary.totalAppointments / trends.length)
                     : '0'}
                 </p>
-                <p className="mt-2 text-xs text-indigo-700">
+                <p className="mt-2 text-xs text-indigo-700 dark:text-indigo-400/80">
                   Ajusta turnos y logística según esta capacidad base.
                 </p>
               </TarjetaContenido>

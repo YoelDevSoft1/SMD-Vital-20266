@@ -1,7 +1,18 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Database, Server, HardDrive, RefreshCw, Clock, AlertTriangle } from 'lucide-react';
+import {
+  Activity,
+  AlertCircle,
+  AlertTriangle,
+  Clock,
+  Database,
+  HardDrive,
+  HeartPulse,
+  RefreshCw,
+  Server,
+} from 'lucide-react';
 import { adminService } from '@/services/admin.service';
+import { Alerta } from '@/components/ui/Alerta';
 import { Boton } from '@/components/ui/Boton';
 import {
   Tarjeta,
@@ -10,6 +21,8 @@ import {
   TarjetaEncabezado,
   TarjetaTitulo,
 } from '@/components/ui/Tarjeta';
+import { EsqueletoCuadriculaEstadisticas, EsqueletoTarjeta } from '@/components/ui/Esqueleto';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
 import SystemLogsModal from '@/components/SystemLogsModal';
 
 function formatearFechaHora(value?: string) {
@@ -89,10 +102,17 @@ export default function SystemHealth() {
 
   if (isLoading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-muted-foreground">
-          <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
-          <span>Cargando estado del sistema...</span>
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Estado del Sistema</h1>
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
+            Última actualización: cargando...
+          </p>
+        </div>
+        <EsqueletoCuadriculaEstadisticas count={3} />
+        <div className="grid gap-6 md:grid-cols-2">
+          <EsqueletoTarjeta />
+          <EsqueletoTarjeta />
         </div>
       </div>
     );
@@ -102,25 +122,36 @@ export default function SystemHealth() {
     return (
       <div className="space-y-4">
         <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Estado del Sistema</h1>
-        <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-1 h-5 w-5 text-red-600 dark:text-red-400" />
-            <div className="space-y-2">
-              <p className="font-medium text-red-700 dark:text-red-300">
-                No se pudo obtener la información del sistema.
-              </p>
-              <p className="text-sm text-red-600/80 dark:text-red-400/80">
-                Verifica la conexión con el backend y vuelve a intentarlo.
-              </p>
-              <Boton
-                variant="outline"
-                onClick={() => refetch()}
-              >
-                Reintentar
-              </Boton>
-            </div>
-          </div>
-        </div>
+        <Alerta
+          variant="danger"
+          title="No se pudo obtener la información del sistema"
+          icon={AlertCircle}
+          action={
+            <Boton variant="outline" onClick={() => refetch()}>
+              <RefreshCw className="h-4 w-4" />
+              Reintentar
+            </Boton>
+          }
+        >
+          Verifica la conexión con el backend y vuelve a intentarlo.
+        </Alerta>
+      </div>
+    );
+  }
+
+  if (!health) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Estado del Sistema</h1>
+        <EstadoVacio
+          icon={HeartPulse}
+          title="Sin datos del sistema"
+          description="Aún no se han recibido reportes de salud del backend."
+          action={{
+            label: 'Reintentar',
+            onClick: () => refetch(),
+          }}
+        />
       </div>
     );
   }

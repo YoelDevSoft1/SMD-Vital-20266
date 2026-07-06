@@ -163,9 +163,9 @@ export default function BillingDashboard() {
       </div>
 
       {/* Por pagar — agrupado por destinatario */}
-      <Tarjeta>
+      <Tarjeta className="dark:bg-card">
         <TarjetaEncabezado>
-          <TarjetaTitulo className="flex flex-wrap items-center gap-2 text-base">
+          <TarjetaTitulo className="flex flex-wrap items-center gap-2 text-base text-foreground dark:text-foreground">
             <Clock className="h-4 w-4 text-warning" aria-hidden="true" />
             Por pagar
             <Insignia variant="warning" size="sm">
@@ -196,6 +196,7 @@ export default function BillingDashboard() {
               icon={Inbox}
               title="Sin pagos pendientes"
               description="Cuando haya pagos por realizar a profesionales o agentes aparecerán aquí."
+              size="md"
             />
           ) : (
             pendingByRecipient.map((group) => (
@@ -203,12 +204,12 @@ export default function BillingDashboard() {
                 key={group.id}
                 className="overflow-hidden rounded-lg border border-border"
               >
-                <div className="flex flex-wrap items-center justify-between gap-3 bg-muted/40 p-3 sm:p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 bg-muted/40 p-3 dark:bg-muted/40 sm:p-4">
                   <div className="flex min-w-0 items-center gap-3">
                     <Avatar name={group.name} size="md" />
                     <div className="min-w-0">
-                      <p className="truncate font-semibold text-foreground">{group.name}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="truncate font-semibold text-foreground dark:text-foreground">{group.name}</p>
+                      <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                         {group.role} · {group.items.length}{' '}
                         {group.items.length === 1 ? 'servicio' : 'servicios'}
                       </p>
@@ -248,9 +249,9 @@ export default function BillingDashboard() {
       </Tarjeta>
 
       {/* Pagado · por confirmar */}
-      <Tarjeta>
+      <Tarjeta className="dark:bg-card">
         <TarjetaEncabezado>
-          <TarjetaTitulo className="flex flex-wrap items-center gap-2 text-base">
+          <TarjetaTitulo className="flex flex-wrap items-center gap-2 text-base text-foreground dark:text-foreground">
             <Send className="h-4 w-4 text-info" aria-hidden="true" />
             Pagado · pendiente de confirmación
             <Insignia variant="info" size="sm">
@@ -282,6 +283,7 @@ export default function BillingDashboard() {
               icon={CheckCircle2}
               title="Sin pagos esperando confirmación"
               description="Cuando transfieras un pago, el destinatario podrá confirmarlo desde su panel."
+              size="md"
             />
           ) : (
             <PaidList acks={paidData?.acknowledgements ?? []} />
@@ -290,9 +292,9 @@ export default function BillingDashboard() {
       </Tarjeta>
 
       {/* Batches de liquidación */}
-      <Tarjeta>
+      <Tarjeta className="dark:bg-card">
         <TarjetaEncabezado>
-          <TarjetaTitulo className="flex flex-wrap items-center gap-2 text-base">
+          <TarjetaTitulo className="flex flex-wrap items-center gap-2 text-base text-foreground dark:text-foreground">
             <FileText className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
             Lotes de liquidación
             <Insignia variant="neutral" size="sm">
@@ -351,17 +353,17 @@ function AckRow({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5 text-sm sm:px-4">
       <div className="min-w-0 flex-1">
-        <p className="truncate text-foreground">
+        <p className="truncate text-foreground dark:text-foreground">
           {ack.appointment?.service?.name ?? 'Servicio'}
         </p>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground dark:text-muted-foreground">
           {ack.appointment?.patient?.user?.firstName} {ack.appointment?.patient?.user?.lastName}
           {' · '}
           {ack.appointment?.scheduledAt && formatearFecha(ack.appointment.scheduledAt)}
         </p>
       </div>
       <div className="flex items-center gap-3">
-        <span className="font-semibold tabular-nums text-foreground">
+        <span className="font-semibold tabular-nums text-foreground dark:text-foreground">
           {formatearCOP(ack.amount)}
         </span>
         <Boton size="sm" variant="outline" onClick={onPay} isLoading={loading}>
@@ -381,10 +383,10 @@ function PaidList({ acks }: { acks: Acknowledgement[] }) {
           className="flex items-center justify-between rounded-md border border-border p-2.5 text-sm"
         >
           <div className="min-w-0 flex-1">
-            <p className="truncate font-medium text-foreground">
+            <p className="truncate font-medium text-foreground dark:text-foreground">
               {ack.recipient?.firstName} {ack.recipient?.lastName}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground">
               {ack.appointment?.service?.name} ·{' '}
               {ack.appointment?.patient?.user?.firstName}{' '}
               {ack.appointment?.patient?.user?.lastName}
@@ -394,7 +396,7 @@ function PaidList({ acks }: { acks: Acknowledgement[] }) {
             <p className="font-semibold tabular-nums text-info">
               {formatearCOP(ack.amount)}
             </p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-[10px] text-muted-foreground dark:text-muted-foreground">
               pagado {ack.paidAt && formatearFecha(ack.paidAt)}
             </p>
           </div>
@@ -476,14 +478,14 @@ function BatchRow({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <p className="font-semibold text-foreground">
+            <p className="font-semibold text-foreground dark:text-foreground">
               {batch.recipient?.firstName} {batch.recipient?.lastName}
             </p>
             <Insignia variant={statusMeta.variant} size="sm">
               {statusMeta.etiqueta}
             </Insignia>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
             <Calendar className="mr-1 inline h-3 w-3" aria-hidden="true" />
             {formatearFecha(batch.periodStart)} → {formatearFecha(batch.periodEnd)}
             {' · '}
@@ -523,10 +525,10 @@ function BatchRow({
           </>
         ) : null}
         {batch.status === 'PAID' && batch.reference ? (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground dark:text-muted-foreground">
             <CheckCircle2 className="mr-1 inline h-3 w-3 text-success" aria-hidden="true" />
             Pagado · ref:{' '}
-            <span className="font-mono font-medium text-foreground">
+            <span className="font-mono font-medium text-foreground dark:text-foreground">
               {batch.reference}
             </span>
           </p>

@@ -1,12 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { format, subDays } from 'date-fns';
-import { Download, FileJson, RefreshCw } from 'lucide-react';
+import { AlertCircle, Download, FileJson, FileText, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
+import { Alerta } from '@/components/ui/Alerta';
 import { Boton } from '@/components/ui/Boton';
 import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
 import { Entrada } from '@/components/ui/Entrada';
+import { EsqueletoTabla } from '@/components/ui/Esqueleto';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
 import type { RipsDraft, RipsDraftFilters, RipsDraftStatus } from '@/types';
 
 const statusOptions: Array<RipsDraftStatus | ''> = ['', 'DRAFT', 'VALIDATED', 'EXPORTED', 'FAILED'];
@@ -71,6 +74,13 @@ export default function RipsDrafts() {
   const drafts: RipsDraft[] = payload?.data ?? [];
   const pagination = payload?.pagination;
 
+  // Toast on query error (in addition to inline error state)
+  useEffect(() => {
+    if (error) {
+      toast.error('No se pudo cargar RIPS');
+    }
+  }, [error]);
+
   const updateFilter = <K extends keyof RipsDraftFilters>(key: K, value: RipsDraftFilters[K]) => {
     setFilters((current) => ({
       ...current,
@@ -100,10 +110,10 @@ export default function RipsDrafts() {
         </div>
       </div>
 
-      <Tarjeta className="border border-border shadow-sm dark:border-border">
+      <Tarjeta className="sticky top-16 z-20 border border-border shadow-sm dark:border-border dark:bg-card/95">
         <TarjetaEncabezado>
-          <TarjetaTitulo className="flex items-center gap-2 text-lg">
-            <FileJson className="h-5 w-5 text-blue-600" />
+          <TarjetaTitulo className="flex items-center gap-2 text-lg text-foreground dark:text-foreground">
+            <FileJson className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             Filtros RIPS
           </TarjetaTitulo>
         </TarjetaEncabezado>
@@ -111,7 +121,7 @@ export default function RipsDrafts() {
           <select
             value={filters.status ?? ''}
             onChange={(event) => updateFilter('status', event.target.value as RipsDraftStatus | '')}
-            className="rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
+            className="h-11 rounded-lg border border-border bg-white px-3 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
           >
             {statusOptions.map((status) => (
               <option key={status || 'all'} value={status}>
@@ -135,14 +145,35 @@ export default function RipsDrafts() {
         </TarjetaContenido>
       </Tarjeta>
 
-      <Tarjeta className="border border-border shadow-sm dark:border-border">
+      <Tarjeta className="border border-border shadow-sm dark:border-border dark:bg-card">
         <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">Generando borradores...</div>
+            <div className="p-4 sm:p-6">
+              <EsqueletoTabla rows={8} columns={6} />
+            </div>
           ) : error ? (
-            <div className="p-12 text-center text-sm text-red-600 dark:text-red-400">No se pudo cargar RIPS.</div>
+            <div className="p-4 sm:p-6">
+              <Alerta
+                variant="danger"
+                title="No se pudo cargar RIPS"
+                icon={AlertCircle}
+                action={
+                  <Boton variant="outline" onClick={() => refetch()}>
+                    <RefreshCw className="h-4 w-4" />
+                    Reintentar
+                  </Boton>
+                }
+              >
+                Verifica tu conexión o vuelve a intentarlo en unos segundos.
+              </Alerta>
+            </div>
           ) : drafts.length === 0 ? (
-            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">No hay borradores para estos filtros.</div>
+            <EstadoVacio
+              icon={FileText}
+              title="Sin borradores RIPS"
+              description="No hay borradores para los filtros aplicados."
+              size="md"
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-border text-sm dark:divide-border">

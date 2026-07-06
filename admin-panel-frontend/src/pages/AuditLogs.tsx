@@ -1,11 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { format, subDays } from 'date-fns';
-import { RefreshCw, Search, ShieldCheck } from 'lucide-react';
+import { AlertCircle, FileSearch, RefreshCw, Search, ShieldCheck } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
+import { Alerta } from '@/components/ui/Alerta';
 import { Boton } from '@/components/ui/Boton';
 import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
 import { Entrada } from '@/components/ui/Entrada';
+import { EsqueletoTabla } from '@/components/ui/Esqueleto';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
 import type { AuditLogFilters, AuditLogEntry, UserRole } from '@/types';
 
 const roleOptions: Array<UserRole | ''> = ['', 'ADMIN', 'SUPER_ADMIN', 'DOCTOR', 'NURSE', 'PATIENT'];
@@ -37,6 +41,13 @@ export default function AuditLogs() {
     staleTime: 30_000,
   });
 
+  // Toast on query error (in addition to inline error state)
+  useEffect(() => {
+    if (error) {
+      toast.error('No se pudo cargar la auditoría');
+    }
+  }, [error]);
+
   const payload = data?.data?.data;
   const logs: AuditLogEntry[] = payload?.data ?? [];
   const pagination = payload?.pagination;
@@ -64,10 +75,10 @@ export default function AuditLogs() {
         </Boton>
       </div>
 
-      <Tarjeta className="border border-border shadow-sm dark:border-border">
+      <Tarjeta className="sticky top-16 z-20 border border-border shadow-sm dark:border-border dark:bg-card/95">
         <TarjetaEncabezado>
-          <TarjetaTitulo className="flex items-center gap-2 text-lg">
-            <ShieldCheck className="h-5 w-5 text-blue-600" />
+          <TarjetaTitulo className="flex items-center gap-2 text-lg text-foreground dark:text-foreground">
+            <ShieldCheck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             Filtros de auditoria
           </TarjetaTitulo>
         </TarjetaEncabezado>
@@ -80,7 +91,7 @@ export default function AuditLogs() {
           <select
             value={filters.actorRole ?? ''}
             onChange={(event) => updateFilter('actorRole', event.target.value as UserRole | '')}
-            className="rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
+            className="h-11 rounded-lg border border-border bg-white px-3 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
           >
             {roleOptions.map((role) => (
               <option key={role || 'all'} value={role}>
@@ -91,7 +102,7 @@ export default function AuditLogs() {
           <select
             value={filters.entity ?? ''}
             onChange={(event) => updateFilter('entity', event.target.value)}
-            className="rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
+            className="h-11 rounded-lg border border-border bg-white px-3 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
           >
             {entityOptions.map((entity) => (
               <option key={entity || 'all'} value={entity}>
@@ -102,7 +113,7 @@ export default function AuditLogs() {
           <select
             value={filters.action ?? ''}
             onChange={(event) => updateFilter('action', event.target.value)}
-            className="rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
+            className="h-11 rounded-lg border border-border bg-white px-3 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
           >
             {actionOptions.map((action) => (
               <option key={action || 'all'} value={action}>
@@ -127,14 +138,35 @@ export default function AuditLogs() {
         </TarjetaContenido>
       </Tarjeta>
 
-      <Tarjeta className="border border-border shadow-sm dark:border-border">
+      <Tarjeta className="border border-border shadow-sm dark:border-border dark:bg-card">
         <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">Cargando auditoria...</div>
+            <div className="p-4 sm:p-6">
+              <EsqueletoTabla rows={8} columns={5} />
+            </div>
           ) : error ? (
-            <div className="p-12 text-center text-sm text-red-600 dark:text-red-400">No se pudo cargar la auditoria.</div>
+            <div className="p-4 sm:p-6">
+              <Alerta
+                variant="danger"
+                title="No se pudo cargar la auditoría"
+                icon={AlertCircle}
+                action={
+                  <Boton variant="outline" onClick={() => refetch()}>
+                    <RefreshCw className="h-4 w-4" />
+                    Reintentar
+                  </Boton>
+                }
+              >
+                Verifica tu conexión o vuelve a intentarlo en unos segundos.
+              </Alerta>
+            </div>
           ) : logs.length === 0 ? (
-            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">No hay registros para estos filtros.</div>
+            <EstadoVacio
+              icon={FileSearch}
+              title="No hay registros"
+              description="No se encontraron registros para los filtros aplicados."
+              size="md"
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-border text-sm dark:divide-border">
@@ -160,7 +192,7 @@ export default function AuditLogs() {
                         <div className="text-xs text-muted-foreground dark:text-muted-foreground">{log.actorRole}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                        <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                           {log.action}
                         </span>
                       </td>
