@@ -15,7 +15,7 @@
  *
  * A11y / interaction:
  *   - `isLoading` adds `aria-busy="true"` + Loader2 spinner; button is disabled
- *   - Touch targets: sm ≥ 36px, md/lg ≥ 44px, icon = 40px square
+ *   - Touch targets: sm ≥ 40px, md/lg ≥ 44px, icon = 44px square (Apple HIG)
  *   - Focus ring uses global `focus-visible` ring tokens
  *   - Animations respect `prefers-reduced-motion` via Tailwind's `motion-safe:`
  */
@@ -34,7 +34,7 @@ export type VarianteBoton =
   | 'glass'
   | 'link';
 
-export type TamanoBoton = 'sm' | 'md' | 'lg' | 'icon';
+export type TamanoBoton = 'sm' | 'md' | 'lg' | 'icon' | 'iconSm';
 
 interface PropiedadesBoton extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: VarianteBoton;
@@ -108,10 +108,11 @@ const variantClasses: Record<VarianteBoton, string> = {
 };
 
 const sizeClasses: Record<TamanoBoton, string> = {
-  sm: 'h-9 px-3 text-xs rounded-md gap-1.5',
-  md: 'h-11 px-4 text-sm rounded-lg gap-2',          // ≥44px touch target
-  lg: 'h-12 px-6 text-base rounded-lg gap-2',
-  icon: 'h-10 w-10 rounded-md',                       // 40px square
+  sm: 'h-10 px-3 text-sm rounded-md gap-1.5',          // 40px — Apple HIG para acciones inline
+  md: 'h-11 px-4 text-sm rounded-lg gap-2',              // 44px touch target
+  lg: 'h-12 px-6 text-base rounded-lg gap-2',            // 48px
+  icon: 'h-11 w-11 rounded-md',                          // 44px square — Apple HIG
+  iconSm: 'h-9 w-9 rounded-md',                          // 36px — solo desktop cuando hay espacio
 };
 
 export function Boton({

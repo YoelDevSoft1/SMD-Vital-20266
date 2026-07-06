@@ -20,7 +20,8 @@ export function Entrada({ label, error, helperText, variant = 'solid', className
     forceColorScheme ?? (needsAutoScheme ? (theme === 'dark' ? 'dark' : 'light') : undefined);
 
   const baseStyles = [
-    'w-full px-4 py-2.5 rounded-lg text-sm',
+    'w-full px-4 py-2.5 rounded-lg text-base',
+    'min-h-[44px]',
     'focus:outline-none focus:ring-2 focus:ring-offset-1',
     'disabled:cursor-not-allowed',
     'transition-all duration-200',
@@ -53,8 +54,8 @@ export function Entrada({ label, error, helperText, variant = 'solid', className
     ].join(' '),
   };
 
-  // height mínimo móvil-friendly para inputs densos
-  const minHeight = props.type === 'date' || props.type === 'time' || props.type === 'number' ? 'min-h-[44px]' : '';
+  // height mínimo móvil-friendly para inputs densos — ya está en baseStyles; se conserva por compat
+  const minHeight = '';
 
   const errorStyles = error
     ? 'border-red-400/70 focus:border-red-500/70 focus:ring-red-500/50 dark:border-red-500/70 dark:focus:border-red-500/70 dark:focus:ring-red-500/50'

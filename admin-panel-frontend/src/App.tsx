@@ -27,6 +27,7 @@ import BillingDashboard from './pages/BillingDashboard';
 import type { UserRole } from './types';
 import { obtenerRutaInicio } from './utils/roles';
 import { realtimeService } from './services/realtime.service';
+import { RealtimeIndicator } from './components/RealtimeIndicator';
 
 function RoleRoute({
   children,
@@ -74,6 +75,7 @@ export default function App() {
   return (
     <>
       <RealtimeBridge />
+      <RealtimeIndicator />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

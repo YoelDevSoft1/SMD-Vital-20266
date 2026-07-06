@@ -1,5 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import type { AppointmentRealtimeEvent } from '@/types';
+import { REALTIME_EVENT_NAME } from '@/components/RealtimeIndicator';
 
 type AppointmentEventHandler = (event: AppointmentRealtimeEvent) => void;
 
@@ -23,6 +24,19 @@ function resolveSocketUrl() {
   return window.location.origin;
 }
 
+/**
+ * Emite un CustomEvent global para que el RealtimeIndicator muestre el badge
+ * "En vivo" sin acoplar el servicio al componente de UI.
+ */
+function emitRealtimeUpdate(payload: { appointmentId?: string; type?: string } = {}) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.dispatchEvent(new CustomEvent(REALTIME_EVENT_NAME, { detail: payload }));
+  } catch {
+    /* CustomEvent constructor puede fallar en navegadores antiguos — ignorar silenciosamente. */
+  }
+}
+
 export const realtimeService = {
   connect(onAppointmentEvent: AppointmentEventHandler) {
     const token = localStorage.getItem('accessToken');
@@ -40,8 +54,21 @@ export const realtimeService = {
       withCredentials: true,
     });
 
-    socket.on('appointment-event', onAppointmentEvent);
-    socket.on('appointment-status-changed', onAppointmentEvent);
+    socket.on('appointment-event', (event: AppointmentRealtimeEvent) => {
+      onAppointmentEvent(event);
+      emitRealtimeUpdate({
+        appointmentId: event.appointmentId,
+        type: 'appointment-event',
+      });
+    });
+
+    socket.on('appointment-status-changed', (event: AppointmentRealtimeEvent) => {
+      onAppointmentEvent(event);
+      emitRealtimeUpdate({
+        appointmentId: event.appointmentId,
+        type: 'appointment-status-changed',
+      });
+    });
 
     return () => {
       socket?.off('appointment-event', onAppointmentEvent);
