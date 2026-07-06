@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Boton } from './ui/Boton';
 import { Entrada } from './ui/Entrada';
 import { Etiqueta } from './ui/Etiqueta';
+import { PickerSelect, type PickerSelectOption } from './ui/PickerSelect';
 import { adminService } from '../services/admin.service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -36,6 +37,11 @@ const specialties = [
   'Neumología',
   'Hematología'
 ];
+
+const OPCIONES_ESPECIALIDAD: PickerSelectOption[] = specialties.map((s) => ({
+  value: s,
+  label: s,
+}));
 
 export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -226,20 +232,16 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         </div>
 
         <div>
-          <Etiqueta htmlFor="specialty">Especialidad *</Etiqueta>
-          <select
+          <PickerSelect
             id="specialty"
-            className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm"
+            label="Especialidad"
+            required
             value={formData.specialty}
-            onChange={(e) => handleChange('specialty', e.target.value)}
+            onChange={(value) => handleChange('specialty', value)}
+            options={OPCIONES_ESPECIALIDAD}
+            placeholder="Seleccionar especialidad..."
             disabled={isSubmitting}
-          >
-            {specialties.map(specialty => (
-              <option key={specialty} value={specialty}>
-                {specialty}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         <div>

@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Boton } from '@/components/ui/Boton';
 import { Entrada } from '@/components/ui/Entrada';
 import { Etiqueta } from '@/components/ui/Etiqueta';
+import { PickerSelect, type PickerSelectOption } from '@/components/ui/PickerSelect';
 import { adminService } from '@/services/admin.service';
 import toast from 'react-hot-toast';
 
@@ -50,6 +51,11 @@ const specialties = [
   'Neumología',
   'Hematología'
 ];
+
+const OPCIONES_ESPECIALIDAD: PickerSelectOption[] = specialties.map((s) => ({
+  value: s,
+  label: s,
+}));
 
 export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFormProps) {
   const [formData, setFormData] = useState<CreateDoctorData>({
@@ -218,24 +224,16 @@ export default function CreateDoctorForm({ onSuccess, onCancel }: CreateDoctorFo
           />
         </div>
         <div>
-          <Etiqueta htmlFor="specialty">Especialidad *</Etiqueta>
-          <select
+          <PickerSelect
             id="specialty"
-            className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm"
+            label="Especialidad"
+            required
             value={formData.specialty}
-            onChange={(e) => handleChange('specialty', e.target.value)}
-          >
-            {specialties.map(specialty => (
-              <option key={specialty} value={specialty}>
-                {specialty}
-              </option>
-            ))}
-          </select>
-          {errors.specialty ? (
-            <p className="text-sm font-medium text-red-600 dark:text-red-400">
-              {errors.specialty}
-            </p>
-          ) : null}
+            onChange={(value) => handleChange('specialty', value)}
+            options={OPCIONES_ESPECIALIDAD}
+            placeholder="Seleccionar especialidad..."
+            error={errors.specialty}
+          />
         </div>
       </div>
 

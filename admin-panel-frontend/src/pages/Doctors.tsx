@@ -26,9 +26,9 @@ import { Boton } from '@/components/ui/Boton';
 import { Entrada } from '@/components/ui/Entrada';
 import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
 import { EsqueletoTabla } from '@/components/ui/Esqueleto';
-import { Seleccion } from '@/components/ui/Seleccion';
 import { Etiqueta } from '@/components/ui/Etiqueta';
 import { EstadoVacio } from '@/components/ui/EstadoVacio';
+import { PickerSelect, type PickerSelectOption } from '@/components/ui/PickerSelect';
 import CreateDoctorForm from '@/components/CreateDoctorForm';
 import DoctorDetailsView from '@/components/DoctorDetailsView';
 import { EditDoctorForm } from '@/components/EditDoctorForm';
@@ -78,6 +78,24 @@ export default function Doctors() {
     'Reumatología',
     'Neumología',
     'Hematología'
+  ];
+
+  const ESPECIALIDADES_OPCIONES: PickerSelectOption[] = specialties.map((s) => ({
+    value: s,
+    label: s,
+  }));
+
+  const DISPONIBILIDAD_OPCIONES: PickerSelectOption[] = [
+    { value: 'true', label: 'Disponibles' },
+    { value: 'false', label: 'No disponibles' },
+  ];
+
+  const EXPERIENCIA_OPCIONES: PickerSelectOption[] = [
+    { value: '1', label: '1+ años' },
+    { value: '3', label: '3+ años' },
+    { value: '5', label: '5+ años' },
+    { value: '10', label: '10+ años' },
+    { value: '15', label: '15+ años' },
   ];
 
   // Fetch doctors for display
@@ -347,46 +365,40 @@ export default function Doctors() {
                 </div>
               </div>
               <div>
-                <Etiqueta htmlFor="doctors-specialty">Especialidad</Etiqueta>
-                <Seleccion
+                <PickerSelect
                   id="doctors-specialty"
+                  label="Especialidad"
                   value={filters.specialty || ''}
-                  onChange={(e) => handleFilterChange('specialty', e.target.value || undefined)}
-                >
-                  <option value="">Todas las especialidades</option>
-                  {specialties.map(specialty => (
-                    <option key={specialty} value={specialty}>
-                      {specialty}
-                    </option>
-                  ))}
-                </Seleccion>
+                  onChange={(v) => handleFilterChange('specialty', v || undefined)}
+                  options={ESPECIALIDADES_OPCIONES}
+                  placeholder="Todas las especialidades"
+                  variant="glass"
+                  title="Filtrar por especialidad"
+                />
               </div>
               <div>
-                <Etiqueta htmlFor="doctors-availability">Disponibilidad</Etiqueta>
-                <Seleccion
+                <PickerSelect
                   id="doctors-availability"
+                  label="Disponibilidad"
                   value={filters.isAvailable === undefined ? '' : filters.isAvailable.toString()}
-                  onChange={(e) => handleFilterChange('isAvailable', e.target.value === '' ? undefined : e.target.value === 'true')}
-                >
-                  <option value="">Todos</option>
-                  <option value="true">Disponibles</option>
-                  <option value="false">No disponibles</option>
-                </Seleccion>
+                  onChange={(v) => handleFilterChange('isAvailable', v === '' ? undefined : v === 'true')}
+                  options={DISPONIBILIDAD_OPCIONES}
+                  placeholder="Todos"
+                  variant="glass"
+                  title="Filtrar por disponibilidad"
+                />
               </div>
               <div>
-                <Etiqueta htmlFor="doctors-experience">Experiencia (años)</Etiqueta>
-                <Seleccion
+                <PickerSelect
                   id="doctors-experience"
-                  value={filters.experience || ''}
-                  onChange={(e) => handleFilterChange('experience', e.target.value ? parseInt(e.target.value) : undefined)}
-                >
-                  <option value="">Cualquier experiencia</option>
-                  <option value="1">1+ años</option>
-                  <option value="3">3+ años</option>
-                  <option value="5">5+ años</option>
-                  <option value="10">10+ años</option>
-                  <option value="15">15+ años</option>
-                </Seleccion>
+                  label="Experiencia (años)"
+                  value={filters.experience?.toString() || ''}
+                  onChange={(v) => handleFilterChange('experience', v ? parseInt(v, 10) : undefined)}
+                  options={EXPERIENCIA_OPCIONES}
+                  placeholder="Cualquier experiencia"
+                  variant="glass"
+                  title="Filtrar por experiencia"
+                />
               </div>
             </div>
           </TarjetaContenido>

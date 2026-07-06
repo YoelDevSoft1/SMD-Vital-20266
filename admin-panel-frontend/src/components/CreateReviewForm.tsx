@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { X, MessageSquare, Star, Save } from 'lucide-react';
 import { Boton } from './ui/Boton';
@@ -6,6 +6,7 @@ import { Entrada } from './ui/Entrada';
 import { Etiqueta } from './ui/Etiqueta';
 import { Interruptor } from './ui/Interruptor';
 import { ModalCristal } from './ui/ModalCristal';
+import { PickerSelect, type PickerSelectOption } from './ui/PickerSelect';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Review } from '@/types';
@@ -43,6 +44,42 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
     queryFn: () => adminService.getDoctors({ page: 1, limit: 100 }),
     enabled: isOpen
   });
+
+  // Opciones para PickerSelect derivadas de las queries (TopPicker necesita PickerSelectOption[])
+  const opcionesPacientes = useMemo<PickerSelectOption[]>(() => {
+    const lista = (patientsData?.data?.data?.data as Array<{
+      id: string;
+      user?: { firstName?: string; lastName?: string; email?: string };
+    }> | undefined) ?? [];
+    return lista.map((p) => {
+      const nombre = `${p.user?.firstName ?? ''} ${p.user?.lastName ?? ''}`.trim();
+      const email = p.user?.email ?? '';
+      return {
+        value: p.id,
+        label: nombre || 'Sin nombre',
+        sublabel: email || undefined,
+        searchText: `${nombre} ${email}`.trim(),
+      };
+    });
+  }, [patientsData]);
+
+  const opcionesDoctores = useMemo<PickerSelectOption[]>(() => {
+    const lista = (doctorsData?.data?.data?.data as Array<{
+      id: string;
+      specialty?: string;
+      user?: { firstName?: string; lastName?: string };
+    }> | undefined) ?? [];
+    return lista.map((d) => {
+      const nombre = `${d.user?.firstName ?? ''} ${d.user?.lastName ?? ''}`.trim();
+      const especialidad = d.specialty ?? '';
+      return {
+        value: d.id,
+        label: nombre ? `Dr. ${nombre}` : 'Sin nombre',
+        sublabel: especialidad || undefined,
+        searchText: `${nombre} ${especialidad}`.trim(),
+      };
+    });
+  }, [doctorsData]);
 
   // Initialize form data when editing
   useEffect(() => {
@@ -181,39 +218,33 @@ export default function CreateReviewForm({ isOpen, onClose, review }: CreateRevi
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Paciente y Doctor</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Etiqueta htmlFor="patientId">Paciente *</Etiqueta>
-                <select
+                <PickerSelect
                   id="patientId"
+                  label="Paciente"
+                  required
                   value={formData.patientId}
-                  onChange={(e) => handleInputChange('patientId', e.target.value)}
-                  className={`h-11 w-full rounded-lg border bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm ${errors.patientId ? 'border-red-400' : 'border-input'}`}
-                >
-                  <option value="">Seleccionar paciente</option>
-                  {(patientsData?.data?.data?.data as any[])?.map((patient: any) => (
-                    <option key={patient.id} value={patient.id}>
-                      {patient.user?.firstName} {patient.user?.lastName} - {patient.user?.email}
-                    </option>
-                  ))}
-                </select>
-                {errors.patientId && <p className="mt-1 text-sm font-medium text-red-600 dark:text-red-400">{errors.patientId}</p>}
+                  onChange={(value) => handleInputChange('patientId', value)}
+                  options={opcionesPacientes}
+                  placeholder="Seleccionar paciente..."
+                  searchPlaceholder="Buscar paciente..."
+                  emptyText="Sin pacientes"
+                  error={errors.patientId}
+                />
               </div>
 
               <div>
-                <Etiqueta htmlFor="doctorId">Doctor *</Etiqueta>
-                <select
+                <PickerSelect
                   id="doctorId"
+                  label="Doctor"
+                  required
                   value={formData.doctorId}
-                  onChange={(e) => handleInputChange('doctorId', e.target.value)}
-                  className={`h-11 w-full rounded-lg border bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm ${errors.doctorId ? 'border-red-400' : 'border-input'}`}
-                >
-                  <option value="">Seleccionar doctor</option>
-                  {(doctorsData?.data?.data?.data as any[])?.map((doctor: any) => (
-                    <option key={doctor.id} value={doctor.id}>
-                      Dr. {doctor.user?.firstName} {doctor.user?.lastName} - {doctor.specialty}
-                    </option>
-                  ))}
-                </select>
-                {errors.doctorId && <p className="mt-1 text-sm font-medium text-red-600 dark:text-red-400">{errors.doctorId}</p>}
+                  onChange={(value) => handleInputChange('doctorId', value)}
+                  options={opcionesDoctores}
+                  placeholder="Seleccionar doctor..."
+                  searchPlaceholder="Buscar doctor..."
+                  emptyText="Sin doctores"
+                  error={errors.doctorId}
+                />
               </div>
             </div>
           </div>

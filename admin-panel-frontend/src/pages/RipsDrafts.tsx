@@ -10,9 +10,23 @@ import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/c
 import { Entrada } from '@/components/ui/Entrada';
 import { EsqueletoTabla } from '@/components/ui/Esqueleto';
 import { EstadoVacio } from '@/components/ui/EstadoVacio';
+import { PickerSelect, type PickerSelectOption } from '@/components/ui/PickerSelect';
 import type { RipsDraft, RipsDraftFilters, RipsDraftStatus } from '@/types';
 
-const statusOptions: Array<RipsDraftStatus | ''> = ['', 'DRAFT', 'VALIDATED', 'EXPORTED', 'FAILED'];
+const STATUS_VALUES: Array<RipsDraftStatus | ''> = ['', 'DRAFT', 'VALIDATED', 'EXPORTED', 'FAILED'];
+
+const STATUS_LABELS: Record<string, string> = {
+  '': 'Todos los estados',
+  DRAFT: 'Borrador',
+  VALIDATED: 'Validado',
+  EXPORTED: 'Exportado',
+  FAILED: 'Fallido',
+};
+
+const OPCIONES_STATUS: PickerSelectOption[] = STATUS_VALUES.map((status) => ({
+  value: status,
+  label: STATUS_LABELS[status] ?? status,
+}));
 
 const statusClass: Record<RipsDraftStatus, string> = {
   DRAFT: 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300',
@@ -118,17 +132,13 @@ export default function RipsDrafts() {
           </TarjetaTitulo>
         </TarjetaEncabezado>
         <TarjetaContenido className="grid gap-3 md:grid-cols-4">
-          <select
+          <PickerSelect
             value={filters.status ?? ''}
-            onChange={(event) => updateFilter('status', event.target.value as RipsDraftStatus | '')}
-            className="h-11 rounded-lg border border-border bg-white px-3 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
-          >
-            {statusOptions.map((status) => (
-              <option key={status || 'all'} value={status}>
-                {status || 'Todos los estados'}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => updateFilter('status', v as RipsDraftStatus | '')}
+            options={OPCIONES_STATUS}
+            variant="glass"
+            title="Filtrar por estado"
+          />
           <Entrada
             type="date"
             value={filters.dateFrom ?? ''}

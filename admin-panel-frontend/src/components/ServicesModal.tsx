@@ -4,6 +4,7 @@ import { X, Stethoscope, Search, Plus, Edit, Trash2, Eye, AlertCircle } from 'lu
 import { Boton } from './ui/Boton';
 import { Entrada } from './ui/Entrada';
 import { Etiqueta } from './ui/Etiqueta';
+import { PickerSelect, type PickerSelectOption } from './ui/PickerSelect';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Service, ServiceFilters } from '@/types';
@@ -219,36 +220,40 @@ export default function ServicesModal({ isOpen, onClose }: ServicesModalProps) {
 
             <div>
               <Etiqueta htmlFor="category" className="text-gray-700 dark:text-gray-300">Categoría</Etiqueta>
-              <select
+              <PickerSelect
                 id="category"
                 value={filters.category || ''}
-                onChange={(e) => handleFilterChange('category', e.target.value || undefined)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              >
-                <option value="">Todas las categorías</option>
-                <option value="CONSULTATION">Consulta</option>
-                <option value="EMERGENCY">Emergencia</option>
-                <option value="FOLLOW_UP">Seguimiento</option>
-                <option value="PREVENTIVE">Preventivo</option>
-                <option value="SPECIALIST">Especialista</option>
-              </select>
+                onChange={(value) => handleFilterChange('category', value || undefined)}
+                options={[
+                  { value: '', label: 'Todas las categorías' },
+                  { value: 'CONSULTATION', label: 'Consulta' },
+                  { value: 'EMERGENCY', label: 'Emergencia' },
+                  { value: 'FOLLOW_UP', label: 'Seguimiento' },
+                  { value: 'PREVENTIVE', label: 'Preventivo' },
+                  { value: 'SPECIALIST', label: 'Especialista' },
+                ]}
+                variant="solid"
+                placeholder="Todas las categorías"
+              />
             </div>
 
             <div>
               <Etiqueta htmlFor="status" className="text-gray-700 dark:text-gray-300">Estado</Etiqueta>
-              <select
+              <PickerSelect
                 id="status"
                 value={filters.isActive === undefined ? '' : filters.isActive ? 'active' : 'inactive'}
-                onChange={(e) => {
-                  const isActive = e.target.value === '' ? undefined : e.target.value === 'active';
+                onChange={(value) => {
+                  const isActive = value === '' ? undefined : value === 'active';
                   handleFilterChange('isActive', isActive);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              >
-                <option value="">Todos los estados</option>
-                <option value="active">Activos</option>
-                <option value="inactive">Inactivos</option>
-              </select>
+                options={[
+                  { value: '', label: 'Todos los estados' },
+                  { value: 'active', label: 'Activos' },
+                  { value: 'inactive', label: 'Inactivos' },
+                ]}
+                variant="solid"
+                placeholder="Todos los estados"
+              />
             </div>
 
             <div className="flex items-end">

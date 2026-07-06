@@ -4,10 +4,16 @@ import { Boton } from '@/components/ui/Boton';
 import { Entrada } from '@/components/ui/Entrada';
 import { Etiqueta } from '@/components/ui/Etiqueta';
 import { Interruptor } from '@/components/ui/Interruptor';
+import { PickerSelect, type PickerSelectOption } from '@/components/ui/PickerSelect';
 import { adminService } from '@/services/admin.service';
 import { OPCIONES_ROLES } from '@/utils/roles';
 import type { User, UserRole } from '@/types';
 import { toast } from 'react-hot-toast';
+
+const OPCIONES_ROL_PICKER: PickerSelectOption[] = OPCIONES_ROLES.map((op) => ({
+  value: op.valor,
+  label: op.etiqueta,
+}));
 
 interface UsuarioEditable {
   id: string;
@@ -145,26 +151,15 @@ export const EditUserForm: React.FC<Propiedades> = ({ user, alExito, alCancelar 
         </div>
 
         <div className="space-y-1.5 md:col-span-2">
-          <Etiqueta htmlFor="edit-role" required>
-            Rol
-          </Etiqueta>
-          <select
+          <PickerSelect
             id="edit-role"
-            className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm"
+            label="Rol"
+            required
             value={datos.role}
-            onChange={(e) => alCambiar('role', e.target.value as UserRole)}
-          >
-            {OPCIONES_ROLES.map((op) => (
-              <option key={op.valor} value={op.valor}>
-                {op.etiqueta}
-              </option>
-            ))}
-          </select>
-          {errores.role ? (
-            <p className="text-sm font-medium text-red-600 dark:text-red-400">
-              {errores.role}
-            </p>
-          ) : null}
+            onChange={(value) => alCambiar('role', value as UserRole)}
+            options={OPCIONES_ROL_PICKER}
+            error={errores.role}
+          />
         </div>
       </div>
 

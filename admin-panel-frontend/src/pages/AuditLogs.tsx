@@ -10,11 +10,61 @@ import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/c
 import { Entrada } from '@/components/ui/Entrada';
 import { EsqueletoTabla } from '@/components/ui/Esqueleto';
 import { EstadoVacio } from '@/components/ui/EstadoVacio';
+import { PickerSelect, type PickerSelectOption } from '@/components/ui/PickerSelect';
 import type { AuditLogFilters, AuditLogEntry, UserRole } from '@/types';
 
-const roleOptions: Array<UserRole | ''> = ['', 'ADMIN', 'SUPER_ADMIN', 'DOCTOR', 'NURSE', 'PATIENT'];
-const entityOptions = ['', 'APPOINTMENT', 'ENCOUNTER', 'MEDICAL_RECORD', 'PRESCRIPTION', 'PAYMENT', 'USER', 'SERVICE', 'REVIEW', 'NOTIFICATION'];
-const actionOptions = ['', 'CREATE', 'UPDATE', 'DELETE', 'COMPLETE', 'SEND_EMAIL', 'DOWNLOAD', 'LOGIN', 'LOGOUT'];
+const ROLE_OPTIONS: Array<UserRole | ''> = ['', 'ADMIN', 'SUPER_ADMIN', 'DOCTOR', 'NURSE', 'PATIENT'];
+const ENTITY_OPTIONS = ['', 'APPOINTMENT', 'ENCOUNTER', 'MEDICAL_RECORD', 'PRESCRIPTION', 'PAYMENT', 'USER', 'SERVICE', 'REVIEW', 'NOTIFICATION'];
+const ACTION_OPTIONS = ['', 'CREATE', 'UPDATE', 'DELETE', 'COMPLETE', 'SEND_EMAIL', 'DOWNLOAD', 'LOGIN', 'LOGOUT'];
+
+const ROLE_LABELS: Record<string, string> = {
+  '': 'Todos los roles',
+  ADMIN: 'Admin',
+  SUPER_ADMIN: 'Super Admin',
+  DOCTOR: 'Médico',
+  NURSE: 'Enfermero/a',
+  PATIENT: 'Paciente',
+};
+
+const ENTITY_LABELS: Record<string, string> = {
+  '': 'Todas las entidades',
+  APPOINTMENT: 'Cita',
+  ENCOUNTER: 'Atención',
+  MEDICAL_RECORD: 'Historia clínica',
+  PRESCRIPTION: 'Receta',
+  PAYMENT: 'Pago',
+  USER: 'Usuario',
+  SERVICE: 'Servicio',
+  REVIEW: 'Reseña',
+  NOTIFICATION: 'Notificación',
+};
+
+const ACTION_LABELS: Record<string, string> = {
+  '': 'Todas las acciones',
+  CREATE: 'Crear',
+  UPDATE: 'Actualizar',
+  DELETE: 'Eliminar',
+  COMPLETE: 'Completar',
+  SEND_EMAIL: 'Enviar correo',
+  DOWNLOAD: 'Descargar',
+  LOGIN: 'Iniciar sesión',
+  LOGOUT: 'Cerrar sesión',
+};
+
+const OPCIONES_ROL: PickerSelectOption[] = ROLE_OPTIONS.map((role) => ({
+  value: role,
+  label: ROLE_LABELS[role] ?? role,
+}));
+
+const OPCIONES_ENTIDAD: PickerSelectOption[] = ENTITY_OPTIONS.map((entity) => ({
+  value: entity,
+  label: ENTITY_LABELS[entity] ?? entity,
+}));
+
+const OPCIONES_ACCION: PickerSelectOption[] = ACTION_OPTIONS.map((action) => ({
+  value: action,
+  label: ACTION_LABELS[action] ?? action,
+}));
 
 const formatearFechaHora = (value: string) =>
   new Intl.DateTimeFormat('es-CO', {
@@ -88,39 +138,27 @@ export default function AuditLogs() {
             onChange={(event) => updateFilter('search', event.target.value)}
             placeholder="Buscar actor o entidad"
           />
-          <select
+          <PickerSelect
             value={filters.actorRole ?? ''}
-            onChange={(event) => updateFilter('actorRole', event.target.value as UserRole | '')}
-            className="h-11 rounded-lg border border-border bg-white px-3 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
-          >
-            {roleOptions.map((role) => (
-              <option key={role || 'all'} value={role}>
-                {role || 'Todos los roles'}
-              </option>
-            ))}
-          </select>
-          <select
+            onChange={(v) => updateFilter('actorRole', v as UserRole | '')}
+            options={OPCIONES_ROL}
+            variant="glass"
+            title="Filtrar por rol"
+          />
+          <PickerSelect
             value={filters.entity ?? ''}
-            onChange={(event) => updateFilter('entity', event.target.value)}
-            className="h-11 rounded-lg border border-border bg-white px-3 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
-          >
-            {entityOptions.map((entity) => (
-              <option key={entity || 'all'} value={entity}>
-                {entity || 'Todas las entidades'}
-              </option>
-            ))}
-          </select>
-          <select
+            onChange={(v) => updateFilter('entity', v)}
+            options={OPCIONES_ENTIDAD}
+            variant="glass"
+            title="Filtrar por entidad"
+          />
+          <PickerSelect
             value={filters.action ?? ''}
-            onChange={(event) => updateFilter('action', event.target.value)}
-            className="h-11 rounded-lg border border-border bg-white px-3 text-sm text-foreground dark:border-border dark:bg-card dark:text-foreground"
-          >
-            {actionOptions.map((action) => (
-              <option key={action || 'all'} value={action}>
-                {action || 'Todas las actions'}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => updateFilter('action', v)}
+            options={OPCIONES_ACCION}
+            variant="glass"
+            title="Filtrar por acción"
+          />
           <Entrada
             type="date"
             value={filters.dateFrom ?? ''}
