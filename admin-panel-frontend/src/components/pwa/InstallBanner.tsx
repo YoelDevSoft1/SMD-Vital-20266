@@ -110,9 +110,11 @@ export default function InstallBanner() {
       role="dialog"
       aria-label="Instalar SMD Vital"
       className={cn(
-        'fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-40 sm:bottom-4 sm:right-4 sm:left-auto sm:max-w-sm',
+        // Mobile: anclado arriba (debajo del Header) para no chocar con MobileBottomNav.
+        // Desktop: esquina inferior derecha tradicional.
+        'fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4rem)] z-40 sm:top-auto sm:bottom-4 sm:right-4 sm:left-auto sm:max-w-sm',
         'rounded-2xl border border-blue-200 bg-white/95 p-4 shadow-2xl backdrop-blur-xl',
-        'animate-in slide-in-from-bottom-4 fade-in duration-300',
+        'animate-in slide-in-from-top-4 fade-in duration-300 sm:animate-in sm:slide-in-from-bottom-4',
         'dark:border-slate-700 dark:bg-slate-900/95'
       )}
     >

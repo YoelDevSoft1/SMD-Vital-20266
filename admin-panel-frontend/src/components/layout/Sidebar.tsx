@@ -314,7 +314,7 @@ export default function Sidebar({ open, isDesktop, onClose, collapsed, onToggleC
               onClick={onClose}
               aria-label="Cerrar menú lateral"
               className={cn(
-                'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md',
+                'inline-flex h-11 w-11 sm:h-10 sm:w-10 flex-shrink-0 items-center justify-center rounded-md',
                 'text-muted-foreground transition-colors',
                 'hover:bg-muted hover:text-foreground',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
@@ -389,7 +389,7 @@ export default function Sidebar({ open, isDesktop, onClose, collapsed, onToggleC
           <div className="mt-2 flex items-center gap-2 rounded-lg border border-border bg-card p-2">
             <div
               aria-hidden="true"
-              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-brand-500 to-info text-sm font-bold text-white"
+              className="flex h-11 w-11 sm:h-10 sm:w-10 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-brand-500 to-info text-sm font-bold text-white"
             >
               {initials}
             </div>
@@ -405,7 +405,7 @@ export default function Sidebar({ open, isDesktop, onClose, collapsed, onToggleC
               aria-label="Cerrar sesión"
               title="Cerrar sesión"
               className={cn(
-                'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md',
+                'inline-flex h-11 w-11 sm:h-10 sm:w-10 flex-shrink-0 items-center justify-center rounded-md',
                 'text-muted-foreground transition-colors',
                 'hover:bg-danger/10 hover:text-danger',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-card',

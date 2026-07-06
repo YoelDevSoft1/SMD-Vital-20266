@@ -127,9 +127,11 @@ export default function UpdatePrompt() {
       <div
         role="alert"
         className={cn(
-          'fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-[60] sm:bottom-4 sm:right-4 sm:left-auto sm:max-w-sm',
+          // Mobile: arriba (debajo del Header) para evitar overlap con MobileBottomNav.
+          // Desktop: esquina inferior derecha.
+          'fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4rem)] z-[60] sm:top-auto sm:bottom-4 sm:right-4 sm:left-auto sm:max-w-sm',
           'flex items-center gap-3 rounded-2xl border border-blue-200 bg-white/95 p-4 shadow-2xl backdrop-blur-xl',
-          'animate-in slide-in-from-bottom-4 fade-in duration-300',
+          'animate-in slide-in-from-top-4 fade-in duration-300 sm:slide-in-from-bottom-4',
           'dark:border-slate-700 dark:bg-slate-900/95'
         )}
       >
@@ -169,9 +171,11 @@ export default function UpdatePrompt() {
       <div
         role="status"
         className={cn(
-          'fixed bottom-[calc(env(safe-area-inset-bottom)+5rem)] left-3 right-3 z-[60] sm:bottom-4 sm:left-auto sm:max-w-xs',
+          // Mobile: arriba (debajo del Header) para evitar overlap con MobileBottomNav.
+          // Desktop: esquina inferior izquierda.
+          'fixed top-[calc(env(safe-area-inset-top)+4rem)] left-3 right-3 z-[60] sm:top-auto sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-xs',
           'flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 shadow-lg',
-          'animate-in slide-in-from-bottom-4 fade-in duration-300',
+          'animate-in slide-in-from-top-4 fade-in duration-300 sm:slide-in-from-bottom-4',
           'dark:border-emerald-700 dark:bg-emerald-900/40'
         )}
       >
