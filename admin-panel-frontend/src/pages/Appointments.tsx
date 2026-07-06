@@ -38,9 +38,27 @@ import CreateAppointmentForm from '@/components/CreateAppointmentForm';
 import AppointmentDetailsView from '@/components/AppointmentDetailsView';
 import DailyRouteMap from '@/components/DailyRouteMap';
 import { DialogoConfirmacion } from '@/components/ui/DialogoConfirmacion';
+import { PickerSelect, type PickerSelectOption } from '@/components/ui/PickerSelect';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
 import type { Appointment, AppointmentFilters, AppointmentStatus, AppointmentTimelineItem, Doctor } from '@/types';
+
+const ESTADOS_CITA_OPCIONES: PickerSelectOption[] = [
+  { value: 'PENDING', label: 'Pendiente' },
+  { value: 'CONFIRMED', label: 'Confirmada' },
+  { value: 'IN_PROGRESS', label: 'En Progreso' },
+  { value: 'COMPLETED', label: 'Completada' },
+  { value: 'CANCELLED', label: 'Cancelada' },
+  { value: 'NO_SHOW', label: 'No Asistió' },
+  { value: 'RESCHEDULED', label: 'Reprogramada' },
+];
+
+const RESULTADOS_POR_PAGINA_OPCIONES: PickerSelectOption[] = [
+  { value: '5', label: '5' },
+  { value: '10', label: '10' },
+  { value: '20', label: '20' },
+  { value: '50', label: '50' },
+];
 
 
 
@@ -444,18 +462,17 @@ export default function Appointments() {
             </p>
           </div>
           <div className="grid gap-2 sm:grid-cols-[220px_160px]">
-            <select
+            <PickerSelect
               value={routeDoctorId}
-              onChange={(event) => setRouteDoctorId(event.target.value)}
-              className="rounded-md border border-border bg-white p-2 text-sm dark:border-border dark:bg-card dark:text-foreground"
-            >
-              <option value="">Selecciona medico</option>
-              {doctors.map((doctor) => (
-                <option key={doctor.id} value={doctor.id}>
-                  {doctor.user?.firstName} {doctor.user?.lastName}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => setRouteDoctorId(v)}
+              options={doctors.map((doctor) => ({
+                value: doctor.id,
+                label: `Dr. ${doctor.user?.firstName ?? ''} ${doctor.user?.lastName ?? ''}`.trim(),
+              }))}
+              placeholder="Selecciona medico"
+              variant="glass"
+              title="Selecciona médico para la ruta"
+            />
             <Entrada
               type="date"
               value={routeDate}
@@ -617,38 +634,25 @@ export default function Appointments() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
-                  Estado
-                </label>
-                <select
-                  className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
+                <PickerSelect
+                  label="Estado"
                   value={filters.status || ''}
-                  onChange={(e) => handleFilterChange('status', e.target.value ? e.target.value as AppointmentStatus : undefined)}
-                >
-                  <option value="">Todos los estados</option>
-                  <option value="PENDING">Pendiente</option>
-                  <option value="CONFIRMED">Confirmada</option>
-                  <option value="IN_PROGRESS">En Progreso</option>
-                  <option value="COMPLETED">Completada</option>
-                  <option value="CANCELLED">Cancelada</option>
-                  <option value="NO_SHOW">No Asistió</option>
-                  <option value="RESCHEDULED">Reprogramada</option>
-                </select>
+                  onChange={(v) => handleFilterChange('status', v ? (v as AppointmentStatus) : undefined)}
+                  options={ESTADOS_CITA_OPCIONES}
+                  placeholder="Todos los estados"
+                  variant="glass"
+                  title="Filtrar por estado"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-muted-foreground mb-2">
-                  Resultados por página
-                </label>
-                <select
-                  className="w-full px-3 py-2 border border-border dark:border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-card text-foreground dark:text-foreground"
-                  value={filters.limit}
-                  onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                </select>
+                <PickerSelect
+                  label="Resultados por página"
+                  value={String(filters.limit ?? 10)}
+                  onChange={(v) => handleFilterChange('limit', parseInt(v, 10))}
+                  options={RESULTADOS_POR_PAGINA_OPCIONES}
+                  variant="glass"
+                  title="Resultados por página"
+                />
               </div>
             </div>
           </TarjetaContenido>

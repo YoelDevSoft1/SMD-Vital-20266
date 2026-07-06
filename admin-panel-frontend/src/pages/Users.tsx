@@ -33,6 +33,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Alerta } from '@/components/ui/Alerta';
 import { Paginacion } from '@/components/ui/Paginacion';
 import { Avatar } from '@/components/ui/Avatar';
+import { PickerSelect, type PickerSelectOption } from '@/components/ui/PickerSelect';
 import CreateUserForm from '@/components/CreateUserForm';
 import UserDetailsView from '@/components/UserDetailsView';
 import { EditUserForm } from '@/components/EditUserForm';
@@ -40,6 +41,25 @@ import { ExportUsersButton } from '@/components/ExportUsersButton';
 import { obtenerMetaRol } from '@/utils/roles';
 import { formatearFecha } from '@/utils/formato';
 import toast from 'react-hot-toast';
+
+const OPCIONES_ROL: PickerSelectOption[] = [
+  { value: 'PATIENT', label: 'Paciente' },
+  { value: 'DOCTOR', label: 'Médico' },
+  { value: 'NURSE', label: 'Enfermero/a' },
+  { value: 'AGENT', label: 'Asesor' },
+  { value: 'ADMIN', label: 'Administrador' },
+  { value: 'SUPER_ADMIN', label: 'Super Admin' },
+];
+
+const OPCIONES_ESTADO: PickerSelectOption[] = [
+  { value: 'true', label: 'Activos' },
+  { value: 'false', label: 'Inactivos' },
+];
+
+const OPCIONES_VERIFICADO: PickerSelectOption[] = [
+  { value: 'true', label: 'Verificados' },
+  { value: 'false', label: 'No verificados' },
+];
 
 export default function Users() {
   const queryClient = useQueryClient();
@@ -267,59 +287,50 @@ export default function Users() {
                 />
               </div>
               <div>
-                <Etiqueta htmlFor="users-role">Rol</Etiqueta>
-                <select
+                <PickerSelect
                   id="users-role"
-                  className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm dark:bg-card"
+                  label="Rol"
                   value={filters.role ?? ''}
-                  onChange={(e) =>
-                    handleFilterChange('role', e.target.value ? (e.target.value as UserRole) : undefined)
-                  }
-                >
-                  <option value="">Todos los roles</option>
-                  <option value="PATIENT">Paciente</option>
-                  <option value="DOCTOR">Médico</option>
-                  <option value="NURSE">Enfermero/a</option>
-                  <option value="AGENT">Asesor</option>
-                  <option value="ADMIN">Administrador</option>
-                  <option value="SUPER_ADMIN">Super Admin</option>
-                </select>
+                  onChange={(v) => handleFilterChange('role', v ? (v as UserRole) : undefined)}
+                  options={OPCIONES_ROL}
+                  placeholder="Todos los roles"
+                  variant="glass"
+                  title="Filtrar por rol"
+                />
               </div>
               <div>
-                <Etiqueta htmlFor="users-status">Estado</Etiqueta>
-                <select
+                <PickerSelect
                   id="users-status"
-                  className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm dark:bg-card"
+                  label="Estado"
                   value={filters.isActive === undefined ? '' : String(filters.isActive)}
-                  onChange={(e) =>
+                  onChange={(v) =>
                     handleFilterChange(
                       'isActive',
-                      e.target.value === '' ? undefined : e.target.value === 'true',
+                      v === '' ? undefined : v === 'true',
                     )
                   }
-                >
-                  <option value="">Todos</option>
-                  <option value="true">Activos</option>
-                  <option value="false">Inactivos</option>
-                </select>
+                  options={OPCIONES_ESTADO}
+                  placeholder="Todos"
+                  variant="glass"
+                  title="Filtrar por estado"
+                />
               </div>
               <div>
-                <Etiqueta htmlFor="users-verified">Verificación</Etiqueta>
-                <select
+                <PickerSelect
                   id="users-verified"
-                  className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm dark:bg-card"
+                  label="Verificación"
                   value={filters.isVerified === undefined ? '' : String(filters.isVerified)}
-                  onChange={(e) =>
+                  onChange={(v) =>
                     handleFilterChange(
                       'isVerified',
-                      e.target.value === '' ? undefined : e.target.value === 'true',
+                      v === '' ? undefined : v === 'true',
                     )
                   }
-                >
-                  <option value="">Todos</option>
-                  <option value="true">Verificados</option>
-                  <option value="false">No verificados</option>
-                </select>
+                  options={OPCIONES_VERIFICADO}
+                  placeholder="Todos"
+                  variant="glass"
+                  title="Filtrar por verificación"
+                />
               </div>
             </div>
           </TarjetaContenido>
