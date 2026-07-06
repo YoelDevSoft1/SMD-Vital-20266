@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { formatearFechaHora } from '@/utils/dateFormat';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, CheckCircle2, Activity, AlertCircle, Upload, ImageIcon, Plus, Save, Trash2 } from 'lucide-react';
+import { Calendar, CheckCircle2, Activity, AlertCircle, RefreshCw, Upload, ImageIcon, Plus, Save, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { clinicalService } from '@/services/clinical.service';
 import { adminService } from '@/services/admin.service';
@@ -12,6 +12,10 @@ import { Boton } from '@/components/ui/Boton';
 import { Entrada } from '@/components/ui/Entrada';
 import { Etiqueta } from '@/components/ui/Etiqueta';
 import { ModalCristal } from '@/components/ui/ModalCristal';
+import { Alerta } from '@/components/ui/Alerta';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
+import { Esqueleto, EsqueletoElementoLista, EsqueletoTarjetaEstadistica } from '@/components/ui/Esqueleto';
+import { Insignia } from '@/components/ui/Insignia';
 import { cn } from '@/utils/cn';
 import { useAuthStore } from '@/store/auth.store';
 import type { ClinicalAppointment, PaginatedResponse } from '@/types';
@@ -24,6 +28,18 @@ const statusLabels: Record<string, string> = {
   CANCELLED: 'Cancelada',
   NO_SHOW: 'No asistio',
   RESCHEDULED: 'Reprogramada',
+};
+
+// Mapea estado de cita a variante de Insignia para uso consistente con el design system.
+// Mantenemos fallback al mapa de colores legacy solo si el estado no está reconocido.
+const statusInsignia: Record<string, 'warning' | 'info' | 'default' | 'success' | 'danger' | 'neutral'> = {
+  PENDING: 'warning',
+  CONFIRMED: 'info',
+  IN_PROGRESS: 'default',
+  COMPLETED: 'success',
+  CANCELLED: 'danger',
+  NO_SHOW: 'neutral',
+  RESCHEDULED: 'default',
 };
 
 const statusColors: Record<string, string> = {
@@ -113,30 +129,22 @@ export default function DoctorDashboard() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl font-bold text-foreground dark:text-foreground sm:text-3xl">Panel clinico</h1>
         </div>
-        <Tarjeta className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
-          <TarjetaContenido className="flex flex-col gap-4 p-4 text-sm sm:p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-              <div>
-                <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">
-                  No se pudo cargar el resumen
-                </h2>
-                <p className="text-red-600 dark:text-red-400">
-                  Verifica tu conexion o intenta nuevamente.
-                </p>
-              </div>
-            </div>
-            <div>
-              <Boton
-                variant="outline"
-                onClick={() => refetch()}
-                className="dark:text-foreground dark:border-border dark:hover:bg-muted"
-              >
-                Reintentar
-              </Boton>
-            </div>
-          </TarjetaContenido>
-        </Tarjeta>
+        <Alerta
+          variant="danger"
+          title="No se pudo cargar el resumen"
+          icon={AlertCircle}
+          action={
+            <Boton
+              variant="outline"
+              onClick={() => refetch()}
+              leftIcon={<RefreshCw className="h-4 w-4" />}
+            >
+              Reintentar
+            </Boton>
+          }
+        >
+          Verifica tu conexion o intenta nuevamente en unos segundos.
+        </Alerta>
       </div>
     );
   }
@@ -274,7 +282,7 @@ export default function DoctorDashboard() {
             <TarjetaContenido className="space-y-4 p-4 sm:p-6">
               <DailyRouteMap route={routeData?.data?.data} />
               {isFetchingRoute ? (
-                <p className="text-sm text-muted-foreground dark:text-muted-foreground">Cargando ruta...</p>
+                <EsqueletoElementoLista />
               ) : routeData?.data?.data?.segments?.length ? (
                 <div className="grid gap-2 md:grid-cols-2">
                   {routeData.data.data.segments.map((segment) => (
@@ -298,9 +306,13 @@ export default function DoctorDashboard() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground dark:text-muted-foreground">
-                  Aun no hay suficientes citas con coordenadas para calcular la ruta.
-                </p>
+                <EstadoVacio
+                  icon={Activity}
+                  title="Sin ruta calculada"
+                  description="Aun no hay suficientes citas con coordenadas para calcular la ruta."
+                  size="sm"
+                  className="border-0 bg-transparent"
+                />
               )}
             </TarjetaContenido>
           </Tarjeta>
@@ -392,40 +404,44 @@ export default function DoctorDashboard() {
         </TarjetaEncabezado>
         <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-8 text-center text-sm text-muted-foreground dark:text-muted-foreground sm:p-12">
-              Cargando citas...
-            </div>
+            <ul className="divide-y divide-border dark:divide-border" aria-label="Cargando proximas citas">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <li key={index} className="p-4 sm:p-6">
+                  <EsqueletoElementoLista />
+                </li>
+              ))}
+            </ul>
           ) : appointments.length === 0 ? (
-            <div className="p-8 text-center text-sm text-muted-foreground dark:text-muted-foreground sm:p-12">
-              No hay citas asignadas.
+            <div className="p-4 sm:p-6">
+              <EstadoVacio
+                icon={Calendar}
+                title="Sin citas asignadas"
+                description="No tienes citas pendientes en este momento."
+                size="md"
+              />
             </div>
           ) : (
-            <div className="divide-y divide-border dark:divide-border">
+            <ul className="divide-y divide-border dark:divide-border">
               {appointments.map((appointment) => (
-                <div
+                <li
                   key={appointment.id}
-                  className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6"
+                  className="flex flex-col gap-3 p-4 transition-colors hover:bg-muted/40 sm:flex-row sm:items-center sm:justify-between sm:p-6"
                 >
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                       {appointment.patient?.user?.firstName} {appointment.patient?.user?.lastName}
                     </h3>
-                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
                       {appointment.service?.name || 'Servicio no definido'} ·{' '}
                       {formatearFechaHora(appointment.scheduledAt)}
                     </p>
                   </div>
-                  <span
-                    className={cn(
-                      'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium',
-                      statusColors[appointment.status] || 'bg-muted text-foreground border-border'
-                    )}
-                  >
+                  <Insignia variant={statusInsignia[appointment.status] ?? 'neutral'} size="md">
                     {statusLabels[appointment.status] || appointment.status}
-                  </span>
-                </div>
+                  </Insignia>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
         </TarjetaContenido>
       </Tarjeta>

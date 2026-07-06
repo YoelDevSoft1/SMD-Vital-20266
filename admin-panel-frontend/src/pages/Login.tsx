@@ -15,6 +15,7 @@ import {
   Eye,
   EyeOff,
   HeartPulse,
+  LogIn,
   ShieldCheck,
   Sparkles,
   Stethoscope,
@@ -268,7 +269,7 @@ export default function Login() {
                 <Boton
                   type="submit"
                   isLoading={loginMutacion.isPending}
-                  leftIcon={!loginMutacion.isPending ? <ShieldCheck className="h-4 w-4" /> : undefined}
+                  leftIcon={!loginMutacion.isPending ? <LogIn className="h-4 w-4" /> : undefined}
                   size="lg"
                   className="w-full"
                   disabled={loginMutacion.isPending}
