@@ -62,11 +62,11 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'El firstName del servicio es required';
+      newErrors.name = 'El nombre del servicio es requerido';
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'La description es requerida';
+      newErrors.description = 'La descripción es requerida';
     }
 
     if (formData.basePrice <= 0) {
@@ -181,10 +181,9 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className={errors.name ? 'border-red-500' : ''}
+                  error={errors.name}
                   placeholder="Ej: Consulta médica general"
                 />
-                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
 
               <div className="md:col-span-2">
@@ -193,13 +192,13 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
                   id="description"
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.description ? 'border-red-500' : 'border-gray-300'
+                  className={`w-full rounded-lg border bg-card px-3 py-2 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm ${
+                    errors.description ? 'border-red-400' : 'border-input'
                   }`}
                   rows={3}
                   placeholder="Describe el servicio médico..."
                 />
-                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+                {errors.description && <p className="mt-1 text-sm font-medium text-red-600 dark:text-red-400">{errors.description}</p>}
               </div>
 
               <div>
@@ -236,7 +235,7 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
               <div>
                 <Etiqueta htmlFor="basePrice">Precio Base (COP) *</Etiqueta>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Entrada
                     id="basePrice"
                     type="number"
@@ -248,13 +247,13 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
                     step="1000"
                   />
                 </div>
-                {errors.basePrice && <p className="text-red-500 text-sm mt-1">{errors.basePrice}</p>}
+                {errors.basePrice && <p className="mt-1 text-sm font-medium text-red-600 dark:text-red-400">{errors.basePrice}</p>}
               </div>
 
               <div>
                 <Etiqueta htmlFor="duration">Duración (minutos) *</Etiqueta>
                 <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Entrada
                     id="duration"
                     type="number"
@@ -266,7 +265,7 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
                     max="480"
                   />
                 </div>
-                {errors.duration && <p className="text-red-500 text-sm mt-1">{errors.duration}</p>}
+                {errors.duration && <p className="mt-1 text-sm font-medium text-red-600 dark:text-red-400">{errors.duration}</p>}
               </div>
             </div>
           </div>
@@ -294,20 +293,16 @@ export default function CreateServiceForm({ isOpen, onClose, service }: CreateSe
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t">
+          <div className="flex flex-col-reverse items-stretch gap-2 border-t border-border pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex-row sm:justify-end">
             <Boton type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Boton>
-            <Boton 
-              type="submit" 
-              disabled={createMutation.isPending || updateMutation.isPending}
+            <Boton
+              type="submit"
+              isLoading={createMutation.isPending || updateMutation.isPending}
+              leftIcon={<Save className="h-4 w-4" />}
             >
-              {createMutation.isPending || updateMutation.isPending ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              ) : (
-                <Save className="w-4 h-4" />
-              )}
-              {isEditing ? 'Actualizar Servicio' : 'Crear Servicio'}
+              {isEditing ? 'Actualizar servicio' : 'Crear servicio'}
             </Boton>
           </div>
         </form>

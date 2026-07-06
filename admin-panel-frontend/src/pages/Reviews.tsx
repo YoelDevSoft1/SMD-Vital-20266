@@ -29,6 +29,8 @@ import { Entrada } from '@/components/ui/Entrada';
 import { Etiqueta } from '@/components/ui/Etiqueta';
 import { Seleccion } from '@/components/ui/Seleccion';
 import { Interruptor } from '@/components/ui/Interruptor';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
+import { EsqueletoLista } from '@/components/ui/Esqueleto';
 import { adminService } from '@/services/admin.service';
 import ReviewsModal from '@/components/ReviewsModal';
 import ReviewDetailsView from '@/components/ReviewDetailsView';
@@ -42,7 +44,7 @@ export default function Reviews() {
   const [selectedReview, setSelectedReview] = useState(null);
 
   // Fetch reviews data
-  const { data: reviewsData } = useQuery({
+  const { data: reviewsData, isLoading: isLoadingReviews } = useQuery({
     queryKey: ['reviews-stats'],
     queryFn: () => adminService.getReviews({ page: 1, limit: 5 })
   });
@@ -142,18 +144,23 @@ export default function Reviews() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Gestión de Reseñas</h1>
-          <p className="text-muted-foreground dark:text-muted-foreground mt-1">Administra todas las reseñas y calificaciones del sistema</p>
+          <h1 className="text-2xl font-bold text-foreground sm:text-3xl dark:text-foreground">Gestión de Reseñas</h1>
+          <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">Administra todas las reseñas y calificaciones del sistema</p>
         </div>
-        <div className="flex items-center space-x-3">
-          <Boton variant="outline" onClick={handleViewAll}>
-            <Filter className="w-4 h-4" />
+        <div className="flex flex-wrap items-center gap-3">
+          <Boton
+            variant="outline"
+            onClick={handleViewAll}
+            leftIcon={<Filter className="h-4 w-4" />}
+          >
             Ver Todas
           </Boton>
-          <Boton onClick={handleCreateNew}>
-            <Plus className="w-4 h-4" />
+          <Boton
+            onClick={handleCreateNew}
+            leftIcon={<Plus className="h-4 w-4" />}
+          >
             Nueva Reseña
           </Boton>
         </div>
@@ -200,16 +207,24 @@ export default function Reviews() {
           </div>
         </div>
         <div className="p-6">
-          {reviews.length === 0 ? (
-            <div className="text-center py-12">
-              <MessageSquare className="w-12 h-12 mx-auto mb-4 text-muted-foreground dark:text-muted-foreground" />
-              <h3 className="text-lg font-medium text-foreground dark:text-foreground mb-2">No hay reseñas</h3>
-              <p className="text-muted-foreground dark:text-muted-foreground mb-4">No se encontraron reseñas recientes.</p>
-              <Boton onClick={handleCreateNew}>
-                <Plus className="w-4 h-4" />
-                Crear Primera Reseña
-              </Boton>
-            </div>
+          {isLoadingReviews ? (
+            <EsqueletoLista rows={4} />
+          ) : reviews.length === 0 ? (
+            <EstadoVacio
+              icon={MessageSquare}
+              title="No hay reseñas"
+              description="No se encontraron reseñas recientes."
+              action={
+                <Boton
+                  variant="primary"
+                  onClick={handleCreateNew}
+                  leftIcon={<Plus className="h-4 w-4" />}
+                >
+                  Crear Primera Reseña
+                </Boton>
+              }
+              size="md"
+            />
           ) : (
             <div className="space-y-4">
               {reviews.slice(0, 5).map((review: any) => (

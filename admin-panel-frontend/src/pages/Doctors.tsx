@@ -28,6 +28,7 @@ import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/c
 import { EsqueletoTabla } from '@/components/ui/Esqueleto';
 import { Seleccion } from '@/components/ui/Seleccion';
 import { Etiqueta } from '@/components/ui/Etiqueta';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
 import CreateDoctorForm from '@/components/CreateDoctorForm';
 import DoctorDetailsView from '@/components/DoctorDetailsView';
 import { EditDoctorForm } from '@/components/EditDoctorForm';
@@ -478,15 +479,21 @@ export default function Doctors() {
               <EsqueletoTabla rows={8} columns={5} />
             </div>
           ) : doctors.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted dark:bg-card">
-                <Stethoscope className="h-6 w-6 text-gray-400 dark:text-muted-foreground" />
-              </div>
-              <h3 className="mt-4 text-sm font-medium text-foreground dark:text-foreground">No hay doctores</h3>
-              <p className="mt-2 text-sm text-muted-foreground dark:text-muted-foreground">
-                No se encontraron doctores con los filtros aplicados.
-              </p>
-            </div>
+            <EstadoVacio
+              icon={Stethoscope}
+              title="No hay doctores"
+              description="No se encontraron doctores con los filtros aplicados."
+              action={
+                <Boton
+                  variant="primary"
+                  onClick={() => setShowCreateModal(true)}
+                  leftIcon={<UserPlus className="h-4 w-4" />}
+                >
+                  Crear doctor
+                </Boton>
+              }
+              size="md"
+            />
           ) : (
             <div className="divide-y divide-border dark:divide-border">
               {doctors.map((doctor) => (
@@ -592,58 +599,51 @@ export default function Doctors() {
                       {/* Actions */}
                       <div className="mt-4 flex flex-wrap gap-2">
                         <Boton
-                          size="sm"
                           variant="outline"
                           onClick={() => {
                             setSelectedDoctor(doctor);
                             setShowDetailsModal(true);
                           }}
+                          leftIcon={<Eye className="h-4 w-4" />}
                           className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                         >
-                          <Eye className="h-3.5 w-3.5" />
                           Ver detalles
                         </Boton>
                         <Boton
-                          size="sm"
                           variant="outline"
                           onClick={() => {
                             setSelectedDoctor(doctor);
                             setShowEditModal(true);
                           }}
+                          leftIcon={<Edit2 className="h-4 w-4" />}
                           className="dark:text-foreground dark:border-border dark:hover:bg-muted"
                         >
-                          <Edit2 className="h-3.5 w-3.5" />
                           Editar
                         </Boton>
                         <Boton
-                          size="sm"
                           variant="outline"
                           onClick={() => handleAvailabilityToggle(doctor)}
-                          disabled={updateAvailabilityMutation.isPending}
-                          className={doctor.isAvailable 
-                            ? 'text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-border dark:hover:bg-muted' 
+                          isLoading={updateAvailabilityMutation.isPending}
+                          leftIcon={
+                            doctor.isAvailable ? (
+                              <XCircle className="h-4 w-4" />
+                            ) : (
+                              <CheckCircle2 className="h-4 w-4" />
+                            )
+                          }
+                          className={doctor.isAvailable
+                            ? 'text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-border dark:hover:bg-muted'
                             : 'text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 dark:border-border dark:hover:bg-muted'
                           }
                         >
-                          {doctor.isAvailable ? (
-                            <>
-                              <XCircle className="h-3.5 w-3.5" />
-                              Desactivar
-                            </>
-                          ) : (
-                            <>
-                              <CheckCircle2 className="h-3.5 w-3.5" />
-                              Activar
-                            </>
-                          )}
+                          {doctor.isAvailable ? 'Desactivar' : 'Activar'}
                         </Boton>
                         <Boton
-                          size="sm"
                           variant="outline"
                           onClick={() => handleDeleteDoctor(doctor)}
+                          leftIcon={<Trash2 className="h-4 w-4" />}
                           className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 dark:border-border dark:hover:bg-muted"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
                           Eliminar
                         </Boton>
                       </div>

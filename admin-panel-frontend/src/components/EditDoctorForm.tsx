@@ -229,7 +229,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
           <Etiqueta htmlFor="specialty">Especialidad *</Etiqueta>
           <select
             id="specialty"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="h-11 w-full rounded-lg border border-input bg-card px-3 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm"
             value={formData.specialty}
             onChange={(e) => handleChange('specialty', e.target.value)}
             disabled={isSubmitting}
@@ -273,12 +273,12 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         <Etiqueta htmlFor="bio">Biografía</Etiqueta>
         <textarea
           id="bio"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           rows={3}
           value={formData.bio}
           onChange={(e) => handleChange('bio', e.target.value)}
           disabled={isSubmitting}
-          placeholder="Breve description profesional..."
+          placeholder="Breve descripción profesional..."
+          className="w-full rounded-lg border border-input bg-card px-3 py-2 text-base text-foreground shadow-soft-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:text-foreground sm:text-sm"
         />
       </div>
 
@@ -408,7 +408,7 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         <div className="flex items-center justify-between">
           <div>
             <Etiqueta htmlFor="isActive">Usuario Activo</Etiqueta>
-            <p className="text-sm text-gray-500">El doctor puede iniciar sesión</p>
+            <p className="text-sm text-muted-foreground">El doctor puede iniciar sesión</p>
           </div>
           <input
             type="checkbox"
@@ -416,14 +416,14 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
             checked={formData.isActive}
             onChange={(e) => handleChange('isActive', e.target.checked)}
             disabled={isSubmitting}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="h-4 w-4 rounded border-input text-brand-600 focus:ring-2 focus:ring-ring"
           />
         </div>
 
         <div className="flex items-center justify-between">
           <div>
             <Etiqueta htmlFor="isVerified">Usuario Verificado</Etiqueta>
-            <p className="text-sm text-gray-500">El doctor ha verificado su email electrónico</p>
+            <p className="text-sm text-muted-foreground">El doctor ha verificado su correo electrónico</p>
           </div>
           <input
             type="checkbox"
@@ -431,14 +431,14 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
             checked={formData.isVerified}
             onChange={(e) => handleChange('isVerified', e.target.checked)}
             disabled={isSubmitting}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="h-4 w-4 rounded border-input text-brand-600 focus:ring-2 focus:ring-ring"
           />
         </div>
 
         <div className="flex items-center justify-between">
           <div>
             <Etiqueta htmlFor="isAvailable">Disponible para Citas</Etiqueta>
-            <p className="text-sm text-gray-500">El doctor puede recibir nuevas citas</p>
+            <p className="text-sm text-muted-foreground">El doctor puede recibir nuevas citas</p>
           </div>
           <input
             type="checkbox"
@@ -446,12 +446,12 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
             checked={formData.isAvailable}
             onChange={(e) => handleChange('isAvailable', e.target.checked)}
             disabled={isSubmitting}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="h-4 w-4 rounded border-input text-brand-600 focus:ring-2 focus:ring-ring"
           />
         </div>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-4 border-t">
+      <div className="flex flex-col-reverse items-stretch gap-2 border-t border-border pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex-row sm:justify-end">
         <Boton
           type="button"
           variant="outline"
@@ -462,10 +462,9 @@ export const EditDoctorForm: React.FC<EditDoctorFormProps> = ({ doctor, onSucces
         </Boton>
         <Boton
           type="submit"
-          disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700"
+          isLoading={isSubmitting}
         >
-          {isSubmitting ? 'Actualizando...' : 'Actualizar Doctor'}
+          {isSubmitting ? 'Actualizando...' : 'Actualizar doctor'}
         </Boton>
       </div>
     </form>
