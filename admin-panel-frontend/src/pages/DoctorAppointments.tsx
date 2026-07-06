@@ -29,6 +29,7 @@ import { Entrada } from '@/components/ui/Entrada';
 import { ModalCristal } from '@/components/ui/ModalCristal';
 import { DialogoConfirmacion } from '@/components/ui/DialogoConfirmacion';
 import { Interruptor } from '@/components/ui/Interruptor';
+import { PickerSelect, type PickerSelectOption } from '@/components/ui/PickerSelect';
 import { cn } from '@/utils/cn';
 import { useAuthStore } from '@/store/auth.store';
 import type { AppointmentTimelineItem, ClinicalAppointment, PaginatedResponse, VitalSign } from '@/types';
@@ -52,6 +53,39 @@ const statusColors: Record<string, string> = {
   NO_SHOW: 'bg-muted text-foreground border-border dark:bg-card dark:text-muted-foreground dark:border-border',
   RESCHEDULED: 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800',
 };
+
+const OPCIONES_ESTADO_CITA: PickerSelectOption[] = [
+  { value: '', label: 'Todos los estados' },
+  { value: 'PENDING', label: 'Pendiente' },
+  { value: 'CONFIRMED', label: 'Confirmada' },
+  { value: 'IN_PROGRESS', label: 'En progreso' },
+  { value: 'COMPLETED', label: 'Completada' },
+  { value: 'CANCELLED', label: 'Cancelada' },
+  { value: 'NO_SHOW', label: 'No asistio' },
+  { value: 'RESCHEDULED', label: 'Reprogramada' },
+];
+
+const OPCIONES_LIMITES_PAGINA: PickerSelectOption[] = [
+  { value: '5', label: '5 por pagina' },
+  { value: '10', label: '10 por pagina' },
+  { value: '20', label: '20 por pagina' },
+];
+
+const OPCIONES_TIPO_REGISTRO: PickerSelectOption[] = [
+  { value: 'DIAGNOSIS', label: 'Diagnostico' },
+  { value: 'PRESCRIPTION', label: 'Prescripcion' },
+  { value: 'LAB_RESULT', label: 'Laboratorio' },
+  { value: 'IMAGING', label: 'Imagenologia' },
+  { value: 'OTHER', label: 'Otro' },
+];
+
+const OPCIONES_GENERO: PickerSelectOption[] = [
+  { value: '', label: 'Genero (opcional)' },
+  { value: 'MALE', label: 'Masculino' },
+  { value: 'FEMALE', label: 'Femenino' },
+  { value: 'OTHER', label: 'Otro' },
+  { value: 'PREFER_NOT_TO_SAY', label: 'Prefiero no decir' },
+];
 
 type FinishFormState = {
   encounterSummary: string;
@@ -1091,39 +1125,24 @@ export default function DoctorAppointments() {
           </div>
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
             <div className="min-w-0 sm:min-w-[200px]">
-              <label htmlFor="appointments-status-filter" className="sr-only">
-                Filtrar por estado
-              </label>
-              <select
+              <PickerSelect
                 id="appointments-status-filter"
-                className="min-h-[44px] w-full rounded-lg border border-border bg-white px-3 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-border dark:bg-card dark:text-foreground"
                 value={filters.status}
-                onChange={(event) => handleFilterChange('status', event.target.value)}
-              >
-                <option value="">Todos los estados</option>
-                <option value="PENDING">Pendiente</option>
-                <option value="CONFIRMED">Confirmada</option>
-                <option value="IN_PROGRESS">En progreso</option>
-                <option value="COMPLETED">Completada</option>
-                <option value="CANCELLED">Cancelada</option>
-                <option value="NO_SHOW">No asistio</option>
-                <option value="RESCHEDULED">Reprogramada</option>
-              </select>
+                onChange={(value) => handleFilterChange('status', value)}
+                options={OPCIONES_ESTADO_CITA}
+                variant="solid"
+                placeholder="Todos los estados"
+              />
             </div>
             <div className="min-w-0 sm:min-w-[120px]">
-              <label htmlFor="appointments-limit-filter" className="sr-only">
-                Resultados por pagina
-              </label>
-              <select
+              <PickerSelect
                 id="appointments-limit-filter"
-                className="min-h-[44px] w-full rounded-lg border border-border bg-white px-3 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-border dark:bg-card dark:text-foreground"
-                value={filters.limit}
-                onChange={(event) => handleFilterChange('limit', Number(event.target.value))}
-              >
-                <option value={5}>5 por pagina</option>
-                <option value={10}>10 por pagina</option>
-                <option value={20}>20 por pagina</option>
-              </select>
+                value={String(filters.limit)}
+                onChange={(value) => handleFilterChange('limit', Number(value))}
+                options={OPCIONES_LIMITES_PAGINA}
+                variant="solid"
+                placeholder="Resultados por pagina"
+              />
             </div>
           </div>
         </TarjetaEncabezado>
@@ -1401,19 +1420,14 @@ export default function DoctorAppointments() {
                 <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                   Tipo de registro
                 </label>
-                <select
+                <PickerSelect
                   value={finishForm.recordType}
-                  onChange={(event) =>
-                    setFinishForm((prev) => ({ ...prev, recordType: event.target.value }))
+                  onChange={(value) =>
+                    setFinishForm((prev) => ({ ...prev, recordType: value }))
                   }
-                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
-                >
-                  <option value="DIAGNOSIS">Diagnostico</option>
-                  <option value="PRESCRIPTION">Prescripcion</option>
-                  <option value="LAB_RESULT">Laboratorio</option>
-                  <option value="IMAGING">Imagenologia</option>
-                  <option value="OTHER">Otro</option>
-                </select>
+                  options={OPCIONES_TIPO_REGISTRO}
+                  variant="solid"
+                />
               </div>
             </div>
 
@@ -1578,19 +1592,14 @@ export default function DoctorAppointments() {
                   }
                   placeholder="Fecha de nacimiento"
                 />
-                <select
+                <PickerSelect
                   value={emailRecordForm.patientGender}
-                  onChange={(event) =>
-                    setEmailRecordForm((prev) => ({ ...prev, patientGender: event.target.value }))
+                  onChange={(value) =>
+                    setEmailRecordForm((prev) => ({ ...prev, patientGender: value }))
                   }
-                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
-                >
-                  <option value="">Género (opcional)</option>
-                  <option value="MALE">Masculino</option>
-                  <option value="FEMALE">Femenino</option>
-                  <option value="OTHER">Otro</option>
-                  <option value="PREFER_NOT_TO_SAY">Prefiero no decir</option>
-                </select>
+                  options={OPCIONES_GENERO}
+                  variant="solid"
+                />
               </div>
               <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:border-border dark:bg-card dark:text-foreground">
                 <div>
@@ -1775,19 +1784,14 @@ export default function DoctorAppointments() {
                 <label className="text-sm font-medium text-slate-700 dark:text-foreground">
                   Tipo de registro
                 </label>
-                <select
+                <PickerSelect
                   value={emailRecordForm.recordType}
-                  onChange={(event) =>
-                    setEmailRecordForm((prev) => ({ ...prev, recordType: event.target.value }))
+                  onChange={(value) =>
+                    setEmailRecordForm((prev) => ({ ...prev, recordType: value }))
                   }
-                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-slate-700 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-border dark:bg-card dark:text-foreground"
-                >
-                  <option value="DIAGNOSIS">Diagnostico</option>
-                  <option value="PRESCRIPTION">Prescripcion</option>
-                  <option value="LAB_RESULT">Laboratorio</option>
-                  <option value="IMAGING">Imagenologia</option>
-                  <option value="OTHER">Otro</option>
-                </select>
+                  options={OPCIONES_TIPO_REGISTRO}
+                  variant="solid"
+                />
               </div>
             </div>
 

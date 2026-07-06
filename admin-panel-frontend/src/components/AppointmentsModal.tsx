@@ -7,6 +7,7 @@ import { Entrada } from '@/components/ui/Entrada';
 import { Etiqueta } from '@/components/ui/Etiqueta';
 import { Seleccion } from '@/components/ui/Seleccion';
 import { Interruptor } from '@/components/ui/Interruptor';
+import { PickerSelect, type PickerSelectOption } from '@/components/ui/PickerSelect';
 import { toast } from 'react-hot-toast';
 import { adminService } from '@/services/admin.service';
 import type { Appointment, AppointmentFilters, Doctor, Patient, Service } from '@/types';
@@ -199,51 +200,58 @@ export default function AppointmentsModal({ isOpen, onClose }: AppointmentsModal
 
             <div>
               <Etiqueta htmlFor="status">Estado</Etiqueta>
-              <select
+              <PickerSelect
                 id="status"
                 value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Todos los estados</option>
-                {Object.entries(statusTranslations).map(([key, value]) => (
-                  <option key={key} value={key}>{value}</option>
-                ))}
-              </select>
+                onChange={(value) => handleFilterChange('status', value)}
+                options={[
+                  { value: '', label: 'Todos los estados' },
+                  ...Object.entries(statusTranslations).map(([key, value]) => ({
+                    value: key,
+                    label: value,
+                  })),
+                ]}
+                variant="solid"
+                placeholder="Todos los estados"
+              />
             </div>
 
             <div>
               <Etiqueta htmlFor="doctor">Doctor</Etiqueta>
-              <select
+              <PickerSelect
                 id="doctor"
                 value={filters.doctorId}
-                onChange={(e) => handleFilterChange('doctorId', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Todos los doctores</option>
-                {doctorsData?.data?.data?.data?.map((doctor: Doctor) => (
-                  <option key={doctor.id} value={doctor.id}>
-                    {doctor.user.firstName} {doctor.user.lastName}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => handleFilterChange('doctorId', value)}
+                options={[
+                  { value: '', label: 'Todos los doctores' },
+                  ...((doctorsData?.data?.data?.data ?? []) as Doctor[]).map((doctor) => ({
+                    value: doctor.id,
+                    label: `${doctor.user.firstName} ${doctor.user.lastName}`,
+                    searchText: `${doctor.user.firstName} ${doctor.user.lastName}`,
+                  })),
+                ]}
+                variant="solid"
+                placeholder="Todos los doctores"
+              />
             </div>
 
             <div>
               <Etiqueta htmlFor="patient">Paciente</Etiqueta>
-              <select
+              <PickerSelect
                 id="patient"
                 value={filters.patientId}
-                onChange={(e) => handleFilterChange('patientId', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Todos los pacientes</option>
-                {patientsData?.data?.data?.data?.map((patient: Patient) => (
-                  <option key={patient.id} value={patient.id}>
-                    {patient.user.firstName} {patient.user.lastName}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => handleFilterChange('patientId', value)}
+                options={[
+                  { value: '', label: 'Todos los pacientes' },
+                  ...((patientsData?.data?.data?.data ?? []) as Patient[]).map((patient) => ({
+                    value: patient.id,
+                    label: `${patient.user.firstName} ${patient.user.lastName}`,
+                    searchText: `${patient.user.firstName} ${patient.user.lastName}`,
+                  })),
+                ]}
+                variant="solid"
+                placeholder="Todos los pacientes"
+              />
             </div>
 
             <div>
