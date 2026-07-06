@@ -1,0 +1,48 @@
+# [SMD Vital](https://smdvital.com) — Admin Panel PWA
+
+> Panel de administración clínica para SMD Vital Bogotá. Atención médica domiciliaria.
+
+## Documentación principal
+
+- [Login](https://app.smdvital.com/login): Acceso al panel por rol.
+- [Recuperar contraseña](https://app.smdvital.com/recuperar-contrasena): Reset password.
+- [Register](https://app.smdvital.com/register): Crear cuenta (solo paciente/agente).
+- [Dashboard admin](https://app.smdvital.com/): Vista admin (`ADMIN`/`SUPER_ADMIN`).
+- [Dashboard doctor](https://app.smdvital.com/doctor): Vista clínico (`DOCTOR`/`NURSE`).
+- [Dashboard paciente](https://app.smdvital.com/patient): Vista paciente (`PATIENT`).
+- [Dashboard agente](https://app.smdvital.com/agent): Vista asesor (`AGENT`).
+
+## Capacidades
+
+- Citas, doctores, pagos, servicios, reviews (CRUD completo).
+- Disponibilidad y ruta diaria del médico con mapa Leaflet.
+- Acknowledgements de pago (confirmar / disputar).
+- Dashboard, analytics, system health, audit logs, RIPS.
+- PWA installable con offline shell (Workbox).
+- Realtime con Socket.IO para eventos de citas.
+
+## Stack
+
+- Frontend: Vite + React 18 + TypeScript + TanStack Query + Zustand.
+- UI: Tailwind CSS + design system custom (en español).
+- Backend: Node.js + Express + Prisma + PostgreSQL (en `smd-vital-backend/`).
+- Auth: JWT + refresh tokens (interceptor axios single-flight).
+- Realtime: socket.io-client.
+
+## Roles
+
+- `ADMIN`, `SUPER_ADMIN`: acceso completo a usuarios, doctores, citas, pagos, etc.
+- `DOCTOR`, `NURSE`: dashboard clínico, citas asignadas, earnings.
+- `PATIENT`: dashboard paciente, historia clínica.
+- `AGENT`: comisiones, agenda propia.
+
+## Despliegue
+
+- Frontend: Docker (nginx) — ver `Dockerfile`.
+- Variables de entorno: `VITE_API_URL`, `VITE_SOCKET_URL`, `VITE_ENABLE_PWA`.
+- Producción: render.com / fly.io / vercel (multi-deploy configs).
+
+## Repositorio
+
+- [Monorepo](https://github.com/YoelDevSoft1/SMD-Vital-2026): sitio Astro + admin PWA + backend.
+- [Backend API](https://github.com/YoelDevSoft1/SMD-Vital-2026/tree/main/smd-vital-backend).

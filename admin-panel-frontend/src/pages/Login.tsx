@@ -131,7 +131,6 @@ export default function Login() {
               variant="info"
               size="md"
               icon={Stethoscope}
-              className="border-info/30 bg-info-muted text-info [&_svg]:text-info"
             >
               Plataforma médica inteligente y segura
             </Insignia>
@@ -251,7 +250,7 @@ export default function Login() {
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="inline-flex items-center gap-2 text-muted-foreground">
+                  <span className="inline-flex items-center gap-2 text-foreground/80 dark:text-foreground/85">
                     <span
                       aria-hidden="true"
                       className="h-2 w-2 animate-pulse rounded-full bg-success"
