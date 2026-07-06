@@ -851,8 +851,16 @@ export default function DoctorAppointments() {
         </TarjetaEncabezado>
         <TarjetaContenido className="p-4 pt-0 sm:p-6 sm:pt-0">
           {!activeAppointment ? (
-            <div className="rounded-md border border-border p-4 text-sm text-muted-foreground dark:border-border dark:text-muted-foreground">
-              No hay citas asignadas para seguimiento clinico.
+            <div className="flex flex-col items-center justify-center gap-3 rounded-md border border-dashed border-border bg-muted/40 px-6 py-10 text-center dark:border-border dark:bg-card/40">
+              <Stethoscope className="h-8 w-8 text-muted-foreground/60 dark:text-muted-foreground/60" aria-hidden />
+              <div>
+                <p className="text-sm font-medium text-foreground dark:text-foreground">
+                  Sin citas activas
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
+                  Cuando agendes una cita y la asignes a este equipo, aparecerá acá para iniciar la atención.
+                </p>
+              </div>
             </div>
           ) : (
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px] [&>*]:min-w-0">
@@ -860,14 +868,22 @@ export default function DoctorAppointments() {
                 <section className="rounded-md border border-border p-4 dark:border-border">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold uppercase text-muted-foreground dark:text-muted-foreground">
-                        Paciente seleccionado
-                      </p>
-                      <h2 className="mt-1 text-lg font-semibold text-foreground dark:text-foreground">
+                      <div className="flex items-center gap-2">
+                        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground">
+                          Paciente en atención
+                        </p>
+                        {activeAppointment.status === 'IN_PROGRESS' && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:bg-indigo-400/20 dark:text-indigo-300">
+                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-600 dark:bg-indigo-400" />
+                            En curso
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="mt-1 text-xl font-bold text-foreground dark:text-foreground sm:text-lg">
                         {activeAppointment.patient?.user?.firstName} {activeAppointment.patient?.user?.lastName}
                       </h2>
                       <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
-                        {activeAppointment.service?.name || 'Servicio no definido'} - {formatearFechaHora(activeAppointment.scheduledAt)}
+                        {activeAppointment.service?.name || 'Servicio no definido'} · {formatearFechaHora(activeAppointment.scheduledAt)}
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
                         {activeAppointment.address}, {activeAppointment.city}
@@ -876,7 +892,7 @@ export default function DoctorAppointments() {
                     <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                       {(activeAppointment.status === 'PENDING' || activeAppointment.status === 'CONFIRMED') && (
                         <Boton
-                          size="sm"
+                          size="md"
                           onClick={() => handleStartEncounter(activeAppointment)}
                           disabled={startEncounterMutation.isPending}
                         >
@@ -886,7 +902,7 @@ export default function DoctorAppointments() {
                       )}
                       {activeAppointment.status === 'IN_PROGRESS' && user?.role === 'NURSE' && (
                         <Boton
-                          size="sm"
+                          size="md"
                           variant="outline"
                           onClick={() => handleOpenVitalsModal(activeAppointment)}
                           className="dark:text-foreground dark:border-border dark:hover:bg-muted"
@@ -898,14 +914,14 @@ export default function DoctorAppointments() {
                       {activeAppointment.status === 'IN_PROGRESS' &&
                         (user?.role === 'DOCTOR' ||
                           (user?.role === 'NURSE' && activeAppointment.service?.category === 'NURSING')) && (
-                          <Boton size="sm" onClick={() => handleOpenFinishModal(activeAppointment)}>
+                          <Boton size="md" onClick={() => handleOpenFinishModal(activeAppointment)}>
                             <FileCheck2 className="h-4 w-4" />
                             Finalizar
                           </Boton>
                         )}
                       {activeAppointment.status === 'COMPLETED' && (
                         <Boton
-                          size="sm"
+                          size="md"
                           variant="outline"
                           onClick={() => handleSendDocuments(activeAppointment)}
                           isLoading={sendingDocumentsId === activeAppointment.id}
@@ -955,7 +971,7 @@ export default function DoctorAppointments() {
                     </h3>
                     {activeAppointment.status === 'IN_PROGRESS' && user?.role === 'NURSE' && (
                       <Boton
-                        size="sm"
+                        size="md"
                         variant="outline"
                         onClick={() => handleOpenVitalsModal(activeAppointment)}
                         className="dark:text-foreground dark:border-border dark:hover:bg-muted"
@@ -1011,7 +1027,7 @@ export default function DoctorAppointments() {
                     />
                     <div className="mt-3 flex justify-end">
                       <Boton
-                        size="sm"
+                        size="md"
                         onClick={handleSaveEvolutionNote}
                         isLoading={addEncounterNoteMutation.isPending}
                         disabled={activeAppointment.status !== 'IN_PROGRESS'}
@@ -1113,12 +1129,40 @@ export default function DoctorAppointments() {
         </TarjetaEncabezado>
         <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
-              Cargando citas...
+            <div className="space-y-3 p-4" role="status" aria-live="polite" aria-busy="true">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="flex animate-pulse items-center gap-3 rounded-md border border-border p-4 dark:border-border">
+                  <div className="h-10 w-10 shrink-0 rounded-full bg-muted dark:bg-card" />
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <div className="h-3.5 w-1/3 rounded bg-muted dark:bg-card" />
+                    <div className="h-3 w-1/2 rounded bg-muted/70 dark:bg-card/70" />
+                    <div className="h-2.5 w-2/3 rounded bg-muted/60 dark:bg-card/60" />
+                  </div>
+                  <div className="h-8 w-20 shrink-0 rounded bg-muted dark:bg-card" />
+                </div>
+              ))}
+              <span className="sr-only">Cargando citas…</span>
             </div>
           ) : appointments.length === 0 ? (
-            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
-              No hay citas asignadas.
+            <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-center">
+              <Calendar className="h-10 w-10 text-muted-foreground/60 dark:text-muted-foreground/60" aria-hidden />
+              <div>
+                <p className="text-sm font-medium text-foreground dark:text-foreground">
+                  Sin citas asignadas
+                </p>
+                <p className="mt-1 max-w-xs text-xs text-muted-foreground dark:text-muted-foreground">
+                  Cuando lleguen citas nuevas, aparecerán acá. Refresca para actualizar la lista.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                disabled={isFetching}
+                className="mt-1 inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-border bg-white px-4 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-border dark:bg-card dark:hover:bg-muted"
+              >
+                <RefreshCw className={cn('h-3.5 w-3.5', isFetching && 'animate-spin')} aria-hidden />
+                Refrescar
+              </button>
             </div>
           ) : (
             <div className="divide-y divide-border dark:divide-border">
@@ -1126,7 +1170,10 @@ export default function DoctorAppointments() {
                 <div
                   key={appointment.id}
                   className={cn(
-                    'flex flex-col gap-3 p-4 transition sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-6',
+                    // active:scale-[0.997] da un micro-feedback al tap del card,
+                    // dentro del rango recomendado por HIG (0.95-1.05) sin
+                    // desplazar elementos vecinos (regla layout-shift-avoid).
+                    'flex flex-col gap-3 p-4 transition-all duration-150 active:scale-[0.997] sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-6',
                     activeAppointment?.id === appointment.id
                       ? 'bg-blue-50/70 dark:bg-blue-900/20'
                       : 'hover:bg-muted/70 dark:hover:bg-card/40'
@@ -1156,7 +1203,7 @@ export default function DoctorAppointments() {
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
                     <Boton
-                      size="sm"
+                      size="md"
                       variant="outline"
                       onClick={() => setActiveAppointmentId(appointment.id)}
                       className="dark:text-foreground dark:border-border dark:hover:bg-muted"
@@ -1173,7 +1220,7 @@ export default function DoctorAppointments() {
                     </span>
                     {(appointment.status === 'PENDING' || appointment.status === 'CONFIRMED') && (
                       <Boton
-                        size="sm"
+                        size="md"
                         onClick={() => handleStartEncounter(appointment)}
                         disabled={startEncounterMutation.isPending}
                       >
@@ -1185,7 +1232,7 @@ export default function DoctorAppointments() {
                       <>
                         {user?.role === 'NURSE' && (
                           <Boton
-                            size="sm"
+                            size="md"
                             variant="outline"
                             onClick={() => handleOpenVitalsModal(appointment)}
                             className="dark:text-foreground dark:border-border dark:hover:bg-muted"
@@ -1195,7 +1242,7 @@ export default function DoctorAppointments() {
                         )}
                         {(user?.role === 'DOCTOR' ||
                           (user?.role === 'NURSE' && appointment.service?.category === 'NURSING')) && (
-                          <Boton size="sm" onClick={() => handleOpenFinishModal(appointment)}>
+                          <Boton size="md" onClick={() => handleOpenFinishModal(appointment)}>
                             <FileCheck2 className="h-4 w-4" />
                             Finalizar
                           </Boton>
@@ -1204,7 +1251,7 @@ export default function DoctorAppointments() {
                     )}
                     {appointment.status === 'COMPLETED' && (
                       <Boton
-                        size="sm"
+                        size="md"
                         variant="outline"
                         onClick={() => handleSendDocuments(appointment)}
                         isLoading={sendingDocumentsId === appointment.id}
@@ -1230,7 +1277,7 @@ export default function DoctorAppointments() {
               <div className="flex gap-2">
                 <Boton
                   variant="outline"
-                  size="sm"
+                  size="md"
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={!pagination.hasPrev}
                   className="min-h-[40px] flex-1 dark:text-foreground dark:border-border dark:hover:bg-muted sm:flex-none"
@@ -1239,7 +1286,7 @@ export default function DoctorAppointments() {
                 </Boton>
                 <Boton
                   variant="outline"
-                  size="sm"
+                  size="md"
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={!pagination.hasNext}
                   className="min-h-[40px] flex-1 dark:text-foreground dark:border-border dark:hover:bg-muted sm:flex-none"
@@ -1498,6 +1545,9 @@ export default function DoctorAppointments() {
                     setEmailRecordForm((prev) => ({ ...prev, patientEmail: event.target.value }))
                   }
                   placeholder="Correo del paciente"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
                 />
                 <Entrada
                   value={emailRecordForm.serviceName}
