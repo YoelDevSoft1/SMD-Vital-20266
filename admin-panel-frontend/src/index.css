@@ -193,7 +193,6 @@
 
   html, body, #root {
     min-height: 100%;
-    overscroll-behavior-y: none;
   }
 
   /* Login full-bleed dark backdrop */
@@ -202,12 +201,7 @@
     background-color: hsl(222 47% 6%);
   }
 
-  /* Prevent iOS auto-zoom on focus (font >= 16px) */
-  input, select, textarea {
-    font-size: 16px;
-  }
-
-  /* Safe area for PWA installed apps — bottom nav and headers */
+  /* iOS safe-area helpers — usar en headers/footers pegados al borde. */
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0);
   }

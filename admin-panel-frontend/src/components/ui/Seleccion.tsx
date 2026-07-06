@@ -26,7 +26,8 @@ interface SelectValueProps {
 
 export const Seleccion: React.FC<SelectProps> = ({ children, variant = 'glass', className, ...props }) => {
   const baseStyles = [
-    'w-full px-4 py-2.5 rounded-lg text-base md:text-sm',
+    'w-full px-4 py-2.5 rounded-lg text-base',
+    'min-h-[44px]',
     'focus:outline-none focus:ring-2 focus:ring-offset-1',
     'disabled:cursor-not-allowed',
     'transition-all duration-200',

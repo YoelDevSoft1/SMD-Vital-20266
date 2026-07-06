@@ -28,6 +28,8 @@ export interface PropiedadesAlerta {
   onDismiss?: () => void;
   /** Auto-dismiss after N ms. */
   autoHideMs?: number;
+  /** Fijar arriba de la pantalla con safe-area-inset-top. Útil para errores globales. */
+  sticky?: boolean;
   className?: string;
 }
 
@@ -54,6 +56,7 @@ export function Alerta({
   action,
   onDismiss,
   autoHideMs,
+  sticky = false,
   className,
 }: PropiedadesAlerta) {
   const [visible, setVisible] = useState(true);
@@ -80,6 +83,8 @@ export function Alerta({
         'flex items-start gap-3 rounded-lg p-3 ring-1',
         'text-sm',
         variantClasses[variant],
+        sticky &&
+          'sticky z-40 shadow-soft-md backdrop-blur-md pt-[max(0.75rem,env(safe-area-inset-top))]',
         className,
       )}
     >
