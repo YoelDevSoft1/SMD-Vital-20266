@@ -10,7 +10,7 @@ import { Etiqueta } from '@/components/ui/Etiqueta';
 import { Alerta } from '@/components/ui/Alerta';
 import { Insignia } from '@/components/ui/Insignia';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, ShieldCheck, Sparkles, Stethoscope, Users } from 'lucide-react';
+import { Eye, EyeOff, UserPlus, ShieldCheck, Sparkles, Stethoscope, Users } from 'lucide-react';
 
 interface ErroresFormulario {
   firstName?: string;
@@ -333,7 +333,7 @@ export default function Register() {
                   type="submit"
                   isLoading={registroMutacion.isPending}
                   leftIcon={
-                    !registroMutacion.isPending ? <ShieldCheck className="h-4 w-4" /> : undefined
+                    !registroMutacion.isPending ? <UserPlus className="h-4 w-4" /> : undefined
                   }
                   variant="success"
                   size="lg"

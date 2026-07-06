@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { formatearFechaHora, formatearFecha } from '@/utils/dateFormat';
 import { useQuery } from '@tanstack/react-query';
-import { AlertCircle, FileDown, RefreshCw } from 'lucide-react';
+import { AlertCircle, Calendar, FileDown, FileText, RefreshCw, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { clinicalService } from '@/services/clinical.service';
 import { Tarjeta, TarjetaContenido, TarjetaEncabezado, TarjetaTitulo } from '@/components/ui/Tarjeta';
 import { Boton } from '@/components/ui/Boton';
+import { EsqueletoLista } from '@/components/ui/Esqueleto';
+import { Alerta } from '@/components/ui/Alerta';
+import { EstadoVacio } from '@/components/ui/EstadoVacio';
 import type { PatientHistory as PatientHistoryType } from '@/types';
 
 export default function PatientHistory() {
@@ -56,30 +59,18 @@ export default function PatientHistory() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Mi historial</h1>
         </div>
-        <Tarjeta className="border border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-900/20">
-          <TarjetaContenido className="flex flex-col gap-4 p-6 text-sm">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-              <div>
-                <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">
-                  No se pudo cargar tu historial
-                </h2>
-                <p className="text-red-600 dark:text-red-400">
-                  Verifica tu conexion o intenta nuevamente.
-                </p>
-              </div>
-            </div>
-            <div>
-              <Boton
-                variant="outline"
-                onClick={() => refetch()}
-                className="dark:text-foreground dark:border-border dark:hover:bg-muted"
-              >
-                Reintentar
-              </Boton>
-            </div>
-          </TarjetaContenido>
-        </Tarjeta>
+        <Alerta
+          variant="danger"
+          title="No se pudo cargar tu historial"
+          icon={AlertCircle}
+          action={
+            <Boton variant="outline" onClick={() => refetch()}>
+              Reintentar
+            </Boton>
+          }
+        >
+          Verifica tu conexión o vuelve a intentarlo en unos segundos.
+        </Alerta>
       </div>
     );
   }
@@ -112,21 +103,21 @@ export default function PatientHistory() {
         </TarjetaEncabezado>
         <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
-              Cargando citas...
-            </div>
+            <EsqueletoLista rows={4} />
           ) : appointments.length === 0 ? (
-            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
-              No hay citas registradas.
-            </div>
+            <EstadoVacio
+              icon={Calendar}
+              title="No tienes citas registradas"
+              description="Cuando agendes tu primera cita, aparecerá aquí con todos los detalles."
+            />
           ) : (
-            <div className="divide-y divide-border dark:divide-border">
+            <ul className="divide-y divide-border dark:divide-border">
               {appointments.map((appointment) => (
-                <div
+                <li
                   key={appointment.id}
-                  className="flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 p-4 transition-colors hover:bg-muted/40 sm:flex-row sm:items-center sm:justify-between sm:p-6"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                       {appointment.service?.name || 'Servicio no definido'}
                     </h3>
@@ -138,9 +129,9 @@ export default function PatientHistory() {
                   <span className="text-xs text-muted-foreground dark:text-muted-foreground">
                     {appointment.status}
                   </span>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
         </TarjetaContenido>
       </Tarjeta>
@@ -153,23 +144,23 @@ export default function PatientHistory() {
         </TarjetaEncabezado>
         <TarjetaContenido className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
-              Cargando historias...
-            </div>
+            <EsqueletoLista rows={3} />
           ) : medicalRecords.length === 0 ? (
-            <div className="p-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
-              No hay historias medicas registradas.
-            </div>
+            <EstadoVacio
+              icon={FileText}
+              title="Aún no tienes historias clínicas"
+              description="Cuando un profesional genere tu primera historia clínica, aparecerá aquí."
+            />
           ) : (
-            <div className="divide-y divide-border dark:divide-border">
+            <ul className="divide-y divide-border dark:divide-border">
               {medicalRecords.map((record) => {
                 const canDownload = Boolean(record.pdfPath);
                 return (
-                  <div
+                  <li
                     key={record.id}
-                    className="flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-col gap-3 p-4 transition-colors hover:bg-muted/40 sm:flex-row sm:items-center sm:justify-between sm:p-6"
                   >
-                    <div>
+                    <div className="min-w-0">
                       <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
                         {record.title}
                       </h3>
@@ -180,7 +171,7 @@ export default function PatientHistory() {
                     </div>
                     <Boton
                       variant="outline"
-                      size="sm"
+                      size="md"
                       onClick={() =>
                         handleDownload('record', record.id, `historia-${record.id}.pdf`)
                       }
@@ -190,10 +181,10 @@ export default function PatientHistory() {
                       <FileDown className="h-4 w-4" />
                       {canDownload ? 'Descargar' : 'No disponible'}
                     </Boton>
-                  </div>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           )}
         </TarjetaContenido>
       </Tarjeta>
